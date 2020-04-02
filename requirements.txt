@@ -1,0 +1,14 @@
+# General purpose libraries
+matplotlib
+
+# PyTorch
+torch
+torchvision
+
+# Image
+opencv-python
+Pillow
+
+# Documentation generation
+Sphinx
+sphinx_rtd_theme
