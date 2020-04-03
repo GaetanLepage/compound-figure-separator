@@ -1,9 +1,7 @@
 # General purpose libraries
 matplotlib
 
-# PyTorch
-torch
-torchvision
+# Keras
 
 # Image
 opencv-python
