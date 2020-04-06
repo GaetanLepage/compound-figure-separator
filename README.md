@@ -1,6 +1,6 @@
 # panel-seg
 
-Implementation of a complete pipeline for compound figures segmentation
+Implementation of a complete pipeline for compound figures segmentation.\
 This code is heavily inspired from Zou & Al work ([paper](https://asistdl.onlinelibrary.wiley.com/doi/abs/10.1002/asi.24334) and [implementation](https://github.com/JieZou1/PanelSeg/tree/master/PanelSeg_Keras)).
 
 ## Objective
