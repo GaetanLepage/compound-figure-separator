@@ -57,7 +57,7 @@ LABEL_CLASS_MAPPING = {
 CLASS_LABEL_MAPPING = {v: k for k, v in LABEL_CLASS_MAPPING.items()}
 
 
-def map_label(c: str) -> str:
+def map_label(char: str) -> str:
     """
     Map the provided character to the right class.
 
@@ -68,33 +68,28 @@ def map_label(c: str) -> str:
         The class to which belongs the character.
     """
 
-    if c == 'c' or c == 'C':
-        return 'C'
-    elif c == 'k' or c == 'K':
-        return 'K'
-    elif c == 'o' or c == 'O':
-        return 'O'
-    elif c == 'p' or c == 'P':
-        return 'P'
-    elif c == 's' or c == 'S':
-        return 'S'
-    elif c == 'u' or c == 'U':
-        return 'U'
-    elif c == 'v' or c == 'V':
-        return 'V'
-    elif c == 'w' or c == 'W':
-        return 'W'
-    elif c == 'x' or c == 'X':
-        return 'X'
-    elif c == 'y' or c == 'Y':
-        return 'Y'
-    elif c == 'z' or c == 'Z':
-        return 'Z'
-    else:
-        return c
+    char_classes = [
+        ('c', 'C'),
+        ('k', 'K'),
+        ('o', 'O'),
+        ('p', 'P'),
+        ('s', 'S'),
+        ('u', 'U'),
+        ('v', 'V'),
+        ('w', 'W'),
+        ('x', 'X'),
+        ('y', 'Y'),
+        ('z', 'Z')]
 
+    # If the characetr is from a two characters class, return the upper-case one
+    for char_class in char_classes:
+        if char in char_class:
+            return char_class[1]
 
-def case_same_label(c):
+    # If the character is from a single character class, we return it
+    return char
+
+def case_same_label(char):
     """
     TODO
 
@@ -104,28 +99,20 @@ def case_same_label(c):
     Returns:
         TODO
     """
-    if c == 'c' or c == 'C':
+    # If the given character belongs to a "dual class", return True
+    if char in (
+            'c', 'C',
+            'k', 'K',
+            'o', 'O',
+            'p', 'P',
+            's', 'S',
+            'u', 'U',
+            'v', 'V',
+            'w', 'W',
+            'x', 'X',
+            'y', 'Y',
+            'z', 'Z'):
         return True
-    elif c == 'k' or c == 'K':
-        return True
-    elif c == 'o' or c == 'O':
-        return True
-    elif c == 'p' or c == 'P':
-        return True
-    elif c == 's' or c == 'S':
-        return True
-    elif c == 'u' or c == 'U':
-        return True
-    elif c == 'v' or c == 'V':
-        return True
-    elif c == 'w' or c == 'W':
-        return True
-    elif c == 'x' or c == 'X':
-        return True
-    elif c == 'y' or c == 'Y':
-        return True
-    elif c == 'z' or c == 'Z':
-        return True
-    else:
-        return False
 
+    # Else, return False
+    return False

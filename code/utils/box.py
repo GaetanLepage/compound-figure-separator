@@ -1,12 +1,13 @@
-from typing import List
-
 """
 Functions to deal with coordinates and areas of union, intersection of rectangles.
 """
 
+from typing import List
+
 def union(
         rectangle_1: List[float],
-        rectangle_2: List[float]):
+        rectangle_2: List[float]
+        ) -> List[float]:
     """
     Compute the coordinates of the smallest rectangle
     containing both rectangle_1 and rectangle_2.
@@ -19,17 +20,22 @@ def union(
         The union of rectangle_1 and rectangle_2 [x, y, x+w, y+h]
     """
 
-    x = min(rectangle_1[0], rectangle_2[0])
-    y = min(rectangle_1[1], rectangle_2[1])
-    w = max(rectangle_1[2], rectangle_2[2]) - x
-    h = max(rectangle_1[3], rectangle_2[3]) - y
+    x_union = min(rectangle_1[0], rectangle_2[0])
+    y_union = min(rectangle_1[1], rectangle_2[1])
+    width_union = max(rectangle_1[2], rectangle_2[2]) - x_union
+    height_union = max(rectangle_1[3], rectangle_2[3]) - y_union
 
-    return [x, y, x + w, y + h]
+    return [
+        x_union,
+        y_union,
+        x_union + width_union,
+        y_union + height_union]
 
 
 def intersection(
         rectangle_1: List[float],
-        rectangle_2: List[float]):
+        rectangle_2: List[float]
+        ) -> List[float]:
     """
     Compute the coordinates of the ractangles rectangle_1 and rectangle_2.
 
@@ -42,19 +48,26 @@ def intersection(
     """
 
     # rectangle_1 and rectangle_2 should be [x1,y1,x2,y2]
-    x = max(rectangle_1[0], rectangle_2[0])
-    y = max(rectangle_1[1], rectangle_2[1])
-    w = min(rectangle_1[2], rectangle_2[2]) - x
-    h = min(rectangle_1[3], rectangle_2[3]) - y
-    if w < 0 or h < 0:
+    x_intersect = max(rectangle_1[0], rectangle_2[0])
+    y_intersect = max(rectangle_1[1], rectangle_2[1])
+    width_intersect = min(rectangle_1[2], rectangle_2[2]) - x_intersect
+    height_intersect = min(rectangle_1[3], rectangle_2[3]) - y_intersect
+
+    if width_intersect < 0 or height_intersect < 0:
         return [0, 0, 0, 0]
-    return [x, y, x+w, y+h]
+
+    return [
+        x_intersect,
+        y_intersect,
+        x_intersect + width_intersect,
+        y_intersect + height_intersect]
 
 
 def union_area(
         rectangle_1: List[float],
         rectangle_2: List[float],
-        area_intersection: float):
+        area_intersection: float
+        ) -> float:
     """
     Compute the area of the union of the ractangles rectangle_1 and rectangle_2.
 
@@ -75,7 +88,8 @@ def union_area(
 
 def intersection_area(
         rectangle_1: List[float],
-        rectangle_2: List[float]):
+        rectangle_2: List[float]
+        ) -> float:
     """
     Compute the area of the ractangles rectangle_1 and rectangle_2.
 
@@ -87,18 +101,21 @@ def intersection_area(
         The area of the intersection of rectangle_1 and rectangle_2
     """
 
-    x = max(rectangle_1[0], rectangle_2[0])
-    y = max(rectangle_1[1], rectangle_2[1])
-    w = min(rectangle_1[2], rectangle_2[2]) - x
-    h = min(rectangle_1[3], rectangle_2[3]) - y
-    if w < 0 or h < 0:
+    x_intersect = max(rectangle_1[0], rectangle_2[0])
+    y_intersect = max(rectangle_1[1], rectangle_2[1])
+    width_intersect = min(rectangle_1[2], rectangle_2[2]) - x_intersect
+    height_intersect = min(rectangle_1[3], rectangle_2[3]) - y_intersect
+
+    if width_intersect < 0 or height_intersect < 0:
         return 0
-    return w * h
+
+    return width_intersect * height_intersect
 
 
 def iou(
         rectangle_1: List[float],
-        rectangle_2: List[float]):
+        rectangle_2: List[float]
+        ) -> float:
     """
     Compute the area of the ractangles rectangle_1 and rectangle_2.
 
@@ -120,5 +137,3 @@ def iou(
     area_u = union_area(rectangle_1, rectangle_2, area_i)
 
     return float(area_i) / float(area_u + 1e-6)
-
-

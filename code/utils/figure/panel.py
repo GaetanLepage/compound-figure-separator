@@ -1,3 +1,7 @@
+"""
+A class and an exception handling panels (part of a compound figure).
+"""
+
 from typing import List
 
 class Panel:
@@ -37,13 +41,3 @@ class PanelSegError(Exception):
     Attributes:
         message
     """
-
-    def __init__(self, message: str):
-        """
-        Constructor for the `PanelSegError` exception.
-
-        Args:
-            message: The message to display when the exception is raised.
-        """
-        self.message = message
-
