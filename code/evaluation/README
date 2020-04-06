@@ -1,0 +1,12 @@
+Compound Figure Separation - Evaluation Tool
+********************************************
+
+This program allows evaluating a compound figure separation XML run file against
+a given ground truth file. It was developed in the context of ImageCLEF, the
+cross-language image retrieval evaluation benchmark.
+
+To evaluate a file and get the results, use the following command:
+
+java -jar CFSEvaluation.jar <path_of_ground_truth_xml_file> <path_of_candidate_xml_file>
+
+In case of questions, please feel free to contact the author, Roger Schaer <roger.schaer at hevs.ch>
