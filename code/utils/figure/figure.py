@@ -1,10 +1,13 @@
-
 import os
 import logging
+import csv
 
 import xml.etree.ElementTree as ET
 
 from cv2 import cv2
+
+from figure import misc
+from panel import Panel
 
 """
 Class representing a figure.
@@ -46,7 +49,10 @@ class Figure:
 
         # BGR image, we need to convert it to RGB image
         self.image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        # Store the image size
         self.image_height, self.image_width = self.image.shape[:2]
+
 
     def load_annotation_iphotodraw(self, annotation_file_path: str):
         """
