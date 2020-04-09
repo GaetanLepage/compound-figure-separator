@@ -1,20 +1,10 @@
 """
-Deal with annotations from ImageCLEF xml files.
+Deal with annotations from iPhotoDraw xml annotation files.
 """
 
-def convert_annotations_iphotdraw_to_csv(
-        eval_list_csv: str,
-        output_csv_file: str = None):
-    """
-    Convert annotations from a xml file (ImageCLEF format) to a CSV annotations file
-
-    Args:
-        eval_list_csv: the path of the list of figures which annotations
-            have to be loaded
-        output_csv_file: the path where to store the newly created csv file
-    """
-    
-
+from .figure_generators import iphotodraw_xml_figure_generator
+from .figure_viewer import view_data_set
+from ..utils.figure.misc import export_figures_to_csv
 
 def extract_bbox_from_iphotodraw_node(item, image_width, image_height):
     """
@@ -22,12 +12,13 @@ def extract_bbox_from_iphotodraw_node(item, image_width, image_height):
     It also makes sure that the bounding box is within the image.
 
     Args:
-        item: TODO
-        image_width: TODO
-        image_height: TODO
+        item (Element item): Either a panel or label item extracted from
+                                an iPhotoDraw xml annotation file.
+        image_width (int):   The width of the image
+        image_height (int):  The height of the image
 
     Returns:
-        return: x_min, y_min, x_max, y_max
+        return (x_min, y_min, x_max, y_max): The coordinates of the bounding box
     """
     extent_item = item.find('./Data/Extent')
 
@@ -55,3 +46,50 @@ def extract_bbox_from_iphotodraw_node(item, image_width, image_height):
 
     return x_min, y_min, x_max, y_max
 
+
+def convert_annotations_iphotodraw_to_csv(
+        eval_list_csv: str = None,
+        image_directory_path: str = None,
+        output_csv_file: str = None):
+    """
+    Convert annotations from individual xml annotation files from iPhotoDraw
+        to a CSV annotations file.
+    The input files can be provided either from a csv list or from the path
+        to the directory where the image files are.
+
+    Args:
+        eval_list_csv:              The path of the list of figures which annotations
+                                        have to be loaded
+        image_directory_path (str): The path of the directory where the images are stored
+        output_csv_file (str):      The path where to store the newly created csv file
+    """
+
+    figure_generator = iphotodraw_xml_figure_generator(
+        eval_list_csv=eval_list_csv,
+        image_directory_path=image_directory_path
+        )
+
+    export_figures_to_csv(
+        figure_generator=figure_generator,
+        output_csv_file=output_csv_file)
+
+
+def show_iphotodraw_data_set(
+        eval_list_csv: str = None,
+        image_directory_path: str = None):
+    """
+    Preview all the figures from an iPhotoDraw data set.
+    The input files can be provided either from a csv list or from the path
+        to the directory where the image files are.
+
+    Args:
+        eval_list_csv:              The path of the list of figures which annotations
+                                        have to be loaded
+        image_directory_path (str): The path of the directory where the images are stored
+    """
+
+    figure_generator = iphotodraw_xml_figure_generator(
+        eval_list_csv=eval_list_csv,
+        image_directory_path=image_directory_path)
+
+    view_data_set(figure_generator=figure_generator)
