@@ -2,7 +2,7 @@
 Class representing a figure.
 """
 
-
+import sys
 import os
 import csv
 import logging
@@ -13,11 +13,9 @@ import xml.etree.ElementTree as ET
 
 from cv2 import cv2
 
-from panel import Panel
-from figure import misc
-from figure import box
-# import _figure_zou
-
+from .panel import Panel
+from . import misc
+from .. import box
 
 
 class Figure:
@@ -53,12 +51,21 @@ class Figure:
         Load the image using `self.image_path` and stores it
         in `self.image`.
         """
+        # print(os.path.abspath(os.getcwd()))
+        # print(self.image_path)
+        # print(os.path.isdir(os.path.dirname(self.image_path)))
+        # check if the image file exists
+        if not os.path.isfile(self.image_path):
+            raise FileNotFoundError(
+                "The following image file does not exist and thus"\
+                    " cannot be loaded:\n\t{}".format(self.image_path))
 
         # Open the file
         img = cv2.imread(self.image_path)
 
         # BGR image, we need to convert it to RGB image
-        self.image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # self.image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        self.image = img
 
         # Store the image size
         self.image_height, self.image_width = self.image.shape[:2]
@@ -145,7 +152,6 @@ class Figure:
                 csv_writer.writerow(csv_row)
 
 
-
     def load_annotation_from_iphotodraw(
             self,
             annotation_file_path: str):
@@ -156,6 +162,47 @@ class Figure:
         Args:
             annotation_file_path
         """
+
+        def extract_bbox_from_iphotodraw_node(item):
+            """
+            Extract bounding box information from Element item (ElementTree).
+            It also makes sure that the bounding box is within the image.
+
+            Args:
+                item (Element item): Either a panel or label item extracted from
+                                        an iPhotoDraw xml annotation file.
+                image_width (int):   The width of the image
+                image_height (int):  The height of the image
+
+            Returns:
+                return (x_min, y_min, x_max, y_max): The coordinates of the bounding box
+            """
+            extent_item = item.find('./Data/Extent')
+
+            # Get data from the xml item
+            height_string = extent_item.get('Height')
+            width_string = extent_item.get('Width')
+
+            x_string = extent_item.get('X')
+            y_string = extent_item.get('Y')
+
+            # Compute coordinates of the bounding box
+            x_min = round(float(x_string))
+            y_min = round(float(y_string))
+            x_max = x_min + round(float(width_string))
+            y_max = y_min + round(float(height_string))
+
+            if x_min < 0:
+                x_min = 0
+            if y_min < 0:
+                y_min = 0
+            if x_max > self.image_width:
+                x_max = self.image_width
+            if y_max > self.image_height:
+                y_max = self.image_height
+
+            return x_min, y_min, x_max, y_max
+
 
         def extract_panel_info() -> List[Panel]:
             """
@@ -198,10 +245,8 @@ class Figure:
                 else:
                     label_text = ''
 
-                x_min, y_min, x_max, y_max = misc.extract_bbox_from_iphotodraw_node(
-                    item=panel_item,
-                    image_width=self.image_width,
-                    image_height=self.image_height)
+                x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(
+                    item=panel_item)
 
                 if x_max <= x_min or y_max <= y_min:
                     logging.error(
@@ -249,10 +294,8 @@ class Figure:
                         annotation_file_path,
                         label_text)
 
-                x_min, y_min, x_max, y_max = misc.extract_bbox_from_iphotodraw_node(
-                    item=label_item,
-                    image_width=self.image_width,
-                    image_height=self.image_height)
+                x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(
+                    item=label_item)
 
                 if x_max <= x_min or y_max <= y_min:
                     logging.error(
@@ -458,7 +501,7 @@ class Figure:
             window_name = self.filename
 
         cv2.imshow(window_name, image_preview)
-        cv2.waitKey(0)
+        cv2.waitKey(delay)
         cv2.destroyAllWindows()
 
 

@@ -6,7 +6,7 @@ import math
 import csv
 
 from typing import List
-from panel import Panel
+from .panel import Panel
 
 
 def compute_panel_label_distances(panels, labels):
@@ -105,7 +105,7 @@ def export_figures_to_csv(
         individual_export=False,
         individual_export_csv_directory=None):
     """
-    TODO
+    TODO: might have to go in io/
 
     Args:
         figure_generator: a generator yielding figure objects
