@@ -7,16 +7,23 @@ import argparse
 
 sys.path.append(".")
 
+from panel_seg.utils.figure.misc import export_figures_to_csv
 from panel_seg.io.figure_generators import image_clef_xml_figure_generator
-from panel_seg.io.figure_viewer import view_data_set
 
 
 def parse_args(args):
     """
-    TODO
+    Parse the arguments from the command line.
+
+    Args:
+        args: The arguments from the command line call.
+
+    Returns:
+        Populated namespace
     """
     parser = argparse.ArgumentParser(
-        description='Preview all the figures from an ImageCLEF data set.')
+        description='Convert annotations from an ImageCLEF xml annotation file"\
+            " to a CSV annotations file.')
 
     parser.add_argument(
         '--annotation_xml',
@@ -29,6 +36,18 @@ def parse_args(args):
         help='The path to the directory whre the images are stored.',
         default='data/imageCLEF/test/FigureSeparationTest2016/',
         type=str)
+
+    parser.add_argument(
+        '--output_csv',
+        help='The path of the csv file to which annotations have to be exported.',
+        default='data/imageCLEF/test/test.csv',
+        type=str)
+
+    parser.add_argument(
+        '--individual_csv',
+        help='Also export the annotations to a single csv file.',
+        action='store_true')
+
 
     return parser.parse_args(args)
 
@@ -47,10 +66,11 @@ def main(args=None):
         xml_annotation_file_path=args.annotation_xml,
         image_directory_path=args.image_directory_path)
 
-    view_data_set(
+    export_figures_to_csv(
         figure_generator=figure_generator,
-        delay=100,
-        window_name="ImageCLEF data preview")
+        output_csv_file=args.output_csv,
+        individual_export=args.individual_csv,
+        individual_export_csv_directory=None)
 
 
 if __name__ == '__main__':

@@ -60,8 +60,8 @@ def image_clef_xml_figure_generator(
         figure = Figure(
             image_path=image_path)
 
+        # Load image file
         try:
-            # Load image file
             figure.load_image()
         except FileNotFoundError as exception:
             logging.error(exception)

@@ -7,7 +7,9 @@ import argparse
 
 sys.path.append(".")
 
-from panel_seg.io.iphotodraw_input import show_iphotodraw_data_set
+from panel_seg.io.figure_generators import iphotodraw_xml_figure_generator
+from panel_seg.io.figure_viewer import view_data_set
+
 
 def parse_args(args):
     """
@@ -41,9 +43,14 @@ def main(args=None):
         args = sys.argv[1:]
     args = parse_args(args)
 
-    show_iphotodraw_data_set(
+    figure_generator = iphotodraw_xml_figure_generator(
         eval_list_txt=args.eval_list_txt,
         image_directory_path=args.image_directory_path)
+
+    view_data_set(
+        figure_generator=figure_generator,
+        delay=100,
+        window_name="PanelSeg data preview")
 
 
 if __name__ == '__main__':
