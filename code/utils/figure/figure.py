@@ -39,8 +39,11 @@ class Figure:
             image_path: path to the image file
         """
         self.image_path = image_path
+        self.filename = os.path.basename(self.image_path)
+
         self.panels = None
         self.image = None
+        self.preview_image = None
         self.image_width = 0
         self.image_height = 0
 
@@ -63,7 +66,7 @@ class Figure:
 
     def load_annotation_from_csv(self, annotation_file_path: str):
         """
-        Load figure annotations from the given csv file.
+        Load figure annotations from the given (individual) csv file.
 
         Args:
             annotation_file_path
@@ -75,7 +78,7 @@ class Figure:
         with open(annotation_file_path, newline='') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', quotechar='|')
 
-            # Loop over each low (panel)
+            # Loop over each row (panel)
             for row in csv_reader:
                 panel_rect = [int(row[1]), int(row[2]), int(row[3]), int(row[4])]
 
@@ -90,7 +93,60 @@ class Figure:
         self.panels = panels
 
 
-    def get_annotation_from_iphotodraw(
+    def export_annotation_to_individual_csv(
+            self,
+            csv_export_dir: str = None):
+        """
+        TODO
+        """
+
+        # By default the csv is at the same location
+        if csv_export_dir is None:
+            csv_export_dir = os.path.dirname(self.image_path)
+
+        # check if directory exists
+        if not os.path.isdir(csv_export_dir):
+            logging.error(
+                "Export directory does not exist : %s",
+                csv_export_dir)
+
+        # Remove extension from original figure image file name
+        csv_export_file_name = os.path.splitext(
+            self.filename)[0] + '.csv'
+
+        csv_file_path = os.path.join(
+            csv_export_dir,
+            csv_export_file_name)
+
+        # check if file already exists
+        if os.path.isfile(csv_file_path):
+            logging.warning(
+                "The csv individual annotation file already exist :%s\n\t==> Skipping.",
+                csv_file_path)
+            return
+
+        with open(csv_file_path, 'w', newline='') as csvfile:
+
+            csv_writer = csv.writer(csvfile, delimiter=',')
+
+            # Looping over Panel objects
+            for panel in self.panels:
+
+                csv_row = [
+                    self.image_path,
+                    panel.panel_rect[0],
+                    panel.panel_rect[1],
+                    panel.panel_rect[2],
+                    panel.panel_rect[3],
+                    'panel'
+                    ]
+
+                # Writting to csv file
+                csv_writer.writerow(csv_row)
+
+
+
+    def load_annotation_from_iphotodraw(
             self,
             annotation_file_path: str):
         """
@@ -319,10 +375,21 @@ class Figure:
             panels=panels,
             labels=labels)
 
-    def save_preview(self, folder):
+
+    def get_preview(self, force=False):
         """
-        Save the annotation preview at folder.
+        TODO
+
+        Args:
+            force: if True, forces the preview image to be recomputed even if
+                the corresponding attribute was not empty.
+
+        Returns:
+            preview_img: the preview image
         """
+        if self.preview_image is not None and not force:
+            return self.preview_image
+
         shape_colors = [
             (255, 0, 0),
             (0, 255, 0),
@@ -331,9 +398,10 @@ class Figure:
             (255, 0, 255),
             (0, 255, 255),
         ]
-        _, file = os.path.split(self.image_path)
 
-        export_path = os.path.join(folder, file)
+        if self.image is None:
+            self.load_image()
+
         preview_img = self.image.copy()
 
         # Drowing rectangles
@@ -341,6 +409,8 @@ class Figure:
 
             # Select color
             color = shape_colors[panel_index % len(shape_colors)]
+
+            # Draw panel box
             cv2.rectangle(
                 img=preview_img,
                 pt1=(panel.panel_rect[0], panel.panel_rect[1]),
@@ -349,12 +419,15 @@ class Figure:
                 thickness=3)
 
             if panel.label_rect is not None:
+                # Draw label box
                 cv2.rectangle(
                     img=preview_img,
                     pt1=(panel.label_rect[0], panel.label_rect[1]),
                     pt2=(panel.label_rect[2], panel.label_rect[3]),
                     color=color,
                     thickness=2)
+
+                # Draw label text
                 cv2.putText(
                     img=preview_img,
                     text=panel.label,
@@ -363,4 +436,44 @@ class Figure:
                     fontScale=1,
                     color=color)
 
+        # Store the computed image
+        self.preview_image = preview_img
+
+        return preview_img
+
+
+    def show_preview(self, delay=0, window_name=None):
+        """
+        TODO
+
+        Args:
+            delay: the number of seconds after which the window is closed
+                if 0, the delay is disabled.
+            window_name: TODO
+        """
+
+        image_preview = self.get_preview()
+
+        if window_name is None:
+            window_name = self.filename
+
+        cv2.imshow(window_name, image_preview)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+
+    def save_preview(self, folder):
+        """
+        Save the annotation preview at folder.
+        """
+        preview_img = self.get_preview()
+
+
+        # Remove extension from original figure image file name
+        file_name = os.path.splitext(
+            self.filename)[0]
+
+        export_path = os.path.join(folder, file_name + "_preview.jpg")
+
+        # Write the preview image file to destination
         cv2.imwrite(export_path, preview_img)

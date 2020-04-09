@@ -16,9 +16,9 @@ class Panel:
 
     def __init__(
             self,
-            label: str,
             panel_rect: List[float],
-            label_rect: List[float]):
+            label: str = None,
+            label_rect: List[float] = None):
         """
         Init for a `Panel` object
 

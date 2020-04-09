@@ -3,6 +3,7 @@ Miscellaneous functions for figures.
 """
 
 import math
+import csv
 
 from typing import List
 from panel import Panel
@@ -98,17 +99,42 @@ def assign_labels_to_panels(
         panel.label_rect = labels[best_path[panel_index]].label_rect
 
 
-def read_sample_list(list_path: List[str]):
+def export_figures_to_csv(
+        figure_generator,
+        output_csv_file: str,
+        individual_export=False,
+        individual_export_csv_directory=None):
     """
     TODO
 
-    Parameters :
-        * list_path (TODO): TODO
-
-    Returns :
-        * TODO (TODO): TODO
+    Args:
+        figure_generator: a generator yielding figure objects
+        output_csv_file: the path of the csv file containing the annotations
+        individual_csv: if True, also export the annotation to a single csv file
+        TODO
     """
-    # TODO
-    # with tf.gfile.GFile(list_path) as fid:
-        # lines = fid.readlines()
-    # return [line.strip().split(' ')[0] for line in lines]
+
+    with open(output_csv_file, 'w', newline='') as csvfile:
+
+        csv_writer = csv.writer(csvfile, delimiter=',')
+
+        # Looping over Figure objects thanks to generator
+        for figure in figure_generator:
+
+            # Looping over Panel objects
+            for panel in figure.panels:
+
+                csv_row = [
+                    figure.image_path,
+                    panel.panel_rect[0],
+                    panel.panel_rect[1],
+                    panel.panel_rect[2],
+                    panel.panel_rect[3],
+                    'panel'
+                    ]
+
+                csv_writer.writerow(csv_row)
+
+                if individual_export:
+                    figure.export_annotation_to_individual_csv(
+                        csv_export_dir=individual_export_csv_directory)
