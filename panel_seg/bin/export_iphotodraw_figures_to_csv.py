@@ -8,7 +8,7 @@ import argparse
 sys.path.append(".")
 
 from panel_seg.utils.figure.misc import export_figures_to_csv
-from panel_seg.io.figure_generators import image_clef_xml_figure_generator
+from panel_seg.io.figure_generators import iphotodraw_xml_figure_generator
 
 
 def parse_args(args):
@@ -22,19 +22,19 @@ def parse_args(args):
         Populated namespace
     """
     parser = argparse.ArgumentParser(
-        description='Convert annotations from an ImageCLEF xml annotation file."\
+        description='Convert annotations from individual iPhotoDraw xml annotation files."\
             " to a CSV annotations file.')
 
     parser.add_argument(
-        '--annotation_xml',
-        help='The path to the xml annotation file.',
-        default='data/imageCLEF/test/FigureSeparationTest2016GT.xml',
+        '--eval_list_txt',
+        help='The path to the txt file listing the images.',
+        default='data/zou/eval.txt',
         type=str)
 
     parser.add_argument(
         '--image_directory_path',
         help='The path to the directory whre the images are stored.',
-        default='data/imageCLEF/test/FigureSeparationTest2016/',
+        default=None,
         type=str)
 
     parser.add_argument(
@@ -67,8 +67,8 @@ def main(args=None):
         args = sys.argv[1:]
     args = parse_args(args)
 
-    figure_generator = image_clef_xml_figure_generator(
-        xml_annotation_file_path=args.annotation_xml,
+    figure_generator = iphotodraw_xml_figure_generator(
+        eval_list_txt=args.eval_list_txt,
         image_directory_path=args.image_directory_path)
 
     export_figures_to_csv(

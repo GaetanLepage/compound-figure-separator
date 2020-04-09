@@ -108,10 +108,11 @@ def export_figures_to_csv(
     TODO: might have to go in io/
 
     Args:
-        figure_generator: a generator yielding figure objects
-        output_csv_file: the path of the csv file containing the annotations
-        individual_csv: if True, also export the annotation to a single csv file
-        TODO
+        figure_generator:                A generator yielding figure objects
+        output_csv_file:                 The path of the csv file containing the annotations
+        individual_csv:                  If True, also export the annotation to a single csv file
+        individual_export_csv_directory: The path of the directory whete to store the individual
+                                            csv annotation files."
     """
 
     with open(output_csv_file, 'w', newline='') as csvfile:

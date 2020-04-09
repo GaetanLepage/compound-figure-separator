@@ -490,7 +490,7 @@ class Figure:
         TODO
 
         Args:
-            delay: the number of seconds after which the window is closed
+            delay:       The number of seconds after which the window is closed
                 if 0, the delay is disabled.
             window_name: TODO
         """
