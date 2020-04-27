@@ -10,6 +10,8 @@ Welcome to panel-seg's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+.. include::
+   modules.rst
 
 
 Indices and tables
@@ -18,3 +20,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
