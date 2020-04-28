@@ -40,6 +40,12 @@ def export_figures_to_csv(figure_generator,
                     'panel'
                     ]
 
+                if panel.label is not None and panel.label_rect is not None:
+                    csv_row.append(panel.label_rect[0])
+                    csv_row.append(panel.label_rect[1])
+                    csv_row.append(panel.label_rect[2])
+                    csv_row.append(panel.label_rect[3])
+                    csv_row.append(panel.label)
                 csv_writer.writerow(csv_row)
 
                 if individual_export:

@@ -1,5 +1,5 @@
 """
-Miscellaneous functions for figures.
+Beam search algorithm for mapping panels and labels.
 """
 
 import math

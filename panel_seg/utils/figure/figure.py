@@ -41,15 +41,21 @@ class Figure:
         Args:
             image_path: path to the image file
         """
+        # Image information
         self.image_path = image_path
         self.image_filename = os.path.basename(self.image_path)
         self.image_format = os.path.splitext(self.image_filename)[-1]
 
-        self.panels = None
         self.image = None
-        self.preview_image = None
         self.image_width = 0
         self.image_height = 0
+
+        # Ground truth panel annotations
+        self.gt_panels = None
+
+        # Predicted panels
+        self.pred_panels = None
+
 
 
     def load_image(self):
@@ -76,85 +82,72 @@ class Figure:
         # Store the image size
         self.image_height, self.image_width = self.image.shape[:2]
 
+#########################
+# IMPORT GT ANNOTATIONS #
+#########################
 
-    def load_annotation_from_csv(self, annotation_file_path: str):
+    def load_annotation_from_csv(self,
+                                 predicted_annotations_folder: str,
+                                 is_ground_truth=True):
         """
         Load figure annotations from the given (individual) csv file.
 
         Args:
-            annotation_file_path
+            predicted_annotations_folder: TODO
+            is_ground_truth: TODO
         """
+
+        base_name = os.path.splitext(self.image_filename)[0]
+
+        annotation_csv = os.path.join(predicted_annotations_folder, base_name)
+
+        if not os.path.isfile(annotation_csv):
+            raise FileNotFoundError("The prediction annotation csv file does not exist :"\
+                "\n\tShould be {}".format(annotation_csv))
+
         # Create empty list of panels
         panels = []
 
         # Open the csv file containing annotations
-        with open(annotation_file_path, newline='') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',', quotechar='|')
+        with open(annotation_csv, 'r') as annotation_csv_file:
+            csv_reader = csv.reader(annotation_csv_file, delimiter=',')
 
             # Loop over each row (panel)
             for row in csv_reader:
-                panel_rect = [int(row[1]), int(row[2]), int(row[3]), int(row[4])]
 
-                # create panel object
-                panel = Panel(
-                    label='',
-                    panel_rect=panel_rect,
-                    label_rect=None)
+                # Panel segmentation + panel splitting
+                if len(row) == 11:
+                    label_coordinates = [int(x) for x in row[6:10]]
+                    label = row[10]
+                # Panel splitting only
+                elif len(row) == 6:
+                    label_coordinates = None
+                    label = None
+                else:
+                    raise ValueError("Row should be of length 6 or 11")
+
+                image_path = row[0]
+                panel_coordinates = [int(x) for x in row[1:5]]
+                panel_class = row[5]
+                assert panel_class == 'panel'
+
+                assert image_path == self.image_path, "Wrong image path in csv:"\
+                    "\n\timage file name : {}"\
+                    "\n\timage in csv row : {}".format(self.image_path,
+                                                       image_path)
+
+                # Instanciate Panel object
+                panel = Panel(panel_rect=panel_coordinates,
+                              label_rect=label_coordinates,
+                              label=label)
 
                 panels.append(panel)
 
-        self.panels = panels
+        if is_ground_truth:
+            self.gt_panels = panels
+        else:
+            self.pred_panels = panels
 
-
-    def export_annotation_to_individual_csv(self,
-                                            csv_export_dir: str = None):
-        """
-        TODO
-        """
-
-        # By default the csv is at the same location
-        if csv_export_dir is None:
-            csv_export_dir = os.path.dirname(self.image_path)
-
-        # check if directory exists
-        if not os.path.isdir(csv_export_dir):
-            logging.error(
-                "Export directory does not exist : %s",
-                csv_export_dir)
-
-        # Remove extension from original figure image file name
-        csv_export_file_name = os.path.splitext(
-            self.image_filename)[0] + '.csv'
-
-        csv_file_path = os.path.join(
-            csv_export_dir,
-            csv_export_file_name)
-
-        # check if file already exists
-        if os.path.isfile(csv_file_path):
-            logging.warning(
-                "The csv individual annotation file already exist :%s\n\t==> Skipping.",
-                csv_file_path)
-            return
-
-        with open(csv_file_path, 'w', newline='') as csvfile:
-
-            csv_writer = csv.writer(csvfile, delimiter=',')
-
-            # Looping over Panel objects
-            for panel in self.panels:
-
-                csv_row = [
-                    self.image_path,
-                    panel.panel_rect[0],
-                    panel.panel_rect[1],
-                    panel.panel_rect[2],
-                    panel.panel_rect[3],
-                    'panel'
-                    ]
-
-                # Writting to csv file
-                csv_writer.writerow(csv_row)
 
 
     def load_annotation_from_iphotodraw(self,
@@ -414,25 +407,65 @@ class Figure:
         #   information of their matching label
         # Save this list of panels in tha appropriate attribute of
         #   the figure object
-        self.panels = match_panels_with_labels(panels=panels,
-                                               labels=labels)
+        self.gt_panels = match_panels_with_labels(panels=panels,
+                                                  labels=labels)
 
 
-    def get_preview(self, force=False):
+
+##############
+# EVALUATION #
+##############
+
+
+def map_gt_and_predictions(self, overlap_threshold=0.66):
+    """
+    TODO
+    """
+    num_correct = 0
+    picked_pred_panels_indices = [False for _ in range(len(self.pred_panels))]
+    for gt_panel_index, gt_panel in enumerate(self.gt_panels):
+        max_overlap = -1
+        max_auto_index = -1
+        for pred_panel_index, pred_panel in enumerate(self.pred_panels):
+            if picked_pred_panels_indices[pred_panel_index]:
+                continue
+            intersection_area = box.intersection_area(gt_panel.panel_rect, pred_panel.panel_rect)
+            if intersection_area == 0:
+                continue
+            pred_panel_area = box.area(pred_panel.panel_rect)
+            overlap = intersection_area / pred_panel_area
+            if overlap > max_overlap:
+                max_overlap = overlap
+                max_auto_index = pred_panel_index
+
+        if max_overlap > overlap_threshold:
+            num_correct += 1
+            picked_pred_panels_indices[max_auto_index] = True
+
+    return num_correct
+
+
+
+
+##################
+# PREVIEW FIGURE #
+##################
+
+    def get_preview(self, mode='gt'):
         """
         Generate an image preview for the figure.
         It consists in drawing the panels (and labels, if applicable) bounding boxes
         on top of the image.
 
         Args:
-            force: if True, forces the preview image to be recomputed even if
-                the corresponding attribute was not empty.
+            mode: Select which information to display:
+                    * 'gt': only the ground truth
+                    * 'pred': only the predictions
+                    * 'both': both predicted and ground truth annotations.
 
         Returns:
             preview_img: the preview image
         """
-        if self.preview_image is not None and not force:
-            return self.preview_image
 
         shape_colors = [
             (255, 0, 0),
@@ -448,8 +481,18 @@ class Figure:
 
         preview_img = self.image.copy()
 
-        # Drowing rectangles
-        for panel_index, panel in enumerate(self.panels):
+        if mode == 'gt':
+            panels = self.gt_panels
+        elif mode == 'pred':
+            panels = self.pred_panels
+        elif mode == 'both':
+            # TODO implement this mode
+            raise NotImplementedError
+        else:
+            raise ValueError("mode should be either 'gt', 'pred', or 'both'.")
+
+        # Drawing rectangles
+        for panel_index, panel in enumerate(panels):
 
             # Select color
             color = shape_colors[panel_index % len(shape_colors)]
@@ -483,17 +526,21 @@ class Figure:
         return preview_img
 
 
-    def show_preview(self, delay=0, window_name=None):
+    def show_preview(self, mode='gt', delay=0, window_name=None):
         """
-        TODO
+        Display a preview of the image along with the panels and labels drawn on top.
 
         Args:
+            mode: Select which information to display:
+                    * 'gt': only the ground truth
+                    * 'pred': only the predictions
+                    * 'both': both predicted and ground truth annotations.
             delay:       The number of seconds after which the window is closed
                 if 0, the delay is disabled.
             window_name: Name of the image display window.
         """
 
-        image_preview = self.get_preview()
+        image_preview = self.get_preview(mode)
 
         if window_name is None:
             window_name = self.image_filename
@@ -503,11 +550,18 @@ class Figure:
         cv2.destroyAllWindows()
 
 
-    def save_preview(self, folder):
+    def save_preview(self, folder, mode='gt'):
         """
         Save the annotation preview at folder.
+
+        Args:
+            folder: TODO
+            mode: Select which information to display:
+                    * 'gt': only the ground truth
+                    * 'pred': only the predictions
+                    * 'both': both predicted and ground truth annotations.
         """
-        preview_img = self.get_preview()
+        preview_img = self.get_preview(mode)
 
 
         # Remove extension from original figure image file name
@@ -519,6 +573,71 @@ class Figure:
         # Write the preview image file to destination
         cv2.imwrite(export_path, preview_img)
 
+
+#################
+# EXPORT FIGURE #
+#################
+
+
+    def export_gt_annotation_to_individual_csv(self,
+                                               csv_export_dir: str = None):
+        """
+        Export the ground truth annotation of the figure to an individual csv file.
+
+        Args:
+            csv_export_dir: path to the directory where to export the csv file.
+        """
+
+        # By default the csv is at the same location
+        if csv_export_dir is None:
+            csv_export_dir = os.path.dirname(self.image_path)
+
+        # check if directory exists
+        if not os.path.isdir(csv_export_dir):
+            logging.error(
+                "Export directory does not exist : %s",
+                csv_export_dir)
+
+        # Remove extension from original figure image file name
+        csv_export_file_name = os.path.splitext(
+            self.image_filename)[0] + '.csv'
+
+        csv_file_path = os.path.join(
+            csv_export_dir,
+            csv_export_file_name)
+
+        # check if file already exists
+        if os.path.isfile(csv_file_path):
+            logging.warning(
+                "The csv individual annotation file already exist :%s\n\t==> Skipping.",
+                csv_file_path)
+            return
+
+        with open(csv_file_path, 'w', newline='') as csvfile:
+
+            csv_writer = csv.writer(csvfile, delimiter=',')
+
+            # Looping over Panel objects
+            for panel in self.gt_panels:
+
+                csv_row = [
+                    self.image_path,
+                    panel.panel_rect[0],
+                    panel.panel_rect[1],
+                    panel.panel_rect[2],
+                    panel.panel_rect[3],
+                    'panel'
+                    ]
+
+                if panel.label is not None and panel.label_rect is not None:
+                    csv_row.append(panel.label_rect[0])
+                    csv_row.append(panel.label_rect[1])
+                    csv_row.append(panel.label_rect[2])
+                    csv_row.append(panel.label_rect[3])
+                    csv_row.append(panel.label)
+
+                # Writting to csv file
+                csv_writer.writerow(csv_row)
 
     def convert_to_tf_example(self):
         """
@@ -549,7 +668,7 @@ class Figure:
         ymax = []
         classes = []
         classes_text = []
-        for panel in self.panels:
+        for panel in self.gt_panels:
             # Bounding box
             xmin.append(float(panel.panel_rect[0]) / self.image_width)
             ymin.append(float(panel.panel_rect[1]) / self.image_height)
