@@ -18,17 +18,15 @@ def parse_args(args):
     parser = argparse.ArgumentParser(
         description='Preview all the figures from an ImageCLEF data set.')
 
-    parser.add_argument(
-        '--annotation_xml',
-        help='The path to the xml annotation file.',
-        default='data/imageCLEF/test/FigureSeparationTest2016GT.xml',
-        type=str)
+    parser.add_argument('--annotation_xml',
+                        help='The path to the xml annotation file.',
+                        default='data/imageCLEF/test/FigureSeparationTest2016GT.xml',
+                        type=str)
 
-    parser.add_argument(
-        '--image_directory_path',
-        help='The path to the directory whre the images are stored.',
-        default='data/imageCLEF/test/FigureSeparationTest2016/',
-        type=str)
+    parser.add_argument('--image_directory_path',
+                        help='The path to the directory whre the images are stored.',
+                        default='data/imageCLEF/test/FigureSeparationTest2016/',
+                        type=str)
 
     return parser.parse_args(args)
 

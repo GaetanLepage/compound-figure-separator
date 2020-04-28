@@ -20,10 +20,8 @@ DATA_DIR = os.path.join(
     "data/")
 
 
-def image_clef_xml_figure_generator(
-        xml_annotation_file_path: str,
-        image_directory_path: str,
-    ):
+def image_clef_xml_figure_generator(xml_annotation_file_path: str,
+                                    image_directory_path: str):
     """
     Generator of Figure objects from ImageCLEF data set.
 
@@ -57,8 +55,7 @@ def image_clef_xml_figure_generator(
             image_path))
 
         # Create Figure object
-        figure = Figure(
-            image_path=image_path)
+        figure = Figure(image_path=image_path)
 
         # Load image file
         try:
@@ -122,11 +119,8 @@ def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
 
         image_paths = [
             os.path.abspath(line) if os.path.isfile(line)
-            else os.path.abspath(
-                os.path.join(
-                    DATA_DIR,
-                    line)
-                )
+            else os.path.abspath(os.path.join(DATA_DIR,
+                                              line))
             for line in eval_list_lines
                 ]
 
@@ -148,10 +142,9 @@ def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
 
     # Looping over the list of image paths
     for image_index, image_path in enumerate(image_paths):
-        print('Processing Image {}/{} : {}'.format(
-            image_index + 1,
-            num_images,
-            image_path))
+        print('Processing Image {}/{} : {}'.format(image_index + 1,
+                                                   num_images,
+                                                   image_path))
 
         # Create figure object
         figure = Figure(image_path=image_path)

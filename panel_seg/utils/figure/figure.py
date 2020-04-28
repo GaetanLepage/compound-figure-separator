@@ -18,7 +18,7 @@ import tensorflow as tf
 from cv2 import cv2
 
 from .panel import Panel
-from . import misc
+from . import beam_search
 from .. import box
 from .. import dataset_util
 
@@ -42,8 +42,8 @@ class Figure:
             image_path: path to the image file
         """
         self.image_path = image_path
-        self.filename = os.path.basename(self.image_path)
-        self.image_format = os.path.splitext(self.filename)[-1]
+        self.image_filename = os.path.basename(self.image_path)
+        self.image_format = os.path.splitext(self.image_filename)[-1]
 
         self.panels = None
         self.image = None
@@ -106,9 +106,8 @@ class Figure:
         self.panels = panels
 
 
-    def export_annotation_to_individual_csv(
-            self,
-            csv_export_dir: str = None):
+    def export_annotation_to_individual_csv(self,
+                                            csv_export_dir: str = None):
         """
         TODO
         """
@@ -125,7 +124,7 @@ class Figure:
 
         # Remove extension from original figure image file name
         csv_export_file_name = os.path.splitext(
-            self.filename)[0] + '.csv'
+            self.image_filename)[0] + '.csv'
 
         csv_file_path = os.path.join(
             csv_export_dir,
@@ -369,16 +368,14 @@ class Figure:
                 # TODO why do we use Beam search here ? We are supposed to
                 #   be dealing with ground truth
                 # Beam search algorithm to map labels to panels
-                misc.assign_labels_to_panels(
-                    panels=panel_dict[label_char],
-                    labels=label_dict[label_char])
+                beam_search.assign_labels_to_panels(panels=panel_dict[label_char],
+                                                    labels=label_dict[label_char])
 
             # expand the panel_rect to always include label_rect
             for panel in panels:
                 if panel.label_rect is not None:
-                    panel.panel_rect = box.union(
-                        rectangle_1=panel.label_rect,
-                        rectangle_2=panel.panel_rect)
+                    panel.panel_rect = box.union(rectangle_1=panel.label_rect,
+                                                 rectangle_2=panel.panel_rect)
 
             return panels
 
@@ -417,14 +414,15 @@ class Figure:
         #   information of their matching label
         # Save this list of panels in tha appropriate attribute of
         #   the figure object
-        self.panels = match_panels_with_labels(
-            panels=panels,
-            labels=labels)
+        self.panels = match_panels_with_labels(panels=panels,
+                                               labels=labels)
 
 
     def get_preview(self, force=False):
         """
-        TODO
+        Generate an image preview for the figure.
+        It consists in drawing the panels (and labels, if applicable) bounding boxes
+        on top of the image.
 
         Args:
             force: if True, forces the preview image to be recomputed even if
@@ -457,30 +455,27 @@ class Figure:
             color = shape_colors[panel_index % len(shape_colors)]
 
             # Draw panel box
-            cv2.rectangle(
-                img=preview_img,
-                pt1=(panel.panel_rect[0], panel.panel_rect[1]),
-                pt2=(panel.panel_rect[2], panel.panel_rect[3]),
-                color=color,
-                thickness=3)
+            cv2.rectangle(img=preview_img,
+                          pt1=(panel.panel_rect[0], panel.panel_rect[1]),
+                          pt2=(panel.panel_rect[2], panel.panel_rect[3]),
+                          color=color,
+                          thickness=3)
 
             if panel.label_rect is not None:
                 # Draw label box
-                cv2.rectangle(
-                    img=preview_img,
-                    pt1=(panel.label_rect[0], panel.label_rect[1]),
-                    pt2=(panel.label_rect[2], panel.label_rect[3]),
-                    color=color,
-                    thickness=2)
+                cv2.rectangle(img=preview_img,
+                              pt1=(panel.label_rect[0], panel.label_rect[1]),
+                              pt2=(panel.label_rect[2], panel.label_rect[3]),
+                              color=color,
+                              thickness=2)
 
                 # Draw label text
-                cv2.putText(
-                    img=preview_img,
-                    text=panel.label,
-                    org=(panel.label_rect[2] + 10, panel.label_rect[3]),
-                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                    fontScale=1,
-                    color=color)
+                cv2.putText(img=preview_img,
+                            text=panel.label,
+                            org=(panel.label_rect[2] + 10, panel.label_rect[3]),
+                            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                            fontScale=1,
+                            color=color)
 
         # Store the computed image
         self.preview_image = preview_img
@@ -495,13 +490,13 @@ class Figure:
         Args:
             delay:       The number of seconds after which the window is closed
                 if 0, the delay is disabled.
-            window_name: TODO
+            window_name: Name of the image display window.
         """
 
         image_preview = self.get_preview()
 
         if window_name is None:
-            window_name = self.filename
+            window_name = self.image_filename
 
         cv2.imshow(window_name, image_preview)
         cv2.waitKey(delay)
@@ -517,7 +512,7 @@ class Figure:
 
         # Remove extension from original figure image file name
         file_name = os.path.splitext(
-            self.filename)[0]
+            self.image_filename)[0]
 
         export_path = os.path.join(folder, file_name + "_preview.jpg")
 
@@ -527,11 +522,15 @@ class Figure:
 
     def convert_to_tf_example(self):
         """
-        TODO
+        Convert the figure to a TensorFlow example which is compatible with the TensorFlow
+        Object Detection API.
+
+        Returns:
+            example: The corresponding tf example.
         """
 
         # Load image
-        with tf.gfile.GFile(self.image_path, 'rb') as fid:
+        with tf.io.gfile.GFile(self.image_path, 'rb') as fid:
             encoded_jpg = fid.read()
 
         encoded_jpg_io = io.BytesIO(encoded_jpg)
@@ -568,9 +567,9 @@ class Figure:
             'image/encoded':
                 dataset_util.bytes_feature(encoded_jpg),
             'image/source_id':
-                dataset_util.bytes_feature(self.filename.encode('utf8')),
+                dataset_util.bytes_feature(self.image_filename.encode('utf8')),
             'image/filename':
-                dataset_util.bytes_feature(self.filename.encode('utf8')),
+                dataset_util.bytes_feature(self.image_filename.encode('utf8')),
             'image/height':
                 dataset_util.int64_feature(self.image_height),
             'image/width':

@@ -3,10 +3,8 @@ Miscellaneous functions for figures.
 """
 
 import math
-import csv
-import tensorflow as tf
-
 from typing import List
+
 from .panel import Panel
 
 
@@ -45,10 +43,9 @@ def compute_panel_label_distances(panels, labels):
     return distances
 
 
-def assign_labels_to_panels(
-        panels: List[Panel],
-        labels: List[str],
-        beam_length: int = 100):
+def assign_labels_to_panels(panels: List[Panel],
+                            labels: List[str],
+                            beam_length: int = 100):
     """
     Use beam search to assign labels to panels according to the overall distance
     Assign labels.label_rect to panels.label_rect
@@ -62,7 +59,9 @@ def assign_labels_to_panels(
     distances = compute_panel_label_distances(panels, labels)
 
     # Beam search
-    all_item_pairs = []  # in the format (overall_distance, label_indexes)
+
+    # in the format (overall_distance, label_indexes)
+    all_item_pairs = []
     for panel_i, panel in enumerate(panels):
         item_pairs = []
         if panel_i == 0:
@@ -98,59 +97,3 @@ def assign_labels_to_panels(
     best_path = all_item_pairs[-1][0][1]
     for panel_index, panel in enumerate(panels):
         panel.label_rect = labels[best_path[panel_index]].label_rect
-
-
-def export_figures_to_csv(figure_generator,
-                          output_csv_file: str,
-                          individual_export=False,
-                          individual_export_csv_directory=None):
-    """
-    TODO: might have to go in io/
-
-    Args:
-        figure_generator:                A generator yielding figure objects
-        output_csv_file:                 The path of the csv file containing the annotations
-        individual_csv:                  If True, also export the annotation to a single csv file
-        individual_export_csv_directory: The path of the directory whete to store the individual
-                                            csv annotation files."
-    """
-
-    with open(output_csv_file, 'w', newline='') as csvfile:
-
-        csv_writer = csv.writer(csvfile, delimiter=',')
-
-        # Looping over Figure objects thanks to generator
-        for figure in figure_generator:
-
-            # Looping over Panel objects
-            for panel in figure.panels:
-
-                csv_row = [
-                    figure.image_path,
-                    panel.panel_rect[0],
-                    panel.panel_rect[1],
-                    panel.panel_rect[2],
-                    panel.panel_rect[3],
-                    'panel'
-                    ]
-
-                csv_writer.writerow(csv_row)
-
-                if individual_export:
-                    figure.export_annotation_to_individual_csv(
-                        csv_export_dir=individual_export_csv_directory)
-
-
-def export_figures_to_tf_record(figure_generator,
-                                tf_record_filename):
-    """
-    TODO
-    """
-
-    with tf.io.TFRecordWriter(tf_record_filename) as writer:
-
-        for figure in figure_generator:
-
-            tf_example = figure.convert_to_tf_example()
-
-            writer.write(tf_example.SerializeToString())
