@@ -5,7 +5,7 @@ TODO
 import sys
 import argparse
 
-sys.path.append(".")
+sys.path.append('.')
 
 from panel_seg.io.figure_generators import image_clef_xml_figure_generator
 from panel_seg.io.figure_viewer import view_data_set

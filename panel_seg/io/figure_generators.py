@@ -93,17 +93,16 @@ def image_clef_xml_figure_generator(
         yield figure
 
 
-def iphotodraw_xml_figure_generator(
-        eval_list_txt: str = None,
-        image_directory_path: str = None):
+def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
+                                    image_directory_path: str = None):
     """
     Generator of Figure objects from iPhotoDraw xml annotations.
     The input files can be provided either from a csv list or from the path
-        to the directory where the image files are.
+    to the directory where the image files are.
 
     Args:
         eval_list_txt:              The path of the list of figures which annotations
-                                        have to be loaded
+                                    have to be loaded
         image_directory_path (str): The path of the directory where the images are stored
     """
 

@@ -6,16 +6,21 @@ import sys
 import os
 import csv
 import logging
+import io
+import PIL.Image
+import hashlib
 
 from typing import List
 
 import xml.etree.ElementTree as ET
+import tensorflow as tf
 
 from cv2 import cv2
 
 from .panel import Panel
 from . import misc
 from .. import box
+from .. import dataset_util
 
 
 class Figure:
@@ -38,6 +43,7 @@ class Figure:
         """
         self.image_path = image_path
         self.filename = os.path.basename(self.image_path)
+        self.image_format = os.path.splitext(self.filename)[-1]
 
         self.panels = None
         self.image = None
@@ -152,9 +158,8 @@ class Figure:
                 csv_writer.writerow(csv_row)
 
 
-    def load_annotation_from_iphotodraw(
-            self,
-            annotation_file_path: str):
+    def load_annotation_from_iphotodraw(self,
+                                        annotation_file_path: str):
         """
         Load iPhotoDraw annotation.
         Deal with Zou's data set
@@ -316,10 +321,8 @@ class Figure:
             return labels
 
 
-        def match_panels_with_labels(
-                panels: List[Panel],
-                labels: List[Panel]
-                ) -> List[Panel]:
+        def match_panels_with_labels(panels: List[Panel],
+                                     labels: List[Panel]) -> List[Panel]:
             """
             Match both lists to get a unique list of panels containing
             information of their matching label
@@ -520,3 +523,74 @@ class Figure:
 
         # Write the preview image file to destination
         cv2.imwrite(export_path, preview_img)
+
+
+    def convert_to_tf_example(self):
+        """
+        TODO
+        """
+
+        # Load image
+        with tf.gfile.GFile(self.image_path, 'rb') as fid:
+            encoded_jpg = fid.read()
+
+        encoded_jpg_io = io.BytesIO(encoded_jpg)
+        image = PIL.Image.open(encoded_jpg_io)
+
+        # Generate unique id
+        key = hashlib.sha256(encoded_jpg).hexdigest()
+
+        # Check that image shape is correct
+        assert image.size[0] == self.image_width, "Inconsistent image width."
+        assert image.size[1] == self.image_height, "Inconsistent image height."
+
+        xmin = []
+        ymin = []
+        xmax = []
+        ymax = []
+        classes = []
+        classes_text = []
+        for panel in self.panels:
+            # Bounding box
+            xmin.append(float(panel.panel_rect[0]) / self.image_width)
+            ymin.append(float(panel.panel_rect[1]) / self.image_height)
+            xmax.append(float(panel.panel_rect[2]) / self.image_width)
+            ymax.append(float(panel.panel_rect[3]) / self.image_height)
+
+            # Class information
+            class_name = 'panel'
+            classes_text.append(class_name.encode('utf8'))
+            classes.append(1)
+
+        feature = {
+            'image/key/sha256':
+                dataset_util.bytes_feature(key.encode('utf8')),
+            'image/encoded':
+                dataset_util.bytes_feature(encoded_jpg),
+            'image/source_id':
+                dataset_util.bytes_feature(self.filename.encode('utf8')),
+            'image/filename':
+                dataset_util.bytes_feature(self.filename.encode('utf8')),
+            'image/height':
+                dataset_util.int64_feature(self.image_height),
+            'image/width':
+                dataset_util.int64_feature(self.image_width),
+            'image/format':
+                dataset_util.bytes_feature(self.image_format.encode('utf8')),
+            'image/object/bbox/xmin':
+                dataset_util.float_list_feature(xmin),
+            'image/object/bbox/xmax':
+                dataset_util.float_list_feature(xmax),
+            'image/object/bbox/ymin':
+                dataset_util.float_list_feature(ymin),
+            'image/object/bbox/ymax':
+                dataset_util.float_list_feature(ymax),
+            'image/object/class/text':
+                dataset_util.bytes_list_feature(classes_text),
+            'image/object/class/label':
+                dataset_util.int64_list_feature(classes),
+            }
+
+        example = tf.train.Example(features=tf.train.Features(feature=feature))
+
+        return example

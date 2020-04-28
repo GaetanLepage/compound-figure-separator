@@ -4,6 +4,7 @@ Miscellaneous functions for figures.
 
 import math
 import csv
+import tensorflow as tf
 
 from typing import List
 from .panel import Panel
@@ -99,11 +100,10 @@ def assign_labels_to_panels(
         panel.label_rect = labels[best_path[panel_index]].label_rect
 
 
-def export_figures_to_csv(
-        figure_generator,
-        output_csv_file: str,
-        individual_export=False,
-        individual_export_csv_directory=None):
+def export_figures_to_csv(figure_generator,
+                          output_csv_file: str,
+                          individual_export=False,
+                          individual_export_csv_directory=None):
     """
     TODO: might have to go in io/
 
@@ -139,3 +139,18 @@ def export_figures_to_csv(
                 if individual_export:
                     figure.export_annotation_to_individual_csv(
                         csv_export_dir=individual_export_csv_directory)
+
+
+def export_figures_to_tf_record(figure_generator,
+                                tf_record_filename):
+    """
+    TODO
+    """
+
+    with tf.io.TFRecordWriter(tf_record_filename) as writer:
+
+        for figure in figure_generator:
+
+            tf_example = figure.convert_to_tf_example()
+
+            writer.write(tf_example.SerializeToString())

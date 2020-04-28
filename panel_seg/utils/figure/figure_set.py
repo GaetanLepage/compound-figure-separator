@@ -48,8 +48,8 @@ class FigureSet:
         """
         TODO
 
-        Parameters :
-            * list_path (TODO): TODO
+        Args :
+            list_path (TODO): TODO
 
         Returns :
             * TODO (TODO): TODO
@@ -113,7 +113,7 @@ class FigureSet:
                     raise FileNotFoundError('Could not find {}.'.format(xml_path))
 
                 # Load annotations (panels + labels) from iPhotoDraw xml
-                figure.get_annotation_from_iphotodraw(xml_path)
+                figure.load_annotation_from_iphotodraw(xml_path)
 
             except FileNotFoundError as file_not_found_error:
                 logging.warning(file_not_found_error)
