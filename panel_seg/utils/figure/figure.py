@@ -21,6 +21,7 @@ from .panel import Panel
 from . import beam_search
 from .. import box
 from .. import dataset_util
+from . import label_class
 
 
 class Figure:
@@ -118,7 +119,7 @@ class Figure:
                 # Panel segmentation + panel splitting
                 if len(row) == 11:
                     label_coordinates = [int(x) for x in row[6:10]]
-                    label = row[10]
+                    label = label_class.map_label(row[10])
                 # Panel splitting only
                 elif len(row) == 6:
                     label_coordinates = None
@@ -228,7 +229,7 @@ class Figure:
                 # If the label text contains two words,
                 # then the second one is the label text
                 if len(words) == 2:
-                    label_text = words[1]
+                    label_text = label_class.map_label(words[1])
 
                     if len(label_text) != 1:
                         # Now we process single character panel label only (a, b, c...)
@@ -290,6 +291,7 @@ class Figure:
                         '%s: label %s is not single character',
                         annotation_file_path,
                         label_text)
+                label_text = label_class.map_label(label_text)
 
                 x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(
                     item=label_item)
@@ -417,33 +419,33 @@ class Figure:
 ##############
 
 
-def map_gt_and_predictions(self, overlap_threshold=0.66):
-    """
-    TODO
-    """
-    num_correct = 0
-    picked_pred_panels_indices = [False for _ in range(len(self.pred_panels))]
-    for gt_panel_index, gt_panel in enumerate(self.gt_panels):
-        max_overlap = -1
-        max_auto_index = -1
-        for pred_panel_index, pred_panel in enumerate(self.pred_panels):
-            if picked_pred_panels_indices[pred_panel_index]:
-                continue
-            intersection_area = box.intersection_area(gt_panel.panel_rect, pred_panel.panel_rect)
-            if intersection_area == 0:
-                continue
-            pred_panel_area = box.area(pred_panel.panel_rect)
-            overlap = intersection_area / pred_panel_area
-            if overlap > max_overlap:
-                max_overlap = overlap
-                max_auto_index = pred_panel_index
+    def map_gt_and_predictions(self, overlap_threshold=0.66):
+        """
+        TODO
+        """
+        num_correct = 0
+        picked_pred_panels_indices = [False for _ in range(len(self.pred_panels))]
+        for gt_panel_index, gt_panel in enumerate(self.gt_panels):
+            max_overlap = -1
+            max_auto_index = -1
+            for pred_panel_index, pred_panel in enumerate(self.pred_panels):
+                if picked_pred_panels_indices[pred_panel_index]:
+                    continue
+                intersection_area = box.intersection_area(gt_panel.panel_rect,
+                                                          pred_panel.panel_rect)
+                if intersection_area == 0:
+                    continue
+                pred_panel_area = box.area(pred_panel.panel_rect)
+                overlap = intersection_area / pred_panel_area
+                if overlap > max_overlap:
+                    max_overlap = overlap
+                    max_auto_index = pred_panel_index
 
-        if max_overlap > overlap_threshold:
-            num_correct += 1
-            picked_pred_panels_indices[max_auto_index] = True
+            if max_overlap > overlap_threshold:
+                num_correct += 1
+                picked_pred_panels_indices[max_auto_index] = True
 
-    return num_correct
-
+        return num_correct
 
 
 
@@ -638,6 +640,7 @@ def map_gt_and_predictions(self, overlap_threshold=0.66):
 
                 # Writting to csv file
                 csv_writer.writerow(csv_row)
+
 
     def convert_to_tf_example(self):
         """

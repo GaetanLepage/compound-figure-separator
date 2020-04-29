@@ -86,7 +86,7 @@ def image_clef_xml_figure_generator(xml_annotation_file_path: str,
             panels.append(panel)
 
         # Store the list of panels in the Figure object
-        figure.panels = panels
+        figure.gt_panels = panels
 
         yield figure
 
@@ -118,12 +118,15 @@ def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
         with open(eval_list_txt, 'r') as eval_list_file:
             eval_list_lines = eval_list_file.read().splitlines()
 
+        # image_paths = [
+            # os.path.abspath(line) if os.path.isfile(line)
+            # else os.path.abspath(os.path.join(DATA_DIR, line))
+            # for line in eval_list_lines]
+
         image_paths = [
-            os.path.abspath(line) if os.path.isfile(line)
-            else os.path.abspath(os.path.join(DATA_DIR,
-                                              line))
-            for line in eval_list_lines
-                ]
+            line if os.path.isfile(line)
+            else os.path.join('data/', line)
+            for line in eval_list_lines]
 
     elif image_directory_path is not None:
 
@@ -177,56 +180,58 @@ def global_csv_figure_generator(
     with open(csv_annotation_file_path, 'r') as csv_annotation_file:
         csv_reader = csv.reader(csv_annotation_file, delimiter=',')
 
-    panels = []
-    image_path = None
-    figure = None
+        panels = []
+        image_path = ''
+        figure = None
 
-    for row in csv_reader:
+        for row in csv_reader:
 
-        # New figure
-        if row[0] != image_path:
-            if figure is not None:
-                figure.gt_panels = panels
-                yield figure
+            # New figure
+            if not image_path.endswith(row[0]):
+                if figure is not None:
+                    figure.gt_panels = panels
+                    yield figure
 
-            image_path = row[0]
-            if not os.path.isfile(image_path):
-                raise FileNotFoundError("The following image file does not exist :"\
-                    "\n\t {}".format(image_path))
+                image_path = row[0]
+                if not os.path.isfile(image_path):
+                    image_path = os.path.join('data/', image_path)
+                if not os.path.isfile(image_path):
+                    raise FileNotFoundError("The following image file does not exist :"\
+                        "\n\t {}".format(image_path))
 
-            figure = Figure(image_path=image_path)
-            panels = []
-
-
-        # Panel segmentation + panel splitting
-        if len(row) == 11:
-            label_coordinates = [int(x) for x in row[6:10]]
-            label = row[10]
-        # Panel splitting only
-        elif len(row) == 6:
-            label_coordinates = None
-            label = None
-        else:
-            raise ValueError("Row should be of length 6 or 11")
-
-        panel_coordinates = [int(x) for x in row[1:5]]
-        panel_class = row[5]
-        assert panel_class == 'panel'
-
-        # Instanciate Panel object
-        panel = Panel(panel_rect=panel_coordinates,
-                      label_rect=label_coordinates,
-                      label=label)
-
-        panels.append(panel)
-
-    # set panels for the last figure
-    figure.gt_panels = panels
-    yield figure
+                figure = Figure(image_path=image_path)
+                panels = []
 
 
+            # Panel segmentation + panel splitting
+            if len(row) == 11:
+                try:
+                    label_coordinates = [int(x) for x in row[6:10]]
+                    label = row[10]
+                except ValueError:
+                    label_coordinates = None
+                    label = None
+            # Panel splitting only
+            elif len(row) == 6:
+                label_coordinates = None
+                label = None
+            else:
+                raise ValueError("Row should be of length 6 or 11")
 
+            panel_coordinates = [int(x) for x in row[1:5]]
+            panel_class = row[5]
+            assert panel_class == 'panel'
 
+            # Instanciate Panel object
+            panel = Panel(panel_rect=panel_coordinates,
+                          label_rect=label_coordinates,
+                          label=label)
+
+            panels.append(panel)
+
+        # set panels for the last figure
+        figure.gt_panels = panels
+        yield figure
 
 
 def individual_csv_figure_generator(

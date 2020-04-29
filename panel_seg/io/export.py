@@ -29,7 +29,7 @@ def export_figures_to_csv(figure_generator,
         for figure in figure_generator:
 
             # Looping over Panel objects
-            for panel in figure.panels:
+            for panel in figure.gt_panels:
 
                 csv_row = [
                     figure.image_path,
@@ -46,6 +46,8 @@ def export_figures_to_csv(figure_generator,
                     csv_row.append(panel.label_rect[2])
                     csv_row.append(panel.label_rect[3])
                     csv_row.append(panel.label)
+                else:
+                    csv_row += ['']*5
                 csv_writer.writerow(csv_row)
 
                 if individual_export:

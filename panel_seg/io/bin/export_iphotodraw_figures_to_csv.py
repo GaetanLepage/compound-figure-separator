@@ -31,7 +31,7 @@ def parse_args(args):
                         type=str)
 
     parser.add_argument('--image_directory_path',
-                        help='The path to the directory whre the images are stored.',
+                        help='The path to the directory where the images are stored.',
                         default=None,
                         type=str)
 
