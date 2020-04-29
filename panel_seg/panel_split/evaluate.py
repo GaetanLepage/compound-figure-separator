@@ -3,14 +3,13 @@ TODO
 """
 
 
-def evaluate_predictions(figure_generator: str,
-                         predicted_annotations_folder: str):
+def evaluate_predictions(figure_generator: str):
     """
-    Compute the metrics (ImageCLEF and mAP) from a given set of predictions.
+    Compute the metrics (ImageCLEF and mAP) from a given set of panel slitting predictions.
 
     Args:
-        figure_generator: TODO
-        predicted_annotations_folder: TODO
+        figure_generator:               A figure generator yielding Figure objects augmented with
+                                            predicted panels.
     """
 
     num_samples = 0
@@ -26,9 +25,7 @@ def evaluate_predictions(figure_generator: str,
 
     for figure in figure_generator:
 
-        figure.load_pred_annotations_from_csv(predicted_annotations_folder,
-                                              is_ground_truth=False)
-
+        # Compute the number of good predictions
         num_correct = figure.map_gt_and_predictions()
 
 
@@ -50,6 +47,7 @@ def evaluate_predictions(figure_generator: str,
 
         num_samples += 1
 
+    # ImageCLEF scores
     image_clef_accuracy = sum_accuracies / num_samples
     image_clef_precision = sum_precisions / num_samples
     image_clef_recall = sum_recalls / num_samples
@@ -58,9 +56,7 @@ def evaluate_predictions(figure_generator: str,
                                                                        image_clef_precision,
                                                                        image_clef_recall))
 
-    # f.write("Overall ImageCLEF Accuracy: {}, Precision: {}, Recall: {}\n".format(
-        # overall_accuracy, overall_precision, overall_recall))
-
+    # Regular scores
     overall_accuracy = overall_correct_count / max(overall_pred_count, overall_gt_count)
     overall_recall = overall_correct_count / overall_gt_count
     overall_precision = overall_correct_count / overall_pred_count

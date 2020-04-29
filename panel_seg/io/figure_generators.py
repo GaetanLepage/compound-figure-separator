@@ -21,6 +21,34 @@ DATA_DIR = os.path.join(
     "data/")
 
 
+def image_list_figure_generator(image_list_txt: str):
+    """
+    Generator of Figure objects from an image list.
+    This generator does not load any annotations.
+
+    Args:
+        image_list_txt:              The path of the list of images to be loaded
+    """
+
+    with open(image_list_txt, 'r') as image_list_file:
+
+        for line in image_list_file.readlines():
+
+            if os.path.isfile(line):
+                image_file_path = line
+            else:
+                image_file_path = os.path.join('data/', image_file_path)
+
+            if not os.path.isfile(image_file_path):
+                logging.warning("File not found : %s", line)
+                continue
+
+            figure = Figure(image_path=image_file_path)
+
+            yield figure
+
+
+
 def image_clef_xml_figure_generator(xml_annotation_file_path: str,
                                     image_directory_path: str):
     """
@@ -200,6 +228,13 @@ def global_csv_figure_generator(
                         "\n\t {}".format(image_path))
 
                 figure = Figure(image_path=image_path)
+                # Load image file
+                try:
+                    figure.load_image()
+                except FileNotFoundError as exception:
+                    logging.error(exception)
+                    continue
+
                 panels = []
 
 

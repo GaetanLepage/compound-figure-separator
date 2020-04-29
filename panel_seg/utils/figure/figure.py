@@ -64,9 +64,10 @@ class Figure:
         Load the image using `self.image_path` and stores it
         in `self.image`.
         """
-        # print(os.path.abspath(os.getcwd()))
-        # print(self.image_path)
-        # print(os.path.isdir(os.path.dirname(self.image_path)))
+
+        if self.image is not None:
+            return
+
         # check if the image file exists
         if not os.path.isfile(self.image_path):
             raise FileNotFoundError(
