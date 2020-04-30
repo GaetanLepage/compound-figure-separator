@@ -1,0 +1,8 @@
+# my_retinanet.yaml
+type: 'retinanet'
+train:
+  batch_size: 2
+  train_file_pattern: "data/ImageCLEF/training/FigureSeparationTraining2016.tfrecord"
+eval:
+  eval_file_pattern: "data/ImageCLEF/test/FigureSeparationTest2016.tfrecord"
+use_tpu: False

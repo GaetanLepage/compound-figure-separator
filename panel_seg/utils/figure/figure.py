@@ -58,7 +58,6 @@ class Figure:
         self.pred_panels = None
 
 
-
     def load_image(self):
         """
         Load the image using `self.image_path` and stores it
@@ -414,11 +413,9 @@ class Figure:
                                                   labels=labels)
 
 
-
 ##############
 # EVALUATION #
 ##############
-
 
     def map_gt_and_predictions(self, overlap_threshold=0.66):
         """
@@ -580,7 +577,6 @@ class Figure:
 #################
 # EXPORT FIGURE #
 #################
-
 
     def export_gt_annotation_to_individual_csv(self,
                                                csv_export_dir: str = None):
