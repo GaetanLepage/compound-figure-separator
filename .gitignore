@@ -1,4 +1,6 @@
 data/*
+# Tensorflow files
+**/models/*
 
 
 *.iml
