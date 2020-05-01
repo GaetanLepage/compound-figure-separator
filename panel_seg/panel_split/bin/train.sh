@@ -1,5 +1,6 @@
 PATH_TO_TF_MODELS="/home/gaetan/hevs/implementations/object_detection/models/"
-MODEL_DIR="panel_seg/panel_split/models"
+#MODEL_DIR="panel_seg/panel_split/models"
+MODEL_DIR="panel_seg/panel_split/models_voc"
 
 python3 ${PATH_TO_TF_MODELS}official/vision/detection/main.py \
   --strategy_type=mirrored \

@@ -1,8 +1,9 @@
 # my_retinanet.yaml
 type: 'retinanet'
 train:
-  batch_size: 2
-  train_file_pattern: "data/ImageCLEF/training/FigureSeparationTraining2016.tfrecord"
+  batch_size: 128
+  #train_file_pattern: "data/ImageCLEF/training/FigureSeparationTraining2016.tfrecord"
+  train_file_pattern: "/home/gaetan/hevs/implementations/object_detection/data/VOCdevkit/VOC2007/voc_train.tfrecord"
 eval:
-  eval_file_pattern: "data/ImageCLEF/test/FigureSeparationTest2016.tfrecord"
-use_tpu: False
+  #eval_file_pattern: "data/ImageCLEF/test/FigureSeparationTest2016.tfrecord"
+  eval_file_pattern: "/home/gaetan/hevs/implementations/object_detection/data/VOCdevkit/VOC2007/voc_eval.tfrecord"
