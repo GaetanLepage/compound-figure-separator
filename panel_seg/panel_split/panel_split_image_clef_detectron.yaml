@@ -1,0 +1,12 @@
+_BASE_: "/home/gaetan/hevs/implementations/object_detection/detectron2/configs/COCO-Detection/retinanet_R_50_FPN_1x.yaml"
+OUTPUT_DIR: "panel_seg/panel_split/output_detectron"
+MODEL:
+  RETINANET:
+    NUM_CLASSES: 1
+DATASETS:
+  TRAIN: ("image_clef_train",)
+  TEST: ("image_clef_test",)
+SOLVER:
+  IMS_PER_BATCH: 4
+TEST:
+  EVAL_PERIOD: 0

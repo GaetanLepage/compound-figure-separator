@@ -78,10 +78,10 @@ def image_clef_xml_figure_generator(xml_annotation_file_path: str,
             image_directory_path,
             image_filename + '.jpg')
 
-        print('Processing Image {}/{} : {}'.format(
-            annotation_index + 1,
-            num_images,
-            image_path))
+        # print('Processing Image {}/{} : {}'.format(
+            # annotation_index + 1,
+            # num_images,
+            # image_path))
 
         # Create Figure object
         figure = Figure(image_path=image_path)

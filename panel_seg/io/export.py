@@ -72,3 +72,34 @@ def export_figures_to_tf_record(figure_generator,
             tf_example = figure.convert_to_tf_example()
 
             writer.write(tf_example.SerializeToString())
+
+def export_figures_to_detectron_dict(figure_generator):
+    """
+    TODO
+    """
+    from detectron2.structures import BoxMode
+
+    dataset_dicts = []
+    for index, figure in enumerate(figure_generator):
+        record = {}
+
+        record["file_name"] = figure.image_path
+        record["image_id"] = index
+        record["height"] = figure.image_height
+        record["width"] = figure.image_width
+
+        # annos = v["regions"]
+        objs = []
+        for panel in figure.gt_panels:
+            # assert not anno["region_attributes"]
+            # anno = anno["shape_attributes"]
+
+            obj = {
+                "bbox": panel.panel_rect,
+                "bbox_mode": BoxMode.XYXY_ABS,
+                "category_id": 0
+            }
+            objs.append(obj)
+        record["annotations"] = objs
+        dataset_dicts.append(record)
+    return dataset_dicts
