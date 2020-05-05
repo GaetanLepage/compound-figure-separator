@@ -1,5 +1,6 @@
 """
-TODO
+Script to export Zou's dataset annotations to a csv compatible with
+keras-retinanet (https://github.com/fizyr/keras-retinanet).
 """
 
 import sys

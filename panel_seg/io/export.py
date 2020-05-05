@@ -73,9 +73,16 @@ def export_figures_to_tf_record(figure_generator,
 
             writer.write(tf_example.SerializeToString())
 
+
 def export_figures_to_detectron_dict(figure_generator):
     """
-    TODO
+    Export a set of Figure objects to a ddict which is compatible with Facebook Detectron 2.
+
+    Args:
+        figure_generator:   A generator yielding figure objects.
+
+    Returns:
+        dataset_dicts (dict): a dict representing tthe data set.
     """
     from detectron2.structures import BoxMode
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TODO
+Script to perform and evaluate the panel splitting task on the ImageCLEF data set.
 """
 
 import sys
@@ -55,7 +55,7 @@ def main(args=None):
         xml_annotation_file_path=args.annotation_xml,
         image_directory_path=args.image_directory_path)
 
-    # Export figures to csv
+    # Augment Figures by predicting panel locations
     augmented_figure_generators = predict(figure_generator=figure_generator,
                                           predict_function=None,
                                           pre_processing_function=None)

@@ -1,36 +1,58 @@
 """
-TODO
+
 """
 
 
+from typing import List
 import numpy as np
 
 from panel_seg.utils.figure.panel import Panel
 
 
-def overlap_with_mask(box, mask):
+def _overlap_with_mask(box: List[float], mask: List[float]):
     """
-    TODO
+    Compute the overlap of the box with the mask.
+
+    Args:
+        box:    The coordinates of the bounding box.
+        mask:   The mask.
     """
     roi = mask[box[1]:box[3], box[0]:box[2]]
     count = np.count_nonzero(roi)
-    box_area = (box[2] - box[0])*(box[3]-box[1])
+    box_area = (box[2] - box[0]) * (box[3]-box[1])
     ratio = count/box_area
     return ratio
 
 
-def update_mask(box, mask):
+def _update_mask(box, mask):
     """
-    TODO
+    Changes the mask by setting all pixels of the `box` to 1.
+
+    Args:
+        box:    A bounding box.
+        mask:   The mask.
     """
     mask[box[1]:box[3], box[0]:box[2]] = 1
 
 
-def post_processing(boxes, scores, labels, image_shape):
+def _post_processing(boxes: List[List[float]],
+                     scores: List[float],
+                     labels: List[str],
+                     image_shape: List[float]):
     """
-    TODO
+    Post processing to remove false positives.
+
+    Args:
+        boxes:          A list of predicted bounding boxes.
+        scores:         A list of scores (one for each bbox).
+        labels:         A list of labels.
+        image_shape:    The image shape (H, W, C).
+
+    Returns:
+        boxes:      The list of filtered bboxes.
+        scores:     The list of associated scores.
+        labels:     The list of associated labels.
     """
-    # Post processing to remove false positives
     # 1. We keep only scores greater than 0.05
     indices = []
     for index, score in enumerate(scores):
@@ -39,6 +61,7 @@ def post_processing(boxes, scores, labels, image_shape):
         # scores are sorted so we can break
         else:
             break
+
     boxes, scores, labels = boxes[indices], scores[indices], labels[indices]
 
     # 2. We remove boxes which overlaps with other high score boxes
@@ -48,9 +71,9 @@ def post_processing(boxes, scores, labels, image_shape):
 
     for index, box in enumerate(boxes):
         box_i = box.astype(int)
-        if overlap_with_mask(box_i, mask) < 0.66:
+        if _overlap_with_mask(box_i, mask) < 0.66:
             indices.append(index)
-            update_mask(box_i, mask)
+            _update_mask(box_i, mask)
     boxes, scores, labels = boxes[indices], scores[indices], labels[indices]
 
     # 3. We keep only at  most 30 panels
@@ -87,10 +110,10 @@ def predict(figure_generator,
 
         boxes, scores, labels = predict_function(image)
 
-        boxes, scores, labels = post_processing(boxes=boxes,
-                                                scores=scores,
-                                                labels=labels,
-                                                image_shape=image.shape)
+        boxes, scores, labels = _post_processing(boxes=boxes,
+                                                 scores=scores,
+                                                 labels=labels,
+                                                 image_shape=image.shape)
 
         pred_panels = []
         for box in boxes:

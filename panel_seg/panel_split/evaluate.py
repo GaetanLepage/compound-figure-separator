@@ -1,5 +1,5 @@
 """
-TODO
+Module to evaluate the panel splitting task metrics.
 """
 
 

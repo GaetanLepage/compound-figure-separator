@@ -1,5 +1,6 @@
 """
-TODO
+Script to visualize Zou's data set by displaying the images along with the corresponding
+bounding boxes and labels.
 """
 
 import sys
@@ -13,7 +14,13 @@ from panel_seg.io.figure_viewer import view_data_set
 
 def parse_args(args):
     """
-    TODO
+    Parse the arguments from the command line.
+
+    Args:
+        args: The arguments from the command line call.
+
+    Returns:
+        Populated namespace
     """
     parser = argparse.ArgumentParser(
         description='Preview all the figures from an iPhotoDraw data set.')
@@ -33,7 +40,7 @@ def parse_args(args):
 
 def main(args=None):
     """
-    TODO
+    Launch previsualization of Zou's data set.
     """
 
     # parse arguments

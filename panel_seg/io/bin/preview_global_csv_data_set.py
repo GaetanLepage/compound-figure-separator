@@ -1,5 +1,6 @@
 """
-TODO
+Script to visualize a "csv annotated" data set by displaying the images
+along with the corresponding bounding boxes and labels.
 """
 
 import sys
@@ -13,14 +14,19 @@ from panel_seg.io.figure_viewer import view_data_set
 
 def parse_args(args):
     """
-    TODO
+    Parse the arguments from the command line.
+
+    Args:
+        args: The arguments from the command line call.
+
+    Returns:
+        Populated namespace
     """
     parser = argparse.ArgumentParser(
         description='Preview all the figures from a data set represented by a csv annotation file.')
 
     parser.add_argument('--annotation_csv',
                         help='The path to the csv annotation file.',
-                        default='data/', # TODO
                         type=str)
 
     return parser.parse_args(args)
@@ -28,7 +34,7 @@ def parse_args(args):
 
 def main(args=None):
     """
-    TODO
+    Launch previsualization of a csv data set.
     """
 
     # parse arguments

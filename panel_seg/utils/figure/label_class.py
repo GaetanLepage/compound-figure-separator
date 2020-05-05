@@ -91,13 +91,13 @@ def map_label(char: str) -> str:
 
 def case_same_label(char):
     """
-    TODO
+    Check if  `char` belongs to a "dual class".
 
     Args:
         c: a character [0-9][a-z][A-Z]
 
     Returns:
-        TODO
+        bool which tells whether `char` belongs to a "dual class".
     """
     # If the given character belongs to a "dual class", return True
     if char in (

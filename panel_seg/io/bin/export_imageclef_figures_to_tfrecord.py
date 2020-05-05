@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 """
-TODO
+Script to export the ImageCLEF dataset to a tfrecord file compatible with
+Tensorflow's Object Detection API.
+(https://github.com/tensorflow/models/tree/master/official/vision/detection)
 """
 
 import sys
@@ -39,7 +41,7 @@ def parse_args(args):
     parser.add_argument('--output_tfrecord',
                         help='The path of the tfrecord file to which annotations"\
                                 " have to be exported.',
-                        default='data/ImageCLEF/test/test.csv',
+                        default='data/ImageCLEF/training/training.tfrecord',
                         type=str)
 
 

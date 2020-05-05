@@ -88,22 +88,24 @@ class Figure:
 #########################
 
     def load_annotation_from_csv(self,
-                                 predicted_annotations_folder: str,
+                                 annotations_folder: str,
                                  is_ground_truth=True):
         """
         Load figure annotations from the given (individual) csv file.
 
         Args:
-            predicted_annotations_folder: TODO
-            is_ground_truth: TODO
+            annotations_folder: Path to an annotation file (csv format).
+            is_ground_truth:    Tells whether annotations are ground truth or predictions
+                                    If True, annotations will be stored in `self.gt_panels`
+                                    else, in `self.pred_panels`
         """
 
         base_name = os.path.splitext(self.image_filename)[0]
 
-        annotation_csv = os.path.join(predicted_annotations_folder, base_name)
+        annotation_csv = os.path.join(annotations_folder, base_name)
 
         if not os.path.isfile(annotation_csv):
-            raise FileNotFoundError("The prediction annotation csv file does not exist :"\
+            raise FileNotFoundError("The annotation csv file does not exist :"\
                 "\n\tShould be {}".format(annotation_csv))
 
         # Create empty list of panels
@@ -270,7 +272,7 @@ class Figure:
             Extract information from and validate all label items
 
             Returns:
-                TODO
+                A list of Panel objects representing the detected labels.
             """
             labels = []
             for label_item in label_items:
@@ -417,9 +419,19 @@ class Figure:
 # EVALUATION #
 ##############
 
-    def map_gt_and_predictions(self, overlap_threshold=0.66):
+    def map_gt_and_predictions(self, overlap_threshold: float = 0.66) -> int:
         """
-        TODO
+        Compute the number of rightly predicted panels for the figure.
+        If a predicted panel and a ground truth panel overlap enough
+        (according to the `overlap_threshold` parameter), they are said to be matched and thus
+        count for a positive detection.
+
+        Args:
+            overlap_threshold (float): The overlap threshold needed for a prediction to be
+                                            classified as valid.
+
+        Returns:
+            num_correct (int): The number of accurate predictions.
         """
         num_correct = 0
         picked_pred_panels_indices = [False for _ in range(len(self.pred_panels))]
@@ -486,7 +498,7 @@ class Figure:
         elif mode == 'pred':
             panels = self.pred_panels
         elif mode == 'both':
-            # TODO implement this mode
+            # TODO implement the mode 'both' for image_preview
             raise NotImplementedError
         else:
             raise ValueError("mode should be either 'gt', 'pred', or 'both'.")
@@ -550,16 +562,16 @@ class Figure:
         cv2.destroyAllWindows()
 
 
-    def save_preview(self, folder, mode='gt'):
+    def save_preview(self, folder: str, mode='gt'):
         """
         Save the annotation preview at folder.
 
         Args:
-            folder: TODO
-            mode: Select which information to display:
-                    * 'gt': only the ground truth
-                    * 'pred': only the predictions
-                    * 'both': both predicted and ground truth annotations.
+            folder (str): The folder where to store the image preview.
+            mode (str): Select which information to display:
+                        * 'gt': only the ground truth
+                        * 'pred': only the predictions
+                        * 'both': both predicted and ground truth annotations.
         """
         preview_img = self.get_preview(mode)
 

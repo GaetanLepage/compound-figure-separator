@@ -198,7 +198,10 @@ def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
 def global_csv_figure_generator(
         csv_annotation_file_path: str):
     """
-    TODO
+    Generator of Figure objects from a single csv annotation file.
+
+    Args:
+        csv_annotation_file:    The path of the csv annotation file to load.
     """
 
     if not os.path.isfile(csv_annotation_file_path):
@@ -272,7 +275,11 @@ def global_csv_figure_generator(
 def individual_csv_figure_generator(
         csv_annotation_directory: str):
     """
-    TODO
+    Generator of Figure objects from individual csv annotation files (one per image).
+
+    Args:
+        csv_annotation_directory:   The path of the directory containing the csv annotation files.
     """
 
-    # TODO
+    # TODO implement the individual_csv_figure_generator()
+    raise NotImplementedError

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 """
-TODO
+Script to export the ImageCLEF dataset annotations to a csv compatible with
+keras-retinanet (https://github.com/fizyr/keras-retinanet).
 """
 
 import sys
