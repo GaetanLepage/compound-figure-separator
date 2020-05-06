@@ -35,13 +35,18 @@ class Figure:
         panels: contain all panels
     """
 
-    def __init__(self, image_path: str, index):
+    def __init__(self, image_path: str, index: int):
         """
         Constructor for a Figure object.
 
         Args:
             image_path: path to the image file
+            index:      A unique index to identify the figure within the data set
         """
+
+        # Figure identifier
+        self.index = index
+
         # Image information
         self.image_path = image_path
         self.image_filename = os.path.basename(self.image_path)
@@ -51,13 +56,18 @@ class Figure:
         self.image_width = 0
         self.image_height = 0
 
-        self.index = index
+
+        # Can contain a preview of the image with its bounding boxes.
+        self.preview_image = None
 
         # Ground truth panel annotations
         self.gt_panels = None
 
         # Predicted panels
         self.pred_panels = None
+
+        # Logger
+        self._logger = logging.getLogger(__name__)
 
 
     def load_image(self):
@@ -84,6 +94,7 @@ class Figure:
 
         # Store the image size
         self.image_height, self.image_width = self.image.shape[:2]
+
 
 #########################
 # IMPORT GT ANNOTATIONS #
@@ -398,10 +409,8 @@ class Figure:
             elif text.startswith('label'):
                 label_items.append(shape_item)
             else:
-                logging.error(
-                    '%s: has unknown <shape> xml items %s',
-                    annotation_file_path,
-                    text)
+                self._logger.error('%s: has unknown <shape> xml items %s',
+                                   annotation_file_path, text)
 
         # Extract information from and validate all panel items
         panels = extract_panel_info()
@@ -437,7 +446,7 @@ class Figure:
         """
         num_correct = 0
         picked_pred_panels_indices = [False for _ in range(len(self.pred_panels))]
-        for gt_panel_index, gt_panel in enumerate(self.gt_panels):
+        for gt_panel in self.gt_panels:
             max_overlap = -1
             max_auto_index = -1
             for pred_panel_index, pred_panel in enumerate(self.pred_panels):
@@ -481,6 +490,31 @@ class Figure:
             preview_img: the preview image
         """
 
+        if mode not in ('gt', 'pred', 'both'):
+            raise ValueError("mode should be either 'gt', 'pred', or 'both'.")
+
+        # Load image if necessary
+        if self.image is None:
+            self.load_image()
+        preview_img = self.image.copy()
+
+        if mode == 'both':
+
+            for panel in self.gt_panels:
+                # Green for ground truth panels
+                panel.draw_elements(image=preview_img,
+                                    color=(0, 255, 0))
+
+            if self.pred_panels is None:
+                self._logger.warning("No predicted panels exist for this figure." \
+                    " Hence, they cannot be displayed.")
+                return preview_img
+
+            for panel in self.pred_panels:
+                # Yellow for predicted panels
+                panel.draw_elements(image=preview_img,
+                                    color=(255, 255, 0))
+
         shape_colors = [
             (255, 0, 0),
             (0, 255, 0),
@@ -490,49 +524,22 @@ class Figure:
             (0, 255, 255),
         ]
 
-        if self.image is None:
-            self.load_image()
-
-        preview_img = self.image.copy()
-
         if mode == 'gt':
             panels = self.gt_panels
         elif mode == 'pred':
             panels = self.pred_panels
-        elif mode == 'both':
-            # TODO implement the mode 'both' for image_preview
-            raise NotImplementedError
-        else:
-            raise ValueError("mode should be either 'gt', 'pred', or 'both'.")
 
-        # Drawing rectangles
+        if panels is None:
+            raise ValueError(f"{mode} panels are None. Cannot display")
+
         for panel_index, panel in enumerate(panels):
 
             # Select color
             color = shape_colors[panel_index % len(shape_colors)]
 
-            # Draw panel box
-            cv2.rectangle(img=preview_img,
-                          pt1=(panel.panel_rect[0], panel.panel_rect[1]),
-                          pt2=(panel.panel_rect[2], panel.panel_rect[3]),
-                          color=color,
-                          thickness=3)
+            panel.draw_elements(image=preview_img,
+                                color=color)
 
-            if panel.label_rect is not None:
-                # Draw label box
-                cv2.rectangle(img=preview_img,
-                              pt1=(panel.label_rect[0], panel.label_rect[1]),
-                              pt2=(panel.label_rect[2], panel.label_rect[3]),
-                              color=color,
-                              thickness=2)
-
-                # Draw label text
-                cv2.putText(img=preview_img,
-                            text=panel.label,
-                            org=(panel.label_rect[2] + 10, panel.label_rect[3]),
-                            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                            fontScale=1,
-                            color=color)
 
         # Store the computed image
         self.preview_image = preview_img
