@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Script to visualize the ImageCLEF data set by displaying the images along with the corresponding
 bounding boxes.
@@ -9,7 +10,7 @@ import argparse
 sys.path.append('.')
 
 from panel_seg.io.figure_generators import image_clef_xml_figure_generator
-from panel_seg.io.figure_viewer import view_data_set
+from panel_seg.io.figure_viewer import parse_viewer_args, view_data_set
 
 
 def parse_args(args):
@@ -35,6 +36,8 @@ def parse_args(args):
                         default='data/ImageCLEF/test/FigureSeparationTest2016/',
                         type=str)
 
+    parser = parse_viewer_args(parser)
+
     return parser.parse_args(args)
 
 
@@ -52,10 +55,10 @@ def main(args=None):
         xml_annotation_file_path=args.annotation_xml,
         image_directory_path=args.image_directory_path)
 
-    view_data_set(
-        figure_generator=figure_generator,
-        delay=100,
-        window_name="ImageCLEF data preview")
+    view_data_set(figure_generator=figure_generator,
+                  mode=args.mode,
+                  delay=args.delay,
+                  window_name="ImageCLEF data preview")
 
 
 if __name__ == '__main__':
