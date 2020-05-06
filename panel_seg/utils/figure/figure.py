@@ -35,7 +35,7 @@ class Figure:
         panels: contain all panels
     """
 
-    def __init__(self, image_path: str):
+    def __init__(self, image_path: str, index):
         """
         Constructor for a Figure object.
 
@@ -50,6 +50,8 @@ class Figure:
         self.image = None
         self.image_width = 0
         self.image_height = 0
+
+        self.index = index
 
         # Ground truth panel annotations
         self.gt_panels = None

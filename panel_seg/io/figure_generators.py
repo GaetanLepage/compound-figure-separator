@@ -32,6 +32,8 @@ def image_list_figure_generator(image_list_txt: str):
 
     with open(image_list_txt, 'r') as image_list_file:
 
+        image_counter = 0
+
         for line in image_list_file.readlines():
 
             if os.path.isfile(line):
@@ -43,9 +45,12 @@ def image_list_figure_generator(image_list_txt: str):
                 logging.warning("File not found : %s", line)
                 continue
 
-            figure = Figure(image_path=image_file_path)
+            figure = Figure(image_path=image_file_path,
+                            index=image_counter)
 
             yield figure
+
+            image_counter += 1
 
 
 
@@ -70,6 +75,8 @@ def image_clef_xml_figure_generator(xml_annotation_file_path: str,
     # Total number of images
     num_images = len(annotation_items)
 
+    counter = 0
+
     for annotation_index, annotation_item in enumerate(annotation_items):
         filename_item = annotation_item.find('./filename')
         image_filename = filename_item.text
@@ -84,7 +91,8 @@ def image_clef_xml_figure_generator(xml_annotation_file_path: str,
             # image_path))
 
         # Create Figure object
-        figure = Figure(image_path=image_path)
+        figure = Figure(image_path=image_path,
+                        index=counter)
 
         # Load image file
         try:
@@ -117,6 +125,8 @@ def image_clef_xml_figure_generator(xml_annotation_file_path: str,
         figure.gt_panels = panels
 
         yield figure
+
+        counter += 1
 
 
 def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
@@ -179,7 +189,8 @@ def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
                                                    image_path))
 
         # Create figure object
-        figure = Figure(image_path=image_path)
+        figure = Figure(image_path=image_path,
+                        index=image_index)
 
         try:
             # Load image file
@@ -215,6 +226,8 @@ def global_csv_figure_generator(
         image_path = ''
         figure = None
 
+        image_counter = 0
+
         for row in csv_reader:
 
             # New figure
@@ -223,6 +236,8 @@ def global_csv_figure_generator(
                     figure.gt_panels = panels
                     yield figure
 
+                    image_counter += 1
+
                 image_path = row[0]
                 if not os.path.isfile(image_path):
                     image_path = os.path.join('data/', image_path)
@@ -230,7 +245,8 @@ def global_csv_figure_generator(
                     raise FileNotFoundError("The following image file does not exist :"\
                         "\n\t {}".format(image_path))
 
-                figure = Figure(image_path=image_path)
+                figure = Figure(image_path=image_path,
+                                index=image_counter)
                 # Load image file
                 try:
                     figure.load_image()

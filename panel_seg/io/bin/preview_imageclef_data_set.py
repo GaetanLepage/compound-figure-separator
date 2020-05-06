@@ -27,12 +27,12 @@ def parse_args(args):
 
     parser.add_argument('--annotation_xml',
                         help='The path to the xml annotation file.',
-                        default='data/imageCLEF/test/FigureSeparationTest2016GT.xml',
+                        default='data/ImageCLEF/test/FigureSeparationTest2016GT.xml',
                         type=str)
 
     parser.add_argument('--image_directory_path',
                         help='The path to the directory whre the images are stored.',
-                        default='data/imageCLEF/test/FigureSeparationTest2016/',
+                        default='data/ImageCLEF/test/FigureSeparationTest2016/',
                         type=str)
 
     return parser.parse_args(args)
