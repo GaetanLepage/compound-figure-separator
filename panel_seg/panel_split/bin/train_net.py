@@ -29,6 +29,7 @@ from detectron2.evaluation import verify_results
 from detectron2.modeling import GeneralizedRCNNWithTTA
 
 from panel_seg.panel_split.load_panel_split_datasets import register_image_clef_datasets
+from panel_seg.panel_split.panel_split_evaluator import PanelSplitEvaluator
 
 
 class Trainer(DefaultTrainer):
@@ -50,8 +51,8 @@ class Trainer(DefaultTrainer):
         """
         if output_folder is None:
             output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
-        # TODO return PanelSplitEvaluator
-        return None
+
+        return PanelSplitEvaluator(dataset_name, output_folder)
 
 
 def setup(args):
@@ -69,6 +70,7 @@ def setup(args):
 def main(args):
     cfg = setup(args)
 
+    register_image_clef_datasets()
     if args.eval_only:
         model = Trainer.build_model(cfg)
         DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
@@ -85,7 +87,6 @@ def main(args):
     If you'd like to do anything fancier than the standard training logic,
     consider writing your own training loop or subclassing the trainer.
     """
-    register_image_clef_datasets()
     trainer = Trainer(cfg)
     trainer.resume_or_load(resume=args.resume)
     # trainer.register_hooks(

@@ -8,8 +8,8 @@ def evaluate_predictions(figure_generator: str):
     Compute the metrics (ImageCLEF and mAP) from a given set of panel slitting predictions.
 
     Args:
-        figure_generator:               A figure generator yielding Figure objects augmented with
-                                            predicted panels.
+        figure_generator:   A figure generator yielding Figure objects augmented with
+                                predicted panels.
     """
 
     num_samples = 0
