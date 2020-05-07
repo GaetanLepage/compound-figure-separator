@@ -2,17 +2,17 @@
 Class representing a figure.
 """
 
-import sys
 import os
 import csv
 import logging
 import io
-import PIL.Image
 import hashlib
-
 from typing import List
-
 import xml.etree.ElementTree as ET
+
+import PIL.Image
+
+
 import tensorflow as tf
 
 from cv2 import cv2
@@ -94,7 +94,6 @@ class Figure:
 
         # Store the image size
         self.image_height, self.image_width = self.image.shape[:2]
-
 
 #########################
 # IMPORT GT ANNOTATIONS #
@@ -430,44 +429,72 @@ class Figure:
 # EVALUATION #
 ##############
 
-    def map_gt_and_predictions(self, overlap_threshold: float = 0.66) -> int:
+    def get_num_correct_predictions(self,
+                                    use_overlap_instead_of_iou=False,
+                                    threshold: float = None) -> int:
         """
-        Compute the number of rightly predicted panels for the figure.
-        If a predicted panel and a ground truth panel overlap enough
-        (according to the `overlap_threshold` parameter), they are said to be matched and thus
-        count for a positive detection.
+        Compute the number of rightly predicted panels for the figure according to oen of the
+        following criteria:
+            * A predicted panel which has an IoU > `threshold` (0.5 by default) with a
+                ground truth panel is counted as a positive match (default case, i.e. when
+                `use_overlap_instead_of_iou` is False).
+                => This method is the one to choose to later compute mAP.
+
+            * A predicted panel which has an overlap > `threshold` (0.66 by default) with a
+                ground truth panel is counted as a positive match (when
+                `use_overlap_instead_of_iou` is True)
+                => This method is the one to choose to later compute the ImageCLEF accuracy.
+                (see http://ceur-ws.org/Vol-1179/CLEF2013wn-ImageCLEF-SecoDeHerreraEt2013b.pdf)
 
         Args:
-            overlap_threshold (float): The overlap threshold needed for a prediction to be
-                                            classified as valid.
+            use_overlap_instead_of_iou (bool):  if True, computes the number of correct matches
+                                                    using the ImageCLEF rule. This affects the
+                                                    default value of the threshold.
+            threshold (float):                  The iou (or overlap) threshold needed for a
+                                                    prediction to be classified as valid.
 
         Returns:
             num_correct (int): The number of accurate predictions.
         """
+
+        if threshold is None:
+            threshold = 0.66 if use_overlap_instead_of_iou else 0.5
+
         num_correct = 0
         picked_pred_panels_indices = [False for _ in range(len(self.pred_panels))]
         for gt_panel in self.gt_panels:
-            max_overlap = -1
-            max_auto_index = -1
+            max_metric = -1
+            best_matching_pred_panel_index = -1
+
             for pred_panel_index, pred_panel in enumerate(self.pred_panels):
                 if picked_pred_panels_indices[pred_panel_index]:
                     continue
-                intersection_area = box.intersection_area(gt_panel.panel_rect,
-                                                          pred_panel.panel_rect)
-                if intersection_area == 0:
-                    continue
-                pred_panel_area = box.area(pred_panel.panel_rect)
-                overlap = intersection_area / pred_panel_area
-                if overlap > max_overlap:
-                    max_overlap = overlap
-                    max_auto_index = pred_panel_index
 
-            if max_overlap > overlap_threshold:
+                if use_overlap_instead_of_iou:
+                    # --> Using ImageCLEF metric
+                    intersection_area = box.intersection_area(gt_panel.panel_rect,
+                                                              pred_panel.panel_rect)
+                    if intersection_area == 0:
+                        continue
+                    pred_panel_area = box.area(pred_panel.panel_rect)
+                    overlap = intersection_area / pred_panel_area
+
+                    metric = overlap
+                else:
+                    # Using IoU (common for object detection)
+                    iou = box.iou(gt_panel.panel_rect, pred_panel.panel_rect)
+
+                    metric = iou
+
+                if metric > max_metric:
+                    max_metric = metric
+                    best_matching_pred_panel_index = pred_panel_index
+
+            if max_metric > threshold:
                 num_correct += 1
-                picked_pred_panels_indices[max_auto_index] = True
+                picked_pred_panels_indices[best_matching_pred_panel_index] = True
 
         return num_correct
-
 
 
 ##################
@@ -515,6 +542,15 @@ class Figure:
                 panel.draw_elements(image=preview_img,
                                     color=(255, 255, 0))
 
+            return preview_img
+
+        elif mode == 'gt':
+            panels = self.gt_panels
+
+        # mode = 'pred'
+        else:
+            panels = self.pred_panels
+
         shape_colors = [
             (255, 0, 0),
             (0, 255, 0),
@@ -524,10 +560,6 @@ class Figure:
             (0, 255, 255),
         ]
 
-        if mode == 'gt':
-            panels = self.gt_panels
-        elif mode == 'pred':
-            panels = self.pred_panels
 
         if panels is None:
             raise ValueError(f"{mode} panels are None. Cannot display")

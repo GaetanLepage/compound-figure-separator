@@ -3,10 +3,13 @@ TODO
 """
 
 import logging
+from collections import defaultdict, OrderedDict
+
 import torch
 
 from detectron2.data import MetadataCatalog
 from detectron2.evaluation.evaluator import DatasetEvaluator
+from detectron2.utils import comm
 
 from panel_seg.io.figure_generators import image_clef_xml_figure_generator
 from panel_seg.utils.figure.panel import Panel
@@ -64,7 +67,6 @@ class PanelSplitEvaluator(DatasetEvaluator):
 
         for input, output in zip(inputs, outputs):
             image_id = input["image_id"]
-            print(image_id)
             instances = output["instances"].to(self._cpu_device)
             boxes = instances.pred_boxes.tensor.numpy()
             # print("boxes =", boxes)
@@ -76,19 +78,11 @@ class PanelSplitEvaluator(DatasetEvaluator):
             for box, score, cls in zip(boxes, scores, classes):
                 prediction = {}
                 assert cls == 0, "class should be 0 as we are only detecting panels."
-                # xmin, ymin, xmax, ymax = box
-                # The inverse of data loading logic in `datasets/pascal_voc.py`
-                # xmin += 1
-                # ymin += 1
-                # self._predictions[cls].append(
-                    # f"{image_id} {score:.3f} {xmin:.1f} {ymin:.1f} {xmax:.1f} {ymax:.1f}"
-                # )
                 prediction['box'] = box
                 prediction['score'] = score
                 predicted_panels.append(prediction)
 
             self._predictions[image_id] = predicted_panels
-            print("LEN_PRED = ", len(self._predictions))
 
 
     def evaluate(self):
@@ -104,6 +98,15 @@ class PanelSplitEvaluator(DatasetEvaluator):
                 * key: the name of the task (e.g., bbox)
                 * value: a dict of {metric name: score}, e.g.: {"AP50": 80}
         """
+        # Gathering
+        all_predictions = comm.gather(self._predictions, dst=0)
+        if not comm.is_main_process():
+            return
+        predictions = defaultdict(list)
+        for predictions_per_rank in all_predictions:
+            for clsid, lines in predictions_per_rank.items():
+                predictions[clsid].extend(lines)
+        del all_predictions
 
         # TODO make cases {Zou, ImageCLEF}
 
@@ -115,7 +118,7 @@ class PanelSplitEvaluator(DatasetEvaluator):
 
             for figure in figure_generator:
 
-                predicted_panels = self._predictions[figure.index]
+                predicted_panels = predictions[figure.index]
 
                 predicted_panel_objects = []
 
@@ -128,4 +131,7 @@ class PanelSplitEvaluator(DatasetEvaluator):
 
                 yield figure
 
-        evaluate_predictions(figure_generator=augmented_figure_generator())
+        metrics_dict = evaluate_predictions(figure_generator=augmented_figure_generator())
+
+        # Respect the expected result for a DatasetEvaluator
+        return OrderedDict({'bbox': metrics_dict})
