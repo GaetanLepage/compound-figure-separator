@@ -3,10 +3,15 @@ OUTPUT_DIR: "panel_seg/panel_split/output_detectron"
 MODEL:
   RETINANET:
     NUM_CLASSES: 1
+    NMS_THRESH_TEST: 0.1
 DATASETS:
   TRAIN: ("image_clef_train",)
+  VALIDATION: ("image_clef_val",)
   TEST: ("image_clef_test",)
 SOLVER:
   IMS_PER_BATCH: 4
+VALIDATION:
+  VALIDATION_PERIOD: 1000
 TEST:
-  EVAL_PERIOD: 20
+  EVAL_PERIOD: 0
+  DETECTIONS_PER_IMAGE: 16
