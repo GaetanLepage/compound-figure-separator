@@ -16,19 +16,18 @@ this file as an example of how to use the library.
 You may want to write your own script with your datasets and other customizations.
 """
 
-import logging
 import os
-from collections import OrderedDict
-import torch
 
 import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
-from detectron2.engine import DefaultTrainer, default_argument_parser, default_setup, hooks, launch
+from detectron2.engine import DefaultTrainer, default_argument_parser, default_setup, launch
 from detectron2.evaluation import verify_results
-from detectron2.modeling import GeneralizedRCNNWithTTA
+from detectron2.data.build import build_detection_test_loader
+from detectron2.data.dataset_mapper import DatasetMapper
 
 from panel_seg.panel_split.load_panel_split_datasets import register_image_clef_datasets
+from panel_seg.panel_split.loss_eval_hook import LossEvalHook
 from panel_seg.panel_split.panel_split_evaluator import PanelSplitEvaluator
 
 
@@ -73,9 +72,9 @@ def main(args):
     register_image_clef_datasets()
     if args.eval_only:
         model = Trainer.build_model(cfg)
-        DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
-            cfg.MODEL.WEIGHTS, resume=args.resume
-        )
+        DetectionCheckpointer(model,
+                              save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS,
+                                                                      resume=args.resume)
         res = Trainer.test(cfg, model)
         # if cfg.TEST.AUG.ENABLED:
             # res.update(Trainer.test_with_TTA(cfg, model))
@@ -83,15 +82,18 @@ def main(args):
             verify_results(cfg, res)
         return res
 
-    """
-    If you'd like to do anything fancier than the standard training logic,
-    consider writing your own training loop or subclassing the trainer.
-    """
+    # If you'd like to do anything fancier than the standard training logic,
+    # consider writing your own training loop or subclassing the trainer.
     trainer = Trainer(cfg)
     trainer.resume_or_load(resume=args.resume)
     # trainer.register_hooks(
-        # [hooks.EvalHook(eval_period=20,
-                        # eval_function=lambda: trainer.test_with_TTA(cfg, trainer.model))])
+        # [LossEvalHook(eval_period=cfg.VALIDATION.VALIDATION_PERIOD,
+                      # model=model,
+                      # data_loader=build_detection_test_loader(
+                          # cfg=cfg,
+                          # dataset_name=cfg.DATASETS.VALIDATION,
+                          # mapper=DatasetMapper(cfg=cfg,
+                                               # is_train=True)))])
     return trainer.train()
 
 
