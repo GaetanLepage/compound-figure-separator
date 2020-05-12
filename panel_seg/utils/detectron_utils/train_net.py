@@ -25,7 +25,7 @@ from detectron2.data.dataset_mapper import DatasetMapper
 from panel_seg.panel_split.model.load_panel_split_datasets import register_image_clef_datasets
 from panel_seg.utils.detectron_utils.loss_eval_hook import LossEvalHook
 from panel_seg.panel_split.model.panel_split_evaluator import PanelSplitEvaluator
-from panel_seg.panel_split.model.config import add_evaluation_config
+from panel_seg.utils.detectron_utils.config import add_evaluation_config
 
 
 class Trainer(DefaultTrainer):
@@ -36,7 +36,10 @@ class Trainer(DefaultTrainer):
     """
 
     @classmethod
-    def build_evaluator(cls, cfg, dataset_name, output_folder=None):
+    def build_evaluator(cls,
+                        cfg,
+                        dataset_name,
+                        output_folder=None):
         """
         Create evaluator(s) for a given dataset.
         This uses the special metadata "evaluator_type" associated with each builtin dataset.
@@ -51,7 +54,13 @@ class Trainer(DefaultTrainer):
 
     def build_hooks(self):
         """
-        TODO
+        This method overwrites the default one from DefaultTrainer.
+        It adds the `LossEvalHook` that allows
+        Build a list of default hooks, including timing, evaluation,
+        checkpointing, lr scheduling, precise BN, writing events.
+
+        Returns:
+            list[HookBase]:
         """
         hooks = super().build_hooks()
 
@@ -65,7 +74,6 @@ class Trainer(DefaultTrainer):
                                       mapper=DatasetMapper(cfg=self.cfg,
                                                            is_train=True))))
         return hooks
-
 
 
 
