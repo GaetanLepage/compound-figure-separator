@@ -10,18 +10,21 @@ def evaluate_predictions(figure_generator: str):
     Args:
         figure_generator:   A figure generator yielding Figure objects augmented with
                                 predicted panels.
+
+    Returns:
+        A dict containing the computed metrics.
     """
 
     num_samples = 0
+    overall_gt_count = 0
+    overall_pred_count = 0
 
     # ImageCLEF
     sum_imageclef_accuracies = 0.0
 
 
+    # Stats to compute mAP
     overall_correct_count = 0
-    overall_gt_count = 0
-    overall_pred_count = 0
-
     sum_recalls = 0.0
     sum_precisions = 0.0
 
