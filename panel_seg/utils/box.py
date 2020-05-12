@@ -4,6 +4,19 @@ Functions to deal with coordinates and areas of union, intersection of rectangle
 
 from typing import List
 
+def get_center(rectangle: List[float]):
+    """
+    Compute the coordinates of the rectangle center.
+
+    Args:
+        rectangle: rectangle [x1,y1,x2,y2]
+
+    Returns:
+        (x_center, y_center) the coordinates of the center.
+    """
+    return (rectangle[0] + rectangle[2]) / 2.0,\
+           (rectangle[1] + rectangle[3]) / 2.0
+
 def union(
         rectangle_1: List[float],
         rectangle_2: List[float]

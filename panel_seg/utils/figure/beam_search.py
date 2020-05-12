@@ -6,6 +6,7 @@ import math
 from typing import List
 
 from .panel import Panel
+from panel_seg.utils import box
 
 
 def compute_panel_label_distances(panels, labels):
@@ -24,15 +25,11 @@ def compute_panel_label_distances(panels, labels):
     for panel in panels:
         dists = []
         panel_rect = panel.panel_rect
-        panel_center = [
-            (panel_rect[0] + panel_rect[2])/2.0,
-            (panel_rect[1] + panel_rect[3])/2.0]
+        panel_center = box.get_center(panel_rect)
 
         for label in labels:
             label_rect = label.label_rect
-            label_center = [
-                (label_rect[0] + label_rect[2])/2.0,
-                (label_rect[1] + label_rect[3])/2.0]
+            label_center = box.get_center(label_rect)
 
             distance = math.hypot(
                 panel_center[0] - label_center[0],
