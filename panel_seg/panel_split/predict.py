@@ -118,7 +118,6 @@ def predict(figure_generator,
         pred_panels = []
         for box in boxes:
 
-            # TODO check coordinates order convention
             panel = Panel(panel_rect=box)
 
             pred_panels.append(panel)
