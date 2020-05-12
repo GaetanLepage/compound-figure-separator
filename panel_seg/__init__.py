@@ -1,3 +1,15 @@
 """
-Global package for the PanelSeg project.
+######################
+# Panel Segmentation #
+######################
+
+GitHub:         https://github.com/GaetanLepage/panel-seg
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
 """
