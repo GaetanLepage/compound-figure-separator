@@ -22,10 +22,10 @@ from detectron2.evaluation import verify_results
 from detectron2.data.build import build_detection_test_loader
 from detectron2.data.dataset_mapper import DatasetMapper
 
-from panel_seg.panel_split.model.load_panel_split_datasets import register_image_clef_datasets
+from panel_seg.panel_split.load_panel_split_datasets import register_panel_splitting_dataset
 from panel_seg.utils.detectron_utils.loss_eval_hook import LossEvalHook
-from panel_seg.panel_split.model.panel_split_evaluator import PanelSplitEvaluator
-from panel_seg.utils.detectron_utils.config import add_evaluation_config
+from panel_seg.panel_split.panel_split_evaluator import PanelSplitEvaluator
+from panel_seg.utils.detectron_utils.config import add_validation_config
 
 
 class Trainer(DefaultTrainer):
@@ -65,14 +65,16 @@ class Trainer(DefaultTrainer):
         hooks = super().build_hooks()
 
         # We add our custom validation hook
-        hooks.insert(-1,
-                     LossEvalHook(eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
-                                  model=self.model,
-                                  data_loader=build_detection_test_loader(
-                                      cfg=self.cfg,
-                                      dataset_name=self.cfg.DATASETS.VALIDATION,
-                                      mapper=DatasetMapper(cfg=self.cfg,
-                                                           is_train=True))))
+        if self.cfg.DATASETS.VALIDATION != "":
+            hooks.insert(-1,
+                         LossEvalHook(eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
+                                      model=self.model,
+                                      data_loader=build_detection_test_loader(
+                                          cfg=self.cfg,
+                                          dataset_name=self.cfg.DATASETS.VALIDATION,
+                                          mapper=DatasetMapper(cfg=self.cfg,
+                                                               is_train=True))))
+
         return hooks
 
 
@@ -82,7 +84,7 @@ def setup(args):
     Create configs and perform basic setups.
     """
     cfg = get_cfg()
-    add_evaluation_config(cfg)
+    add_validation_config(cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()
@@ -90,11 +92,24 @@ def setup(args):
     return cfg
 
 
+def register_datasets(cfg):
+    """
+    TODO
+    """
+    for dataset_name in cfg.DATASETS.TRAIN:
+        register_panel_splitting_dataset(name=dataset_name)
+
+    for dataset_name in cfg.DATASETS.TEST:
+        register_panel_splitting_dataset(name=dataset_name)
+
+    if cfg.DATASETS.VALIDATION != "":
+        register_panel_splitting_dataset(name=cfg.DATASETS.VALIDATION)
+
+
 def main(args):
     cfg = setup(args)
 
-    # TODO Clean dataset ingest
-    register_image_clef_datasets()
+    register_datasets(cfg)
 
     # Inference only (testing)
     if args.eval_only:

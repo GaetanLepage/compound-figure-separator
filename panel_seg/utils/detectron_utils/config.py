@@ -16,4 +16,4 @@ def add_validation_config(cfg):
     _C.VALIDATION = CN()
 
     # The time between each evaluation
-    _C.VALIDATION.VALIDATION_PERIOD = 1000
+    _C.VALIDATION.VALIDATION_PERIOD = 0
