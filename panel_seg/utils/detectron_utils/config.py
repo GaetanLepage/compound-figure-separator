@@ -1,5 +1,8 @@
-from detectron2.config import CfgNode as CN
+"""
+TODO
+"""
 
+from detectron2.config import CfgNode as CN
 
 def add_evaluation_config(cfg):
     """

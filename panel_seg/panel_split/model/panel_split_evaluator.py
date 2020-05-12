@@ -20,6 +20,8 @@ class PanelSplitEvaluator(DatasetEvaluator):
     """
     Class subclassing Detectron2's `DatasetEvaluator`.
     Perform the evaluation of panel splitting metrics on a given test set.
+
+    TODO: this class can be generalized for the whole PanelSeg project (except the `evaluate` method)
     """
 
 
@@ -116,7 +118,10 @@ class PanelSplitEvaluator(DatasetEvaluator):
             image_directory_path=self._image_directory_path)
 
         def augmented_figure_generator():
-
+            """
+            Iterate over a Figure generator, make predictions and yield back the augmented
+            Figure objects.
+            """
             for figure in figure_generator:
 
                 predicted_panels = predictions[figure.index]

@@ -2,6 +2,8 @@
 
 """
 Load ImageCLEF data set to be used with the Detectron API
+
+TODO : refactor and make more generic.
 """
 
 from detectron2.data import DatasetCatalog, MetadataCatalog
