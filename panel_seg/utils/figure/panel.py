@@ -49,7 +49,7 @@ class Panel:
                       pt1=(self.panel_rect[0], self.panel_rect[1]),
                       pt2=(self.panel_rect[2], self.panel_rect[3]),
                       color=color,
-                      thickness=3)
+                      thickness=2)
 
         if self.label_rect is not None:
             # Draw label box
