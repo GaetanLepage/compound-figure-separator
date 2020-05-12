@@ -18,13 +18,14 @@ from panel_seg.panel_split.evaluate import evaluate_predictions
 
 class PanelSplitEvaluator(DatasetEvaluator):
     """
-    TODO
+    Class subclassing Detectron2's `DatasetEvaluator`.
+    Perform the evaluation of panel splitting metrics on a given test set.
     """
 
 
     def __init__(self, dataset_name, output_dir):
         """
-        TODO
+        init function.
 
         Args:
             dataset_name (str): name of the dataset
