@@ -23,7 +23,7 @@ from detectron2.data.build import build_detection_test_loader
 from detectron2.data.dataset_mapper import DatasetMapper
 
 from panel_seg.panel_split.model.load_panel_split_datasets import register_image_clef_datasets
-from panel_seg.utils.loss_eval_hook import LossEvalHook
+from panel_seg.utils.detectron_utils.loss_eval_hook import LossEvalHook
 from panel_seg.panel_split.model.panel_split_evaluator import PanelSplitEvaluator
 from panel_seg.panel_split.model.config import add_evaluation_config
 
@@ -31,30 +31,9 @@ from panel_seg.panel_split.model.config import add_evaluation_config
 class Trainer(DefaultTrainer):
     """
     We use the "DefaultTrainer" which contains pre-defined default logic for
-    standard training workflow. They may not work for you, especially if you
-    are working on a new research project. In that case you can use the cleaner
-    "SimpleTrainer", or write your own training loop. You can use
-    "tools/plain_train_net.py" as an example.
+    standard training workflow.
+    Here, the Trainer is able to perform validation.
     """
-
-                 # evaluation_period: int,
-                 # evaluation_dataset_name: str):
-    def __init__(self,
-                 cfg: CfgNode):
-        """
-        TODO doc
-
-        Args:
-            cfg (CfgNode): TODO
-            evaluation_period (int): TODO
-            evaluation_dataset_name (str): TODO
-        """
-        self._validation_period = cfg.VALIDATION.VALIDATION_PERIOD
-        # self._validation_period = evaluation_period
-        self._validation_dataset_name = cfg.DATASETS.VALIDATION
-        # self._validation_dataset_name = evaluation_dataset_name
-        super().__init__(cfg)
-
 
     @classmethod
     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
@@ -76,12 +55,13 @@ class Trainer(DefaultTrainer):
         """
         hooks = super().build_hooks()
 
+        # We add our custom validation hook
         hooks.insert(-1,
-                     LossEvalHook(eval_period=self._validation_period,
+                     LossEvalHook(eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
                                   model=self.model,
                                   data_loader=build_detection_test_loader(
                                       cfg=self.cfg,
-                                      dataset_name=self._validation_dataset_name,
+                                      dataset_name=self.cfg.DATASETS.VALIDATION,
                                       mapper=DatasetMapper(cfg=self.cfg,
                                                            is_train=True))))
         return hooks
@@ -105,39 +85,35 @@ def setup(args):
 def main(args):
     cfg = setup(args)
 
+    # TODO Clean dataset ingest
     register_image_clef_datasets()
 
+    # Inference only (testing)
     if args.eval_only:
+
+        # Load the model
         model = Trainer.build_model(cfg)
+
+        # Load the latest weights
         DetectionCheckpointer(model,
                               save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS,
                                                                       resume=args.resume)
         res = Trainer.test(cfg, model)
-        # if cfg.TEST.AUG.ENABLED:
-            # res.update(Trainer.test_with_TTA(cfg, model))
         if comm.is_main_process():
             verify_results(cfg, res)
         return res
 
-    # If you'd like to do anything fancier than the standard training logic,
-    # consider writing your own training loop or subclassing the trainer.
+    # Training
     trainer = Trainer(cfg)
-                      # args.evaluation_period,
-                      # args.evaluation_dataset_name)
     trainer.resume_or_load(resume=args.resume)
     return trainer.train()
 
 
 if __name__ == "__main__":
     parser = default_argument_parser()
-    parser.add_argument("--eval-period",
-                        help="The number of iterations between two validations.",
-                        type=int,
-                        default=5000)
 
     args = parser.parse_args()
     print("Command Line Args:", args)
-    # load_datasets(args.dataset)
     launch(main,
            args.num_gpus,
            num_machines=args.num_machines,
