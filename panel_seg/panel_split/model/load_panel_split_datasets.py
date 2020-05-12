@@ -28,13 +28,13 @@ def _train_val_splitter(is_train=True):
         image_directory_path=TRAIN_IMAGE_PATH)
 
     for index, figure in enumerate(train_figure_generator):
-        # if is_train and index % 5:
-            # yield figure
-
-        # elif not (is_train and index % 5):
-            # yield figure
-        if is_train:
+        if is_train and index % 5:
             yield figure
+
+        elif not (is_train and index % 5):
+            yield figure
+        # if is_train:
+            # yield figure
 
 
 
