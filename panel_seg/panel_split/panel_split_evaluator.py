@@ -39,9 +39,13 @@ class PanelSplitEvaluator(DatasetEvaluator):
         self._logger = logging.getLogger(__name__)
         self._predictions = dict()
 
+        # The figure generator corresponding to the dataset
+        # TODO Not possible to handle LIST of test data sets.
+        self._figure_generator = meta.figure_generator
+
         # TODO assert we are dealing with ImageCLEF
-        self._xml_annotation_file_path = meta.xml_annotation_file_path
-        self._image_directory_path = meta.image_directory_path
+        # self._xml_annotation_file_path = meta.xml_annotation_file_path
+        # self._image_directory_path = meta.image_directory_path
 
 
     def reset(self):
@@ -113,16 +117,17 @@ class PanelSplitEvaluator(DatasetEvaluator):
 
         # TODO make cases {Zou, ImageCLEF}
 
-        figure_generator = image_clef_xml_figure_generator(
-            xml_annotation_file_path=self._xml_annotation_file_path,
-            image_directory_path=self._image_directory_path)
+        # figure_generator = image_clef_xml_figure_generator(
+            # xml_annotation_file_path=self._xml_annotation_file_path,
+            # image_directory_path=self._image_directory_path)
+
 
         def augmented_figure_generator():
             """
             Iterate over a Figure generator, make predictions and yield back the augmented
             Figure objects.
             """
-            for figure in figure_generator:
+            for figure in self._figure_generator:
 
                 predicted_panels = predictions[figure.index]
 

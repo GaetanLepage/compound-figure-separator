@@ -6,12 +6,13 @@ MODEL:
     NMS_THRESH_TEST: 0.1
 DATASETS:
   TRAIN: ("image_clef_train",)
-  VALIDATION: "image_clef_val"
-  TEST: ("image_clef_test",)
+  #VALIDATION: "image_clef_val"
+  #TEST: ("image_clef_test",)
+  TEST: ("panel_seg_test",)
 SOLVER:
   IMS_PER_BATCH: 4
-VALIDATION:
-  VALIDATION_PERIOD: 5000
+#VALIDATION:
+  #VALIDATION_PERIOD: 5000
 TEST:
   EVAL_PERIOD: 0
   DETECTIONS_PER_IMAGE: 16

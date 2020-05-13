@@ -344,8 +344,8 @@ class Figure:
             """
             if len(labels) != 0 and len(labels) != len(panels):
                 logging.warning(
-                    '%s: has different panel and label rects. Most likely there"\
-                        " are mixes with-label and without-label panels',
+                    "%s: has different panel and label rects. Most likely there"\
+                        " are mixes with-label and without-label panels",
                     annotation_file_path)
 
             # collect all panel label characters

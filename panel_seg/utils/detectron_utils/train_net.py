@@ -97,13 +97,13 @@ def register_datasets(cfg):
     TODO
     """
     for dataset_name in cfg.DATASETS.TRAIN:
-        register_panel_splitting_dataset(name=dataset_name)
+        register_panel_splitting_dataset(dataset_name=dataset_name)
 
     for dataset_name in cfg.DATASETS.TEST:
-        register_panel_splitting_dataset(name=dataset_name)
+        register_panel_splitting_dataset(dataset_name=dataset_name)
 
     if cfg.DATASETS.VALIDATION != "":
-        register_panel_splitting_dataset(name=cfg.DATASETS.VALIDATION)
+        register_panel_splitting_dataset(dataset_name=cfg.DATASETS.VALIDATION)
 
 
 def main(args):
