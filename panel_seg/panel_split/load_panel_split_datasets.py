@@ -6,8 +6,6 @@ Load ImageCLEF data set to be used with the Detectron API
 TODO : refactor and make more generic.
 """
 
-from itertools import tee
-
 from detectron2.data import DatasetCatalog, MetadataCatalog
 
 from panel_seg.io.figure_generators import (
@@ -44,18 +42,18 @@ def register_panel_splitting_dataset(dataset_name):
             raise NotImplementedError("Validation data set has not yet been created.")
 
         else:
+            # TODO warn the user in this case
             pass
 
         # TODO might be useful to implement generators as a class
         # Create two instances of the figure_generator so that one is given to the metadata
-        figure_generator, figure_generator_copy = tee(image_clef_xml_figure_generator(
+        figure_generator = image_clef_xml_figure_generator(
             xml_annotation_file_path=xml_annotation_file_path,
-            image_directory_path=image_directory_path))
+            image_directory_path=image_directory_path)
 
-        # MetadataCatalog.get(name=dataset_name).set(
-            # xml_annotation_file_path=xml_annotation_file_path)
-        # MetadataCatalog.get(name=dataset_name).set(
-            # image_directory_path=image_directory_path)
+        figure_generator_copy = image_clef_xml_figure_generator(
+            xml_annotation_file_path=xml_annotation_file_path,
+            image_directory_path=image_directory_path)
 
 
     # Dataset from Zou
@@ -71,13 +69,14 @@ def register_panel_splitting_dataset(dataset_name):
         else:
             pass
 
-        figure_generator, figure_generator_copy = tee(iphotodraw_xml_figure_generator(
-            eval_list_txt=eval_list_txt))
-
-        # MetadataCatalog.get(name=dataset_name).set(eval_list_txt=eval_list_txt)
-        # MetadataCatalog.get(name=dataset_name).set(image_directory_path=image_directory_path)
+        # Create two instances of the figure_generator so that one is given to the metadata
+        figure_generator = iphotodraw_xml_figure_generator(
+            eval_list_txt=eval_list_txt)
+        figure_generator_copy = iphotodraw_xml_figure_generator(
+            eval_list_txt=eval_list_txt)
 
     else:
+        # TODO warn the user in this case
         pass
 
     DatasetCatalog.register(name=dataset_name,

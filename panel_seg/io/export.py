@@ -76,13 +76,13 @@ def export_figures_to_tf_record(figure_generator,
 
 def export_figures_to_detectron_dict(figure_generator):
     """
-    Export a set of Figure objects to a ddict which is compatible with Facebook Detectron 2.
+    Export a set of Figure objects to a dict which is compatible with Facebook Detectron 2.
 
     Args:
         figure_generator:   A generator yielding figure objects.
 
     Returns:
-        dataset_dicts (dict): a dict representing tthe data set.
+        dataset_dicts (dict): a dict representing the data set.
     """
     from detectron2.structures import BoxMode
 
@@ -95,11 +95,8 @@ def export_figures_to_detectron_dict(figure_generator):
         record["height"] = figure.image_height
         record["width"] = figure.image_width
 
-        # annos = v["regions"]
         objs = []
         for panel in figure.gt_panels:
-            # assert not anno["region_attributes"]
-            # anno = anno["shape_attributes"]
 
             obj = {
                 "bbox": panel.panel_rect,
