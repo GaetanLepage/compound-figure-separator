@@ -30,6 +30,8 @@ from panel_seg.utils.detectron_utils.config import add_validation_config
 
 class Trainer(DefaultTrainer):
     """
+    TODO : do une train_net.py per task... or find a better way to split the work
+
     We use the "DefaultTrainer" which contains pre-defined default logic for
     standard training workflow.
     Here, the Trainer is able to perform validation.
@@ -41,15 +43,12 @@ class Trainer(DefaultTrainer):
                         dataset_name,
                         output_folder=None):
         """
-        Create evaluator(s) for a given dataset.
-        This uses the special metadata "evaluator_type" associated with each builtin dataset.
-        For your own dataset, you can simply create an evaluator manually in your
-        script and do not have to worry about the hacky if-else logic here.
+        TODO
         """
         if output_folder is None:
             output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
 
-        return PanelSplitEvaluator(dataset_name, output_folder)
+        return PanelSplitEvaluator(dataset_name, tasks)
 
 
     def build_hooks(self):
