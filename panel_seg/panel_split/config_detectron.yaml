@@ -8,7 +8,7 @@ DATASETS:
   TRAIN: ("image_clef_train",)
   #VALIDATION: "image_clef_val"
   #TEST: ("image_clef_test",)
-  TEST: ("panel_seg_test",)
+  TEST: ("image_clef_test",)
 SOLVER:
   IMS_PER_BATCH: 4
 #VALIDATION:
