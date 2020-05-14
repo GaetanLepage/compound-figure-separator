@@ -429,11 +429,11 @@ class Figure:
 # EVALUATION #
 ##############
 
-    def get_num_correct_predictions(self,
-                                    use_overlap_instead_of_iou=False,
-                                    threshold: float = None) -> int:
+    def get_num_correct_predictions_panel_splitting(self,
+                                                    use_overlap_instead_of_iou=False,
+                                                    threshold: float = None) -> int:
         """
-        Compute the number of rightly predicted panels for the figure according to oen of the
+        Compute the number of rightly predicted panels for the figure according to one of the
         following criteria:
             * A predicted panel which has an IoU > `threshold` (0.5 by default) with a
                 ground truth panel is counted as a positive match (default case, i.e. when
@@ -445,6 +445,8 @@ class Figure:
                 `use_overlap_instead_of_iou` is True)
                 => This method is the one to choose to later compute the ImageCLEF accuracy.
                 (see http://ceur-ws.org/Vol-1179/CLEF2013wn-ImageCLEF-SecoDeHerreraEt2013b.pdf)
+
+        ==> Use this to evaluate the 'panel splitting' task.
 
         Args:
             use_overlap_instead_of_iou (bool):  if True, computes the number of correct matches
@@ -481,7 +483,7 @@ class Figure:
 
                     metric = overlap
                 else:
-                    # Using IoU (common for object detection)
+                    # --> Using IoU (common for object detection)
                     iou = box.iou(gt_panel.panel_rect, pred_panel.panel_rect)
 
                     metric = iou
@@ -491,6 +493,43 @@ class Figure:
                     best_matching_pred_panel_index = pred_panel_index
 
             if max_metric > threshold:
+                num_correct += 1
+                picked_pred_panels_indices[best_matching_pred_panel_index] = True
+
+        return num_correct
+
+
+    def get_num_correct_predictions_label_recognition(self):
+        """
+        Compute the number of rightly predicted labels for the figure :
+        A predicted panel which has an IoU > `threshold` (0.5 by default) with a
+        ground truth panel is counted as a positive match
+
+        ==> Use this to evaluate the 'label recognition' task.
+
+        TODO finish to code this
+
+        Returns:
+            num_correct (int): The number of accurate predictions.
+        """
+
+        num_correct = 0
+        picked_pred_panels_indices = [False for _ in range(len(self.pred_panels))]
+        for gt_panel in self.gt_panels:
+            max_iou = -1
+            best_matching_pred_panel_index = -1
+
+            for pred_panel_index, pred_panel in enumerate(self.pred_panels):
+                if picked_pred_panels_indices[pred_panel_index]:
+                    continue
+
+                iou = box.iou(gt_panel.label_rect, pred_panel.label_rect)
+
+                if iou > max_iou:
+                    max_iou = iou
+                    best_matching_pred_panel_index = pred_panel_index
+
+            if max_iou > 0.5:
                 num_correct += 1
                 picked_pred_panels_indices[best_matching_pred_panel_index] = True
 
@@ -544,7 +583,7 @@ class Figure:
 
             return preview_img
 
-        elif mode == 'gt':
+        if mode == 'gt':
             panels = self.gt_panels
 
         # mode = 'pred'
