@@ -74,7 +74,7 @@ def export_figures_to_tf_record(figure_generator,
             writer.write(tf_example.SerializeToString())
 
 
-def export_figures_to_detectron_dict(figure_generator):
+def export_figures_to_detectron_dict(figure_generator, task='panel_splitting'):
     """
     Export a set of Figure objects to a dict which is compatible with Facebook Detectron 2.
 
@@ -86,6 +86,10 @@ def export_figures_to_detectron_dict(figure_generator):
     """
     from detectron2.structures import BoxMode
 
+    if task not in ['panel_splitting', 'label_recog', 'panel_seg']:
+        raise ValueError("`task` has to be one of ['panel_splitting', 'label_recog',"\
+            f" 'panel_seg'] but is {task}")
+
     dataset_dicts = []
     for index, figure in enumerate(figure_generator):
         record = {}
@@ -96,13 +100,25 @@ def export_figures_to_detectron_dict(figure_generator):
         record["width"] = figure.image_width
 
         objs = []
+
         for panel in figure.gt_panels:
 
-            obj = {
-                "bbox": panel.panel_rect,
-                "bbox_mode": BoxMode.XYXY_ABS,
-                "category_id": 0
-            }
+            if task == 'panel_splitting':
+                obj = {
+                    "bbox": panel.panel_rect,
+                    "bbox_mode": BoxMode.XYXY_ABS,
+                    "category_id": 0
+                }
+            elif task == 'label_recog':
+                obj = {
+                    "bbox": panel.label_rect,
+                    "bbox_mode": BoxMode.XYXY_ABS,
+                    "category_id": panel.label
+                }
+            # panel segmentation task
+            else:
+                raise NotImplementedError("Dict() export is not yet implemented.")
+
             objs.append(obj)
         record["annotations"] = objs
         dataset_dicts.append(record)
