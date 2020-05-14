@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-
 """
-Load ImageCLEF data set to be used with the Detectron API
+Load ImageCLEF and PanelSeg data sets to be used with the Detectron API for the
+panel splitting task.
 
 TODO : refactor and make more generic.
 """
@@ -13,7 +12,6 @@ from panel_seg.io.figure_generators import (
     iphotodraw_xml_figure_generator)
 
 from panel_seg.io.export import export_figures_to_detectron_dict
-
 
 def register_panel_splitting_dataset(dataset_name):
     """
@@ -58,11 +56,11 @@ def register_panel_splitting_dataset(dataset_name):
 
     # Dataset from Zou
     elif "panel_seg" in dataset_name:
-        if dataset_name == "panel_seg_train":
+        if dataset_name == "zou_panel_splitting_train":
             eval_list_txt = "data/zou/train.txt"
             image_directory_path = "data/zou/"
 
-        elif dataset_name == "panel_seg_test":
+        elif dataset_name == "zou_panel_splitting_test":
             eval_list_txt = "data/zou/train.txt"
             image_directory_path = "data/zou/"
 
