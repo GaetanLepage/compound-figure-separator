@@ -156,6 +156,7 @@ def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
         with open(eval_list_txt, 'r') as eval_list_file:
             eval_list_lines = eval_list_file.read().splitlines()
 
+        # TODO remove ?
         # image_paths = [
             # os.path.abspath(line) if os.path.isfile(line)
             # else os.path.abspath(os.path.join(DATA_DIR, line))
@@ -265,6 +266,7 @@ def global_csv_figure_generator(
                 except ValueError:
                     label_coordinates = None
                     label = None
+
             # Panel splitting only
             elif len(row) == 6:
                 label_coordinates = None
