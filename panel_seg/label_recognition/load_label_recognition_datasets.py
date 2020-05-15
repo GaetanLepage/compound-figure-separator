@@ -16,7 +16,7 @@ from panel_seg.io.export import export_figures_to_detectron_dict
 from panel_seg.utils.figure.label_class import LABEL_CLASS_MAPPING
 
 
-def register_panel_splitting_dataset(dataset_name):
+def register_label_recognition_dataset(dataset_name):
     """
     Register the appropriate data set for panel splitting in the Detectron `DatasetCatalog`.
 
