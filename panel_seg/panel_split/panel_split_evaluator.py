@@ -1,12 +1,13 @@
 """
+        # TODO inverser les boucles
 TODO
 """
 
-from panel_seg.utils.figure.panel import Panel
+from panel_seg.utils.figure.panel import DetectedPanel
 
 from panel_seg.utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 
-from panel_seg.panel_split.evaluate import evaluate_predictions
+from panel_seg.panel_split.evaluate import evaluate_detections
 
 class PanelSplitEvaluator(PanelSegAbstractEvaluator):
     """
@@ -20,7 +21,7 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
         """
         super().__init__(dataset_name=dataset_name,
                          task_name='panel_splitting',
-                         evaluation_function=evaluate_predictions)
+                         evaluation_function=evaluate_detections)
 
     def process(self, inputs, outputs):
         """
@@ -70,12 +71,13 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
             predicted_panel_objects = []
 
             for prediction in predicted_panels:
-                panel = Panel(panel_rect=prediction['box'])
+                panel = DetectedPanel(panel_rect=prediction['box'],
+                                      panel_detection_score=prediction['score'])
 
                 predicted_panel_objects.append(panel)
 
                 # TODO do some post processing here maybe
 
-            figure.pred_panels = predicted_panel_objects
+            figure.detected_panels = predicted_panel_objects
 
             yield figure

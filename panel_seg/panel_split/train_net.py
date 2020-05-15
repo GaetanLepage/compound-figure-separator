@@ -48,7 +48,7 @@ class Trainer(DefaultTrainer):
         if output_folder is None:
             output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
 
-        return PanelSplitEvaluator(dataset_name, tasks)
+        return PanelSplitEvaluator(dataset_name)
 
 
     def build_hooks(self):

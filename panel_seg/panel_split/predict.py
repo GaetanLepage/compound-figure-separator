@@ -115,13 +115,13 @@ def predict(figure_generator,
                                                  labels=labels,
                                                  image_shape=image.shape)
 
-        pred_panels = []
+        detected_panels = []
         for box in boxes:
 
             panel = Panel(panel_rect=box)
 
-            pred_panels.append(panel)
+            detected_panels.append(panel)
 
-        figure.pred_panels = pred_panels
+        figure.detected_panels = detected_panels
 
         yield figure

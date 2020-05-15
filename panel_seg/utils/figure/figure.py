@@ -64,7 +64,7 @@ class Figure:
         self.gt_panels = None
 
         # Predicted panels
-        self.pred_panels = None
+        self.detected_panels = None
 
         # Logger
         self._logger = logging.getLogger(__name__)
@@ -109,7 +109,7 @@ class Figure:
             annotations_folder: Path to an annotation file (csv format).
             is_ground_truth:    Tells whether annotations are ground truth or predictions
                                     If True, annotations will be stored in `self.gt_panels`
-                                    else, in `self.pred_panels`
+                                    else, in `self.detected_panels`
         """
 
         base_name = os.path.splitext(self.image_filename)[0]
@@ -161,7 +161,7 @@ class Figure:
         if is_ground_truth:
             self.gt_panels = panels
         else:
-            self.pred_panels = panels
+            self.detected_panels = panels
 
 
 
@@ -429,10 +429,11 @@ class Figure:
 # EVALUATION #
 ##############
 
-    def get_num_correct_predictions_panel_splitting(self,
-                                                    use_overlap_instead_of_iou=False,
-                                                    threshold: float = None) -> int:
+    def match_detected_and_gt_panels(self,
+                                     iou_threshold: float = 0.5,
+                                     overlap_threshold: float = 0.66):
         """
+        TODO: update doc as this method radically changed.
         Compute the number of rightly predicted panels for the figure according to one of the
         following criteria:
             * A predicted panel which has an IoU > `threshold` (0.5 by default) with a
@@ -459,44 +460,53 @@ class Figure:
             num_correct (int): The number of accurate predictions.
         """
 
-        if threshold is None:
-            threshold = 0.66 if use_overlap_instead_of_iou else 0.5
+        picked_gt_panels_overlap = [False] * len(self.gt_panels)
+        picked_gt_panels_iou = [False] * len(self.gt_panels)
 
-        num_correct = 0
-        picked_pred_panels_indices = [False for _ in range(len(self.pred_panels))]
-        for gt_panel in self.gt_panels:
-            max_metric = -1
-            best_matching_pred_panel_index = -1
+        for detected_panel in self.detected_panels:
+            max_iou = -1
+            max_overlap = -1
 
-            for pred_panel_index, pred_panel in enumerate(self.pred_panels):
-                if picked_pred_panels_indices[pred_panel_index]:
+            best_matching_gt_panel_iou_index = -1
+            best_matching_gt_panel_overlap_index = -1
+
+            for gt_panel_index, gt_panel in enumerate(self.gt_panels):
+
+                intersection_area = box.intersection_area(gt_panel.panel_rect,
+                                                          detected_panel.panel_rect)
+                if intersection_area == 0:
                     continue
 
-                if use_overlap_instead_of_iou:
-                    # --> Using ImageCLEF metric
-                    intersection_area = box.intersection_area(gt_panel.panel_rect,
-                                                              pred_panel.panel_rect)
-                    if intersection_area == 0:
-                        continue
-                    pred_panel_area = box.area(pred_panel.panel_rect)
-                    overlap = intersection_area / pred_panel_area
+                detected_panel_area = box.area(detected_panel.panel_rect)
 
-                    metric = overlap
-                else:
-                    # --> Using IoU (common for object detection)
-                    iou = box.iou(gt_panel.panel_rect, pred_panel.panel_rect)
+                # --> Using ImageCLEF metric (overlap)
+                overlap = intersection_area / detected_panel_area
 
-                    metric = iou
+                if overlap > max_overlap:
+                    max_overlap = overlap
+                    best_matching_gt_panel_overlap_index = gt_panel_index
 
-                if metric > max_metric:
-                    max_metric = metric
-                    best_matching_pred_panel_index = pred_panel_index
+                # --> Using IoU (common for object detection)
+                iou = box.iou(gt_panel.panel_rect, detected_panel.panel_rect)
 
-            if max_metric > threshold:
-                num_correct += 1
-                picked_pred_panels_indices[best_matching_pred_panel_index] = True
+                if iou > max_iou:
+                    max_iou = iou
+                    best_matching_gt_panel_iou_index = gt_panel_index
 
-        return num_correct
+
+            if max_iou > iou_threshold and not picked_gt_panels_iou[best_matching_gt_panel_iou_index]:
+                picked_gt_panels_iou[best_matching_gt_panel_iou_index] = True
+                detected_panel.panel_is_true_positive_iou = True
+
+            else:
+                detected_panel.panel_is_true_positive_iou = False
+
+            if max_overlap > overlap_threshold and not picked_gt_panels_overlap[best_matching_gt_panel_overlap_index]:
+                picked_gt_panels_overlap[best_matching_gt_panel_overlap_index] = True
+                detected_panel.panel_is_true_positive_overlap = True
+
+            else:
+                detected_panel.panel_is_true_positive_overlap = False
 
 
     def get_num_correct_predictions_label_recognition(self):
@@ -514,24 +524,25 @@ class Figure:
         """
 
         num_correct = 0
-        picked_pred_panels_indices = [False for _ in range(len(self.pred_panels))]
+        picked_detected_panels_indices = [False for _ in range(len(self.detected_panels))]
+        # TODO inverser les boucles
         for gt_panel in self.gt_panels:
             max_iou = -1
-            best_matching_pred_panel_index = -1
+            best_matching_detected_panel_index = -1
 
-            for pred_panel_index, pred_panel in enumerate(self.pred_panels):
-                if picked_pred_panels_indices[pred_panel_index]:
+            for detected_panel_index, detected_panel in enumerate(self.detected_panels):
+                if picked_detected_panels_indices[detected_panel_index]:
                     continue
 
-                iou = box.iou(gt_panel.label_rect, pred_panel.label_rect)
+                iou = box.iou(gt_panel.label_rect, detected_panel.label_rect)
 
                 if iou > max_iou:
                     max_iou = iou
-                    best_matching_pred_panel_index = pred_panel_index
+                    best_matching_detected_panel_index = detected_panel_index
 
             if max_iou > 0.5:
                 num_correct += 1
-                picked_pred_panels_indices[best_matching_pred_panel_index] = True
+                picked_detected_panels_indices[best_matching_detected_panel_index] = True
 
         return num_correct
 
@@ -571,12 +582,12 @@ class Figure:
                 panel.draw_elements(image=preview_img,
                                     color=(0, 255, 0))
 
-            if self.pred_panels is None:
-                self._logger.warning("No predicted panels exist for this figure." \
+            if self.detected_panels is None:
+                self._logger.warning("No detected panels exist for this figure." \
                     " Hence, they cannot be displayed.")
                 return preview_img
 
-            for panel in self.pred_panels:
+            for panel in self.detected_panels:
                 # Yellow for predicted panels
                 panel.draw_elements(image=preview_img,
                                     color=(255, 255, 0))
@@ -588,7 +599,7 @@ class Figure:
 
         # mode = 'pred'
         else:
-            panels = self.pred_panels
+            panels = self.detected_panels
 
         shape_colors = [
             (255, 0, 0),

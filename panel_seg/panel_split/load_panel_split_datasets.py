@@ -55,7 +55,7 @@ def register_panel_splitting_dataset(dataset_name):
 
 
     # Dataset from Zou
-    elif "panel_seg" in dataset_name:
+    elif "zou" in dataset_name:
         if dataset_name == "zou_panel_splitting_train":
             eval_list_txt = "data/zou/train.txt"
             image_directory_path = "data/zou/"
@@ -65,6 +65,7 @@ def register_panel_splitting_dataset(dataset_name):
             image_directory_path = "data/zou/"
 
         else:
+            # TODO warn the user in this case
             pass
 
         # Create two instances of the figure_generator so that one is given to the metadata
