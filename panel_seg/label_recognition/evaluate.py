@@ -12,11 +12,12 @@ from panel_seg.utils.average_precision import compute_average_precision
 
 def evaluate_detections(figure_generator: str):
     """
-    Compute the metrics (ImageCLEF and mAP) from a given set of panel slitting detections.
+    Compute the metrics (precision, recall and mAP) from a given set of
+    label recognition detections.
 
     Args:
         figure_generator:   A figure generator yielding Figure objects augmented with
-                                detected panels.
+                                detected labels.
 
     Returns:
         A dict containing the computed metrics.
@@ -26,11 +27,10 @@ def evaluate_detections(figure_generator: str):
     overall_gt_count = 0
     overall_detected_count = 0
 
-    # ImageCLEF
-    sum_imageclef_accuracies = 0.0
-
     # Stats to compute mAP
     overall_correct_count = 0
+    sum_recalls = 0.0
+    sum_precisions = 0.0
 
     # TODO explain this choice
     detections = SortedKeyList(key=lambda u: u[0])
@@ -39,7 +39,7 @@ def evaluate_detections(figure_generator: str):
 
         # Perform matching on this figure
         # This tests whether a detected panel is true positive or false positive
-        figure.match_detected_and_gt_panels()
+        figure.match_detected_and_gt_panels() # TODO change for labels
 
         # Common counters
         num_samples += 1
@@ -66,6 +66,13 @@ def evaluate_detections(figure_generator: str):
 
         # 2) Usual metrics (based on IOU 0.5 threshold)
         overall_correct_count += num_correct_iou_thresh
+
+        if len(figure.detected_panels) == 0:
+            precision = 0
+        else:
+            precision = num_correct_iou_thresh / len(figure.detected_panels)
+        sum_precisions += precision
+
 
     # 1) ImageCLEF accuracy
     imageclef_accuracy = sum_imageclef_accuracies / num_samples
