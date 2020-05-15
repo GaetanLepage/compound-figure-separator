@@ -1,17 +1,16 @@
 _BASE_: "/home/gaetan/hevs/implementations/object_detection/detectron2/configs/COCO-Detection/retinanet_R_50_FPN_1x.yaml"
-OUTPUT_DIR: "panel_seg/panel_split/output_zou"
+OUTPUT_DIR: "panel_seg/panel_split/output_imageclef"
 MODEL:
   RETINANET:
     NUM_CLASSES: 1
     NMS_THRESH_TEST: 0.1
 DATASETS:
-  TRAIN: ("zou_panel_splitting_train",)
+  TRAIN: ("image_clef_train",)
   #VALIDATION: "image_clef_val"
   #TEST: ("image_clef_test",)
-  TEST: ("zou_panel_splitting_test",)
+  TEST: ("image_clef_test",)
 SOLVER:
   IMS_PER_BATCH: 4
-  BASE_LR: 0.001
 #VALIDATION:
   #VALIDATION_PERIOD: 5000
 TEST:
