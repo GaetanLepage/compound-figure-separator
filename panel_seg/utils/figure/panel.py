@@ -68,6 +68,41 @@ class Panel:
                         color=color)
 
 
+class DetectedPanel(Panel):
+    """
+    TODO
+    """
+
+    def __init__(
+            self,
+            panel_rect: List[float],
+            panel_detection_score: float,
+            label: str = None,
+            label_rect: List[float] = None,
+            label_detection_score: float = None):
+        """
+        Init for a `DetectedPanel` object
+
+        Args:
+            label: the label of the Panel
+            panel_rect: The rectangle localizing the panel
+            label_rect: The rectangle localizing the label
+        """
+
+        super().__init__(panel_rect,
+                         label,
+                         label_rect)
+
+        self.panel_detection_score = panel_detection_score
+        self.label_detection_score = label_detection_score
+
+        self.panel_is_true_positive_iou = False
+        self.panel_is_true_positive_overlap = False
+
+        self.label_is_true_positive_iou = False
+        self.label_is_true_positive_overlap = False
+
+
 class PanelSegError(Exception):
     """
     Exception for FigureSeg
