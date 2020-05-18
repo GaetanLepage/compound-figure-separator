@@ -5,6 +5,8 @@ Export tools for panel-seg datasets
 import csv
 import tensorflow as tf
 
+from panel_seg.utils.figure.label_class import LABEL_CLASS_MAPPING
+
 def export_figures_to_csv(figure_generator,
                           output_csv_file: str,
                           individual_export=False,
@@ -110,16 +112,25 @@ def export_figures_to_detectron_dict(figure_generator, task='panel_splitting'):
                     "category_id": 0
                 }
             elif task == 'label_recog':
+                if panel.label_rect is None or len(panel.label) != 1:
+                    # We ensure that, for this task, the labels are valid
+                    # (they have been previously checked while loading annotations)
+                    continue
+
                 obj = {
                     "bbox": panel.label_rect,
                     "bbox_mode": BoxMode.XYXY_ABS,
-                    "category_id": panel.label
+                    "category_id": LABEL_CLASS_MAPPING[panel.label]
                 }
             # panel segmentation task
             else:
                 raise NotImplementedError("Dict() export is not yet implemented.")
 
             objs.append(obj)
+
         record["annotations"] = objs
-        dataset_dicts.append(record)
+
+        if len(objs) != 0:
+            dataset_dicts.append(record)
+
     return dataset_dicts
