@@ -64,9 +64,6 @@ def evaluate_detections(figure_generator: str):
 
         sum_imageclef_accuracies += imageclef_accuracy
 
-        # 2) Usual metrics (based on IOU 0.5 threshold)
-        overall_correct_count += num_correct_iou_thresh
-
     # 1) ImageCLEF accuracy
     imageclef_accuracy = sum_imageclef_accuracies / num_samples
 

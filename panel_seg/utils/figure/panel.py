@@ -73,13 +73,12 @@ class DetectedPanel(Panel):
     TODO
     """
 
-    def __init__(
-            self,
-            panel_rect: List[float],
-            panel_detection_score: float,
-            label: str = None,
-            label_rect: List[float] = None,
-            label_detection_score: float = None):
+    def __init__(self,
+                 panel_rect: List[float] = None,
+                 panel_detection_score: float = None,
+                 label: str = None,
+                 label_rect: List[float] = None,
+                 label_detection_score: float = None):
         """
         Init for a `DetectedPanel` object
 
@@ -99,8 +98,7 @@ class DetectedPanel(Panel):
         self.panel_is_true_positive_iou = False
         self.panel_is_true_positive_overlap = False
 
-        self.label_is_true_positive_iou = False
-        self.label_is_true_positive_overlap = False
+        self.label_is_true_positive = False
 
 
 class PanelSegError(Exception):

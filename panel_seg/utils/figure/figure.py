@@ -305,6 +305,7 @@ class Figure:
                         '%s: label %s is not single character',
                         annotation_file_path,
                         label_text)
+
                 label_text = label_class.map_label(label_text)
 
                 x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(
@@ -509,7 +510,7 @@ class Figure:
                 detected_panel.panel_is_true_positive_overlap = False
 
 
-    def get_num_correct_predictions_label_recognition(self):
+    def match_detected_and_gt_labels(self):
         """
         Compute the number of rightly predicted labels for the figure :
         A predicted panel which has an IoU > `threshold` (0.5 by default) with a
@@ -517,34 +518,36 @@ class Figure:
 
         ==> Use this to evaluate the 'label recognition' task.
 
-        TODO finish to code this
+        TODO comment the code
 
         Returns:
             num_correct (int): The number of accurate predictions.
         """
 
-        num_correct = 0
-        picked_detected_panels_indices = [False for _ in range(len(self.detected_panels))]
-        # TODO inverser les boucles
-        for gt_panel in self.gt_panels:
-            max_iou = -1
-            best_matching_detected_panel_index = -1
+        picked_gt_panels_indices = [False] * len(self.gt_panels)
 
-            for detected_panel_index, detected_panel in enumerate(self.detected_panels):
-                if picked_detected_panels_indices[detected_panel_index]:
+        for detected_panel in self.detected_panels:
+            max_iou = -1
+            best_matching_gt_panel_index = -1
+
+            for gt_panel_index, gt_panel in enumerate(self.gt_panels):
+
+                if gt_panel.label_rect is None or len(gt_panel.label) != 1:
                     continue
 
                 iou = box.iou(gt_panel.label_rect, detected_panel.label_rect)
 
                 if iou > max_iou:
                     max_iou = iou
-                    best_matching_detected_panel_index = detected_panel_index
+                    best_matching_gt_panel_index = gt_panel_index
 
-            if max_iou > 0.5:
-                num_correct += 1
-                picked_detected_panels_indices[best_matching_detected_panel_index] = True
+            if max_iou > 0.5 and not picked_gt_panels_indices[best_matching_gt_panel_index]:
+                picked_gt_panels_indices[best_matching_gt_panel_index] = True
+                detected_panel.label_is_true_positive = True
 
-        return num_correct
+            else:
+                detected_panel.label_is_true_positive = False
+
 
 
 ##################

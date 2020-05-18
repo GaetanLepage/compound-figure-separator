@@ -29,85 +29,90 @@ def evaluate_detections(figure_generator: str):
 
     # Stats to compute mAP
     overall_correct_count = 0
-    sum_recalls = 0.0
-    sum_precisions = 0.0
 
-    # TODO explain this choice
-    detections = SortedKeyList(key=lambda u: u[0])
+    # {class -> [(score, is_tp)]}
+    detections_by_class = {}
+    # {class -> number_of_gt}
+    gt_count_by_class = {}
 
     for figure in figure_generator:
 
         # Perform matching on this figure
         # This tests whether a detected panel is true positive or false positive
-        figure.match_detected_and_gt_panels() # TODO change for labels
+        figure.match_detected_and_gt_labels()
 
-        # Common counters
+        # Count number of figures in the whole dataset
         num_samples += 1
-        overall_gt_count += len(figure.gt_panels)
+
+        # Keep track of the number of gt labels for each class
+        for gt_panel in figure.gt_panels:
+
+            # Drop useless panels for this task
+            if gt_panel.label_rect is None or len(gt_panel.label) != 1:
+                continue
+
+            cls = gt_panel.label
+
+            overall_gt_count += 1
+
+            if cls not in gt_count_by_class:
+                gt_count_by_class[cls] = 1
+            else:
+                gt_count_by_class[cls] += 1
+
+
         overall_detected_count += len(figure.detected_panels)
-
-        num_correct_imageclef = 0
-        num_correct_iou_thresh = 0
-
         for detected_panel in figure.detected_panels:
-            num_correct_imageclef += int(detected_panel.panel_is_true_positive_overlap)
+            overall_correct_count += int(detected_panel.label_is_true_positive)
 
-            num_correct_iou_thresh += int(detected_panel.panel_is_true_positive_iou)
+            cls = detected_panel.label
 
-            detections.add((detected_panel.panel_detection_score,
-                            detected_panel.panel_is_true_positive_iou))
+            # initialize the dict entry for this class if necessary
+            if cls not in detections_by_class:
+                detections_by_class[cls] = SortedKeyList(key=lambda u: u[0])
 
-
-        # 1) ImageCLEF accuracy (based on overlap 0.66 threshold)
-        k = max(len(figure.gt_panels), len(figure.detected_panels))
-        imageclef_accuracy = num_correct_imageclef / k
-
-        sum_imageclef_accuracies += imageclef_accuracy
-
-        # 2) Usual metrics (based on IOU 0.5 threshold)
-        overall_correct_count += num_correct_iou_thresh
-
-        if len(figure.detected_panels) == 0:
-            precision = 0
-        else:
-            precision = num_correct_iou_thresh / len(figure.detected_panels)
-        sum_precisions += precision
+            detections_by_class[cls].add((detected_panel.label_detection_score,
+                                          detected_panel.label_is_true_positive))
 
 
-    # 1) ImageCLEF accuracy
-    imageclef_accuracy = sum_imageclef_accuracies / num_samples
-
-    # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
-    true_positives = [np.float(is_positive) for _, is_positive in detections]
-    overall_correct_count = np.sum(true_positives)
-
-    # 2) overall recall = TP / TP + FN
+    # 1) overall recall = TP / TP + FN
     recall = overall_correct_count / overall_gt_count
-    # 3) overall precision = TP / TP + FP
+    # 2) overall precision = TP / TP + FP
     precision = overall_correct_count / overall_detected_count
 
-    # 4) mAP computation
-    cumsum_true_positives = np.cumsum(true_positives)
+    # Computation of mAP is done class wise
+    mAP = 0
+    for cls in detections_by_class:
 
-    # cumulated_recalls
-    cumulated_recalls = cumsum_true_positives / overall_gt_count
+        # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
+        class_true_positives = [np.float(is_positive)
+                                for _, is_positive in detections_by_class[cls]]
 
-    # = cumsum(TP + FP)
-    cumsum_detections = np.arange(1, overall_detected_count + 1)
-    cumulated_precisions = cumsum_true_positives / cumsum_detections
+        class_detected_count = len(detections_by_class[cls])
+        class_gt_count = gt_count_by_class[cls]
 
-    # mAP = area under the precison/recall curve (only one 'class' here)
-    mAP, _, _ = compute_average_precision(rec=cumulated_recalls,
-                                          prec=cumulated_precisions)
+        # 4) mAP computation
+        class_cumsum_true_positives = np.cumsum(class_true_positives)
+
+        # cumulated_recalls
+        class_cumulated_recalls = class_cumsum_true_positives / class_gt_count
+
+        # = cumsum(TP + FP)
+        class_cumsum_detections = np.arange(1, class_detected_count + 1)
+        class_cumulated_precisions = class_cumsum_true_positives / class_cumsum_detections
+
+        mAP += compute_average_precision(rec=class_cumulated_recalls,
+                                         prec=class_cumulated_precisions)
 
 
-    print(f"ImageCLEF Accuracy (overlap threshold = 0.66): {imageclef_accuracy:.3f}\n"\
-            f"Precision: {precision:.3f}\n"\
-            f"Recall: {recall:.3f}\n"\
-            f"mAP (IoU threshold = 0.5): {mAP:.3f}")
+    # normalize mAP by the number of classes
+    mAP /= len(detections_by_class)
+
+    print(f"Precision: {precision:.3f}\n"\
+          f"Recall: {recall:.3f}\n"\
+          f"mAP (IoU threshold = 0.5): {mAP:.3f}")
 
     metrics = {
-        'image_clef_accuracy': imageclef_accuracy,
         'precision': precision,
         'recall': recall,
         'mAP': mAP

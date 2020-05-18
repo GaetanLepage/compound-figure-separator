@@ -60,4 +60,5 @@ def compute_average_precision(rec: np.ndarray, prec: np.ndarray) -> float:
     for i in i_list:
         ap += (mrec[i] - mrec[i - 1]) * mpre[i]
 
-    return ap, mrec, mpre
+    # TODO make sure we don't need mrec and mpre
+    return ap#, mrec, mpre

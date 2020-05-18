@@ -52,7 +52,7 @@ def register_label_recognition_dataset(dataset_name):
     DatasetCatalog.register(name=dataset_name,
                             func=lambda: export_figures_to_detectron_dict(
                                 figure_generator=figure_generator,
-                                task='label_recognition'))
+                                task='label_recog'))
 
     MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator_copy)
 
