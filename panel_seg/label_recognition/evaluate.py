@@ -9,6 +9,9 @@ import numpy as np
 
 from panel_seg.utils.average_precision import compute_average_precision
 
+# TODO remove
+from panel_seg.utils.box import iou
+
 
 def evaluate_detections(figure_generator: str):
     """
@@ -89,13 +92,16 @@ def evaluate_detections(figure_generator: str):
                                 for _, is_positive in detections_by_class[cls]]
 
         class_detected_count = len(detections_by_class[cls])
-        class_gt_count = gt_count_by_class[cls]
+        class_gt_count = gt_count_by_class[cls] if cls in gt_count_by_class else 0
 
         # 4) mAP computation
         class_cumsum_true_positives = np.cumsum(class_true_positives)
 
         # cumulated_recalls
-        class_cumulated_recalls = class_cumsum_true_positives / class_gt_count
+        if class_gt_count == 0:
+            class_cumulated_recalls = np.zeros(shape=(class_detected_count,))
+        else:
+            class_cumulated_recalls = class_cumsum_true_positives / class_gt_count
 
         # = cumsum(TP + FP)
         class_cumsum_detections = np.arange(1, class_detected_count + 1)

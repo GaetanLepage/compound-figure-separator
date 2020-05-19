@@ -180,15 +180,11 @@ def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
         sys.exit(1)
 
 
-    # Total number of images
-    num_images = len(image_paths)
-
     # Looping over the list of image paths
     for image_index, image_path in enumerate(image_paths):
         # print('Processing Image {}/{} : {}'.format(image_index + 1,
                                                    # num_images,
                                                    # image_path))
-
         # Create figure object
         figure = Figure(image_path=image_path,
                         index=image_index)
