@@ -28,6 +28,7 @@ def parse_viewer_args(parser: ArgumentParser):
     parser.add_argument('--delay',
                         help="The number of seconds after which the window is closed."\
                                 " If 0, the delay is disabled.",
+                        type=int,
                         default=100)
 
     return parser
