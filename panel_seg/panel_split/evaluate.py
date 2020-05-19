@@ -58,7 +58,7 @@ def evaluate_detections(figure_generator: str):
                             detected_panel.panel_is_true_positive_iou))
 
 
-        # 1) ImageCLEF accuracy (based on overlap 0.66 threshold)
+        # ImageCLEF accuracy (based on overlap 0.66 threshold)
         k = max(len(figure.gt_panels), len(figure.detected_panels))
         imageclef_accuracy = num_correct_imageclef / k
 
@@ -87,7 +87,7 @@ def evaluate_detections(figure_generator: str):
     cumulated_precisions = cumsum_true_positives / cumsum_detections
 
     # mAP = area under the precison/recall curve (only one 'class' here)
-    mAP, _, _ = compute_average_precision(rec=cumulated_recalls,
+    mAP = compute_average_precision(rec=cumulated_recalls,
                                           prec=cumulated_precisions)
 
 
