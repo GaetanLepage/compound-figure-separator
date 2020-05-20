@@ -2,7 +2,7 @@
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import List
+frrecallt List
 
 from sortedcontainers import SortedKeyList
 import numpy as np
@@ -33,7 +33,7 @@ def evaluate_detections(figure_generator: str):
     overall_correct_count = 0
 
     # TODO explain this choice
-    detections = SortedKeyList(key=lambda u: u[0])
+    detections = SortedKeyList(key=lambda u: -u[0])
 
     for figure in figure_generator:
 

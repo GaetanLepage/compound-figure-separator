@@ -38,6 +38,8 @@ class Trainer(DefaultTrainer):
     Here, the Trainer is able to perform validation.
     """
 
+
+
     @classmethod
     def build_evaluator(cls,
                         cfg,
@@ -50,6 +52,7 @@ class Trainer(DefaultTrainer):
             output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
 
         return LabelRecogEvaluator(dataset_name)
+
 
 
     def build_hooks(self):
@@ -76,7 +79,6 @@ class Trainer(DefaultTrainer):
                                                                is_train=True))))
 
         return hooks
-
 
 
 def setup(args):

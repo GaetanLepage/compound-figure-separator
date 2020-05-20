@@ -4,7 +4,10 @@ TODO
 
 import numpy as np
 
-def compute_average_precision(rec: np.ndarray, prec: np.ndarray) -> float:
+# TODO remove
+import matplotlib.pyplot as plt
+
+def compute_average_precision(recall: np.ndarray, precision: np.ndarray) -> float:
     """
     TODO
 
@@ -25,40 +28,20 @@ def compute_average_precision(rec: np.ndarray, prec: np.ndarray) -> float:
         AP (float): the resulting average precision.
     """
 
-    # insert 0.0 at begining of list
-    np.insert(rec, 0, 0.0)
+    mrec = np.concatenate(([0.], recall, [1.]))
+    mpre = np.concatenate(([0.], precision, [0.]))
 
-    # insert 1.0 at end of list
-    np.append(rec, 1.0)
-
-    # Copy the array
-    mrec = rec.copy()
-
-    # insert 0.0 at begining of list
-    np.insert(prec, 0, 0.0)
-
-    # insert 1.0 at end of list
-    np.append(prec, 1.0)
-
-    # Copy the array
-    mpre = prec.copy()
-
+    # Compute the precision envelope
     # Make the precision monotonically decreasing (goes from the end to the beginning)
-    for i in range(len(mpre)-2, -1, -1):
-        mpre[i] = max(mpre[i], mpre[i+1])
+    for i in range(len(mpre) - 1, 0, -1):
+        mpre[i - 1] = np.maximum(mpre[i - 1], mpre[i])
 
-    # Create a list of indexes where the recall changes
-    i_list = []
-    for i in range(1, len(mrec)):
-        if mrec[i] != mrec[i - 1]:
-            i_list.append(i)
 
-    # The Average Precision (AP) is the area under the curve
-    #    (numerical integration)
+    # to calculate area under PR curve, look for points
+    # where X axis (recall) changes value
+    i = np.where(mrec[1:] != mrec[:-1])[0]
 
-    ap = 0.0
-    for i in i_list:
-        ap += (mrec[i] - mrec[i - 1]) * mpre[i]
+    # and sum (\Delta recall) * prec
+    ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
 
-    # TODO make sure we don't need mrec and mpre
-    return ap#, mrec, mpre
+    return ap

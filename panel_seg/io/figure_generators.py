@@ -185,6 +185,7 @@ def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
         # print('Processing Image {}/{} : {}'.format(image_index + 1,
                                                    # num_images,
                                                    # image_path))
+
         # Create figure object
         figure = Figure(image_path=image_path,
                         index=image_index)

@@ -510,7 +510,7 @@ class Figure:
                 detected_panel.panel_is_true_positive_overlap = False
 
 
-    def match_detected_and_gt_labels(self):
+    def match_detected_and_gt_labels(self, iou_threshold: float = 0.5):
         """
         Compute the number of rightly predicted labels for the figure :
         A predicted panel which has an IoU > `threshold` (0.5 by default) with a
@@ -535,13 +535,18 @@ class Figure:
                 if gt_panel.label_rect is None or len(gt_panel.label) != 1:
                     continue
 
+                # If the label classes do not match, no need to compute the IoU
+                if gt_panel.label != detected_panel.label:
+                    continue
+
                 iou = box.iou(gt_panel.label_rect, detected_panel.label_rect)
 
                 if iou > max_iou:
                     max_iou = iou
                     best_matching_gt_panel_index = gt_panel_index
 
-            if max_iou > 0.5 and not picked_gt_panels_indices[best_matching_gt_panel_index]:
+            if max_iou > iou_threshold\
+                    and not picked_gt_panels_indices[best_matching_gt_panel_index]:
                 picked_gt_panels_indices[best_matching_gt_panel_index] = True
                 detected_panel.label_is_true_positive = True
 

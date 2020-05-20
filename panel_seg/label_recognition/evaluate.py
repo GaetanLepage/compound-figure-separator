@@ -72,7 +72,7 @@ def evaluate_detections(figure_generator: str):
 
             # initialize the dict entry for this class if necessary
             if cls not in detections_by_class:
-                detections_by_class[cls] = SortedKeyList(key=lambda u: u[0])
+                detections_by_class[cls] = SortedKeyList(key=lambda u: -u[0])
 
             detections_by_class[cls].add((detected_panel.label_detection_score,
                                           detected_panel.label_is_true_positive))
@@ -107,8 +107,8 @@ def evaluate_detections(figure_generator: str):
         class_cumsum_detections = np.arange(1, class_detected_count + 1)
         class_cumulated_precisions = class_cumsum_true_positives / class_cumsum_detections
 
-        mAP += compute_average_precision(rec=class_cumulated_recalls,
-                                         prec=class_cumulated_precisions)
+        mAP += compute_average_precision(recall=class_cumulated_recalls,
+                                         precision=class_cumulated_precisions)
 
 
     # normalize mAP by the number of classes
