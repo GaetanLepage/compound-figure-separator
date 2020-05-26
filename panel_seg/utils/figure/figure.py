@@ -234,10 +234,11 @@ class Figure:
                 # *) The first one is "panel"
                 # *) The second one is the label letter
                 if len(words) > 2:
-                    logging.error(
-                        '%s: %s is not correct',
-                        annotation_file_path,
-                        label_text)
+                    # TODO check what to do in this case
+                    # logging.error(
+                        # '%s: %s is not correct',
+                        # annotation_file_path,
+                        # label_text)
                     continue
 
                 # If the label text contains two words,
@@ -245,12 +246,13 @@ class Figure:
                 if len(words) == 2:
                     label_text = label_class.map_label(words[1])
 
-                    if len(label_text) != 1:
-                        # Now we process single character panel label only (a, b, c...)
-                        logging.warning(
-                            '%s: panel %s is not single character',
-                            annotation_file_path,
-                            label_text)
+                    # TODO check what to do in this case
+                    # if len(label_text) != 1:
+                        # # Now we process single character panel label only (a, b, c...)
+                        # logging.warning(
+                            # '%s: panel %s is not single character',
+                            # annotation_file_path,
+                            # label_text)
 
                 # The text only contains a single panel
                 # => no label
@@ -261,10 +263,11 @@ class Figure:
                     item=panel_item)
 
                 if x_max <= x_min or y_max <= y_min:
-                    logging.error(
-                        '%s: panel %s rect is not correct!',
-                        annotation_file_path,
-                        label_text)
+                    # TODO check what to do in this case
+                    # logging.error(
+                        # '%s: panel %s rect is not correct!',
+                        # annotation_file_path,
+                        # label_text)
                     continue
 
                 # Create Panel object
@@ -300,11 +303,12 @@ class Figure:
                     continue
                 label_text = words[1]
                 # Now we process single character panel label only
-                if len(label_text) != 1:
-                    logging.warning(
-                        '%s: label %s is not single character',
-                        annotation_file_path,
-                        label_text)
+                # TODO check what to do in this case
+                # if len(label_text) != 1:
+                    # logging.warning(
+                        # '%s: label %s is not single character',
+                        # annotation_file_path,
+                        # label_text)
 
                 label_text = label_class.map_label(label_text)
 
@@ -375,9 +379,10 @@ class Figure:
                         label_char)
                     continue
 
-                # TODO why do we use Beam search here ? We are supposed to
-                #   be dealing with ground truth
+
                 # Beam search algorithm to map labels to panels
+                # ==> This is only useful when there are several panels with the same label in a
+                # single image. In Zou's data set, this is never the case
                 beam_search.assign_labels_to_panels(panels=panel_dict[label_char],
                                                     labels=label_dict[label_char])
 

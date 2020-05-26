@@ -5,8 +5,8 @@ Beam search algorithm for mapping panels and labels.
 import math
 from typing import List
 
-from .panel import Panel
 from panel_seg.utils import box
+from .panel import Panel, DetectedPanel
 
 
 def compute_panel_label_distances(panels, labels):
@@ -41,7 +41,7 @@ def compute_panel_label_distances(panels, labels):
 
 
 def assign_labels_to_panels(panels: List[Panel],
-                            labels: List[str],
+                            labels: List[Panel],
                             beam_length: int = 100):
     """
     Use beam search to assign labels to panels according to the overall distance
@@ -57,29 +57,36 @@ def assign_labels_to_panels(panels: List[Panel],
 
     # Beam search
 
-    # in the format (overall_distance, label_indexes)
+    # a `pair` represents a path (overall_distance, label_indexes)
     all_item_pairs = []
-    for panel_i, panel in enumerate(panels):
+    for panel_idx, panel in enumerate(panels):
         item_pairs = []
-        if panel_i == 0:
-            for label_index in range(len(labels)):
-                dist = distances[panel_i][label_index]
-                label_indexes = [label_index]
-                item_pair = [dist, label_indexes]
+
+        # Initialisation
+        if panel_idx == 0:
+            for label_idx in range(len(labels)):
+                dist = distances[panel_idx][label_idx]
+                label_indexes = [label_idx]
+                item_pair = (dist, label_indexes)
                 item_pairs.append(item_pair)
+
+            print("init over:", item_pairs)
+
+        # Exploring the graph
         else:
-            prev_item_pairs = all_item_pairs[panel_i - 1]
+            prev_item_pairs = all_item_pairs[panel_idx - 1]
             for prev_item_pair in prev_item_pairs:
-                prev_label_indexes = prev_item_pair[1]
-                prev_dist = prev_item_pair[0]
-                for label_index in range(len(labels)):
-                    if label_index in prev_label_indexes:
+
+                prev_dist, prev_label_indexes = prev_item_pair
+
+                for label_idx in range(len(labels)):
+                    if label_idx in prev_label_indexes:
                         # We allow a label assigned to one panel only
                         continue
-                    dist = distances[panel_i][label_index] + prev_dist
-                    label_indexes = list(prev_item_pair[1])
-                    label_indexes.append(label_index)
-                    item_pair = [dist, label_indexes]
+                    dist = distances[panel_idx][label_idx] + prev_dist
+                    label_indexes = list(prev_label_indexes)
+                    label_indexes.append(label_idx)
+                    item_pair = (dist, label_indexes)
                     item_pairs.append(item_pair)
 
         # sort item_pairs
@@ -90,7 +97,14 @@ def assign_labels_to_panels(panels: List[Panel],
 
         all_item_pairs.append(item_pairs)
 
+        print("panel index:", panel_idx)
+        print("all_item_pairs:", all_item_pairs)
+
     # check the last item_pairs
+    print(all_item_pairs)
+    # all_item_pairs[-1] : last "layer" (complete paths)
+    # all_item_pairs[-1][0] : pair which has the shortest path (it was sorted)
+    # all_item_pairs[-1][0][1] : the complete path from this pair
     best_path = all_item_pairs[-1][0][1]
     for panel_index, panel in enumerate(panels):
-        panel.label_rect = labels[best_path[panel_index]].label_rect
+        panel.add_label_info(label=labels[best_path[panel_index]])

@@ -106,14 +106,18 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         if not comm.is_main_process():
             # TODO maybe return None instead of nothing
             return
-        predictions = defaultdict(list)
+        predictions = defaultdict(dict)
         for predictions_per_rank in all_predictions:
             for clsid, lines in predictions_per_rank.items():
-                predictions[clsid].extend(lines)
+                predictions[clsid] = lines
         del all_predictions
 
-        metrics_dict = self._evaluation_function(
-            figure_generator=self._augmented_figure_generator(predictions))
+        # TODO remove
+        for figure in self._augmented_figure_generator(predictions):
+            pass
+
+        # metrics_dict = self._evaluation_function(
+            # figure_generator=self._augmented_figure_generator(predictions))
 
         # Respect the expected result for a DatasetEvaluator
         return OrderedDict({self._task_name: metrics_dict})

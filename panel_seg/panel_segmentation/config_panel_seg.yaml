@@ -1,0 +1,51 @@
+#_BASE_: "/home/gaetan/hevs/implementations/object_detection/detectron2/configs/COCO-Detection/retinanet_R_50_FPN_1x.yaml"
+OUTPUT_DIR: "panel_seg/panel_segmentation/output"
+
+MODEL:
+  META_ARCHITECTURE: "RetinaNet"
+  BACKBONE:
+    NAME: "build_retinanet_resnet_fpn_backbone"
+  RESNETS:
+    OUT_FEATURES: ["res2", "res3", "res4", "res5"]
+  PANEL_ANCHOR_GENERATOR:
+    SIZES: !!python/object/apply:eval ["[[x, x * 2**(1.0/3), x * 2**(2.0/3) ] for x in [32, 64, 128, 256, 512]]"]
+    ASPECT_RATIOS: !!python/object/apply:eval ["[[0.5, 1.0, 2.0]]"]
+  LABEL_ANCHOR_GENERATOR:
+    SIZES: !!python/object/apply:eval ["[[x, x * 2**(1.0/3), x * 2**(2.0/3) ] for x in [16, 32, 64]]"]
+    ASPECT_RATIOS: !!python/object/apply:eval ["[[0.5, 1.0, 2.0]]"]
+  PANEL_FPN:
+    IN_FEATURES: ["res3", "res4", "res5"]
+    OUT_CHANNELS: 256
+  LABEL_FPN:
+    IN_FEATURES: ["res2", "res3", "res4"]
+    OUT_CHANNELS: 64
+  RETINANET:
+    IOU_THRESHOLDS: [0.4, 0.5]
+    IOU_LABELS: [0, -1, 1]
+    NUM_LABEL_CLASSES: 50
+    NMS_THRESH_TEST: 0.1
+
+    PANEL_IN_FEATURES: ["p3", "p4", "p5", "p6", "p7"]
+    LABEL_IN_FEATURES: ["p2", "p3", "p4"]
+
+DATASETS:
+  TRAIN: ("zou_panel_seg_train",)
+  TEST: ("zou_panel_seg_test",)
+
+SOLVER:
+  # TODO I don't know why we can only fit 1 img/GPU here...
+  IMS_PER_BATCH: 1
+  BASE_LR: 0.00001  # Note that RetinaNet uses a different default learning rate
+  STEPS: (60000, 80000)
+  MAX_ITER: 250000
+
+#VALIDATION:
+  #VALIDATION_PERIOD: 5000
+TEST:
+  EVAL_PERIOD: 0
+  DETECTIONS_PER_IMAGE: 16
+
+INPUT:
+  MIN_SIZE_TRAIN: (640, 672, 704, 736, 768, 800)
+
+VERSION: 2

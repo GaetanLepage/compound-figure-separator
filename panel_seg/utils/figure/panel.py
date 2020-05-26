@@ -76,6 +76,14 @@ class Panel:
                         color=color)
 
 
+    def add_label_info(self, label: 'Panel'):
+        """
+        TODO
+        """
+        self.label_rect = label.label_rect
+        self.label = label.label
+
+
 class DetectedPanel(Panel):
     """
     TODO
@@ -107,6 +115,16 @@ class DetectedPanel(Panel):
         self.panel_is_true_positive_overlap = False
 
         self.label_is_true_positive = False
+
+
+    def add_label_info(self, label: 'DetectedPanel'):
+        """
+        TODO
+        """
+        super.add_label_info(label)
+
+        self.label_detection_score = label.label_detection_score
+
 
 
 class PanelSegError(Exception):
