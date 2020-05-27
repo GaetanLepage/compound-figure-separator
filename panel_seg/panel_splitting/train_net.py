@@ -22,9 +22,9 @@ from detectron2.evaluation import verify_results
 from detectron2.data.build import build_detection_test_loader
 from detectron2.data.dataset_mapper import DatasetMapper
 
-from panel_seg.panel_split.load_panel_split_datasets import register_panel_splitting_dataset
+from panel_seg.panel_splitting.load_panel_split_datasets import register_panel_splitting_dataset
 from panel_seg.utils.detectron_utils.loss_eval_hook import LossEvalHook
-from panel_seg.panel_split.panel_split_evaluator import PanelSplitEvaluator
+from panel_seg.panel_splitting.panel_split_evaluator import PanelSplitEvaluator
 from panel_seg.utils.detectron_utils.config import add_validation_config
 
 

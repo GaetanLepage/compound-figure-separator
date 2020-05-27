@@ -8,9 +8,9 @@ import argparse
 
 sys.path.append(".")
 
-from panel_seg.io.figure_generators import image_clef_xml_figure_generator
-from panel_seg.panel_split.predict import predict
-from panel_seg.panel_split.evaluate import evaluate_predictions
+from panel_seg.data.figure_generators import image_clef_xml_figure_generator
+from panel_seg.panel_splitting.predict import predict
+from panel_seg.panel_splitting.evaluate import evaluate_predictions
 
 
 def parse_args(args):

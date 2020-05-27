@@ -2,8 +2,6 @@
 Module to evaluate the panel splitting task metrics.
 """
 
-frrecallt List
-
 from sortedcontainers import SortedKeyList
 import numpy as np
 
@@ -32,7 +30,7 @@ def evaluate_detections(figure_generator: str):
     # Stats to compute mAP
     overall_correct_count = 0
 
-    # TODO explain this choice
+    # Sort the detections in the decreasing order of their scores
     detections = SortedKeyList(key=lambda u: -u[0])
 
     for figure in figure_generator:
@@ -54,6 +52,7 @@ def evaluate_detections(figure_generator: str):
 
             num_correct_iou_thresh += int(detected_panel.panel_is_true_positive_iou)
 
+            # Add this detection in the sorted list
             detections.add((detected_panel.panel_detection_score,
                             detected_panel.panel_is_true_positive_iou))
 
@@ -87,8 +86,8 @@ def evaluate_detections(figure_generator: str):
     cumulated_precisions = cumsum_true_positives / cumsum_detections
 
     # mAP = area under the precison/recall curve (only one 'class' here)
-    mAP = compute_average_precision(rec=cumulated_recalls,
-                                          prec=cumulated_precisions)
+    mAP = compute_average_precision(recall=cumulated_recalls,
+                                    precision=cumulated_precisions)
 
 
     print(f"ImageCLEF Accuracy (overlap threshold = 0.66): {imageclef_accuracy:.3f}\n"\

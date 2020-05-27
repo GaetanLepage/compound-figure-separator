@@ -4,10 +4,8 @@ TODO
 """
 
 from panel_seg.utils.figure.panel import DetectedPanel
-
 from panel_seg.utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
-
-from panel_seg.panel_split.evaluate import evaluate_detections
+from panel_seg.panel_splitting.evaluate import evaluate_detections
 
 class PanelSplitEvaluator(PanelSegAbstractEvaluator):
     """

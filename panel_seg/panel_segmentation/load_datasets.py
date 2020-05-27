@@ -6,9 +6,9 @@ Load PanelSeg data set to be used with the Detectron API for the panel segmentat
 
 from detectron2.data import DatasetCatalog, MetadataCatalog
 
-from panel_seg.io.figure_generators import iphotodraw_xml_figure_generator
+from panel_seg.data.figure_generators import iphotodraw_xml_figure_generator
 
-from panel_seg.io.export import export_figures_to_detectron_dict
+from panel_seg.data.export import export_figures_to_detectron_dict
 from panel_seg.utils.figure.label_class import LABEL_CLASS_MAPPING
 
 

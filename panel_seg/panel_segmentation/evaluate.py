@@ -9,9 +9,6 @@ import numpy as np
 
 from panel_seg.utils.average_precision import compute_average_precision
 
-# TODO remove
-from panel_seg.utils.box import iou
-
 
 def evaluate_detections(figure_generator: str):
     """
@@ -107,8 +104,8 @@ def evaluate_detections(figure_generator: str):
         class_cumsum_detections = np.arange(1, class_detected_count + 1)
         class_cumulated_precisions = class_cumsum_true_positives / class_cumsum_detections
 
-        mAP += compute_average_precision(rec=class_cumulated_recalls,
-                                         prec=class_cumulated_precisions)
+        mAP += compute_average_precision(recall=class_cumulated_recalls,
+                                         precision=class_cumulated_precisions)
 
 
     # normalize mAP by the number of classes
