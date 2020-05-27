@@ -1,4 +1,4 @@
-# Panel-Seg IO module
+# Panel-Seg Data module
 
 The IO module relies on an efficient factorization using figure generators.
 Indeed, handling both supported data sets in a similar manner is made possible
