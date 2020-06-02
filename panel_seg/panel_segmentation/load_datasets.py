@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 Load PanelSeg data set to be used with the Detectron API for the panel segmentation task.
 """
@@ -32,7 +30,7 @@ def register_panel_segmentation_dataset(dataset_name):
         image_directory_path = "data/zou/"
 
     elif dataset_name == "zou_panel_seg_test":
-        eval_list_txt = "data/zou/train.txt"
+        eval_list_txt = "data/zou/eval.txt"
         image_directory_path = "data/zou/"
 
     else:
@@ -52,4 +50,5 @@ def register_panel_segmentation_dataset(dataset_name):
 
     MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator_copy)
 
+    # Add the class names as metadata.
     MetadataCatalog.get(name=dataset_name).set(thing_classes=list(LABEL_CLASS_MAPPING.keys()))
