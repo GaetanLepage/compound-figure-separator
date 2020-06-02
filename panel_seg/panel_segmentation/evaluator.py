@@ -2,6 +2,8 @@
 TODO
 """
 
+from typing import List
+
 from panel_seg.utils.figure.panel import DetectedPanel
 
 from panel_seg.utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
@@ -15,11 +17,10 @@ import panel_seg.utils.figure.beam_search as beam_search
 
 class PanelSegEvaluator(PanelSegAbstractEvaluator):
     """
-    TODO
     Perform the evaluation of panel segmentation metrics on a given test set.
     """
 
-    def __init__(self, dataset_name):
+    def __init__(self, dataset_name: str):
         """
         TODO
         """
@@ -27,7 +28,9 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
                          task_name='panel_seg',
                          evaluation_function=evaluate_detections)
 
-    def process(self, inputs, outputs):
+    def process(self,
+                inputs: List[dict],
+                outputs: List[dict]):
         """
         Process the pair of inputs and outputs.
 
@@ -102,6 +105,10 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
                                              panel_detection_score=panel['score'])
                                for panel in detected_panels]
 
+            # 1) evaluate panel splitting score only
+            figure.detected_panels = detected_panels
+
+
             detected_labels = [DetectedPanel(label_rect=label['box'],
                                              label_detection_score=label['score'],
                                              label=CLASS_LABEL_MAPPING[label['label']])
@@ -111,7 +118,6 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
             # complete DetectedPanel objects (with label, panel_rect and label_rect fields).
 
             # TODO remove
-            figure.detected_panels = detected_panels
             figure.detected_panels.extend(detected_labels)
 
             figure.show_preview(mode='pred', delay=0)

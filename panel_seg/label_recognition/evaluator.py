@@ -15,11 +15,10 @@ from panel_seg.utils.figure.figure import Figure
 
 class LabelRecogEvaluator(PanelSegAbstractEvaluator):
     """
-    TODO
     Perform the evaluation of label recognition metrics on a given test set.
     """
 
-    def __init__(self, dataset_name):
+    def __init__(self, dataset_name: str):
         """
         TODO
         """

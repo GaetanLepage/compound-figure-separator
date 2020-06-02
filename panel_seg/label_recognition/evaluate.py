@@ -80,6 +80,7 @@ def evaluate_detections(figure_generator: iter) -> dict:
     # 2) overall precision = TP / TP + FP
     precision = overall_correct_count / overall_detected_count
 
+    # 3) mean average precision (mAP)
     # Computation of mAP is done class wise
     mAP = 0
     for cls in detections_by_class:
@@ -91,7 +92,6 @@ def evaluate_detections(figure_generator: iter) -> dict:
         class_detected_count = len(detections_by_class[cls])
         class_gt_count = gt_count_by_class[cls] if cls in gt_count_by_class else 0
 
-        # 4) mAP computation
         class_cumsum_true_positives = np.cumsum(class_true_positives)
 
         # cumulated_recalls
