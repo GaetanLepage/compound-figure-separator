@@ -20,7 +20,10 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
     """
 
 
-    def __init__(self, dataset_name, task_name, evaluation_function):
+    def __init__(self,
+                 dataset_name,
+                 task_name,
+                 evaluation_function):
         """
         init function.
 
@@ -29,10 +32,10 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         # TODO test if outputed xml gives same results (metrics) if using the java tool from ImageCLEF
 
         Args:
-            dataset_name (str):             name of the dataset
-            task_name (str):                name of the task
+            dataset_name (str):             name of the dataset.
+            task_name (str):                name of the task.
             evaluation_function (function): function taking a figure generator as input and
-                                                returning a dict of metric results
+                                                returning a dict of metric results.
         """
         self._dataset_name = dataset_name
         meta = MetadataCatalog.get(dataset_name)
@@ -113,11 +116,11 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         del all_predictions
 
         # TODO remove
-        for figure in self._augmented_figure_generator(predictions):
-            pass
+        # for figure in self._augmented_figure_generator(predictions):
+            # pass
 
-        # metrics_dict = self._evaluation_function(
-            # figure_generator=self._augmented_figure_generator(predictions))
+        metrics_dict = self._evaluation_function(
+            figure_generator=self._augmented_figure_generator(predictions))
 
         # Respect the expected result for a DatasetEvaluator
         return OrderedDict({self._task_name: metrics_dict})

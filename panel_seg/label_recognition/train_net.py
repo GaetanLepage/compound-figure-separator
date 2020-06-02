@@ -1,92 +1,108 @@
 #!/usr/bin/env python
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 """
-TODO
-Detection Training Script.
+Label Recognition detection training script.
 
 This scripts reads a given config file and runs the training or evaluation.
-It is an entry point that is made to train standard models in detectron2.
-
-In order to let one script support training of many models,
 """
 
 import os
-import logging
-
-from collections import OrderedDict
+from typing import List
 
 import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import CfgNode, get_cfg
-from detectron2.engine import DefaultTrainer, default_argument_parser, default_setup, launch
+from detectron2.engine import (
+    DefaultTrainer,
+    default_argument_parser,
+    default_setup,
+    launch,
+    HookBase)
 from detectron2.evaluation import verify_results
 from detectron2.data.build import build_detection_test_loader
 from detectron2.data.dataset_mapper import DatasetMapper
 
-from panel_seg.label_recognition.load_label_recognition_datasets import register_label_recognition_dataset
+from panel_seg.label_recognition.load_datasets import register_label_recognition_dataset
 from panel_seg.utils.detectron_utils.loss_eval_hook import LossEvalHook
-from panel_seg.label_recognition.label_recog_evaluator import LabelRecogEvaluator
+from panel_seg.label_recognition.evaluator import LabelRecogEvaluator
 from panel_seg.utils.detectron_utils.config import add_validation_config
 
 
 class Trainer(DefaultTrainer):
     """
-    TODO : do une train_net.py per task... or find a better way to split the work
-
     We use the "DefaultTrainer" which contains pre-defined default logic for
     standard training workflow.
+
     Here, the Trainer is able to perform validation.
     """
 
-
-
     @classmethod
     def build_evaluator(cls,
-                        cfg,
-                        dataset_name,
-                        output_folder=None):
+                        cfg: CfgNode,
+                        dataset_name: str,
+                        output_folder: str = None) -> LabelRecogEvaluator:
         """
-        TODO
+        Builds the LabelRecogEvaluator that will be called at test time.
+
+        Args:
+            cfg (CfgNode):       The config node filled with necessary options.
+            dataset_name (str):  The name of the test data set.
+            output_folder (str): The path of the output folder where to store the results
+
+        Returns:
+            LabelRecogEvaluator: The evaluator for testing label recognition results.
         """
+        # TODO implement export functionnality
         if output_folder is None:
             output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
 
         return LabelRecogEvaluator(dataset_name)
 
 
-
-    def build_hooks(self):
+    def build_hooks(self) -> List[HookBase]:
         """
         This method overwrites the default one from DefaultTrainer.
-        It adds the `LossEvalHook` that allows
-        Build a list of default hooks, including timing, evaluation,
-        checkpointing, lr scheduling, precise BN, writing events.
+        It adds (if necessary) the `LossEvalHook` that allows evaluating the loss on the
+        validation set.
 
         Returns:
-            list[HookBase]:
+            List[HookBase]: The augmented list of hooks.
         """
+        # Build a list of default hooks, including timing, evaluation,
+        # checkpointing, lr scheduling, precise BN, writing events.
         hooks = super().build_hooks()
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            hooks.insert(-1,
-                         LossEvalHook(eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
-                                      model=self.model,
-                                      data_loader=build_detection_test_loader(
-                                          cfg=self.cfg,
-                                          dataset_name=self.cfg.DATASETS.VALIDATION,
-                                          mapper=DatasetMapper(cfg=self.cfg,
-                                                               is_train=True))))
+            data_set_mapper = DatasetMapper(cfg=self.cfg, is_train=True)
+            data_loader = build_detection_test_loader(cfg=self.cfg,
+                                                      dataset_name=self.cfg.DATASETS.VALIDATION,
+                                                      mapper=data_set_mapper)
+
+            loss_eval_hook = LossEvalHook(eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
+                                          model=self.model,
+                                          data_loader=data_loader)
+            hooks.insert(index=-1,
+                         obj=loss_eval_hook)
 
         return hooks
 
 
-def setup(args):
+def setup(args: List[str]) -> CfgNode:
     """
     Create configs and perform basic setups.
+
+    Args:
+        args (List[str]): Arguments from the command line.
+
+    Retuns:
+        cfg (CfgNode): A config node filled with necessary options.
     """
     cfg = get_cfg()
+
+    # Add some config options to handle validation
     add_validation_config(cfg)
+
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()
@@ -94,23 +110,40 @@ def setup(args):
     return cfg
 
 
-def register_datasets(cfg):
+def register_datasets(cfg: CfgNode):
     """
-    TODO
+    Register the data sets needed for label recognition in Detectron 2's registry.
+
+    Args:
+        cfg (CfgNode): The config node filled with necessary options.
     """
+    # Training
     for dataset_name in cfg.DATASETS.TRAIN:
         register_label_recognition_dataset(dataset_name=dataset_name)
 
+    # Test
     for dataset_name in cfg.DATASETS.TEST:
         register_label_recognition_dataset(dataset_name=dataset_name)
 
+    # Validation
     if cfg.DATASETS.VALIDATION != "":
         register_label_recognition_dataset(dataset_name=cfg.DATASETS.VALIDATION)
 
 
-def main(args):
+def main(args: List[str]) -> dict:
+    """
+    Launch training/testing for the label recognition task on a single device.
+
+    Args:
+        args (List[str]): Arguments from the command line.
+
+    Returns:
+        If training: OrderedDict of results, if evaluation is enabled. Otherwise None.
+        If test: a dict of result metrics.
+    """
     cfg = setup(args)
 
+    # Register the needed datasets
     register_datasets(cfg)
 
     # Inference only (testing)

@@ -19,6 +19,9 @@ from detectron2.modeling.postprocessing import detector_postprocess
 
 from detectron2.modeling.backbone.fpn import FPN, LastLevelP6P7
 
+# TODO remove
+from panel_seg.utils.figure.figure import Figure
+
 __all__ = ["PanelSegRetinaNet"]
 
 
@@ -65,6 +68,10 @@ def build_fpn_backbones(cfg, input_shape: ShapeSpec):
 def permute_to_N_HWA_K(tensor, K):
     """
     Transpose/reshape a tensor from (N, (A x K), H, W) to (N, (HxWxA), K)
+
+    Args:
+        tensor (torch.Tensor):  An output tensor from a RetinaNetHead.
+        K (int):                The number of classes (for classification) or 4 (for regression).
     """
     assert tensor.dim() == 4, tensor.shape
     N, _, H, W = tensor.shape
@@ -76,12 +83,16 @@ def permute_to_N_HWA_K(tensor, K):
 
 def permute_all_cls_and_box_to_N_HWA_K_and_concat(box_cls,
                                                   box_delta,
-                                                  num_classes=80):
+                                                  num_classes: int = 80):
     """
-    Rearrange the tensor layout from the network output, i.e.:
-    list[Tensor]: #lvl tensors of shape (N, A x K, Hi, Wi)
-    to per-image predictions, i.e.:
-    Tensor: of shape (N x sum(Hi x Wi x A), K)
+    Rearrange the tensor layout from the network output to per-image predictions.
+
+    Args:
+        box_cls, box_delta (list[Tensor]):  #lvl tensors of shape (N, A x K, Hi, Wi)
+        num_classes (int):                  The number of classes.
+
+    Returns:
+        Tensor of shape (N x sum(Hi x Wi x A), K)
     """
     # for each feature level, permute the outputs to make them be in the
     # same format as the labels. Note that the labels are computed for
@@ -277,6 +288,9 @@ class PanelSegRetinaNet(nn.Module):
                 gt_boxes=[instance.label_gt_boxes for instance in gt_instances],
                 num_classes=self.num_label_classes)
 
+
+            panel_gt_class = panel_gt_classes[0]
+
             # losses = self.losses(gt_classes, gt_anchors_reg_deltas, box_cls, box_delta)
             losses = self.losses(panel_gt_classes=panel_gt_classes,
                                  panel_gt_anchor_deltas=panel_gt_anchors_reg_deltas,
@@ -337,6 +351,7 @@ class PanelSegRetinaNet(nn.Module):
                 label_output_boxes.clip(label_results.image_size)
 
                 processed_results.append({"panels": panel_results, "labels": label_results})
+
             return processed_results
 
 
@@ -363,8 +378,10 @@ class PanelSegRetinaNet(nn.Module):
         """
 
         pred_class_logits, pred_anchor_deltas = permute_all_cls_and_box_to_N_HWA_K_and_concat(
-            pred_class_logits, pred_anchor_deltas, num_classes
-        )  # Shapes: (N x R, K) and (N x R, 4), respectively.
+            box_cls=pred_class_logits,
+            box_delta=pred_anchor_deltas,
+            num_classes=num_classes)
+        # Shapes: (N x R, K) and (N x R, 4), respectively.
 
         gt_classes = gt_classes.flatten()
         gt_anchors_deltas = gt_anchors_deltas.view(-1, 4)
@@ -466,10 +483,29 @@ class PanelSegRetinaNet(nn.Module):
         output_gt_classes = []
         output_gt_anchors_deltas = []
         anchors = Boxes.cat(anchors)  # Rx4
+        # print("############")
+        # if num_classes == 1:
+            # print("This is a panel")
+        # else:
+            # print("This is a label")
+        # print("anchors:", anchors.tensor.shape)
+
+
+        # print("gt_classes", len(gt_classes))
+        # print("gt_boxes", len(gt_boxes))
 
         for gt_classes_per_img, gt_boxes_per_img in zip(gt_classes, gt_boxes):
             match_quality_matrix = pairwise_iou(gt_boxes_per_img, anchors)
             gt_matched_idxs, anchor_labels = self.matcher(match_quality_matrix)
+
+            # print("GT CLASSES:", gt_classes_per_img)
+            # print("GT BOXES:", gt_boxes_per_img)
+
+            # print("gt_classes_per_img", gt_classes_per_img.shape)
+            # print("gt_boxes_per_img", gt_boxes_per_img.tensor.shape)
+
+            # print("match_quality_matrix", match_quality_matrix.shape)
+            # print("gt_matched_idxs", gt_matched_idxs.shape)
 
             has_gt = len(gt_boxes_per_img) > 0
             if has_gt:
@@ -484,6 +520,9 @@ class PanelSegRetinaNet(nn.Module):
                 gt_classes_i[anchor_labels == 0] = num_classes
                 # Anchors with label -1 are ignored.
                 gt_classes_i[anchor_labels == -1] = -1
+                # print("gt_classes_i", gt_classes_i.shape)
+                # print("gt_boxes_i", matched_gt_boxes.tensor.shape)
+
             else:
                 gt_classes_i = torch.zeros_like(gt_matched_idxs) + num_classes
                 gt_anchors_reg_deltas_i = torch.zeros_like(anchors.tensor)
@@ -581,8 +620,8 @@ class PanelSegRetinaNet(nn.Module):
             box_reg_i = box_reg_i[anchor_idxs]
             anchors_i = anchors_i[anchor_idxs]
             # predict boxes
-            predicted_boxes = self.box2box_transform.apply_deltas(box_reg_i,
-                                                                  anchors_i.tensor)
+            predicted_boxes = self.box2box_transform.apply_deltas(deltas=box_reg_i,
+                                                                  boxes=anchors_i.tensor)
 
             boxes_all.append(predicted_boxes)
             scores_all.append(predicted_prob)

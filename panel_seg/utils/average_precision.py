@@ -4,10 +4,8 @@ TODO
 
 import numpy as np
 
-# TODO remove
-import matplotlib.pyplot as plt
-
-def compute_average_precision(recall: np.ndarray, precision: np.ndarray) -> float:
+def compute_average_precision(recall: np.ndarray,
+                              precision: np.ndarray) -> float:
     """
     TODO
 
@@ -21,8 +19,8 @@ def compute_average_precision(recall: np.ndarray, precision: np.ndarray) -> floa
     ap=sum((mrec(i)-mrec(i-1)).*mpre(i));
 
     Args:
-        rec (np.array[float]):  TODO
-        prec (np.array[float]): TODO
+        recall (np.array[float]):  TODO
+        precision (np.array[float]): TODO
 
     Returns:
         AP (float): the resulting average precision.

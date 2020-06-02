@@ -4,12 +4,12 @@ Functions to deal with coordinates and areas of union, intersection of rectangle
 
 from typing import List
 
-def get_center(rectangle: List[float]):
+def get_center(rectangle: List[float]) -> (float, float):
     """
     Compute the coordinates of the rectangle center.
 
     Args:
-        rectangle: rectangle [x1,y1,x2,y2]
+        rectangle: rectangle [x1, y1, x2, y2]
 
     Returns:
         (x_center, y_center) the coordinates of the center.
@@ -17,17 +17,16 @@ def get_center(rectangle: List[float]):
     return (rectangle[0] + rectangle[2]) / 2.0,\
            (rectangle[1] + rectangle[3]) / 2.0
 
-def union(
-        rectangle_1: List[float],
-        rectangle_2: List[float]
-        ) -> List[float]:
+
+def union(rectangle_1: List[float],
+          rectangle_2: List[float]) -> List[float]:
     """
     Compute the coordinates of the smallest rectangle
     containing both rectangle_1 and rectangle_2.
 
     Args:
-        rectangle_1: rectangle [x1,y1,x2,y2]
-        rectangle_2: rectangle [x1,y1,x2,y2]
+        rectangle_1: rectangle [x1, y1, x2, y2]
+        rectangle_2: rectangle [x1, y1, x2, y2]
 
     Returns:
         The union of rectangle_1 and rectangle_2 [x, y, x+w, y+h]
@@ -45,16 +44,14 @@ def union(
         y_union + height_union]
 
 
-def intersection(
-        rectangle_1: List[float],
-        rectangle_2: List[float]
-        ) -> List[float]:
+def intersection(rectangle_1: List[float],
+                 rectangle_2: List[float]) -> List[float]:
     """
     Compute the coordinates of the ractangles rectangle_1 and rectangle_2.
 
     Args:
-        rectangle_1: rectangle [x1,y1,x2,y2]
-        rectangle_2: rectangle [x1,y1,x2,y2]
+        rectangle_1 (List[float]): rectangle [x1, y1, x2, y2]
+        rectangle_2 (List[float]): rectangle [x1, y1, x2, y2]
 
     Returns:
         The intersection of rectangle_1 and rectangle_2 [x, y, x+w, y+h]
@@ -76,14 +73,12 @@ def intersection(
         y_intersect + height_intersect]
 
 
-def area(
-        rectangle: List[float],
-        ) -> float:
+def area(rectangle: List[float]) -> float:
     """
     Compute the area of the given rectangle.
 
     Args:
-        rectangle: rectangle [x1,y1,x2,y2]
+        rectangle: rectangle [x1, y1, x2, y2]
 
     Returns:
         The area of the rectangle.
@@ -92,21 +87,19 @@ def area(
     return (rectangle[2] - rectangle[0]) * (rectangle[3] - rectangle[1])
 
 
-def union_area(
-        rectangle_1: List[float],
-        rectangle_2: List[float],
-        area_intersection: float
-        ) -> float:
+def union_area(rectangle_1: List[float],
+               rectangle_2: List[float],
+               area_intersection: float) -> float:
     """
     Compute the area of the union of the ractangles rectangle_1 and rectangle_2.
 
     Args:
-        rectangle_1: rectangle [x1,y1,x2,y2]
-        rectangle_2: rectangle [x1,y1,x2,y2]
-        area_intersection: the area of the intersection of rectangle_1 and rectangle_2
+        rectangle_1 (List[float]):  rectangle [x1, y1, x2, y2].
+        rectangle_2 (List[float]):  rectangle [x1, y1, x2, y2].
+        area_intersection (float):  the area of the intersection of rectangle_1 and rectangle_2.
 
     Returns:
-        The area of the union of rectangle_1 and rectangle_2
+        The area of the union of rectangle_1 and rectangle_2.
     """
 
     area_1 = area(rectangle_1)
@@ -115,19 +108,17 @@ def union_area(
     return area_union
 
 
-def intersection_area(
-        rectangle_1: List[float],
-        rectangle_2: List[float]
-        ) -> float:
+def intersection_area(rectangle_1: List[float],
+                      rectangle_2: List[float]) -> float:
     """
     Compute the area of the ractangles rectangle_1 and rectangle_2.
 
     Args:
-        rectangle_1: rectangle [x1,y1,x2,y2]
-        rectangle_2: rectangle [x1,y1,x2,y2]
+        rectangle_1 (List[float]): rectangle [x1,y1,x2,y2].
+        rectangle_2 (List[float]): rectangle [x1,y1,x2,y2].
 
     Returns:
-        The area of the intersection of rectangle_1 and rectangle_2
+        The area of the intersection of rectangle_1 and rectangle_2.
     """
 
     x_intersect = max(rectangle_1[0], rectangle_2[0])
@@ -147,8 +138,8 @@ def iou(rectangle_1: List[float],
     Compute the area of the ractangles rectangle_1 and rectangle_2.
 
     Args:
-        rectangle_1: rectangle [x1,y1,x2,y2]
-        rectangle_2: rectangle [x1,y1,x2,y2]
+        rectangle_1 (List[float]): rectangle [x1,y1,x2,y2].
+        rectangle_2 (List[float]): rectangle [x1,y1,x2,y2].
 
     Returns:
         The area of the intersection of rectangle_1 and rectangle_2

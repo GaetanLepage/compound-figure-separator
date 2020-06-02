@@ -8,13 +8,13 @@ import numpy as np
 from panel_seg.utils.average_precision import compute_average_precision
 
 
-def evaluate_detections(figure_generator: str):
+def evaluate_detections(figure_generator: iter) -> dict:
     """
     Compute the metrics (ImageCLEF and mAP) from a given set of panel slitting detections.
 
     Args:
-        figure_generator:   A figure generator yielding Figure objects augmented with
-                                detected panels.
+        figure_generator (iter):    A figure generator yielding Figure objects augmented with
+                                        detected panels.
 
     Returns:
         A dict containing the computed metrics.

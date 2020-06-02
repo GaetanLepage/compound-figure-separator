@@ -1,8 +1,6 @@
 """
 Load ImageCLEF and PanelSeg data sets to be used with the Detectron API for the
 panel splitting task.
-
-TODO : refactor and make more generic.
 """
 
 from detectron2.data import DatasetCatalog, MetadataCatalog
@@ -13,7 +11,8 @@ from panel_seg.data.figure_generators import (
 
 from panel_seg.data.export import export_figures_to_detectron_dict
 
-def register_panel_splitting_dataset(dataset_name):
+
+def register_panel_splitting_dataset(dataset_name: str):
     """
     Register the appropriate data set for panel splitting in the Detectron `DatasetCatalog`.
 
@@ -28,7 +27,6 @@ def register_panel_splitting_dataset(dataset_name):
     if "image_clef" in dataset_name:
 
         if dataset_name == "image_clef_train":
-
             xml_annotation_file_path = "data/ImageCLEF/training/FigureSeparationTraining2016-GT.xml"
             image_directory_path = "data/ImageCLEF/training/FigureSeparationTraining2016/"
 
@@ -58,11 +56,9 @@ def register_panel_splitting_dataset(dataset_name):
     elif "zou" in dataset_name:
         if dataset_name == "zou_panel_splitting_train":
             eval_list_txt = "data/zou/train.txt"
-            image_directory_path = "data/zou/"
 
         elif dataset_name == "zou_panel_splitting_test":
-            eval_list_txt = "data/zou/train.txt"
-            image_directory_path = "data/zou/"
+            eval_list_txt = "data/zou/eval.txt"
 
         else:
             # TODO warn the user in this case
@@ -80,8 +76,10 @@ def register_panel_splitting_dataset(dataset_name):
 
     DatasetCatalog.register(name=dataset_name,
                             func=lambda: export_figures_to_detectron_dict(
-                                figure_generator=figure_generator))
+                                figure_generator=figure_generator,
+                                task='panel_splitting'))
 
     MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator_copy)
 
+    # Add the class names (here, only 'panel') as metadata.
     MetadataCatalog.get(name=dataset_name).set(thing_classes=["panel"])

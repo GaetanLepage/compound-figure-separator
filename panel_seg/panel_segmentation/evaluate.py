@@ -2,25 +2,23 @@
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import List
-
 from sortedcontainers import SortedKeyList
 import numpy as np
 
 from panel_seg.utils.average_precision import compute_average_precision
 
 
-def evaluate_detections(figure_generator: str):
+def evaluate_detections(figure_generator: iter) -> dict:
     """
-    Compute the metrics (precision, recall and mAP) from a given set of
-    panel segmentation detections.
+    Compute the metrics (precision, recall and mAP) from a given set of panel segmentation
+    detections.
 
     Args:
-        figure_generator:   A figure generator yielding Figure objects augmented with
-                                detected panels and labels.
+        figure_generator (iter):   A figure generator yielding Figure objects augmented with
+                                        detected panels and labels.
 
     Returns:
-        A dict containing the computed metrics.
+        metrics (dict): A dict containing the computed metrics.
     """
 
     num_samples = 0

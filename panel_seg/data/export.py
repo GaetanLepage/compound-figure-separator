@@ -5,22 +5,25 @@ Export tools for panel-seg datasets
 import csv
 import tensorflow as tf
 
-from panel_seg.utils.figure.label_class import LABEL_CLASS_MAPPING
+from ..utils.figure.label_class import LABEL_CLASS_MAPPING
 
-def export_figures_to_csv(figure_generator,
+
+def export_figures_to_csv(figure_generator: callable,
                           output_csv_file: str,
-                          individual_export=False,
-                          individual_export_csv_directory=None):
+                          individual_export: bool = False,
+                          individual_export_csv_directory: str = None):
     """
     Export a set of figures to a csv file.
     This may be used for keras-retinanet.
 
     Args:
-        figure_generator:                A generator yielding figure objects
-        output_csv_file:                 The path of the csv file containing the annotations
-        individual_csv:                  If True, also export the annotation to a single csv file
-        individual_export_csv_directory: The path of the directory whete to store the individual
-                                            csv annotation files."
+        figure_generator (callable):            A generator yielding figure objects
+        output_csv_file (str):                  The path of the csv file containing the
+                                                    annotations
+        individual_csv (bool):                  If True, also export the annotation to a single
+                                                    csv file
+        individual_export_csv_directory (str):  The path of the directory whete to store the
+                                                    individual csv annotation files."
     """
 
     with open(output_csv_file, 'w', newline='') as csvfile:
@@ -57,14 +60,14 @@ def export_figures_to_csv(figure_generator,
                         csv_export_dir=individual_export_csv_directory)
 
 
-def export_figures_to_tf_record(figure_generator,
-                                tf_record_filename):
+def export_figures_to_tf_record(figure_generator: callable,
+                                tf_record_filename: str):
     """
     Convert a set of figures to a a TensorFlow records file.
 
     Args:
-        figure_generator:   A generator yielding figure objects.
-        tf_record_filename: Path to the output tf record file.
+        figure_generator (callable):    A generator yielding figure objects.
+        tf_record_filename (str):       Path to the output tf record file.
     """
 
     with tf.io.TFRecordWriter(tf_record_filename) as writer:
@@ -76,15 +79,16 @@ def export_figures_to_tf_record(figure_generator,
             writer.write(tf_example.SerializeToString())
 
 
-def export_figures_to_detectron_dict(figure_generator, task='panel_splitting'):
+def export_figures_to_detectron_dict(figure_generator: callable,
+                                     task: str = 'panel_splitting') -> dict:
     """
     Export a set of Figure objects to a dict which is compatible with Facebook Detectron 2.
 
     Args:
-        figure_generator:   A generator yielding figure objects.
+        figure_generator (callable):    A generator yielding figure objects.
 
     Returns:
-        dataset_dicts (dict): a dict representing the data set.
+        dataset_dicts (dict): A dict representing the data set.
     """
     from detectron2.structures import BoxMode
 
@@ -124,7 +128,18 @@ def export_figures_to_detectron_dict(figure_generator, task='panel_splitting'):
                 }
             # panel segmentation task
             else:
-                raise NotImplementedError("Dict() export is not yet implemented.")
+                # TODO Deal with unlabeled panels
+                if panel.label_rect is None or len(panel.label) != 1:
+                    # We ensure that, for this task, the labels are valid
+                    # (they have been previously checked while loading annotations)
+                    continue
+
+                obj = {
+                    "panel_bbox": panel.panel_rect,
+                    "bbox_mode": BoxMode.XYXY_ABS,
+                    "label_bbox": panel.label_rect,
+                    "category_id": LABEL_CLASS_MAPPING[panel.label]
+                }
 
             objs.append(obj)
 

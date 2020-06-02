@@ -1,70 +1,56 @@
+"""
+This file contains the mapping that's applied to panel segmentation dataset dicts.
+"""
+
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+from typing import List
+
 import copy
 import logging
 import numpy as np
 import torch
-from fvcore.common.file_io import PathManager
-from PIL import Image
+from fvcore.transforms.transform import TransformList
 
 from detectron2.data import detection_utils as utils
 from detectron2.data import transforms as T
 
 from detectron2.structures import BoxMode, Instances, Boxes
+from detectron2.config import CfgNode
 
-"""
-This file contains the default mapping that's applied to "dataset dicts".
-"""
 
 __all__ = ["PanelSegDatasetMapper"]
 
 
-# def filter_empty_instances(instances, by_box=True, box_threshold=1e-5):
-    # """
-    # Filter out empty instances in an `Instances` object.
-
-    # Args:
-        # instances (Instances):
-        # by_box (bool): whether to filter out instances with empty boxes
-        # by_mask (bool): whether to filter out instances with empty masks
-        # box_threshold (float): minimum width and height to be considered non-empty
-
-    # Returns:
-        # Instances: the filtered instances.
-    # """
-    # r = []
-    # r.append(instances.gt_boxes.nonempty(threshold=box_threshold))
-
-    # if not r:
-        # return instances
-    # m = r[0]
-    # for x in r[1:]:
-        # m = m & x
-    # return instances[m]
-
-
-
 class PanelSegDatasetMapper:
     """
-    A callable which takes a dataset dict in Detectron2 Dataset format,
+    A callable which takes a dataset dict in Panel Segmentation Dataset format,
     and map it into a format used by the model.
-
-    This is the default callable to be used to map your dataset dict into training data.
-    You may need to follow it to implement your own one for customized logic,
-    such as a different way to read or transform images.
-    See :doc:`/tutorials/data_loading` for details.
-
-    The callable currently does the following:
 
     1. Read the image from "file_name"
     2. Applies cropping/geometric transforms to the image and annotations
     3. Prepare data and annotations to Tensor and :class:`Instances`
+
+    Attributes:
+        crop_gen (RandomCrop):          The transformation that will be applied to samples.
+        tfm_gen (list[TransformGen]):   A list of :class:`TransformGen` from config.
+        img_format (str):               The image format (ex: 'BGR').
+        is_train (bool):                Whether we are currently training or testing.
     """
 
-    def __init__(self, cfg, is_train=True):
+    def __init__(self,
+                 cfg: CfgNode,
+                 is_train: bool = True):
+        """
+        Init method for class PanelSegDatasetMapper.
+
+        Args:
+            cfg (CfgNode):      The config node filled with necessary options.
+            is_train (bool):    Whether we are currently training or testing.
+        """
 
         if cfg.INPUT.CROP.ENABLED and is_train:
             self.crop_gen = T.RandomCrop(cfg.INPUT.CROP.TYPE, cfg.INPUT.CROP.SIZE)
-            logging.getLogger(__name__).info("CropGen used in training: " + str(self.crop_gen))
+            logging.getLogger(__name__).info("CropGen used in training: %s", str(self.crop_gen))
         else:
             self.crop_gen = None
 
@@ -76,28 +62,24 @@ class PanelSegDatasetMapper:
 
 
     @staticmethod
-    def _transform_instance_annotations(annotation,
-                                        transforms):
+    def _transform_instance_annotations(annotation: dict,
+                                        transforms: TransformList) -> dict:
         """
-        Apply transforms to box, segmentation and keypoints annotations of a single instance.
+        Apply transforms to box annotations of a single instance.
 
-        It will use `transforms.apply_box` for the box, and
-        `transforms.apply_coords` for segmentation polygons & keypoints.
+        It will use `transforms.apply_box` for the box.
         If you need anything more specially designed for each data structure,
         you'll need to implement your own version of this function or the transforms.
 
         Args:
-            annotation (dict): dict of instance annotations for a single instance.
-                It will be modified in-place.
-            transforms (TransformList):
-            image_size (tuple): the height, width of the transformed image
-            keypoint_hflip_indices (ndarray[int]): see `create_keypoint_hflip_indices`.
+            annotation (dict):          dict of instance annotations for a single instance.
+                                            It will be modified in-place.
+            transforms (TransformList): The list of tranformations to apply on the given instance.
+            image_size (tuple):         The height, width of the transformed image
 
         Returns:
-            dict:
-                the same input dict with fields "bbox", "segmentation", "keypoints"
-                transformed according to `transforms`.
-                The "bbox_mode" field will be set to XYXY_ABS.
+            dict: the same input dict with field "bbox" transformed according to `transforms`.
+                        The "bbox_mode" field will be set to XYXY_ABS.
         """
         panel_bbox = BoxMode.convert(box=annotation["panel_bbox"],
                                      from_mode=annotation["bbox_mode"],
@@ -114,22 +96,22 @@ class PanelSegDatasetMapper:
 
 
     @staticmethod
-    def annotations_to_instances(annos, image_size):
+    def annotations_to_instances(annos: List[dict],
+                                 image_size: tuple) -> Instances:
         """
         Create an :class:`Instances` object used by the models,
         from instance annotations in the dataset dict.
 
         Args:
-            annos (list[dict]): a list of instance annotations in one image, each
-                element for one instance.
+            annos (List[dict]): a list of instance annotations in one image, each
+                                    element for one instance.
             image_size (tuple): height, width
 
         Returns:
-            Instances:
-                It will contain fields "gt_boxes", "gt_classes",
-                "gt_masks", "gt_keypoints", if they can be obtained from `annos`.
-                This is the format that builtin models expect.
+            Instances: It will contain fields "gt_boxes", "gt_classes", if they can be obtained
+                            from `annos`. This is the format that builtin models expect.
         """
+        # Create an `Instances` object
         target = Instances(image_size)
 
         # Panels
@@ -161,7 +143,7 @@ class PanelSegDatasetMapper:
         return target
 
 
-    def __call__(self, dataset_dict):
+    def __call__(self, dataset_dict: dict) -> dict:
         """
         Args:
             dataset_dict (dict): Metadata of one image, in Detectron2 Dataset format.
@@ -200,16 +182,7 @@ class PanelSegDatasetMapper:
         # Therefore it's important to use torch.Tensor.
         dataset_dict["image"] = torch.as_tensor(np.ascontiguousarray(image.transpose(2, 0, 1)))
 
-        # USER: Remove if you don't use pre-computed proposals.
-        # if self.load_proposals:
-            # utils.transform_proposals(dataset_dict,
-                                      # image_shape,
-                                      # transforms,
-                                      # self.min_box_side_len,
-                                      # self.proposal_topk)
-
         if not self.is_train:
-            # USER: Modify this if you want to keep them for some reason.
             dataset_dict.pop("annotations", None)
             return dataset_dict
 
@@ -224,9 +197,7 @@ class PanelSegDatasetMapper:
             ]
             instances = self.annotations_to_instances(annos,
                                                       image_shape)
-            # Create a tight bounding box from masks, useful when image is cropped
-            # if self.crop_gen and instances.has("gt_masks"):
-                # instances.gt_boxes = instances.gt_masks.get_bounding_boxes()
+
             # dataset_dict["instances"] = utils.filter_empty_instances(instances)
 
             # TODO check if we have to adapt this for handling panel_boxes and label_boxes

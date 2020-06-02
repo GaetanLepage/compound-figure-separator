@@ -6,26 +6,28 @@ keras-retinanet (https://github.com/fizyr/keras-retinanet).
 """
 
 import sys
-import argparse
+from argparse import ArgumentParser
+
+from typing import List
 
 sys.path.append(".")
 
-from panel_seg.io.figure_generators import image_clef_xml_figure_generator
-from panel_seg.io.export import export_figures_to_csv
+from panel_seg.data.figure_generators import image_clef_xml_figure_generator
+from panel_seg.data.export import export_figures_to_csv
 
 
-def parse_args(args):
+def parse_args(args: List[str]) -> ArgumentParser:
     """
     Parse the arguments from the command line.
 
     Args:
-        args: The arguments from the command line call.
+        args (List[str]): The arguments from the command line call.
 
     Returns:
-        Populated namespace
+        (ArgumentParser): Populated namespace.
     """
-    parser = argparse.ArgumentParser(description='Convert annotations from an ImageCLEF xml"\
-                                        " annotation file to a CSV annotations file.')
+    parser = ArgumentParser(description="Convert annotations from an ImageCLEF xml"\
+                                        " annotation file to a CSV annotations file.")
 
     parser.add_argument('--annotation_xml',
                         help='The path to the xml annotation file.',
@@ -55,9 +57,12 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def main(args=None):
+def main(args: List[str] = None):
     """
     Load figures from ImageCLEF xml annotation files and export them to csv.
+
+    Args:
+        args (List[str]): Arguments from the command line.
     """
 
     # parse arguments

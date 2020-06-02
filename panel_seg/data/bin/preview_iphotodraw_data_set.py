@@ -5,25 +5,26 @@ bounding boxes and labels.
 """
 
 import sys
-import argparse
+from argparse import ArgumentParser
+
+from typing import List
 
 sys.path.append(".")
 
-from panel_seg.io.figure_generators import iphotodraw_xml_figure_generator
-from panel_seg.io.figure_viewer import parse_viewer_args, view_data_set
+from panel_seg.data.figure_generators import iphotodraw_xml_figure_generator
+from panel_seg.data.figure_viewer import parse_viewer_args, view_data_set
 
-def parse_args(args):
+def parse_args(args: List[str]) -> ArgumentParser:
     """
     Parse the arguments from the command line.
 
     Args:
-        args: The arguments from the command line call.
+        args (List[str]): The arguments from the command line call.
 
     Returns:
-        Populated namespace
+        (ArgumentParser): Populated namespace.
     """
-    parser = argparse.ArgumentParser(
-        description='Preview all the figures from an iPhotoDraw data set.')
+    parser = ArgumentParser(description="Preview all the figures from an iPhotoDraw data set.")
 
     parser.add_argument('--eval_list_txt',
                         help='The path to the txt file listing the images.',
@@ -40,9 +41,12 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def main(args=None):
+def main(args: List[str] = None):
     """
     Launch previsualization of Zou's data set.
+
+    Args:
+        args (List[str]): Arguments from the command line.
     """
 
     # parse arguments
@@ -50,10 +54,12 @@ def main(args=None):
         args = sys.argv[1:]
     args = parse_args(args)
 
+    # Create the figure generator handling iPhotoDraw annotation files.
     figure_generator = iphotodraw_xml_figure_generator(
         eval_list_txt=args.eval_list_txt,
         image_directory_path=args.image_directory_path)
 
+    # Preview the data set.
     view_data_set(figure_generator=figure_generator,
                   mode=args.mode,
                   delay=args.delay,
