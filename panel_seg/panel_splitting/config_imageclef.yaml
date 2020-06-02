@@ -1,4 +1,4 @@
-_BASE_: "/home/gaetan/hevs/implementations/object_detection/detectron2/configs/COCO-Detection/retinanet_R_50_FPN_1x.yaml"
+_BASE_: "../utils/detectron_utils/Base-RetinaNet.yaml"
 OUTPUT_DIR: "panel_seg/panel_splitting/output_imageclef"
 MODEL:
   RETINANET:
