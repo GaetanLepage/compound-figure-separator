@@ -4,27 +4,28 @@ keras-retinanet (https://github.com/fizyr/keras-retinanet).
 """
 
 import sys
-import argparse
+from argparse import ArgumentParser
+
+from typing import List
 
 sys.path.append(".")
 
-from panel_seg.io.figure_generators import iphotodraw_xml_figure_generator
-from panel_seg.io.export import export_figures_to_csv
+from panel_seg.data.figure_generators import iphotodraw_xml_figure_generator
+from panel_seg.data.export import export_figures_to_csv
 
 
-def parse_args(args):
+def parse_args(args: List[str]) -> ArgumentParser:
     """
     Parse the arguments from the command line.
 
     Args:
-        args: The arguments from the command line call.
+        args (List[str]): The arguments from the command line call.
 
     Returns:
-        Populated namespace
+        (ArgumentParser): Populated namespace.
     """
-    parser = argparse.ArgumentParser(description='Convert annotations from individual iPhotoDraw"\
-                                                    " xml annotation files. to a CSV annotations"\
-                                                    " file.')
+    parser = ArgumentParser(description="Convert annotations from individual iPhotoDraw"\
+                                        " xml annotation files. to a CSV annotations file.")
 
     parser.add_argument('--eval_list_txt',
                         help='The path to the txt file listing the images.',
@@ -54,22 +55,25 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def main(args=None):
+def main(args: List[str] = None):
     """
     Load figures from iPhotoDraw xml annotation files and export them to csv.
+
+    Args:
+        args (List[str]): Arguments from the command line.
     """
 
-    # parse arguments
+    # Parse arguments.
     if args is None:
         args = sys.argv[1:]
     args = parse_args(args)
 
-    # Create the figure generator handling xml annotation files
+    # Create the figure generator handling xml annotation files.
     figure_generator = iphotodraw_xml_figure_generator(
         eval_list_txt=args.eval_list_txt,
         image_directory_path=args.image_directory_path)
 
-    # Export figures to csv
+    # Export figures to csv.
     export_figures_to_csv(figure_generator=figure_generator,
                           output_csv_file=args.output_csv,
                           individual_export=args.individual_csv,

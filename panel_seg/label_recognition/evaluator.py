@@ -1,7 +1,8 @@
 """
-        # TODO inverser les boucles
 TODO
 """
+
+from typing import List
 
 from panel_seg.utils.figure.panel import DetectedPanel
 
@@ -9,6 +10,8 @@ from panel_seg.utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 
 from panel_seg.label_recognition.evaluate import evaluate_detections
 from panel_seg.utils.figure.label_class import CLASS_LABEL_MAPPING
+from panel_seg.utils.figure.figure import Figure
+
 
 class LabelRecogEvaluator(PanelSegAbstractEvaluator):
     """
@@ -24,20 +27,16 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
                          task_name='label_recog',
                          evaluation_function=evaluate_detections)
 
-    def process(self, inputs, outputs):
+
+    def process(self,
+                inputs: List[dict],
+                outputs: List[dict]):
         """
         Process the pair of inputs and outputs.
-        If they contain batches, the pairs can be consumed one-by-one using `zip`:
-
-        .. code-block:: python
-
-            for input_, output in zip(inputs, outputs):
-                # do evaluation on single input/output pair
-                ...
 
         Args:
-            inputs (list): the inputs that's used to call the model.
-            outputs (list): the return value of `model(inputs)`
+            inputs (List[dict]):    The inputs that's used to call the model.
+            outputs (List[dict]):   The return value of `model(inputs)`.
         """
 
         for input, output in zip(inputs, outputs):
@@ -60,10 +59,16 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
             self._predictions[image_id] = predicted_panels
 
 
-    def _augmented_figure_generator(self, predictions):
+    def _augmented_figure_generator(self, predictions: dict) -> Figure:
         """
-        Iterate over a Figure generator, make predictions and yield back the augmented
-        Figure objects.
+        Loop over the Figure generator, fill the Figure objects with predictions and yield back
+        the augmented Figure objects.
+
+        Args:
+            predictions (dict): The dict containing the predictions from the model.
+
+        Yields:
+            figure (Figure): Figure objects augmented with predictions.
         """
         for figure in self._figure_generator:
 
@@ -73,6 +78,7 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
 
             for prediction in predicted_panels:
 
+                # Instanciate a Panel object.
                 panel = DetectedPanel(label=CLASS_LABEL_MAPPING[prediction['cls']],
                                       label_rect=prediction['box'],
                                       label_detection_score=prediction['score'])

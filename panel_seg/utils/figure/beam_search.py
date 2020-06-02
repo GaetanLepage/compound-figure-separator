@@ -6,15 +6,15 @@ import math
 from typing import List
 
 from panel_seg.utils import box
-from .panel import Panel, DetectedPanel
+from panel_seg.utils.figure.panel import Panel
 
 
-def compute_panel_label_distances(panels, labels):
+def compute_panel_label_distances(panels: List[Panel], labels: List[Panel]):
     """
     Compute distances between each label and each panel.
 
     Args:
-        panels: the list of Panel objects.
+        panels: The list of Panel objects with
         labels:
 
     Returns:
@@ -49,10 +49,11 @@ def assign_labels_to_panels(panels: List[Panel],
     panels and labels must have the same length
 
     Args:
-        panels: panels having the same label character
-        labels: labels having the same label character
+        panels (List[Panel]): panels having the same label character.
+        labels (List[Panel]): labels having the same label character.
     """
 
+    # Compute the distance matrix.
     distances = compute_panel_label_distances(panels, labels)
 
     # Beam search
@@ -69,8 +70,6 @@ def assign_labels_to_panels(panels: List[Panel],
                 label_indexes = [label_idx]
                 item_pair = (dist, label_indexes)
                 item_pairs.append(item_pair)
-
-            print("init over:", item_pairs)
 
         # Exploring the graph
         else:
@@ -97,11 +96,12 @@ def assign_labels_to_panels(panels: List[Panel],
 
         all_item_pairs.append(item_pairs)
 
-        print("panel index:", panel_idx)
-        print("all_item_pairs:", all_item_pairs)
+        # TODO remove
+        # print("panel index:", panel_idx)
+        # print("all_item_pairs:", all_item_pairs)
 
     # check the last item_pairs
-    print(all_item_pairs)
+    # print(all_item_pairs)
     # all_item_pairs[-1] : last "layer" (complete paths)
     # all_item_pairs[-1][0] : pair which has the shortest path (it was sorted)
     # all_item_pairs[-1][0][1] : the complete path from this pair

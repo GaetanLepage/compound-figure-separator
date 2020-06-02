@@ -1,11 +1,16 @@
 """
-        # TODO inverser les boucles
 TODO
 """
 
+from typing import List
+
 from panel_seg.utils.figure.panel import DetectedPanel
+
 from panel_seg.utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 from panel_seg.panel_splitting.evaluate import evaluate_detections
+
+from panel_seg.utils.figure.figure import Figure
+
 
 class PanelSplitEvaluator(PanelSegAbstractEvaluator):
     """
@@ -13,7 +18,7 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
     Perform the evaluation of panel splitting metrics on a given test set.
     """
 
-    def __init__(self, dataset_name):
+    def __init__(self, dataset_name: str):
         """
         TODO
         """
@@ -21,20 +26,16 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
                          task_name='panel_splitting',
                          evaluation_function=evaluate_detections)
 
-    def process(self, inputs, outputs):
+
+    def process(self,
+                inputs: List[dict],
+                outputs: List[dict]):
         """
         Process the pair of inputs and outputs.
-        If they contain batches, the pairs can be consumed one-by-one using `zip`:
-
-        .. code-block:: python
-
-            for input_, output in zip(inputs, outputs):
-                # do evaluation on single input/output pair
-                ...
 
         Args:
-            inputs (list): the inputs that's used to call the model.
-            outputs (list): the return value of `model(inputs)`
+            inputs (List[dict]):    The inputs that's used to call the model.
+            outputs (List[dict]):   The return value of `model(inputs)`.
         """
 
         for input, output in zip(inputs, outputs):
@@ -57,10 +58,16 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
             self._predictions[image_id] = predicted_panels
 
 
-    def _augmented_figure_generator(self, predictions):
+    def _augmented_figure_generator(self, predictions: dict) -> Figure:
         """
-        Iterate over a Figure generator, make predictions and yield back the augmented
-        Figure objects.
+        Loop over the Figure generator, fill the Figure objects with predictions and yield back
+        the augmented Figure objects.
+
+        Args:
+            predictions (dict): The dict containing the predictions from the model.
+
+        Yields:
+            figure (Figure): Figure objects augmented with predictions.
         """
         for figure in self._figure_generator:
 
@@ -69,6 +76,8 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
             predicted_panel_objects = []
 
             for prediction in predicted_panels:
+
+                # Instanciate a Panel object.
                 panel = DetectedPanel(panel_rect=prediction['box'],
                                       panel_detection_score=prediction['score'])
 

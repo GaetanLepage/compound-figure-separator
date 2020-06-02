@@ -21,20 +21,21 @@ DATA_DIR = os.path.join(
     "data/")
 
 
-def image_list_figure_generator(image_list_txt: str):
+def image_list_figure_generator(image_list_txt: str) -> Figure:
     """
     Generator of Figure objects from an image list.
     This generator does not load any annotations.
 
     Args:
-        image_list_txt:              The path of the list of images to be loaded
+        image_list_txt (str):   The path of the list of images to be loaded.
+
+    Yields:
+        figure (Figure): Figure objects without annotations.
     """
 
     with open(image_list_txt, 'r') as image_list_file:
 
-        image_counter = 0
-
-        for line in image_list_file.readlines():
+        for image_counter, line in enumerate(image_list_file.readlines()):
 
             if os.path.isfile(line):
                 image_file_path = line
@@ -50,18 +51,18 @@ def image_list_figure_generator(image_list_txt: str):
 
             yield figure
 
-            image_counter += 1
-
-
 
 def image_clef_xml_figure_generator(xml_annotation_file_path: str,
-                                    image_directory_path: str):
+                                    image_directory_path: str) -> Figure:
     """
     Generator of Figure objects from ImageCLEF data set.
 
     Args:
-        xml_annotation_file_path:   The path of the xml annotation file
-        image_directory_path (str): The path of the directory where the images are stored
+        xml_annotation_file_path (str):     The path of the xml annotation file.
+        image_directory_path (str):         The path of the directory where the images are stored.
+
+    Yields:
+        figure (Figure): Figure objects with annotations.
     """
 
     # Open and parse the xml annotation file
@@ -74,8 +75,6 @@ def image_clef_xml_figure_generator(xml_annotation_file_path: str,
 
     # Total number of images
     num_images = len(annotation_items)
-
-    counter = 0
 
     for annotation_index, annotation_item in enumerate(annotation_items):
         filename_item = annotation_item.find('./filename')
@@ -92,7 +91,7 @@ def image_clef_xml_figure_generator(xml_annotation_file_path: str,
 
         # Create Figure object
         figure = Figure(image_path=image_path,
-                        index=counter)
+                        index=annotation_index)
 
         # Load image file
         try:
@@ -126,20 +125,21 @@ def image_clef_xml_figure_generator(xml_annotation_file_path: str,
 
         yield figure
 
-        counter += 1
-
 
 def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
-                                    image_directory_path: str = None):
+                                    image_directory_path: str = None) -> Figure:
     """
     Generator of Figure objects from iPhotoDraw xml annotations.
     The input files can be provided either from a csv list or from the path
     to the directory where the image files are.
 
     Args:
-        eval_list_txt:              The path of the list of figures which annotations
-                                    have to be loaded
-        image_directory_path (str): The path of the directory where the images are stored
+        eval_list_txt (str):            The path of the list of figures which annotations
+                                            have to be loaded.
+        image_directory_path (str):     The path of the directory where the images are stored
+
+    Yields:
+        figure (Figure): Figure objects with annotations.
     """
 
     if eval_list_txt is not None and image_directory_path is not None:
@@ -186,6 +186,11 @@ def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
                                                    # num_images,
                                                    # image_path))
 
+        # TODO remove
+        # if image_index > 50:
+            # return
+
+
         # Create figure object
         figure = Figure(image_path=image_path,
                         index=image_index)
@@ -204,13 +209,15 @@ def iphotodraw_xml_figure_generator(eval_list_txt: str = None,
         yield figure
 
 
-def global_csv_figure_generator(
-        csv_annotation_file_path: str):
+def global_csv_figure_generator(csv_annotation_file_path: str) -> Figure:
     """
     Generator of Figure objects from a single csv annotation file.
 
     Args:
-        csv_annotation_file:    The path of the csv annotation file to load.
+        csv_annotation_file (str):  The path of the csv annotation file to load.
+
+    Yields:
+        figure (Figure): Figure objects with annotations.
     """
 
     if not os.path.isfile(csv_annotation_file_path):
@@ -287,13 +294,16 @@ def global_csv_figure_generator(
         yield figure
 
 
-def individual_csv_figure_generator(
-        csv_annotation_directory: str):
+def individual_csv_figure_generator(csv_annotation_directory: str) -> Figure:
     """
     Generator of Figure objects from individual csv annotation files (one per image).
 
     Args:
-        csv_annotation_directory:   The path of the directory containing the csv annotation files.
+        csv_annotation_directory (str):     The path of the directory containing the csv
+                                                annotation files.
+
+    Yields:
+        figure (Figure): Figure objects with annotations.
     """
 
     # TODO implement the individual_csv_figure_generator()

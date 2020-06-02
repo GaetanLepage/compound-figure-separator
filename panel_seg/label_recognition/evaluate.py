@@ -2,28 +2,23 @@
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import List
-
 from sortedcontainers import SortedKeyList
 import numpy as np
 
 from panel_seg.utils.average_precision import compute_average_precision
 
-# TODO remove
-from panel_seg.utils.box import iou
 
-
-def evaluate_detections(figure_generator: str):
+def evaluate_detections(figure_generator: iter) -> dict:
     """
-    Compute the metrics (precision, recall and mAP) from a given set of
-    label recognition detections.
+    Compute the metrics (precision, recall and mAP) from a given set of label recognition
+    detections.
 
     Args:
-        figure_generator:   A figure generator yielding Figure objects augmented with
-                                detected labels.
+        figure_generator (iter):    A figure generator yielding Figure objects augmented with
+                                        detected labels.
 
     Returns:
-        A dict containing the computed metrics.
+        metrics (dict): A dict containing the computed metrics.
     """
 
     num_samples = 0
@@ -71,9 +66,11 @@ def evaluate_detections(figure_generator: str):
             cls = detected_panel.label
 
             # initialize the dict entry for this class if necessary
+            # it is sorting the predictions in the decreasing order of their score
             if cls not in detections_by_class:
                 detections_by_class[cls] = SortedKeyList(key=lambda u: -u[0])
 
+            # Add this detection in the sorted list
             detections_by_class[cls].add((detected_panel.label_detection_score,
                                           detected_panel.label_is_true_positive))
 
@@ -107,6 +104,7 @@ def evaluate_detections(figure_generator: str):
         class_cumsum_detections = np.arange(1, class_detected_count + 1)
         class_cumulated_precisions = class_cumsum_true_positives / class_cumsum_detections
 
+        # Add the AP score to the overall mAP total
         mAP += compute_average_precision(recall=class_cumulated_recalls,
                                          precision=class_cumulated_precisions)
 

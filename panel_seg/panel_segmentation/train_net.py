@@ -1,33 +1,35 @@
 #!/usr/bin/env python
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 """
-Detection Training Script.
+Panel Segmentation detection training script.
 
 This scripts reads a given config file and runs the training or evaluation.
-It is an entry point that is made to train standard models in detectron2.
-
-In order to let one script support training of many models,
 """
 
 import os
-import logging
+from typing import List
 
 import torch
-
-from collections import OrderedDict
+from torch.utils.data import DataLoader
 
 import detectron2.utils.comm as comm
 from detectron2.utils.logger import setup_logger
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import CfgNode, get_cfg
-from detectron2.engine import DefaultTrainer, default_argument_parser, default_setup, launch
+from detectron2.engine import (
+    DefaultTrainer,
+    default_argument_parser,
+    default_setup,
+    launch,
+    HookBase)
 from detectron2.evaluation import verify_results
 from detectron2.data.build import build_detection_train_loader, build_detection_test_loader
 
 from panel_seg.panel_segmentation.dataset_mapper import PanelSegDatasetMapper
-from panel_seg.panel_segmentation.load_panel_segmentation_datasets import register_panel_segmentation_dataset
+from panel_seg.panel_segmentation.load_datasets import \
+    register_panel_segmentation_dataset
 from panel_seg.utils.detectron_utils.loss_eval_hook import LossEvalHook
-from panel_seg.panel_segmentation.panel_seg_evaluator import PanelSegEvaluator
+from panel_seg.panel_segmentation.evaluator import PanelSegEvaluator
 from panel_seg.utils.detectron_utils.config import add_validation_config
 from panel_seg.panel_segmentation.config import add_panel_seg_config
 
@@ -36,32 +38,29 @@ from panel_seg.panel_segmentation.panel_seg_retinanet import PanelSegRetinaNet
 
 class Trainer(DefaultTrainer):
     """
-    TODO : do une train_net.py per task... or find a better way to split the work
-
     We use the "DefaultTrainer" which contains pre-defined default logic for
     standard training workflow.
+
     Here, the Trainer is able to perform validation.
     """
 
-    # def __init__(self, cfg):
-        # """
-        # TODO
-        # """
-
-        # # TODO maybe overwrite to add dataset mapper as attribute
-
-        # # TODO maybe overwrite to add dataset mapper as attribute
-        # super().__init__(cfg)
-
-
     @classmethod
     def build_evaluator(cls,
-                        cfg,
-                        dataset_name,
-                        output_folder=None):
+                        cfg: CfgNode,
+                        dataset_name: str,
+                        output_folder: str = None) -> PanelSegEvaluator:
         """
-        TODO
+        Builds the PanelSegEvaluator that will be called at test time.
+
+        Args:
+            cfg (CfgNode):          The global config.
+            dataset_name (str):     The name of the test data set.
+            output_folder (str):    The path to the folder where to store the inference results.
+
+        Returns:
+            DatasetEvaluator: The evaluator for testing label recognition results.
         """
+        # TODO implement export functionnality
         if output_folder is None:
             output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
 
@@ -69,9 +68,16 @@ class Trainer(DefaultTrainer):
 
 
     @classmethod
-    def build_train_loader(cls, cfg):
+    def build_train_loader(cls,
+                           cfg: CfgNode) -> DataLoader:
         """
-        TODO
+        Instanciate the training data loader.
+
+        Args:
+            cfg (CfgNode):  The global config.
+
+        Returns:
+            a DataLoader yielding formatted training examples.
         """
         mapper = PanelSegDatasetMapper(cfg, is_train=True)
         return build_detection_train_loader(cfg,
@@ -79,9 +85,18 @@ class Trainer(DefaultTrainer):
 
 
     @classmethod
-    def build_test_loader(cls, cfg, dataset_name):
+    def build_test_loader(cls,
+                          cfg: CfgNode,
+                          dataset_name: str) -> DataLoader:
         """
-        TODO
+        Instanciate the test data loader.
+
+        Args:
+            cfg (CfgNode):      The global config.
+            dataset_name (str): The name of the test dataset.
+
+        Returns:
+            a DataLoader yielding formatted test examples.
         """
         mapper = PanelSegDatasetMapper(cfg, is_train=False)
         return build_detection_test_loader(cfg,
@@ -89,28 +104,31 @@ class Trainer(DefaultTrainer):
                                            mapper=mapper)
 
 
-    def build_hooks(self):
+    def build_hooks(self) -> List[HookBase]:
         """
         This method overwrites the default one from DefaultTrainer.
-        It adds the `LossEvalHook` that allows
-        Build a list of default hooks, including timing, evaluation,
+        It adds the `LossEvalHook` that allows evaluating results on the validation set.
+        The default method builds a list of default hooks, including timing, evaluation,
         checkpointing, lr scheduling, precise BN, writing events.
 
         Returns:
-            list[HookBase]:
+            list[HookBase]: The list of hooks to call during training.
         """
         hooks = super().build_hooks()
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            hooks.insert(-1,
-                         LossEvalHook(eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
-                                      model=self.model,
-                                      data_loader=build_detection_test_loader(
-                                          cfg=self.cfg,
-                                          dataset_name=self.cfg.DATASETS.VALIDATION,
-                                          mapper=PanelSegDatasetMapper(cfg=self.cfg,
-                                                                       is_train=True))))
+            data_set_mapper = PanelSegDatasetMapper(cfg=self.cfg,
+                                                    is_train=True)
+            data_loader = build_detection_test_loader(cfg=self.cfg,
+                                                      dataset_name=self.cfg.DATASETS.VALIDATION,
+                                                      mapper=data_set_mapper)
+
+            loss_eval_hook = LossEvalHook(eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
+                                          model=self.model,
+                                          data_loader=data_loader)
+            hooks.insert(index=-1,
+                         obj=loss_eval_hook)
 
         return hooks
 
@@ -118,11 +136,13 @@ class Trainer(DefaultTrainer):
     @classmethod
     def build_model(cls, cfg):
         """
+        Instanciate and return the PanelSegRetinaNet model.
+
+        Args:
+            cfg (CfgNode):  The global config.
+
         Returns:
             torch.nn.Module:
-
-        It now calls :func:`detectron2.modeling.build_model`.
-        Overwrite it if you'd like a different model.
         """
         model = PanelSegRetinaNet(cfg)
         model.to(torch.device(cfg.MODEL.DEVICE))
@@ -132,13 +152,24 @@ class Trainer(DefaultTrainer):
         return model
 
 
-def setup(args):
+def setup(args: List[str]) -> CfgNode:
     """
     Create configs and perform basic setups.
+
+    Args:
+        args (List[str]): Arguments from the command line.
+
+    Retuns:
+        cfg (CfgNode): A config node filled with necessary options.
     """
     cfg = get_cfg()
+
+    # Add some config options to handle validation
     add_validation_config(cfg)
+
+    # Add some config options relative to the panel segmentation task.
     add_panel_seg_config(cfg)
+
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()
@@ -146,23 +177,40 @@ def setup(args):
     return cfg
 
 
-def register_datasets(cfg):
+def register_datasets(cfg: CfgNode):
     """
-    TODO
+    Register the data sets needed for label recognition in Detectron 2's registry.
+
+    Args:
+        cfg (CfgNode): The config node filled with necessary options.
     """
+    # Training
     for dataset_name in cfg.DATASETS.TRAIN:
         register_panel_segmentation_dataset(dataset_name=dataset_name)
 
+    # Test
     for dataset_name in cfg.DATASETS.TEST:
         register_panel_segmentation_dataset(dataset_name=dataset_name)
 
+    # Validation
     if cfg.DATASETS.VALIDATION != "":
         register_panel_segmentation_dataset(dataset_name=cfg.DATASETS.VALIDATION)
 
 
-def main(args):
+def main(args: List[str]) -> dict:
+    """
+    Launch training/testing for the panel splitting task on a single device.
+
+    Args:
+        args (List[str]): Arguments from the command line.
+
+    Returns:
+        If training: OrderedDict of results, if evaluation is enabled. Otherwise None.
+        If test: a dict of result metrics.
+    """
     cfg = setup(args)
 
+    # Register the needed datasets
     register_datasets(cfg)
 
     # Inference only (testing)

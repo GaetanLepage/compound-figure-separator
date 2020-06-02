@@ -7,26 +7,28 @@ Tensorflow's Object Detection API.
 """
 
 import sys
-import argparse
+from argparse import ArgumentParser
+
+from typing import List
 
 sys.path.append(".")
 
-from panel_seg.io.figure_generators import image_clef_xml_figure_generator
-from panel_seg.io.export import export_figures_to_tf_record
+from panel_seg.data.figure_generators import image_clef_xml_figure_generator
+from panel_seg.data.export import export_figures_to_tf_record
 
 
-def parse_args(args):
+def parse_args(args: List[str]) -> ArgumentParser:
     """
     Parse the arguments from the command line.
 
     Args:
-        args: The arguments from the command line call.
+        args (List[str]): The arguments from the command line call.
 
     Returns:
-        Populated namespace
+        (ArgumentParser): Populated namespace.
     """
-    parser = argparse.ArgumentParser(description="Convert the ImageCLEF dataset to a"\
-                                                    " TFRecord file.")
+    parser = ArgumentParser(description="Convert the ImageCLEF dataset to a"\
+                                            " TFRecord file.")
 
     parser.add_argument('--annotation_xml',
                         help='The path to the xml annotation file.',
@@ -48,9 +50,12 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def main(args=None):
+def main(args: List[str] = None):
     """
     Export the ImageCLEF dataset to a TFRecord file.
+
+    Args:
+        args (List[str]): The arguments from the command line call.
     """
 
     # parse arguments
@@ -64,9 +69,8 @@ def main(args=None):
         image_directory_path=args.image_directory_path)
 
     # Export figures to csv
-    export_figures_to_tf_record(
-        figure_generator=figure_generator,
-        tf_record_filename=args.output_tfrecord)
+    export_figures_to_tf_record(figure_generator=figure_generator,
+                                tf_record_filename=args.output_tfrecord)
 
 
 if __name__ == '__main__':
