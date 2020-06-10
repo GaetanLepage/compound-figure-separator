@@ -10,7 +10,7 @@ from typing import List
 
 sys.path.append(".")
 
-from panel_seg.data.figure_generators import iphotodraw_xml_figure_generator
+from panel_seg.data.figure_generators import IphotodrawXmlFigureGenerator
 from panel_seg.data.export import export_figures_to_csv
 
 
@@ -69,12 +69,12 @@ def main(args: List[str] = None):
     args = parse_args(args)
 
     # Create the figure generator handling xml annotation files.
-    figure_generator = iphotodraw_xml_figure_generator(
+    figure_generator = IphotodrawXmlFigureGenerator(
         eval_list_txt=args.eval_list_txt,
         image_directory_path=args.image_directory_path)
 
     # Export figures to csv.
-    export_figures_to_csv(figure_generator=figure_generator,
+    export_figures_to_csv(figure_generator=figure_generator(),
                           output_csv_file=args.output_csv,
                           individual_export=args.individual_csv,
                           individual_export_csv_directory=args.individual_export_csv_directory)

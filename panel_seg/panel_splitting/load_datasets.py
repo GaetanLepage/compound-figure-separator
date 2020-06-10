@@ -6,8 +6,8 @@ panel splitting task.
 from detectron2.data import DatasetCatalog, MetadataCatalog
 
 from panel_seg.data.figure_generators import (
-    image_clef_xml_figure_generator,
-    iphotodraw_xml_figure_generator)
+    ImageClefXmlFigureGenerator,
+    IphotodrawXmlFigureGenerator)
 
 from panel_seg.data.export import export_figures_to_detectron_dict
 
@@ -43,14 +43,9 @@ def register_panel_splitting_dataset(dataset_name: str):
 
         # TODO might be useful to implement generators as a class
         # Create two instances of the figure_generator so that one is given to the metadata
-        figure_generator = image_clef_xml_figure_generator(
+        figure_generator = ImageClefXmlFigureGenerator(
             xml_annotation_file_path=xml_annotation_file_path,
             image_directory_path=image_directory_path)
-
-        figure_generator_copy = image_clef_xml_figure_generator(
-            xml_annotation_file_path=xml_annotation_file_path,
-            image_directory_path=image_directory_path)
-
 
     # Dataset from Zou
     elif "zou" in dataset_name:
@@ -64,11 +59,7 @@ def register_panel_splitting_dataset(dataset_name: str):
             # TODO warn the user in this case
             pass
 
-        # Create two instances of the figure_generator so that one is given to the metadata
-        figure_generator = iphotodraw_xml_figure_generator(
-            eval_list_txt=eval_list_txt)
-        figure_generator_copy = iphotodraw_xml_figure_generator(
-            eval_list_txt=eval_list_txt)
+        figure_generator = IphotodrawXmlFigureGenerator(eval_list_txt=eval_list_txt)
 
     else:
         # TODO warn the user in this case
@@ -76,10 +67,10 @@ def register_panel_splitting_dataset(dataset_name: str):
 
     DatasetCatalog.register(name=dataset_name,
                             func=lambda: export_figures_to_detectron_dict(
-                                figure_generator=figure_generator,
+                                figure_generator=figure_generator(),
                                 task='panel_splitting'))
 
-    MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator_copy)
+    MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator())
 
     # Add the class names (here, only 'panel') as metadata.
     MetadataCatalog.get(name=dataset_name).set(thing_classes=["panel"])

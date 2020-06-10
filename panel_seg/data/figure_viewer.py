@@ -31,11 +31,19 @@ def parse_viewer_args(parser: ArgumentParser) -> ArgumentParser:
                         type=int,
                         default=100)
 
+
+    parser.add_argument('--save_preview',
+                        help="Save the image previews in image files.",
+                        action='store_true')
+
     return parser
 
 
-def view_data_set(figure_generator: callable,
+def view_data_set(figure_generator: iter,
                   mode: str = 'gt',
+                  *,
+                  save_preview: bool = False,
+                  preview_folder: str = None,
                   delay: int = 0,
                   window_name: str = None):
     """
@@ -43,17 +51,25 @@ def view_data_set(figure_generator: callable,
     The image is displayed along with the bounding boxes (panels and, if present, labels).
 
     Args:
-        figure_generator (callable):    A generator of Figure objects.
-        mode (str):                     Select which information to display:
-                                            * 'gt': only the ground truth
-                                            * 'pred': only the predictions
-                                            * 'both': both predicted and ground truth annotations.
-        delay (int):                    The number of seconds after which the window is closed
-                                            if 0, the delay is disabled.
-        window_name (str):              Name of the image display window.
+        figure_generator (iter):    A generator of Figure objects.
+        mode (str):                 Select which information to display:
+                                        * 'gt': only the ground truth
+                                        * 'pred': only the predictions
+                                        * 'both': both predicted and ground truth annotations.
+        save_preview (bool):        If true, saves the preview as an image.
+        preview_folder (str):       TODO
+        delay (int):                The number of seconds after which the window is closed
+                                        if 0, the delay is disabled.
+        window_name (str):          Name of the image display window.
     """
 
     for figure in figure_generator:
-        figure.show_preview(mode=mode,
-                            delay=delay,
-                            window_name=window_name)
+        # TODO uncomment
+        # figure.show_preview(mode=mode,
+                            # delay=delay,
+                            # window_name=window_name)
+        # TODO remove line
+        figure.get_preview(mode=mode)
+
+        if save_preview:
+            figure.save_preview(folder=preview_folder)

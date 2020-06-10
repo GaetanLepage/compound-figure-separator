@@ -10,7 +10,7 @@ from typing import List
 
 sys.path.append('.')
 
-from panel_seg.data.figure_generators import global_csv_figure_generator
+from panel_seg.data.figure_generators import GlobalCsvFigureGenerator
 from panel_seg.data.figure_viewer import parse_viewer_args, view_data_set
 
 
@@ -50,11 +50,11 @@ def main(args: List[str] = None):
     args = parse_args(args)
 
     # Create the figure generator handling a csv annotation file.
-    figure_generator = global_csv_figure_generator(
+    figure_generator = GlobalCsvFigureGenerator(
         csv_annotation_file_path=args.annotation_csv)
 
     # Preview the data set.
-    view_data_set(figure_generator=figure_generator,
+    view_data_set(figure_generator=figure_generator(),
                   mode=args.mode,
                   delay=args.delay,
                   window_name="CSV data preview")

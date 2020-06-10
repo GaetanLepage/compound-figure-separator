@@ -5,13 +5,14 @@ bounding boxes and labels.
 """
 
 import sys
+import os
 from argparse import ArgumentParser
 
 from typing import List
 
 sys.path.append(".")
 
-from panel_seg.data.figure_generators import iphotodraw_xml_figure_generator
+from panel_seg.data.figure_generators import IphotodrawXmlFigureGenerator
 from panel_seg.data.figure_viewer import parse_viewer_args, view_data_set
 
 def parse_args(args: List[str]) -> ArgumentParser:
@@ -55,13 +56,25 @@ def main(args: List[str] = None):
     args = parse_args(args)
 
     # Create the figure generator handling iPhotoDraw annotation files.
-    figure_generator = iphotodraw_xml_figure_generator(
+    figure_generator = IphotodrawXmlFigureGenerator(
         eval_list_txt=args.eval_list_txt,
         image_directory_path=args.image_directory_path)
 
+    if args.save_preview:
+        if args.eval_list_txt is not None:
+            preview_folder = os.path.dirname(args.eval_list_txt)
+        else:
+            preview_folder = args.image_directory_path
+        preview_folder = os.path.join(preview_folder, 'preview')
+    else:
+        preview_folder = ""
+
+
     # Preview the data set.
-    view_data_set(figure_generator=figure_generator,
+    view_data_set(figure_generator=figure_generator(),
                   mode=args.mode,
+                  save_preview=args.save_preview,
+                  preview_folder=preview_folder,
                   delay=args.delay,
                   window_name="PanelSeg data preview")
 

@@ -8,7 +8,7 @@ import tensorflow as tf
 from ..utils.figure.label_class import LABEL_CLASS_MAPPING
 
 
-def export_figures_to_csv(figure_generator: callable,
+def export_figures_to_csv(figure_generator: iter,
                           output_csv_file: str,
                           individual_export: bool = False,
                           individual_export_csv_directory: str = None):
@@ -17,7 +17,7 @@ def export_figures_to_csv(figure_generator: callable,
     This may be used for keras-retinanet.
 
     Args:
-        figure_generator (callable):            A generator yielding figure objects
+        figure_generator (iter):                A generator yielding figure objects
         output_csv_file (str):                  The path of the csv file containing the
                                                     annotations
         individual_csv (bool):                  If True, also export the annotation to a single
@@ -60,14 +60,14 @@ def export_figures_to_csv(figure_generator: callable,
                         csv_export_dir=individual_export_csv_directory)
 
 
-def export_figures_to_tf_record(figure_generator: callable,
+def export_figures_to_tf_record(figure_generator: iter,
                                 tf_record_filename: str):
     """
     Convert a set of figures to a a TensorFlow records file.
 
     Args:
-        figure_generator (callable):    A generator yielding figure objects.
-        tf_record_filename (str):       Path to the output tf record file.
+        figure_generator (iter):    A generator yielding figure objects.
+        tf_record_filename (str):   Path to the output tf record file.
     """
 
     with tf.io.TFRecordWriter(tf_record_filename) as writer:
@@ -79,13 +79,14 @@ def export_figures_to_tf_record(figure_generator: callable,
             writer.write(tf_example.SerializeToString())
 
 
-def export_figures_to_detectron_dict(figure_generator: callable,
+def export_figures_to_detectron_dict(figure_generator: iter,
                                      task: str = 'panel_splitting') -> dict:
     """
     Export a set of Figure objects to a dict which is compatible with Facebook Detectron 2.
 
     Args:
-        figure_generator (callable):    A generator yielding figure objects.
+        figure_generator (iter):    A generator yielding figure objects.
+        task (str):                 The task for which to export the figures.
 
     Returns:
         dataset_dicts (dict): A dict representing the data set.
@@ -107,45 +108,49 @@ def export_figures_to_detectron_dict(figure_generator: callable,
 
         objs = []
 
-        for panel in figure.gt_panels:
+        if figure.gt_panels is not None:
 
-            if task == 'panel_splitting':
-                obj = {
-                    "bbox": panel.panel_rect,
-                    "bbox_mode": BoxMode.XYXY_ABS,
-                    "category_id": 0
-                }
-            elif task == 'label_recog':
-                if panel.label_rect is None or len(panel.label) != 1:
-                    # We ensure that, for this task, the labels are valid
-                    # (they have been previously checked while loading annotations)
-                    continue
+            for panel in figure.gt_panels:
 
-                obj = {
-                    "bbox": panel.label_rect,
-                    "bbox_mode": BoxMode.XYXY_ABS,
-                    "category_id": LABEL_CLASS_MAPPING[panel.label]
-                }
-            # panel segmentation task
-            else:
-                # TODO Deal with unlabeled panels
-                if panel.label_rect is None or len(panel.label) != 1:
-                    # We ensure that, for this task, the labels are valid
-                    # (they have been previously checked while loading annotations)
-                    continue
+                if task == 'panel_splitting':
+                    obj = {
+                        "bbox": panel.panel_rect,
+                        "bbox_mode": BoxMode.XYXY_ABS,
+                        "category_id": 0
+                    }
 
-                obj = {
-                    "panel_bbox": panel.panel_rect,
-                    "bbox_mode": BoxMode.XYXY_ABS,
-                    "label_bbox": panel.label_rect,
-                    "category_id": LABEL_CLASS_MAPPING[panel.label]
-                }
+                elif task == 'label_recog':
+                    if panel.label_rect is None or len(panel.label) != 1:
+                        # We ensure that, for this task, the labels are valid
+                        # (they have been previously checked while loading annotations)
+                        continue
 
-            objs.append(obj)
+                    obj = {
+                        "bbox": panel.label_rect,
+                        "bbox_mode": BoxMode.XYXY_ABS,
+                        "category_id": LABEL_CLASS_MAPPING[panel.label]
+                    }
 
-        record["annotations"] = objs
+                # panel segmentation task
+                else:
+                    # category_id is artificially set to zero to satisfy the Detectron API.
+                    # The actual label (if any) is stored in 'label'.
+                    obj = {
+                        'panel_bbox': panel.panel_rect,
+                        'bbox_mode': BoxMode.XYXY_ABS
+                    }
 
-        if len(objs) != 0:
-            dataset_dicts.append(record)
+                    if panel.label_rect is not None and len(panel.label) == 1:
+                        # If there is no valid label, it won't be considered for training.
+                        # TODO: later, we would like to handle >1 length labels
+                        obj['label_bbox'] = panel.label_rect
+                        obj['label'] = LABEL_CLASS_MAPPING[panel.label]
+
+
+                objs.append(obj)
+
+            record["annotations"] = objs
+
+        dataset_dicts.append(record)
 
     return dataset_dicts

@@ -4,7 +4,7 @@ Load PanelSeg data set to be used with the Detectron API for the label recogniti
 
 from detectron2.data import DatasetCatalog, MetadataCatalog
 
-from panel_seg.data.figure_generators import iphotodraw_xml_figure_generator
+from panel_seg.data.figure_generators import IphotodrawXmlFigureGenerator
 
 from panel_seg.data.export import export_figures_to_detectron_dict
 from panel_seg.utils.figure.label_class import LABEL_CLASS_MAPPING
@@ -40,20 +40,16 @@ def register_label_recognition_dataset(dataset_name: str):
         pass
 
     # Create a first instance of the figure generator for the data set samples to be loaded.
-    figure_generator = iphotodraw_xml_figure_generator(
+    figure_generator = IphotodrawXmlFigureGenerator(
         eval_list_txt=eval_list_txt)
 
     # Register the data set.
     DatasetCatalog.register(name=dataset_name,
                             func=lambda: export_figures_to_detectron_dict(
-                                figure_generator=figure_generator,
+                                figure_generator=figure_generator(),
                                 task='label_recog'))
 
-    # Create a second instance of the figure_generator so that ground truth can be loaded
-    # when evaluating detection results.
-    figure_generator_copy = iphotodraw_xml_figure_generator(
-        eval_list_txt=eval_list_txt)
-    MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator_copy)
+    MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator())
 
     # Add the class names as metadata.
     MetadataCatalog.get(name=dataset_name).set(thing_classes=list(LABEL_CLASS_MAPPING.keys()))

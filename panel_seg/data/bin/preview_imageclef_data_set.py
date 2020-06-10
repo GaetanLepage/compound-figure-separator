@@ -5,13 +5,14 @@ bounding boxes.
 """
 
 import sys
+import os
 from argparse import ArgumentParser
 
 from typing import List
 
 sys.path.append('.')
 
-from panel_seg.data.figure_generators import image_clef_xml_figure_generator
+from panel_seg.data.figure_generators import ImageClefXmlFigureGenerator
 from panel_seg.data.figure_viewer import parse_viewer_args, view_data_set
 
 
@@ -56,13 +57,15 @@ def main(args: List[str] = None):
     args = parse_args(args)
 
     # Create the figure generator handling ImageCLEF xml annotation files.
-    figure_generator = image_clef_xml_figure_generator(
+    figure_generator = ImageClefXmlFigureGenerator(
         xml_annotation_file_path=args.annotation_xml,
         image_directory_path=args.image_directory_path)
 
     # Preview the data set.
-    view_data_set(figure_generator=figure_generator,
+    view_data_set(figure_generator=figure_generator(),
                   mode=args.mode,
+                  save_preview=args.save_preview,
+                  preview_folder=os.path.join(args.image_directory_path, "preview"),
                   delay=args.delay,
                   window_name="ImageCLEF data preview")
 
