@@ -20,7 +20,8 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
 
     def __init__(self, dataset_name: str):
         """
-        TODO
+        Init function.
+        Call the init function of the parent function (PanelSegAbstractEvaluator).
         """
         super().__init__(dataset_name=dataset_name,
                          task_name='label_recog',

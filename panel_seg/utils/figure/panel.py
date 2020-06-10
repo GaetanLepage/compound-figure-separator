@@ -121,7 +121,7 @@ class DetectedPanel(Panel):
         """
         TODO
         """
-        super.add_label_info(label)
+        super().add_label_info(label)
 
         self.label_detection_score = label.label_detection_score
 

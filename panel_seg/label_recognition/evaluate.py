@@ -36,7 +36,7 @@ def evaluate_detections(figure_generator: iter) -> dict:
     for figure in figure_generator:
 
         # Perform matching on this figure
-        # This tests whether a detected panel is true positive or false positive
+        # This tests whether a detected label is true positive or false positive
         figure.match_detected_and_gt_labels()
 
         # Count number of figures in the whole dataset

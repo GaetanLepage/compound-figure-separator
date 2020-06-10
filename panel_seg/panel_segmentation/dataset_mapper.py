@@ -61,43 +61,47 @@ class PanelSegDatasetMapper:
         self.is_train = is_train
 
 
+    # @staticmethod
+    # def _transform_instance_annotations(annotation: dict,
+                                        # transforms: TransformList) -> dict:
+        # """
+        # Apply transforms to box annotations of a single instance.
+
+        # It will use `transforms.apply_box` for the box.
+        # If you need anything more specially designed for each data structure,
+        # you'll need to implement your own version of this function or the transforms.
+
+        # Args:
+            # annotation (dict):          dict of instance annotations for a single instance.
+                                            # It will be modified in-place.
+            # transforms (TransformList): The list of tranformations to apply on the given instance.
+            # image_size (tuple):         The height, width of the transformed image
+
+        # Returns:
+            # dict: the same input dict with field "bbox" transformed according to `transforms`.
+                        # The "bbox_mode" field will be set to XYXY_ABS.
+        # """
+        # panel_bbox = BoxMode.convert(box=annotation['panel_bbox'],
+                                     # from_mode=annotation['bbox_mode'],
+                                     # to_mode=BoxMode.XYXY_ABS)
+        # # Note that bbox is 1d (per-instance bounding box)
+        # annotation['panel_bbox'] = transforms.apply_box([panel_bbox])[0]
+
+        # if 'label_box' in annotation:
+            # label_bbox = BoxMode.convert(box=annotation['label_bbox'],
+                                         # from_mode=annotation['bbox_mode'],
+                                         # to_mode=BoxMode.XYXY_ABS)
+            # annotation['label_bbox'] = transforms.apply_box([label_bbox])[0]
+
+        # annotation['bbox_mode'] = BoxMode.XYXY_ABS
+
+        # return annotation
+
+
     @staticmethod
-    def _transform_instance_annotations(annotation: dict,
-                                        transforms: TransformList) -> dict:
-        """
-        Apply transforms to box annotations of a single instance.
-
-        It will use `transforms.apply_box` for the box.
-        If you need anything more specially designed for each data structure,
-        you'll need to implement your own version of this function or the transforms.
-
-        Args:
-            annotation (dict):          dict of instance annotations for a single instance.
-                                            It will be modified in-place.
-            transforms (TransformList): The list of tranformations to apply on the given instance.
-            image_size (tuple):         The height, width of the transformed image
-
-        Returns:
-            dict: the same input dict with field "bbox" transformed according to `transforms`.
-                        The "bbox_mode" field will be set to XYXY_ABS.
-        """
-        panel_bbox = BoxMode.convert(box=annotation["panel_bbox"],
-                                     from_mode=annotation["bbox_mode"],
-                                     to_mode=BoxMode.XYXY_ABS)
-        label_bbox = BoxMode.convert(box=annotation["label_bbox"],
-                                     from_mode=annotation["bbox_mode"],
-                                     to_mode=BoxMode.XYXY_ABS)
-        # Note that bbox is 1d (per-instance bounding box)
-        annotation["panel_bbox"] = transforms.apply_box([panel_bbox])[0]
-        annotation["label_bbox"] = transforms.apply_box([label_bbox])[0]
-        annotation["bbox_mode"] = BoxMode.XYXY_ABS
-
-        return annotation
-
-
-    @staticmethod
-    def annotations_to_instances(annos: List[dict],
-                                 image_size: tuple) -> Instances:
+    def _annotations_to_instances(panel_annos: List[dict],
+                                  label_annos: List[dict],
+                                  image_size: tuple) -> Instances:
         """
         Create an :class:`Instances` object used by the models,
         from instance annotations in the dataset dict.
@@ -111,36 +115,45 @@ class PanelSegDatasetMapper:
             Instances: It will contain fields "gt_boxes", "gt_classes", if they can be obtained
                             from `annos`. This is the format that builtin models expect.
         """
-        # Create an `Instances` object
-        target = Instances(image_size)
-
         # Panels
-        panel_boxes = [BoxMode.convert(box=obj["panel_bbox"],
-                                       from_mode=obj["bbox_mode"],
+
+        # Create an `Instances` object for panels
+        panel_instances = Instances(image_size)
+
+        panel_boxes = [BoxMode.convert(box=obj['bbox'],
+                                       from_mode=obj['bbox_mode'],
                                        to_mode=BoxMode.XYXY_ABS)
-                       for obj in annos]
-        panel_boxes = target.panel_gt_boxes = Boxes(panel_boxes)
+                       for obj in panel_annos]
+        panel_boxes = panel_instances.gt_boxes = Boxes(panel_boxes)
         panel_boxes.clip(image_size)
 
         # Only one class (panel)
-        panel_classes = [0 for obj in annos]
+        panel_classes = [0 for obj in panel_annos]
         panel_classes = torch.tensor(panel_classes, dtype=torch.int64)
-        target.panel_gt_classes = panel_classes
+        panel_instances.gt_classes = panel_classes
 
 
-        # Labels
-        label_boxes = [BoxMode.convert(box=obj["label_bbox"],
-                                       from_mode=obj["bbox_mode"],
+        # Labels (also handle case where there are no labels)
+        label_boxes = [BoxMode.convert(box=obj['bbox'],
+                                       from_mode=obj['bbox_mode'],
                                        to_mode=BoxMode.XYXY_ABS)
-                       for obj in annos]
-        label_boxes = target.label_gt_boxes = Boxes(label_boxes)
+                       for obj in label_annos]
+
+        # Create an `Instances` object for labels
+        label_instances = Instances(image_size)
+        # if len(label_boxes) > 0:
+
+        label_boxes = label_instances.gt_boxes = Boxes(label_boxes)
         label_boxes.clip(image_size)
 
-        label_classes = [obj["category_id"] for obj in annos]
+        label_classes = [obj['label'] for obj in label_annos]
         label_classes = torch.tensor(label_classes, dtype=torch.int64)
-        target.label_gt_classes = label_classes
+        label_instances.gt_classes = label_classes
 
-        return target
+        assert len(label_boxes) == len(label_classes),\
+            f"There are {len(label_boxes)} boxes but {len(label_classes)} labels."
+
+        return panel_instances, label_instances
 
 
     def __call__(self, dataset_dict: dict) -> dict:
@@ -183,26 +196,51 @@ class PanelSegDatasetMapper:
         dataset_dict["image"] = torch.as_tensor(np.ascontiguousarray(image.transpose(2, 0, 1)))
 
         if not self.is_train:
-            dataset_dict.pop("annotations", None)
+            dataset_dict.pop('annotations', None)
             return dataset_dict
 
-        if "annotations" in dataset_dict:
-            # USER: Implement additional transformations if you have other types of data
-            annos = [
-                self._transform_instance_annotations(obj,
-                                                     transforms)
+        panel_annos = []
+        label_annos = []
+        for obj in dataset_dict.pop('annotations'):
+            panel_obj = {
+                'bbox': obj['panel_bbox'],
+                'bbox_mode': obj['bbox_mode']
+            }
+            panel_annos.append(utils.transform_instance_annotations(annotation=panel_obj,
+                                                                    transforms=transforms,
+                                                                    image_size=image_shape))
 
-                for obj in dataset_dict.pop("annotations")
-                if obj.get("iscrowd", 0) == 0
-            ]
-            instances = self.annotations_to_instances(annos,
-                                                      image_shape)
+            if 'label' in obj:
+                if 'label_bbox' in obj:
+                    label_obj = {
+                        'bbox': obj['label_bbox'],
+                        'bbox_mode': obj['bbox_mode'],
+                        'label': obj['label']
+                    }
 
-            # dataset_dict["instances"] = utils.filter_empty_instances(instances)
+                    label_annos.append(
+                        utils.transform_instance_annotations(annotation=label_obj,
+                                                             transforms=transforms,
+                                                             image_size=image_shape))
+                else:
+                    logging.error(f"Error with annotation: {obj} has a 'label' field"\
+                        " but no corresponding 'label_bbox' field.")
 
-            # TODO check if we have to adapt this for handling panel_boxes and label_boxes
-            # (see method above)
-            # dataset_dict["instances"] = utils.filter_empty_instances(instances)
-            dataset_dict["instances"] = instances
+            elif 'label_bbox' in obj:
+                logging.error("Inconsistent label annotation:"\
+                    f" obj['label']={obj['label']} and obj['label_bbox']={obj['label_bbox']}")
+
+
+        panel_instances, label_instances = self._annotations_to_instances(panel_annos=panel_annos,
+                                                                          label_annos=label_annos,
+                                                                          image_size=image_shape)
+
+        # dataset_dict["instances"] = utils.filter_empty_instances(instances)
+
+        # TODO check if we have to adapt this for handling panel_boxes and label_boxes
+        # (see method above)
+        # dataset_dict["instances"] = utils.filter_empty_instances(instances)
+        dataset_dict['panel_instances'] = panel_instances
+        dataset_dict['label_instances'] = label_instances
 
         return dataset_dict

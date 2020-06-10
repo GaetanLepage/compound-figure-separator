@@ -20,7 +20,11 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
 
     def __init__(self, dataset_name: str):
         """
-        TODO
+        Init function.
+        Call the init function of the parent class (PanelSegAbstractEvaluator).
+
+        Args:
+            dataset_name (str): The name of the data set to evaluate.
         """
         super().__init__(dataset_name=dataset_name,
                          task_name='panel_splitting',
@@ -86,5 +90,7 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
                 # TODO do some post processing here maybe
 
             figure.detected_panels = predicted_panel_objects
+
+            figure.save_preview(mode='pred')
 
             yield figure

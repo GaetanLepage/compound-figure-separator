@@ -435,35 +435,30 @@ class Figure:
 # EVALUATION #
 ##############
 
-    def match_detected_and_gt_panels(self,
-                                     iou_threshold: float = 0.5,
-                                     overlap_threshold: float = 0.66):
+    def match_detected_and_gt_panels_splitting_task(self,
+                                                    iou_threshold: float = 0.5,
+                                                    overlap_threshold: float = 0.66):
         """
         TODO: update doc as this method radically changed.
         Compute the number of rightly predicted panels for the figure according to one of the
         following criteria:
-            * A predicted panel which has an IoU > `threshold` (0.5 by default) with a
-                ground truth panel is counted as a positive match (default case, i.e. when
-                `use_overlap_instead_of_iou` is False).
-                => This method is the one to choose to later compute mAP.
+            * A predicted panel which has an IoU > `iou_threshold` (0.5 by default) with a
+                ground truth panel is counted as a positive match regarding the "IoU criterion".
+                => This criterion is the one to compute precision, recall, mAP.
 
-            * A predicted panel which has an overlap > `threshold` (0.66 by default) with a
-                ground truth panel is counted as a positive match (when
-                `use_overlap_instead_of_iou` is True)
-                => This method is the one to choose to later compute the ImageCLEF accuracy.
+            * A predicted panel which has an overlap > `overlap_threshold` (0.66 by default) with
+                a ground truth panel is counted as a positive match regarding the
+                "ImageCLEF citerion".
+                => This criterion is the one to compute the ImageCLEF accuracy.
                 (see http://ceur-ws.org/Vol-1179/CLEF2013wn-ImageCLEF-SecoDeHerreraEt2013b.pdf)
 
         ==> Use this to evaluate the 'panel splitting' task.
 
         Args:
-            use_overlap_instead_of_iou (bool):  if True, computes the number of correct matches
-                                                    using the ImageCLEF rule. This affects the
-                                                    default value of the threshold.
-            threshold (float):                  The iou (or overlap) threshold needed for a
-                                                    prediction to be classified as valid.
-
-        Returns:
-            num_correct (int): The number of accurate predictions.
+            iou_threshold (float):      Threshold above which a prediction is considered to be
+                                            true with respect to the IoU value.
+            overlap_threshold (float):  Threshold above which a prediction is considered to be
+                                            true with respect to the overlap value.
         """
 
         picked_gt_panels_overlap = [False] * len(self.gt_panels)
@@ -500,14 +495,16 @@ class Figure:
                     best_matching_gt_panel_iou_index = gt_panel_index
 
 
-            if max_iou > iou_threshold and not picked_gt_panels_iou[best_matching_gt_panel_iou_index]:
+            if max_iou > iou_threshold \
+                    and not picked_gt_panels_iou[best_matching_gt_panel_iou_index]:
                 picked_gt_panels_iou[best_matching_gt_panel_iou_index] = True
                 detected_panel.panel_is_true_positive_iou = True
 
             else:
                 detected_panel.panel_is_true_positive_iou = False
 
-            if max_overlap > overlap_threshold and not picked_gt_panels_overlap[best_matching_gt_panel_overlap_index]:
+            if max_overlap > overlap_threshold \
+                    and not picked_gt_panels_overlap[best_matching_gt_panel_overlap_index]:
                 picked_gt_panels_overlap[best_matching_gt_panel_overlap_index] = True
                 detected_panel.panel_is_true_positive_overlap = True
 
@@ -517,6 +514,7 @@ class Figure:
 
     def match_detected_and_gt_labels(self, iou_threshold: float = 0.5):
         """
+        TODO
         Compute the number of rightly predicted labels for the figure :
         A predicted panel which has an IoU > `threshold` (0.5 by default) with a
         ground truth panel is counted as a positive match
@@ -558,6 +556,41 @@ class Figure:
             else:
                 detected_panel.label_is_true_positive = False
 
+
+    # Panel segmentation
+    def match_detected_and_gt_panels_segmentation_task(self,
+                                                       iou_threshold: float = 0.5):
+        """
+        TODO
+        """
+        picked_gt_panels_indices = [False] * len(self.gt_panels)
+
+        for detected_panel in self.detected_panels:
+            max_iou = -1
+            best_matching_gt_panel_index = -1
+
+            for gt_panel_index, gt_panel in enumerate(self.gt_panels):
+
+                if gt_panel.label_rect is None or len(gt_panel.label) != 1:
+                    continue
+
+                # If the label classes do not match, no need to compute the IoU
+                if gt_panel.label != detected_panel.label:
+                    continue
+
+                iou = box.iou(gt_panel.panel_rect, detected_panel.panel_rect)
+
+                if iou > max_iou:
+                    max_iou = iou
+                    best_matching_gt_panel_index = gt_panel_index
+
+            if max_iou > iou_threshold\
+                    and not picked_gt_panels_indices[best_matching_gt_panel_index]:
+                picked_gt_panels_indices[best_matching_gt_panel_index] = True
+                detected_panel.panel_is_true_positive = True
+
+            else:
+                detected_panel.panel_is_true_positive = False
 
 
 ##################
@@ -603,7 +636,7 @@ class Figure:
             for panel in self.detected_panels:
                 # Yellow for predicted panels
                 panel.draw_elements(image=preview_img,
-                                    color=(255, 255, 0))
+                                    color=(0, 0, 200))
 
             return preview_img
 
@@ -666,7 +699,7 @@ class Figure:
         cv2.destroyAllWindows()
 
 
-    def save_preview(self, folder: str, mode='gt'):
+    def save_preview(self, mode='gt', folder: str = None):
         """
         Save the annotation preview at folder.
 
@@ -679,15 +712,24 @@ class Figure:
         """
         preview_img = self.get_preview(mode)
 
+        if folder is None:
+            folder = os.path.join(os.path.dirname(self.image_path),
+                                  'preview/')
+
+
+        if not os.path.isdir(folder):
+            os.makedirs(folder)
 
         # Remove extension from original figure image file name
         file_name = os.path.splitext(
             self.image_filename)[0]
 
         export_path = os.path.join(folder, file_name + "_preview.jpg")
+        export_path = os.path.abspath(export_path)
 
         # Write the preview image file to destination
-        cv2.imwrite(export_path, preview_img)
+        if not cv2.imwrite(export_path, preview_img):
+            logging.error("Could not write preview image : %s", export_path)
 
 
 #################

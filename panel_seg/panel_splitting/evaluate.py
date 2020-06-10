@@ -37,7 +37,7 @@ def evaluate_detections(figure_generator: iter) -> dict:
 
         # Perform matching on this figure
         # This tests whether a detected panel is true positive or false positive
-        figure.match_detected_and_gt_panels()
+        figure.match_detected_and_gt_panels_splitting_task()
 
         # Common counters
         num_samples += 1

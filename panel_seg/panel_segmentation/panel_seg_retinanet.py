@@ -19,9 +19,6 @@ from detectron2.modeling.postprocessing import detector_postprocess
 
 from detectron2.modeling.backbone.fpn import FPN, LastLevelP6P7
 
-# TODO remove
-from panel_seg.utils.figure.figure import Figure
-
 __all__ = ["PanelSegRetinaNet"]
 
 
@@ -54,7 +51,6 @@ def build_fpn_backbones(cfg, input_shape: ShapeSpec):
     # Label FPN
     label_in_features = cfg.MODEL.LABEL_FPN.IN_FEATURES
     label_out_channels = cfg.MODEL.LABEL_FPN.OUT_CHANNELS
-
     label_fpn = FPN(bottom_up=bottom_up,
                     in_features=label_in_features,
                     out_channels=label_out_channels,
@@ -108,7 +104,6 @@ def permute_all_cls_and_box_to_N_HWA_K_and_concat(box_cls,
     return box_cls, box_delta
 
 
-# @META_ARCH_REGISTRY.register()
 class PanelSegRetinaNet(nn.Module):
     """
     Implement RetinaNet (https://arxiv.org/abs/1708.02002).
@@ -255,51 +250,65 @@ class PanelSegRetinaNet(nn.Module):
                 mapping from a named loss to a tensor storing the loss. Used during training only.
         """
         images = self.preprocess_image(batched_inputs)
-        if "instances" in batched_inputs[0]:
-            gt_instances = [x["instances"].to(self.device) for x in batched_inputs]
-        else:
-            gt_instances = None
 
-
-        # TODO remove
-        # features = self.backbone(images.tensor)
-
-        # Panels
+        # detected panels
         panel_features = self.panel_fpn(images.tensor)
         panel_features = [panel_features[f] for f in self.panel_in_features]
         panel_anchors = self.panel_anchor_generator(panel_features)
-        panel_box_cls, panel_box_delta = self.panel_head(panel_features)
+        panel_cls, panel_box_delta = self.panel_head(panel_features)
 
-        # Labels
+        # detected labels
         label_features = self.label_fpn(images.tensor)
         label_features = [label_features[f] for f in self.label_in_features]
         label_anchors = self.label_anchor_generator(label_features)
-        label_box_cls, label_box_delta = self.label_head(label_features)
+        label_cls, label_box_delta = self.label_head(label_features)
 
         if self.training:
+
+            # Panel GT
+            panel_gt_instances = [x['panel_instances'].to(self.device)
+                                  for x in batched_inputs]
             panel_gt_classes, panel_gt_anchors_reg_deltas = self.get_ground_truth(
                 panel_anchors,
-                gt_classes=[instance.panel_gt_classes for instance in gt_instances],
-                gt_boxes=[instance.panel_gt_boxes for instance in gt_instances],
+                gt_instances=panel_gt_instances,
                 num_classes=1)
+
+            panel_loss_cls, panel_loss_box_reg = self._compute_single_head_losses(
+                gt_classes=panel_gt_classes,
+                gt_anchors_deltas=panel_gt_anchors_reg_deltas,
+                pred_class_logits=panel_cls,
+                pred_anchor_deltas=panel_box_delta,
+                num_classes=1)
+
+            loss_dict = {
+                'panel_loss_cls': panel_loss_cls,
+                'panel_loss_box_reg': panel_loss_box_reg
+            }
+
+            # Label GT
+            label_gt_instances = [x['label_instances'].to(self.device)
+                                  for x in batched_inputs]
+
             label_gt_classes, label_gt_anchors_reg_deltas = self.get_ground_truth(
                 label_anchors,
-                gt_classes=[instance.label_gt_classes for instance in gt_instances],
-                gt_boxes=[instance.label_gt_boxes for instance in gt_instances],
+                gt_instances=label_gt_instances,
+                num_classes=self.num_label_classes)
+            label_loss_cls, label_loss_box_reg = self._compute_single_head_losses(
+                gt_classes=label_gt_classes,
+                gt_anchors_deltas=label_gt_anchors_reg_deltas,
+                pred_class_logits=label_cls,
+                pred_anchor_deltas=label_box_delta,
                 num_classes=self.num_label_classes)
 
+            loss_dict['label_loss_cls'] = label_loss_cls
+            loss_dict['label_loss_box_reg'] = label_loss_box_reg
 
-            panel_gt_class = panel_gt_classes[0]
-
-            # losses = self.losses(gt_classes, gt_anchors_reg_deltas, box_cls, box_delta)
-            losses = self.losses(panel_gt_classes=panel_gt_classes,
-                                 panel_gt_anchor_deltas=panel_gt_anchors_reg_deltas,
-                                 panel_pred_class_logits=panel_box_cls,
-                                 panel_pred_anchor_deltas=panel_box_delta,
-                                 label_gt_classes=label_gt_classes,
-                                 label_gt_anchor_deltas=label_gt_anchors_reg_deltas,
-                                 label_pred_class_logits=label_box_cls,
-                                 label_pred_anchor_deltas=label_box_delta)
+            return loss_dict
+            # Loss
+            # label_gt_classes=label_gt_classes,
+            # label_gt_anchor_deltas=label_gt_anchors_reg_deltas,
+            # label_pred_class_logits=label_box_cls,
+            # label_pred_anchor_deltas=label_box_delta)
 
             # if self.vis_period > 0:
                 # storage = get_event_storage()
@@ -307,14 +316,12 @@ class PanelSegRetinaNet(nn.Module):
                     # results = self.inference(box_cls, box_delta, anchors, images.image_sizes)
                     # self.visualize_training(batched_inputs, results)
 
-            return losses
-
         # Inference
         else:
-            batched_inference_results = self.inference(panel_box_cls,
+            batched_inference_results = self.inference(panel_cls,
                                                        panel_box_delta,
                                                        panel_anchors,
-                                                       label_box_cls,
+                                                       label_cls,
                                                        label_box_delta,
                                                        label_anchors,
                                                        images.image_sizes)
@@ -362,6 +369,7 @@ class PanelSegRetinaNet(nn.Module):
                                     pred_anchor_deltas,
                                     num_classes):
         """
+        TODO
         Args:
             For `gt_classes` and `gt_anchors_deltas` parameters, see
                 :meth:`RetinaNet.get_ground_truth`.
@@ -415,53 +423,20 @@ class PanelSegRetinaNet(nn.Module):
         return loss_cls, loss_box_reg
 
 
-    def losses(self,
-               panel_gt_classes,
-               panel_gt_anchor_deltas,
-               panel_pred_class_logits,
-               panel_pred_anchor_deltas,
-               label_gt_classes,
-               label_gt_anchor_deltas,
-               label_pred_class_logits,
-               label_pred_anchor_deltas):
-        """
-        TODO
-        """
-
-        panel_loss_cls, panel_loss_box_reg = self._compute_single_head_losses(
-            gt_classes=panel_gt_classes,
-            gt_anchors_deltas=panel_gt_anchor_deltas,
-            pred_class_logits=panel_pred_class_logits,
-            pred_anchor_deltas=panel_pred_anchor_deltas,
-            num_classes=1)
-
-        label_loss_cls, label_loss_box_reg = self._compute_single_head_losses(
-            gt_classes=label_gt_classes,
-            gt_anchors_deltas=label_gt_anchor_deltas,
-            pred_class_logits=label_pred_class_logits,
-            pred_anchor_deltas=label_pred_anchor_deltas,
-            num_classes=self.num_label_classes)
-
-        return {
-            "panel_loss_cls": panel_loss_cls,
-            "panel_loss_box_reg": panel_loss_box_reg,
-            "label_loss_cls": label_loss_cls,
-            "label_loss_box_reg": label_loss_box_reg}
-
-
     @torch.no_grad()
     def get_ground_truth(self,
                          anchors,
-                         gt_classes,
-                         gt_boxes,
+                         gt_instances,
                          num_classes):
         """
         Args:
-            anchors (list[Boxes]): A list of #feature level Boxes.
-                The Boxes contains anchors of this image on the specific feature level.
-            targets (list[Instances]): a list of N `Instances`s. The i-th
-                `Instances` contains the ground-truth per-instance annotations
-                for the i-th input image.  Specify `targets` during training only.
+            anchors (list[Boxes]):
+                A list of #feature level Boxes. The Boxes contains anchors of this image on the
+                specific feature level.
+            targets (list[Instances]):
+                A list of N `Instances`s. The i-th `Instances` contains the ground-truth
+                per-instance annotations for the i-th input image.  Specify `targets` during
+                training only.
 
         Returns:
             gt_classes (Tensor):
@@ -488,14 +463,13 @@ class PanelSegRetinaNet(nn.Module):
             # print("This is a panel")
         # else:
             # print("This is a label")
+
         # print("anchors:", anchors.tensor.shape)
+        # print("instances:", gt_instances)
 
 
-        # print("gt_classes", len(gt_classes))
-        # print("gt_boxes", len(gt_boxes))
-
-        for gt_classes_per_img, gt_boxes_per_img in zip(gt_classes, gt_boxes):
-            match_quality_matrix = pairwise_iou(gt_boxes_per_img, anchors)
+        for image_gt_instances in gt_instances:
+            match_quality_matrix = pairwise_iou(image_gt_instances.gt_boxes, anchors)
             gt_matched_idxs, anchor_labels = self.matcher(match_quality_matrix)
 
             # print("GT CLASSES:", gt_classes_per_img)
@@ -507,15 +481,14 @@ class PanelSegRetinaNet(nn.Module):
             # print("match_quality_matrix", match_quality_matrix.shape)
             # print("gt_matched_idxs", gt_matched_idxs.shape)
 
-            has_gt = len(gt_boxes_per_img) > 0
+            has_gt = len(image_gt_instances) > 0
             if has_gt:
                 # ground truth box regression
-                matched_gt_boxes = gt_boxes_per_img[gt_matched_idxs]
+                matched_gt_boxes = image_gt_instances.gt_boxes[gt_matched_idxs]
                 gt_anchors_reg_deltas_i = self.box2box_transform.get_deltas(
                     src_boxes=anchors.tensor,
                     target_boxes=matched_gt_boxes.tensor)
-
-                gt_classes_i = gt_classes_per_img[gt_matched_idxs]
+                gt_classes_i = image_gt_instances.gt_classes[gt_matched_idxs]
                 # Anchors with label 0 are treated as background.
                 gt_classes_i[anchor_labels == 0] = num_classes
                 # Anchors with label -1 are ignored.
@@ -761,7 +734,7 @@ class RetinaNetHead(nn.Module):
 
     def forward(self, features):
         """
-        Arguments:
+        Args:
             features (list[Tensor]): FPN feature map tensors in high to low resolution.
                 Each tensor in the list correspond to different feature levels.
 

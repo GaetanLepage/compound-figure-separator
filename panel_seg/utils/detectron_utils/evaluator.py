@@ -3,13 +3,16 @@ TODO
 """
 
 import logging
+from typing import List
 from collections import defaultdict, OrderedDict
+from pprint import pprint
 
 import torch
 
 from detectron2.data import MetadataCatalog
 from detectron2.evaluation.evaluator import DatasetEvaluator
 from detectron2.utils import comm
+from panel_seg.utils.figure.figure import Figure
 
 class PanelSegAbstractEvaluator(DatasetEvaluator):
     """
@@ -29,7 +32,8 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
         # TODO change default value for tasks
         # TODO manage output results in csv or xml or other
-        # TODO test if outputed xml gives same results (metrics) if using the java tool from ImageCLEF
+        # TODO test if outputed xml gives same results (metrics) if using the java tool from
+        ImageCLEF
 
         Args:
             dataset_name (str):             name of the dataset.
@@ -47,7 +51,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         self._evaluation_function = evaluation_function
 
         # The figure generator corresponding to the dataset
-        # TODO Not possible to handle LIST of test data sets.
+        # TODO Not possible to handle LIST of validation data sets.
         self._figure_generator = meta.figure_generator
 
 
@@ -59,50 +63,46 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         self._predictions = dict()
 
 
-    def process(self, inputs, outputs):
+    def process(self,
+                inputs: List[dict],
+                outputs: List[dict]):
         """
         Process the pair of inputs and outputs.
         If they contain batches, the pairs can be consumed one-by-one using `zip`:
 
-        This method is abstract and has to be implemented.
-
-        .. code-block:: python
-
-            for input_, output in zip(inputs, outputs):
-                # do evaluation on single input/output pair
-                ...
+        This method has to be implemented.
 
         Args:
             inputs (list): the inputs that's used to call the model.
             outputs (list): the return value of `model(inputs)`
         """
 
-        pass
 
-
-    def _augmented_figure_generator(self, predictions):
+    def _augmented_figure_generator(self,
+                                    predictions: dict) -> Figure:
         """
         Iterate over a Figure generator, process raw predictions and yield back the augmented
         Figure objects.
 
         This method is abstract and has to be implemented.
+
+        Args:
+            predictions (dict): The dict containing the predictions from the model.
+
+        Yields:
+            figure (Figure): Figure objects augmented with predictions.
         """
-        pass
 
 
-    def evaluate(self):
+    def evaluate(self) -> dict:
         """
         Evaluate/summarize the performance, after processing all input/output pairs.
 
         Returns:
-            dict:
-                A new evaluator class can return a dict of arbitrary format
-                as long as the user can process the results.
-                In our train_net.py, we expect the following format:
-
-                * key:      The name of the task ('panel_splitting', 'label_recognition',
-                                'panel_segmentation')
-                * value:    A dict of {metric name: score}, e.g.: {"AP50": 80}
+            dict:   A dict containing the computed metrics.
+                        * key:      The name of the task ('panel_splitting', 'label_recognition',
+                                        'panel_segmentation')
+                        * value:    A dict of {metric name: score}, e.g.: {"AP50": 80}
         """
         # Gathering
         all_predictions = comm.gather(self._predictions, dst=0)
@@ -115,12 +115,11 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
                 predictions[clsid] = lines
         del all_predictions
 
-        # TODO remove
-        # for figure in self._augmented_figure_generator(predictions):
-            # pass
-
         metrics_dict = self._evaluation_function(
             figure_generator=self._augmented_figure_generator(predictions))
+
+        # Print the results
+        pprint(metrics_dict)
 
         # Respect the expected result for a DatasetEvaluator
         return OrderedDict({self._task_name: metrics_dict})

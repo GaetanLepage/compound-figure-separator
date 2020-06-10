@@ -1,5 +1,5 @@
 #_BASE_: "/home/gaetan/hevs/implementations/object_detection/detectron2/configs/COCO-Detection/retinanet_R_50_FPN_1x.yaml"
-OUTPUT_DIR: "panel_seg/panel_segmentation/output_omelette"
+OUTPUT_DIR: "panel_seg/panel_segmentation/output"
 
 MODEL:
   META_ARCHITECTURE: "RetinaNet"
@@ -32,6 +32,7 @@ MODEL:
 DATASETS:
   TRAIN: ("zou_panel_seg_train",)
   TEST: ("zou_panel_seg_test",)
+  #TEST: ("pubmed",)
 
 SOLVER:
   # TODO I don't know why we can only fit 1 img/GPU here...
