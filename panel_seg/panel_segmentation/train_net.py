@@ -28,7 +28,10 @@ from detectron2.data.build import build_detection_train_loader, build_detection_
 from panel_seg.panel_segmentation.dataset_mapper import PanelSegDatasetMapper
 from panel_seg.panel_segmentation.load_datasets import \
     register_panel_segmentation_dataset
-from panel_seg.utils.detectron_utils.loss_eval_hook import LossEvalHook
+from panel_seg.utils.detectron_utils import (
+    LossEvalHook,
+    ModelWriter
+)
 from panel_seg.panel_segmentation.evaluator import PanelSegEvaluator
 from panel_seg.utils.detectron_utils.config import add_validation_config
 from panel_seg.panel_segmentation.config import add_panel_seg_config
@@ -116,6 +119,12 @@ class Trainer(DefaultTrainer):
         """
         hooks = super().build_hooks()
 
+        # TODO remove as it can't work
+        # input_example = next(iter(self.data_loader))
+        # hooks.append(ModelWriter(model=self.model,
+                                 # input_example=input_example,
+                                 # log_dir=self.cfg.OUTPUT_DIR))
+
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
             data_set_mapper = PanelSegDatasetMapper(cfg=self.cfg,
@@ -142,13 +151,13 @@ class Trainer(DefaultTrainer):
             cfg (CfgNode):  The global config.
 
         Returns:
-            torch.nn.Module:
+            model (torch.nn.Module): the PanelSegRetinaNet model.
         """
         model = PanelSegRetinaNet(cfg)
         model.to(torch.device(cfg.MODEL.DEVICE))
         logger = setup_logger(name=__name__,
                               distributed_rank=comm.get_rank())
-        logger.info("Model:\n{}".format(model))
+        logger.info("Model:\n%s", model)
         return model
 
 
