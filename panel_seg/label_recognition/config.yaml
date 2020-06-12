@@ -7,7 +7,6 @@ MODEL:
 DATASETS:
   TRAIN: ("zou_label_recog_train",)
   #VALIDATION: "image_clef_val"
-  #TEST: ("image_clef_test",)
   TEST: ("zou_label_recog_test",)
 SOLVER:
   IMS_PER_BATCH: 2
