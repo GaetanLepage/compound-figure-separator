@@ -3,6 +3,7 @@ Module to evaluate the panel splitting task metrics.
 """
 
 from sortedcontainers import SortedKeyList
+from typing import Tuple
 import numpy as np
 
 from panel_seg.utils.average_precision import compute_average_precision
@@ -16,7 +17,12 @@ from pprint import pprint
 
 def panel_splitting_figure_eval(figure: Figure, stat_dict: dict):
     """
-    TODO
+    Evaluate panel splitting metrics on a single figure.
+
+    Args:
+        figure (Figure):    The figure on which to evaluate the panel splitting task.
+        stat_dict (dict):   A dict containing panel splitting evaluation stats
+                                It will be updated by this function.
     """
 
     # TODO make sure panels have been set correctly
@@ -54,12 +60,19 @@ def panel_splitting_figure_eval(figure: Figure, stat_dict: dict):
     stat_dict['sum_imageclef_accuracies'] += imageclef_accuracy
 
 
-def panel_splitting_metrics(stat_dict):
+def panel_splitting_metrics(stat_dict: dict, num_samples: int) -> Tuple[int, int, int]:
     """
-    TODO
+    Evaluate the panel splitting metrics.
+
+    Args:
+        stat_dict (dict):   A dict containing the stats gathered while looping over detections.
+        num_samples (int):  The number of samples in the data set.
+
+    Returns:
+        imageclef_accuracy, precision, recall, mAP (tuple): The final panel splitting metrics
     """
     # 1) ImageCLEF accuracy
-    imageclef_accuracy = stat_dict['sum_imageclef_accuracies'] / stat_dict['num_samples']
+    imageclef_accuracy = stat_dict['sum_imageclef_accuracies'] / num_samples
 
     # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
     true_positives = [np.float(is_positive) for _, is_positive in stat_dict['detections']]
@@ -90,7 +103,12 @@ def panel_splitting_metrics(stat_dict):
 
 def label_recognition_figure_eval(figure: Figure, stat_dict: dict):
     """
-    TODO
+    Evaluate label recognition metrics on a single figure.
+
+    Args:
+        figure (Figure):    The figure on which to evaluate the panel splitting task.
+        stat_dict (dict):   A dict containing panel splitting evaluation stats
+                                It will be updated by this function.
     """
     # TODO make sure panels have been set correctly
     # Perform matching on this figure
@@ -139,7 +157,7 @@ def label_recognition_figure_eval(figure: Figure, stat_dict: dict):
     stat_dict['overall_correct_count'] += num_correct
 
 
-def multi_class_metrics(stat_dict):
+def multi_class_metrics(stat_dict: dict) -> Tuple[int, int, int]:
     """
     TODO
     Used for both label recognition and panel segmentation tasks

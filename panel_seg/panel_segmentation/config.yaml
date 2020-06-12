@@ -5,7 +5,7 @@ MODEL:
   META_ARCHITECTURE: "RetinaNet"
   BACKBONE:
     NAME: "build_retinanet_resnet_fpn_backbone"
-    FREEZE_AT: 2
+    FREEZE_AT: 0
   RESNETS:
     OUT_FEATURES: ["res2", "res3", "res4", "res5"]
   PANEL_ANCHOR_GENERATOR:
@@ -38,9 +38,8 @@ SOLVER:
   # TODO I don't know why we can only fit 1 img/GPU here...
   IMS_PER_BATCH: 1
   BASE_LR: 0.00001  # Note that RetinaNet uses a different default learning rate
-  STEPS: (60000, 80000)
-  MAX_ITER: 90000
-
+  STEPS: (990000,)
+  MAX_ITER: 1000000
 #VALIDATION:
   #VALIDATION_PERIOD: 5000
 TEST:

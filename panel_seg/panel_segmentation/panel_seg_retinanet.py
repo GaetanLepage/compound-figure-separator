@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import logging
 import math
-from typing import List
+from typing import List, Tuple
 import numpy as np
 import torch
 from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss
@@ -10,6 +10,7 @@ from torch import nn
 from detectron2.layers import ShapeSpec, batched_nms, cat
 from detectron2.structures import Boxes, ImageList, Instances, pairwise_iou
 from detectron2.utils.events import get_event_storage
+from detectron2.config import CfgNode
 
 from detectron2.modeling.anchor_generator import DefaultAnchorGenerator
 from detectron2.modeling.backbone.resnet import build_resnet_backbone
@@ -18,6 +19,10 @@ from detectron2.modeling.matcher import Matcher
 from detectron2.modeling.postprocessing import detector_postprocess
 
 from detectron2.modeling.backbone.fpn import FPN, LastLevelP6P7
+from detectron2.modeling.meta_arch.retinanet import (
+    permute_to_N_HWA_K,
+    permute_all_cls_and_box_to_N_HWA_K_and_concat
+)
 
 __all__ = ["PanelSegRetinaNet"]
 
@@ -25,10 +30,14 @@ __all__ = ["PanelSegRetinaNet"]
 # TODO maybe split in multiple files (in a folder model/ for eg)
 
 
-def build_fpn_backbones(cfg, input_shape: ShapeSpec):
+def build_fpn_backbones(cfg: CfgNode,
+                        input_shape: ShapeSpec) -> Tuple[nn.Module, nn.Module]:
     """
+    TODO
+
     Args:
-        cfg: a detectron2 CfgNode
+        cfg (CfgNode): a detectron2 CfgNode
+        input_shape (ShapeSpec): TODO
 
     Returns:
         backbone (Backbone): backbone module, must be a subclass of :class:`Backbone`.
@@ -59,49 +68,6 @@ def build_fpn_backbones(cfg, input_shape: ShapeSpec):
                     fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
 
     return panel_fpn, label_fpn
-
-
-def permute_to_N_HWA_K(tensor, K):
-    """
-    Transpose/reshape a tensor from (N, (A x K), H, W) to (N, (HxWxA), K)
-
-    Args:
-        tensor (torch.Tensor):  An output tensor from a RetinaNetHead.
-        K (int):                The number of classes (for classification) or 4 (for regression).
-    """
-    assert tensor.dim() == 4, tensor.shape
-    N, _, H, W = tensor.shape
-    tensor = tensor.view(N, -1, K, H, W)
-    tensor = tensor.permute(0, 3, 4, 1, 2)
-    tensor = tensor.reshape(N, -1, K)  # Size=(N,HWA,K)
-    return tensor
-
-
-def permute_all_cls_and_box_to_N_HWA_K_and_concat(box_cls,
-                                                  box_delta,
-                                                  num_classes: int = 80):
-    """
-    Rearrange the tensor layout from the network output to per-image predictions.
-
-    Args:
-        box_cls, box_delta (list[Tensor]):  #lvl tensors of shape (N, A x K, Hi, Wi)
-        num_classes (int):                  The number of classes.
-
-    Returns:
-        Tensor of shape (N x sum(Hi x Wi x A), K)
-    """
-    # for each feature level, permute the outputs to make them be in the
-    # same format as the labels. Note that the labels are computed for
-    # all feature levels concatenated, so we keep the same representation
-    # for the objectness and the box_delta
-    box_cls_flattened = [permute_to_N_HWA_K(x, num_classes) for x in box_cls]
-    box_delta_flattened = [permute_to_N_HWA_K(x, 4) for x in box_delta]
-    # concatenate on the first dimension (representing the feature levels), to
-    # take into account the way the labels were generated (with all feature maps
-    # being concatenated as well)
-    box_cls = cat(box_cls_flattened, dim=1).view(-1, num_classes)
-    box_delta = cat(box_delta_flattened, dim=1).view(-1, 4)
-    return box_cls, box_delta
 
 
 class PanelSegRetinaNet(nn.Module):
@@ -174,8 +140,10 @@ class PanelSegRetinaNet(nn.Module):
                                cfg.MODEL.RETINANET.IOU_LABELS,
                                allow_low_quality_matches=True)
 
-        self.register_buffer("pixel_mean", torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
-        self.register_buffer("pixel_std", torch.Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1))
+        self.register_buffer("pixel_mean",
+                             torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
+        self.register_buffer("pixel_std",
+                             torch.Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1))
 
         """
         In Detectron1, loss is normalized by number of foreground samples in the batch.
@@ -249,6 +217,8 @@ class PanelSegRetinaNet(nn.Module):
             dict[str: Tensor]:
                 mapping from a named loss to a tensor storing the loss. Used during training only.
         """
+        # TODO remove
+        # print(batched_inputs)
         images = self.preprocess_image(batched_inputs)
 
         # detected panels
@@ -674,10 +644,10 @@ class RetinaNetHead(nn.Module):
     """
 
     def __init__(self,
-                 cfg,
+                 cfg: CfgNode,
                  input_shape: List[ShapeSpec],
-                 num_classes,
-                 num_anchors):
+                 num_classes: int,
+                 num_anchors: int):
         super().__init__()
 
         in_channels = input_shape[0].channels

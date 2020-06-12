@@ -54,7 +54,7 @@ def assign_labels_to_panels(panels: List[Panel],
         beam_length (int):      TODO
     """
     # TODO remove
-    print("###########")
+    # print("###########")
 
     # Compute the distance matrix.
     distances = compute_panel_label_distances(panels, labels)
@@ -100,8 +100,8 @@ def assign_labels_to_panels(panels: List[Panel],
         all_item_pairs.append(item_pairs)
 
         # TODO remove
-        print("panel index:", panel_idx)
-        print("all_item_pairs:", all_item_pairs)
+        # print("panel index:", panel_idx)
+        # print("all_item_pairs:", all_item_pairs)
 
     # check the last item_pairs
     # print(all_item_pairs)

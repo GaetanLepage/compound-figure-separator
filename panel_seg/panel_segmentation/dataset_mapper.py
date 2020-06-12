@@ -119,6 +119,8 @@ class PanelSegDatasetMapper:
 
         # Create an `Instances` object for panels
         panel_instances = Instances(image_size)
+        # TODO remove
+        # print("panel_instances:", panel_instances.get_fields())
 
         panel_boxes = [BoxMode.convert(box=obj['bbox'],
                                        from_mode=obj['bbox_mode'],
@@ -169,6 +171,7 @@ class PanelSegDatasetMapper:
         image = utils.read_image(dataset_dict["file_name"], format=self.img_format)
         utils.check_image_size(dataset_dict, image)
 
+        # TODO simplify this
         if "annotations" not in dataset_dict:
             image, transforms = T.apply_transform_gens(
                 transform_gens=([self.crop_gen] if self.crop_gen else []) + self.tfm_gens,
@@ -193,7 +196,9 @@ class PanelSegDatasetMapper:
         # Pytorch's dataloader is efficient on torch.Tensor due to shared-memory,
         # but not efficient on large generic data structures due to the use of pickle & mp.Queue.
         # Therefore it's important to use torch.Tensor.
-        dataset_dict["image"] = torch.as_tensor(np.ascontiguousarray(image.transpose(2, 0, 1)))
+        dataset_dict['image'] = torch.as_tensor(np.ascontiguousarray(image.transpose(2, 0, 1)))
+        dataset_dict.pop('file_name')
+        dataset_dict.pop('image_id')
 
         if not self.is_train:
             dataset_dict.pop('annotations', None)
