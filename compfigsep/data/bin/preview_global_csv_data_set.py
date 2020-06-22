@@ -32,8 +32,8 @@ from typing import List
 
 sys.path.append('.')
 
-from ..figure_generators import GlobalCsvFigureGenerator
-from ..figure_viewer import parse_viewer_args, view_data_set
+from compfigsep.data.figure_generators import GlobalCsvFigureGenerator
+from compfigsep.data.figure_viewer import parse_viewer_args, view_data_set
 
 
 def parse_args(args: List[str]) -> ArgumentParser:

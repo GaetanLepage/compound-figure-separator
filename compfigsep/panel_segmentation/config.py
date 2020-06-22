@@ -18,8 +18,8 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-########################################################################################
-TODO
+#######################################################
+Additional configuration options for PanelSegRetinaNet.
 """
 
 from detectron2.config import CfgNode

@@ -46,18 +46,17 @@ from detectron2.engine import (
 from detectron2.evaluation import verify_results
 from detectron2.data.build import build_detection_train_loader, build_detection_test_loader
 
-from panel_seg.panel_segmentation.dataset_mapper import PanelSegDatasetMapper
-from panel_seg.panel_segmentation.load_datasets import \
-    register_panel_segmentation_dataset
-from panel_seg.utils.detectron_utils import (
+from compfigsep.panel_segmentation.dataset_mapper import PanelSegDatasetMapper
+from compfigsep.utils.detectron_utils import (
     LossEvalHook,
     ModelWriter
 )
-from panel_seg.panel_segmentation import (
+from compfigsep.panel_segmentation import (
+    register_panel_segmentation_dataset,
     PanelSegEvaluator,
     add_panel_seg_config,
     PanelSegRetinaNet)
-from panel_seg.utils.detectron_utils.config import add_validation_config
+from compfigsep.utils.detectron_utils.config import add_validation_config
 
 
 class Trainer(DefaultTrainer):

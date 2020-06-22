@@ -25,13 +25,13 @@ Definition of an abstract class to handle figure data loading from various sourc
 import os
 from abc import ABC, abstractmethod
 
-import panel_seg
+import compfigsep
 
 from ...utils.figure.figure import Figure
 
 # Localize data folder
 PROJECT_DIR = os.path.join(
-    os.path.dirname(panel_seg.__file__),
+    os.path.dirname(compfigsep.__file__),
     os.pardir)
 DATA_DIR = os.path.join(
     PROJECT_DIR,

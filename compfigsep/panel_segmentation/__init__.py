@@ -25,5 +25,7 @@ Locate panels, labels and match them together.
 
 from .load_datasets import *
 from .evaluator import *
+from .panel_seg_retinanet import *
+from .config import *
 
 __all__ = [k for k in globals().keys() if not k.startswith("_")]

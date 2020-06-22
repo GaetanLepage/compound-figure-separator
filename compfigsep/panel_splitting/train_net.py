@@ -43,8 +43,8 @@ from detectron2.evaluation import verify_results
 from detectron2.data.build import build_detection_test_loader
 from detectron2.data.dataset_mapper import DatasetMapper
 
-from panel_seg.panel_splitting import register_panel_splitting_dataset, PanelSplitEvaluator
-from panel_seg.utils.detectron_utils import LossEvalHook, add_validation_config
+from compfigsep.panel_splitting import register_panel_splitting_dataset, PanelSplitEvaluator
+from compfigsep.utils.detectron_utils import LossEvalHook, add_validation_config
 
 
 class Trainer(DefaultTrainer):
