@@ -23,6 +23,7 @@ Panel segmentation module.
 Separate compound figures into multiple panels.
 """
 
-from panel_seg.utils.detectron_utils.config import add_validation_config
+from .load_datasets import *
+from .evaluator import *
 
 __all__ = [k for k in globals().keys() if not k.startswith("_")]

@@ -32,13 +32,11 @@ import xml.etree.ElementTree as ET
 
 import numpy as np
 import PIL.Image
-import tensorflow as tf
 from cv2 import cv2
 
 from .panel import Panel
 from . import beam_search
 from .. import box
-from .. import dataset_util
 from . import label_class
 
 
@@ -848,7 +846,7 @@ class Figure:
                 csv_writer.writerow(csv_row)
 
 
-    def convert_to_tf_example(self) -> tf.train.Example:
+    def convert_to_tf_example(self) -> 'tf.train.Example':
         """
         Convert the figure (only panel info) to a TensorFlow example which is compatible with the
         TensorFlow Object Detection API.
@@ -857,6 +855,9 @@ class Figure:
         Returns:
             example (tf.train.Example): The corresponding tf example.
         """
+        # Import TensorFlow.
+        import tensorflow as tf
+        from .. import dataset_util
 
         # Load image
         with tf.io.gfile.GFile(self.image_path, 'rb') as fid:

@@ -22,3 +22,8 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 Panel segmentation module.
 Locate panels, labels and match them together.
 """
+
+from .load_datasets import *
+from .evaluator import *
+
+__all__ = [k for k in globals().keys() if not k.startswith("_")]

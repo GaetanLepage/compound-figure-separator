@@ -31,8 +31,8 @@ from argparse import ArgumentParser
 
 from typing import List
 
-from ..figure_generators import IphotodrawXmlFigureGenerator
-from ..figure_viewer import parse_viewer_args, view_data_set
+from panel_seg.data.figure_generators import IphotodrawXmlFigureGenerator
+from panel_seg.data.figure_viewer import parse_viewer_args, view_data_set
 
 sys.path.append(".")
 

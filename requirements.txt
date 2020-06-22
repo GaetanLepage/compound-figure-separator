@@ -1,11 +1,18 @@
 # General purpose libraries
-matplotlib
+numpy
+sortedcontainers
 
-# Keras
+# Deep learning
+torch
+--find-links https://dl.fbaipublicfiles.com/detectron2/wheels/cu102/torch1.5/index.html
+detectron2
+# Detectron2 requirements:
+    torchvision
+    pycocotools
 
 # Image
-opencv-python
 Pillow
+opencv-python
 
 # Documentation generation
 Sphinx

@@ -53,10 +53,11 @@ from panel_seg.utils.detectron_utils import (
     LossEvalHook,
     ModelWriter
 )
-from panel_seg.panel_segmentation.evaluator import PanelSegEvaluator
+from panel_seg.panel_segmentation import (
+    PanelSegEvaluator,
+    add_panel_seg_config,
+    PanelSegRetinaNet)
 from panel_seg.utils.detectron_utils.config import add_validation_config
-from panel_seg.panel_segmentation.config import add_panel_seg_config
-from panel_seg.panel_segmentation.panel_seg_retinanet import PanelSegRetinaNet
 
 
 class Trainer(DefaultTrainer):

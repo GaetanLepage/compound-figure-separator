@@ -25,7 +25,6 @@ Export tools for panel-seg datasets.
 from typing import Iterable
 
 import csv
-import tensorflow as tf
 
 from ..utils.figure import Figure
 from ..utils.figure.label_class import LABEL_CLASS_MAPPING
@@ -92,6 +91,8 @@ def export_figures_to_tf_record(figure_generator: Iterable[Figure],
         figure_generator (Iterable[Figure]):    A generator yielding figure objects.
         tf_record_filename (str):               Path to the output tf record file.
     """
+    # Import TensorFlow.
+    import tensorflow as tf
 
     with tf.io.TFRecordWriter(tf_record_filename) as writer:
 
