@@ -36,8 +36,6 @@ pip install -r requirements.txt
 ```
 
 
-# TODO: explain how to train/test
-
 It is possible to follow training using _TensorBoard_
 ```bash
 tensorboard --logdir=compfigsep/<TASK_NAME>/output/ [--bind_all]
@@ -83,5 +81,4 @@ This project has received funding from the European Union’s Horizon 2020 resea
 
 For more information on the ExaMode project, please visit www.examode.eu.
 
-![](https://www.examode.eu/wp-content/uploads/2018/11/horizon.jpg) ![](https://www.examode.eu/wp-content/uploads/2018/11/flag_yellow.png) ![](https://www.examode.eu/wp-content/uploads/2018/11/cropped-ExaModeLogo_blacklines_TranspBackGround1?w=10&f=png)
-<!--<img src="https://www.examode.eu/wp-content/uploads/2018/11/cropped-ExaModeLogo_blacklines_TranspBackGround1.png" width="80">-->
+![](https://www.examode.eu/wp-content/uploads/2018/11/horizon.jpg) ![](https://www.examode.eu/wp-content/uploads/2018/11/flag_yellow.png) <img src="https://www.examode.eu/wp-content/uploads/2018/11/cropped-ExaModeLogo_blacklines_TranspBackGround1.png" width="80">
