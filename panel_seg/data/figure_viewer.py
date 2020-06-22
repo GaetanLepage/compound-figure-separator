@@ -1,21 +1,46 @@
 """
-Use a figrure generator for previewing a data set by displaying each image one by one
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+####################################################################################
+Use a figure generator for previewing a data set by displaying each image one by one
 along with the annotations.
 """
 
 from argparse import ArgumentParser
+from typing import Iterable
+
+from ..utils.figure import Figure
+
 
 def parse_viewer_args(parser: ArgumentParser) -> ArgumentParser:
     """
     Parse the argument relative to the preview options :
         * mode ('gt', 'pred' or 'both')
         * delay
+        * save_preview
 
     Args:
-        parser (ArgumentParser): An ArgumentParser.
+        parser (ArgumentParser):    An ArgumentParser.
 
     Returns:
-        parser (ArgumentParser): The 'given' parser augmented with the options.
+        parser (ArgumentParser):    The 'given' parser augmented with the options.
     """
 
     parser.add_argument('--mode',
@@ -31,7 +56,6 @@ def parse_viewer_args(parser: ArgumentParser) -> ArgumentParser:
                         type=int,
                         default=100)
 
-
     parser.add_argument('--save_preview',
                         help="Save the image previews in image files.",
                         action='store_true')
@@ -39,7 +63,7 @@ def parse_viewer_args(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def view_data_set(figure_generator: iter,
+def view_data_set(figure_generator: Iterable[Figure],
                   mode: str = 'gt',
                   *,
                   save_preview: bool = False,
@@ -57,19 +81,16 @@ def view_data_set(figure_generator: iter,
                                         * 'pred': only the predictions
                                         * 'both': both predicted and ground truth annotations.
         save_preview (bool):        If true, saves the preview as an image.
-        preview_folder (str):       TODO
+        preview_folder (str):       The path to the folder where to store the preview images.
         delay (int):                The number of seconds after which the window is closed
                                         if 0, the delay is disabled.
         window_name (str):          Name of the image display window.
     """
 
     for figure in figure_generator:
-        # TODO uncomment
-        # figure.show_preview(mode=mode,
-                            # delay=delay,
-                            # window_name=window_name)
-        # TODO remove line
-        figure.get_preview(mode=mode)
+        figure.show_preview(mode=mode,
+                            delay=delay,
+                            window_name=window_name)
 
         if save_preview:
             figure.save_preview(folder=preview_folder)

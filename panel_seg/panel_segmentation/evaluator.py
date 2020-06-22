@@ -1,27 +1,46 @@
 """
-TODO
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+##########################################
+Evaluator for the panel segmentation task.
 """
 
 from typing import List
 
-from panel_seg.utils.figure.panel import DetectedPanel
-
-from panel_seg.utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
-
-from panel_seg.panel_segmentation.evaluate import evaluate_detections
-from panel_seg.utils.figure.label_class import CLASS_LABEL_MAPPING
-from panel_seg.utils.figure.figure import Figure
-
-
+from ..utils.figure import Figure, DetectedPanel, CLASS_LABEL_MAPPING
+from ..utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
+from .evaluate import evaluate_detections
 
 class PanelSegEvaluator(PanelSegAbstractEvaluator):
     """
+    Evaluator for the panel segmentation task.
     Perform the evaluation of panel segmentation metrics on a given test set.
     """
 
     def __init__(self, dataset_name: str):
         """
-        TODO
+        Init function.
+        Call the init function of the parent class (PanelSegAbstractEvaluator).
+
+        Args:
+            dataset_name (str): The name of the data set to evaluate.
         """
         super().__init__(dataset_name=dataset_name,
                          task_name='panel_seg',
@@ -39,7 +58,7 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
         """
 
         for input, output in zip(inputs, outputs):
-            image_id = input["image_id"]
+            image_id = input['image_id']
 
             self._predictions[image_id] = {}
 
@@ -47,8 +66,6 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
             panel_instances = output["panels"].to(self._cpu_device)
             panel_boxes = panel_instances.pred_boxes.tensor.numpy()
             panel_scores = panel_instances.scores.tolist()
-            # TODO we don't need the panel classes (only one class)
-            # panel_classes = panel_instances.pred_classes.tolist()
 
             predicted_panels = []
             for box, score in zip(panel_boxes, panel_scores):
@@ -100,14 +117,14 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
 
 
             # Convert panels and labels from dict to DetectedPanel objects
-            figure.raw_detected_panels= [DetectedPanel(panel_rect=panel['box'],
-                                             panel_detection_score=panel['score'])
-                               for panel in detected_panels]
+            figure.raw_detected_panels = [DetectedPanel(panel_rect=panel['box'],
+                                                        panel_detection_score=panel['score'])
+                                          for panel in detected_panels]
 
             figure.raw_detected_labels = [DetectedPanel(label_rect=label['box'],
                                                         label_detection_score=label['score'],
                                                         label=CLASS_LABEL_MAPPING[label['label']])
-                               for label in detected_labels]
+                                          for label in detected_labels]
 
             # ==> Those two sets of "half" objects will be merged to give
             # complete DetectedPanel objects (with label, panel_rect and label_rect fields).
@@ -117,8 +134,6 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
                                 # mode='pred')
 
             # figure.show_preview(mode='pred', delay=0)
-
-
 
             # TODO do some post processing here maybe
 

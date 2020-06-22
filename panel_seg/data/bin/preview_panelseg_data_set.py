@@ -1,5 +1,26 @@
 #!/usr/bin/env python3
+
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+########################################################################################
 Script to visualize Zou's data set by displaying the images along with the corresponding
 bounding boxes and labels.
 """
@@ -10,30 +31,30 @@ from argparse import ArgumentParser
 
 from typing import List
 
-sys.path.append(".")
+from ..figure_generators import IphotodrawXmlFigureGenerator
+from ..figure_viewer import parse_viewer_args, view_data_set
 
-from panel_seg.data.figure_generators import IphotodrawXmlFigureGenerator
-from panel_seg.data.figure_viewer import parse_viewer_args, view_data_set
+sys.path.append(".")
 
 def parse_args(args: List[str]) -> ArgumentParser:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]): The arguments from the command line call.
+        args (List[str]):   The arguments from the command line call.
 
     Returns:
-        (ArgumentParser): Populated namespace.
+        parser (ArgumentParser):    Populated namespace.
     """
     parser = ArgumentParser(description="Preview all the figures from an iPhotoDraw data set.")
 
     parser.add_argument('--eval_list_txt',
-                        help='The path to the txt file listing the images.',
-                        default='data/zou/eval.txt',
+                        help="The path to the txt file listing the images.",
+                        default="data/zou/eval.txt",
                         type=str)
 
     parser.add_argument('--image_directory_path',
-                        help='The path to the directory whre the images are stored.',
+                        help="The path to the directory whre the images are stored.",
                         default=None,
                         type=str)
 
@@ -47,10 +68,10 @@ def main(args: List[str] = None):
     Launch previsualization of Zou's data set.
 
     Args:
-        args (List[str]): Arguments from the command line.
+        args (List[str]):   Arguments from the command line.
     """
 
-    # parse arguments
+    # Parse arguments.
     if args is None:
         args = sys.argv[1:]
     args = parse_args(args)

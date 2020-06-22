@@ -1,8 +1,29 @@
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-import logging
+"""
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+##################################################################
+Custom model derived from RetinaNet to achieve panel segmentation.
+"""
+
 import math
-from typing import List, Tuple
-import numpy as np
+from typing import List, Tuple, Dict
 import torch
 from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss
 from torch import nn
@@ -16,7 +37,6 @@ from detectron2.modeling.anchor_generator import DefaultAnchorGenerator
 from detectron2.modeling.backbone.resnet import build_resnet_backbone
 from detectron2.modeling.box_regression import Box2BoxTransform
 from detectron2.modeling.matcher import Matcher
-from detectron2.modeling.postprocessing import detector_postprocess
 
 from detectron2.modeling.backbone.fpn import FPN, LastLevelP6P7
 from detectron2.modeling.meta_arch.retinanet import (
@@ -27,20 +47,23 @@ from detectron2.modeling.meta_arch.retinanet import (
 __all__ = ["PanelSegRetinaNet"]
 
 
-# TODO maybe split in multiple files (in a folder model/ for eg)
-
-
 def build_fpn_backbones(cfg: CfgNode,
                         input_shape: ShapeSpec) -> Tuple[nn.Module, nn.Module]:
     """
-    TODO
+    Build the Resnet 50 backbone and the two FPN networks:
+    * Panel FPN:
+        * Input:  C3, C4, C5
+        * Output: P3, P4, P5, P6, P7
+    * Label FPN:
+        * Input:  C2, C3, C4
+        * Output: P2, P3, P4
 
     Args:
         cfg (CfgNode): a detectron2 CfgNode
         input_shape (ShapeSpec): TODO
 
     Returns:
-        backbone (Backbone): backbone module, must be a subclass of :class:`Backbone`.
+        backbone (Backbone):    backbone module, must be a subclass of :class:`Backbone`.
     """
     # Build the feature extractor (Resnet 50)
     bottom_up = build_resnet_backbone(cfg, input_shape)
@@ -72,13 +95,44 @@ def build_fpn_backbones(cfg: CfgNode,
 
 class PanelSegRetinaNet(nn.Module):
     """
-    Implement RetinaNet (https://arxiv.org/abs/1708.02002).
+    Custom model derived from RetinaNet to achieve panel segmentation.
+
+    This model has been introduced by Zou et al.
+    (https://asistdl.onlinelibrary.wiley.com/doi/abs/10.1002/asi.24334)
+
+    Attributes:
+        num_label_classes (int):                Number of label classes.
+        panel_in_features (List[str]):          List of the names of the panel heads inputs.
+                                                    ex: ['p3', 'p4', 'p5', 'p6', 'p7']
+        label_in_features (List[str]):          List of the names of the label heads inputs.
+                                                    ex: ['p2', 'p3', 'p4']
+        focal_loss_alpha (float):               Alpha parameter for the focal loss.
+        focal_loss_gamma (float):               Gamma parameter for the focal loss.
+        smooth_l1_loss_beta (float):            Beta parameter for the L1 loss (regression loss).
+        score_threshold (float):                Minimum score for a detection to be kept
+                                                    (inference).
+        topk_candidates (int):                  Maximum number of detections per image.
+        nms_threshold (float):                  IoU threshold used in NMS filtering process
+                                                    (inference).
+        max_detections_per_image (int):         Maximum number of detections to return per image
+                                                    during inference.
+        panel_fpn (nn.Module):                  Panel Feature Pyramid Network (FPN).
+        label_fpn (nn.Module):                  Label Feature Pyramid Network (FPN).
+        panel_anchor_generator (DefaultAnchorGenerator):
+                                                Compute anchors for panel detection.
+        panel_head (RetinaNetHead):             RetinaNetHead handling panels prediction.
+        label_anchor_generator (DefaultAnchorGenerator):
+                                                Compute anchors for label detection.
+        label_head (RetinaNet):                 RetinaNetHead handling panels prediction.
+        box2box_transform (Box2BoxTransform):   Box2box transformation as defined in R-CNN.
+        matcher (Matcher):                      Match predicted element to a ground-truth element.
+        loss_normalizer (int):                  Reasonable number of foreground examples.
+        loss_normalizer_momentum (float):       The loss normalizer momentum.
     """
 
-    def __init__(self, cfg):
+    def __init__(self, cfg: CfgNode):
         super().__init__()
 
-        # fmt: off
         self.num_label_classes = cfg.MODEL.RETINANET.NUM_LABEL_CLASSES
         self.panel_in_features = cfg.MODEL.RETINANET.PANEL_IN_FEATURES
         self.label_in_features = cfg.MODEL.RETINANET.LABEL_IN_FEATURES
@@ -91,10 +145,6 @@ class PanelSegRetinaNet(nn.Module):
         self.topk_candidates = cfg.MODEL.RETINANET.TOPK_CANDIDATES_TEST
         self.nms_threshold = cfg.MODEL.RETINANET.NMS_THRESH_TEST
         self.max_detections_per_image = cfg.TEST.DETECTIONS_PER_IMAGE
-        # Vis parameters
-        self.vis_period = cfg.VIS_PERIOD
-        self.input_format = cfg.INPUT.FORMAT
-        # fmt: on
 
         self.panel_fpn, self.label_fpn = build_fpn_backbones(
             cfg,
@@ -154,55 +204,23 @@ class PanelSegRetinaNet(nn.Module):
         self.loss_normalizer = 100  # initialize with any reasonable #fg that's not too small
         self.loss_normalizer_momentum = 0.9
 
+
     @property
-    def device(self):
+    def device(self) -> torch.device:
+        """
+        Identify the device the model is hosted by.
+
+        Returns:
+            device (torch.device):  The model device.
+        """
         return self.pixel_mean.device
 
 
-    def visualize_training(self, batched_inputs, results):
-        """
-        A function used to visualize ground truth images and final network predictions.
-        It shows ground truth bounding boxes on the original image and up to 20
-        predicted object bounding boxes on the original image.
-
-        Args:
-            batched_inputs (list): a list that contains input to the model.
-            results (List[Instances]): a list of #images elements.
-        """
-        from detectron2.utils.visualizer import Visualizer
-
-        assert len(batched_inputs) == len(results),\
-            "Cannot visualize inputs and results of different sizes"
-        storage = get_event_storage()
-        max_boxes = 20
-
-        image_index = 0  # only visualize a single image
-        img = batched_inputs[image_index]["image"].cpu().numpy()
-        assert img.shape[0] == 3, "Images should have 3 channels."
-        if self.input_format == "BGR":
-            img = img[::-1, :, :]
-        img = img.transpose(1, 2, 0)
-        v_gt = Visualizer(img, None)
-        v_gt = v_gt.overlay_instances(boxes=batched_inputs[image_index]["instances"].gt_boxes)
-        anno_img = v_gt.get_image()
-        processed_results = detector_postprocess(results[image_index],
-                                                 img.shape[0],
-                                                 img.shape[1])
-        predicted_boxes = processed_results.pred_boxes.tensor.detach().cpu().numpy()
-
-        v_pred = Visualizer(img, None)
-        v_pred = v_pred.overlay_instances(boxes=predicted_boxes[0:max_boxes])
-        prop_img = v_pred.get_image()
-        vis_img = np.vstack((anno_img, prop_img))
-        vis_img = vis_img.transpose(2, 0, 1)
-        vis_name = f"Top: GT bounding boxes; Bottom: {max_boxes} Highest Scoring Results"
-        storage.put_image(vis_name, vis_img)
-
-
-    def forward(self, batched_inputs):
+    def forward(self, batched_inputs: List[dict]) -> Dict[str, torch.Tensor]:
         """
         Args:
-            batched_inputs: a list, batched outputs of :class:`DatasetMapper` .
+            batched_inputs (List[dict]):
+                A list, batched outputs of :class:`DatasetMapper` .
                 Each item in the list contains the inputs for one image.
                 For now, each item in the list is a dict that contains:
 
@@ -214,11 +232,11 @@ class PanelSegRetinaNet(nn.Module):
                 * "height", "width" (int): the output resolution of the model, used in inference.
                   See :meth:`postprocess` for details.
         Returns:
-            dict[str: Tensor]:
-                mapping from a named loss to a tensor storing the loss. Used during training only.
+            Dict[str, Tensor]:  Mapping from a named loss to a scalar tensor storing the loss.
+                                    Used during training only. The dict keys are:
+                                    'panel_loss_cls', 'panel_loss_box_reg', 'label_loss_cls'
+                                    and 'label_loss_box_reg'.
         """
-        # TODO remove
-        # print(batched_inputs)
         images = self.preprocess_image(batched_inputs)
 
         # detected panels
@@ -233,9 +251,10 @@ class PanelSegRetinaNet(nn.Module):
         label_anchors = self.label_anchor_generator(label_features)
         label_cls, label_box_delta = self.label_head(label_features)
 
+        # Training
         if self.training:
 
-            # Panel GT
+            # Panels
             panel_gt_instances = [x['panel_instances'].to(self.device)
                                   for x in batched_inputs]
             panel_gt_classes, panel_gt_anchors_reg_deltas = self.get_ground_truth(
@@ -255,7 +274,7 @@ class PanelSegRetinaNet(nn.Module):
                 'panel_loss_box_reg': panel_loss_box_reg
             }
 
-            # Label GT
+            # Labels
             label_gt_instances = [x['label_instances'].to(self.device)
                                   for x in batched_inputs]
 
@@ -274,92 +293,85 @@ class PanelSegRetinaNet(nn.Module):
             loss_dict['label_loss_box_reg'] = label_loss_box_reg
 
             return loss_dict
-            # Loss
-            # label_gt_classes=label_gt_classes,
-            # label_gt_anchor_deltas=label_gt_anchors_reg_deltas,
-            # label_pred_class_logits=label_box_cls,
-            # label_pred_anchor_deltas=label_box_delta)
 
-            # if self.vis_period > 0:
-                # storage = get_event_storage()
-                # if storage.iter % self.vis_period == 0:
-                    # results = self.inference(box_cls, box_delta, anchors, images.image_sizes)
-                    # self.visualize_training(batched_inputs, results)
+        # Otherwise, do inference.
+        batched_inference_results = self.inference(panel_cls,
+                                                   panel_box_delta,
+                                                   panel_anchors,
+                                                   label_cls,
+                                                   label_box_delta,
+                                                   label_anchors,
+                                                   images.image_sizes)
+        processed_results = []
+        for inference_results, input_per_image, image_size in zip(
+                batched_inference_results,
+                batched_inputs,
+                images.image_sizes):
 
-        # Inference
-        else:
-            batched_inference_results = self.inference(panel_cls,
-                                                       panel_box_delta,
-                                                       panel_anchors,
-                                                       label_cls,
-                                                       label_box_delta,
-                                                       label_anchors,
-                                                       images.image_sizes)
-            processed_results = []
-            for inference_results, input_per_image, image_size in zip(
-                    batched_inference_results,
-                    batched_inputs,
-                    images.image_sizes):
+            height = input_per_image.get("height", image_size[0])
+            width = input_per_image.get("width", image_size[1])
+            # TODO check that this work with two sets of boxes
+            # r = detector_postprocess(results_per_image, height, width)
 
-                height = input_per_image.get("height", image_size[0])
-                width = input_per_image.get("width", image_size[1])
-                # TODO check that this work with two sets of boxes
-                # r = detector_postprocess(results_per_image, height, width)
+            panel_results, label_results = inference_results
 
-                panel_results, label_results = inference_results
+            scale_x, scale_y = (width / panel_results.image_size[1],
+                                height / panel_results.image_size[0])
 
-                scale_x, scale_y = (width / panel_results.image_size[1],
-                                    height / panel_results.image_size[0])
+            # 1) Panels
+            panel_results = Instances((height, width), **panel_results.get_fields())
 
-                # 1) Panels
-                panel_results = Instances((height, width), **panel_results.get_fields())
+            # Clip and scale boxes
+            panel_output_boxes = panel_results.pred_boxes
+            panel_output_boxes.scale(scale_x, scale_y)
+            panel_output_boxes.clip(panel_results.image_size)
 
-                # Clip and scale boxes
-                panel_output_boxes = panel_results.pred_boxes
-                panel_output_boxes.scale(scale_x, scale_y)
-                panel_output_boxes.clip(panel_results.image_size)
+            # 2) Labels
+            label_results = Instances((height, width), **label_results.get_fields())
 
-                # 2) Labels
-                label_results = Instances((height, width), **label_results.get_fields())
+            # Clip and scale boxes
+            label_output_boxes = label_results.pred_boxes
+            label_output_boxes.scale(scale_x, scale_y)
+            label_output_boxes.clip(label_results.image_size)
 
-                # Clip and scale boxes
-                label_output_boxes = label_results.pred_boxes
-                label_output_boxes.scale(scale_x, scale_y)
-                label_output_boxes.clip(label_results.image_size)
+            processed_results.append({"panels": panel_results, "labels": label_results})
 
-                processed_results.append({"panels": panel_results, "labels": label_results})
-
-            return processed_results
+        return processed_results
 
 
     def _compute_single_head_losses(self,
-                                    gt_classes,
-                                    gt_anchors_deltas,
-                                    pred_class_logits,
-                                    pred_anchor_deltas,
-                                    num_classes):
+                                    gt_classes: torch.Tensor,
+                                    gt_anchors_deltas: torch.Tensor,
+                                    pred_class_logits: torch.Tensor,
+                                    pred_anchor_deltas: torch.Tensor,
+                                    num_classes: int) -> Tuple[float, float]:
         """
-        TODO
+        Compute the loss dict for a single RetinaNet branch (one classification head and one
+        regression head).
+
+        N is the number of images in the batch.
+        R is the total number of anchors.
+        The total number of anchors across levels, i.e. sum(Hi x Wi x A)
+
         Args:
-            For `gt_classes` and `gt_anchors_deltas` parameters, see
-                :meth:`RetinaNet.get_ground_truth`.
-            Their shapes are (N, R) and (N, R, 4), respectively, where R is
-            the total number of anchors across levels, i.e. sum(Hi x Wi x A)
-            For `pred_class_logits` and `pred_anchor_deltas`, see
-                :meth:`RetinaNetHead.forward`.
+            gt_classes (torch.Tensor):          Ground truth classes.
+                                                    shape=(N, R).
+            gt_anchors_deltas (torch.Tensor):   Ground truth box deltas.
+                                                    shape=(N, R, 4).
+            pred_class_logits (torch.Tensor):   Predicted classes for the batch images.
+                                                    shape=(N, R).
+            pred_anchor_deltas (torch.Tensor):  Predicted box deltas.
+                                                    shape=(N, R, 4).
 
         Returns:
-            dict[str: Tensor]:
-                mapping from a named loss to a scalar tensor
-                storing the loss. Used during training only. The dict keys are:
-                "loss_cls" and "loss_box_reg"
+            loss_cls, loss_box_reg (Tuple[float, float]):   The value of the loss for each head
+                                                                (classification and regression).
         """
 
         pred_class_logits, pred_anchor_deltas = permute_all_cls_and_box_to_N_HWA_K_and_concat(
             box_cls=pred_class_logits,
             box_delta=pred_anchor_deltas,
             num_classes=num_classes)
-        # Shapes: (N x R, K) and (N x R, 4), respectively.
 
         gt_classes = gt_classes.flatten()
         gt_anchors_deltas = gt_anchors_deltas.view(-1, 4)
@@ -376,7 +388,6 @@ class PanelSegRetinaNet(nn.Module):
         gt_classes_target = torch.zeros_like(pred_class_logits)
         gt_classes_target[foreground_idxs, gt_classes[foreground_idxs]] = 1
 
-        ## PANEL LOSSES
         # logits loss
         loss_cls = sigmoid_focal_loss_jit(pred_class_logits[valid_idxs],
                                           gt_classes_target[valid_idxs],
@@ -395,35 +406,42 @@ class PanelSegRetinaNet(nn.Module):
 
     @torch.no_grad()
     def get_ground_truth(self,
-                         anchors,
-                         gt_instances,
-                         num_classes):
+                         anchors: List[Boxes],
+                         gt_instances: List[Instances],
+                         num_classes: int) -> Tuple[torch.Tensor, torch.Tensor]:
         """
+        Extract the ground truth classes and deltas from a list of Instances objects.
+
         Args:
-            anchors (list[Boxes]):
-                A list of #feature level Boxes. The Boxes contains anchors of this image on the
-                specific feature level.
-            targets (list[Instances]):
-                A list of N `Instances`s. The i-th `Instances` contains the ground-truth
-                per-instance annotations for the i-th input image.  Specify `targets` during
-                training only.
+            anchors (list[Boxes]):      A list of #feature level Boxes. The Boxes contains
+                                            anchors of this image on the specific feature level.
+            targets (list[Instances]):  A list of N `Instances`s. The i-th `Instances` contains
+                                            the ground-truth per-instance annotations for the
+                                            i-th input image.  Specify `targets` during training
+                                            only.
+            num_classes (int):          The number of classes.
 
         Returns:
-            gt_classes (Tensor):
-                An integer tensor of shape (N, R) storing ground-truth
-                labels for each anchor.
-                R is the total number of anchors, i.e. the sum of Hi x Wi x A for all levels.
-                Anchors with an IoU with some target higher than the foreground threshold
-                are assigned their corresponding label in the [0, K-1] range.
-                Anchors whose IoU are below the background threshold are assigned
-                the label "K". Anchors whose IoU are between the foreground and background
-                thresholds are assigned a label "-1", i.e. ignore.
-            gt_anchors_deltas (Tensor):
-                Shape (N, R, 4).
-                The last dimension represents ground-truth box2box transform
-                targets (dx, dy, dw, dh) that map each anchor to its matched ground-truth box.
-                The values in the tensor are meaningful only when the corresponding
-                anchor is labeled as foreground.
+            gt_classes (torch.Tensor):          An integer tensor of shape (N, R) storing
+                                                    ground-truth labels for each anchor.
+                                                    R is the total number of anchors, i.e. the
+                                                    sum of Hi x Wi x A for all levels.
+                                                    Anchors with an IoU with some target higher
+                                                    than the foreground threshold are assigned
+                                                    their corresponding label in the [0, K-1]
+                                                    range.
+                                                    Anchors whose IoU are below the background
+                                                    threshold are assigned the label "K".
+                                                    Anchors whose IoU are between the foreground
+                                                    and background thresholds are assigned a
+                                                    label "-1", i.e. ignore.
+            gt_anchors_deltas (torch.Tensor):   Shape (N, R, 4). The last dimension represents
+                                                    ground-truth box2box transform targets
+                                                    (dx, dy, dw, dh) that map each anchor to its
+                                                    matched ground-truth box.
+                                                    The values in the tensor are meaningful only
+                                                    when the corresponding anchor is labeled as
+                                                    foreground.
         """
         output_gt_classes = []
         output_gt_anchors_deltas = []
@@ -477,51 +495,66 @@ class PanelSegRetinaNet(nn.Module):
 
 
     def inference(self,
-                  panel_box_cls,
-                  panel_box_delta,
-                  panel_anchors,
-                  label_box_cls,
-                  label_box_delta,
-                  label_anchors,
-                  image_sizes):
+                  panel_box_cls: List[torch.Tensor],
+                  panel_box_delta: List[torch.Tensor],
+                  panel_anchors: List[Boxes],
+                  label_box_cls: List[torch.Tensor],
+                  label_box_delta: List[torch.Tensor],
+                  label_anchors: List[Boxes],
+                  image_sizes: List[torch.Size]) -> List[Tuple[Instances, Instances]]:
         """
-        Arguments:
-            box_cls, box_delta: Same as the output of :meth:`RetinaNetHead.forward`
-            anchors (list[Boxes]): A list of #feature level Boxes.
-                The Boxes contain anchors of this image on the specific feature level.
-            image_sizes (List[torch.Size]): the input image sizes
+        Perform inference using the raw batched outputs from the heads.
+
+        Args:
+            panel_box_cls (List[torch.Tensor]):     Output class predictions from the panel head.
+            panel_box_delta (List[torch.Tensor]):   Output box delta predictions from the panel
+                                                        head.
+            panel_anchors (List[Boxes]):            A list of #feature level Boxes.
+                                                        The Boxes contain anchors of this image on
+                                                        the specific feature level.
+            label_box_cls (List[torch.Tensor]):     Output class predictions from the label head.
+            label_box_delta (List[torch.Tensor]):   Output box delta predictions from the label
+                                                        head.
+            label_anchors (List[Boxes]):            A list of #feature level Boxes.
+                                                        The Boxes contain anchors of this image on
+                                                        the specific feature level.
+            image_sizes (List[torch.Size]):         The input image sizes.
 
         Returns:
-            results (List[Instances]): a list of #images elements.
+            results (List[Tuple[Instances, Instances]]):    A list of #images elements.
         """
         results = []
 
         panel_box_cls = [permute_to_N_HWA_K(x, K=1) for x in panel_box_cls]
-        panel_box_delta = [permute_to_N_HWA_K(x, 4) for x in panel_box_delta]
+        panel_box_delta = [permute_to_N_HWA_K(x, K=4) for x in panel_box_delta]
         # list[Tensor], one per level, each has shape (N, Hi x Wi x A, K or 4)
         label_box_cls = [permute_to_N_HWA_K(x, K=self.num_label_classes) for x in label_box_cls]
-        label_box_delta = [permute_to_N_HWA_K(x, 4) for x in label_box_delta]
+        label_box_delta = [permute_to_N_HWA_K(x, K=4) for x in label_box_delta]
 
         for img_idx, image_size in enumerate(image_sizes):
+            # Panels
             panel_box_cls_per_image = [box_cls_per_level[img_idx]
                                        for box_cls_per_level in panel_box_cls]
             panel_box_reg_per_image = [box_reg_per_level[img_idx]
                                        for box_reg_per_level in panel_box_delta]
+
+            panel_results = self._inference_single_image(box_cls=panel_box_cls_per_image,
+                                                         box_delta=panel_box_reg_per_image,
+                                                         anchors=panel_anchors,
+                                                         image_size=tuple(image_size),
+                                                         num_classes=1)
+
+            # Labels
             label_box_cls_per_image = [box_cls_per_level[img_idx]
                                        for box_cls_per_level in label_box_cls]
             label_box_reg_per_image = [box_reg_per_level[img_idx]
                                        for box_reg_per_level in label_box_delta]
-            panel_results = self.inference_single_image(box_cls=panel_box_cls_per_image,
-                                                        box_delta=panel_box_reg_per_image,
-                                                        anchors=panel_anchors,
-                                                        image_size=tuple(image_size),
-                                                        num_classes=1)
 
-            label_results = self.inference_single_image(box_cls=label_box_cls_per_image,
-                                                        box_delta=label_box_reg_per_image,
-                                                        anchors=label_anchors,
-                                                        image_size=tuple(image_size),
-                                                        num_classes=self.num_label_classes)
+            label_results = self._inference_single_image(box_cls=label_box_cls_per_image,
+                                                         box_delta=label_box_reg_per_image,
+                                                         anchors=label_anchors,
+                                                         image_size=tuple(image_size),
+                                                         num_classes=self.num_label_classes)
 
             results.append((panel_results, label_results))
 
@@ -529,12 +562,26 @@ class PanelSegRetinaNet(nn.Module):
 
 
     def _filter_detections(self,
-                           box_cls,
-                           box_delta,
-                           anchors,
-                           num_classes):
+                           box_cls: List[torch.Tensor],
+                           box_delta: List[torch.Tensor],
+                           anchors: List[Boxes],
+                           num_classes: int) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
-        TODO
+        Filters raw detections to discard unlikely/poor ones.
+
+        Args:
+            box_cls (List[torch.Tensor]):   List of #feature levels. Each entry contains tensor of
+                                                size (H x W x A, K).
+            box_delta (List[torch.Tensor]): Same shape as 'box_cls' except that K becomes 4.
+            anchors (List[Boxes]):          List of #feature levels. Each entry contains a Boxes
+                                                object, which contains all the anchors for that
+                                                image in that feature level.
+            num_classes (int):              The number of classes.
+
+        Returns:
+            boxes (torch.Tensor): TODO
+            scores (torch.Tensor):
+            classes (torch.Tensor):
         """
         boxes_all = []
         scores_all = []
@@ -590,35 +637,37 @@ class PanelSegRetinaNet(nn.Module):
         return boxes_all[keep], scores_all[keep], class_idxs_all[keep]
 
 
-    def inference_single_image(self,
-                               box_cls,
-                               box_delta,
-                               anchors,
-                               image_size,
-                               num_classes):
+    def _inference_single_image(self,
+                                box_cls: List[torch.Tensor],
+                                box_delta: List[torch.Tensor],
+                                anchors: List[Boxes],
+                                image_size: Tuple[int, int],
+                                num_classes: int
+                                ) -> Instances:
         """
-        Single-image inference. Return bounding-box detection results by thresholding
-        on scores and applying non-maximum suppression (NMS).
+        Single-image inference.
+        Return bounding-box detection results by thresholding on scores and applying non-maximum
+        suppression (NMS).
 
-        Arguments:
-            box_cls (list[Tensor]): list of #feature levels. Each entry contains
-                tensor of size (H x W x A, K)
-            box_delta (list[Tensor]): Same shape as 'box_cls' except that K becomes 4.
-            anchors (list[Boxes]): list of #feature levels. Each entry contains
-                a Boxes object, which contains all the anchors for that
-                image in that feature level.
-            image_size (tuple(H, W)): a tuple of the image height and width.
+        Args:
+            box_cls (List[torch.Tensor]):   List of #feature levels. Each entry contains tensor of
+                                                size (H x W x A, K).
+            box_delta (List[torch.Tensor]): Same shape as 'box_cls' except that K becomes 4.
+            anchors (List[Boxes]):          List of #feature levels. Each entry contains a Boxes
+                                                object, which contains all the anchors for that
+                                                image in that feature level.
+            image_size (Tuple[int, int]):   A tuple of the image height and width (H, W).
+            num_classes (int):              The number of classes.
 
         Returns:
-            Same as `inference`, but for only one image.
+            results (Instances):    Inference results in an Instances object.
         """
 
         results = Instances(image_size)
-        boxes, scores, class_idxs = self._filter_detections(
-            box_cls=box_cls,
-            box_delta=box_delta,
-            anchors=anchors,
-            num_classes=num_classes)
+        boxes, scores, class_idxs = self._filter_detections(box_cls=box_cls,
+                                                            box_delta=box_delta,
+                                                            anchors=anchors,
+                                                            num_classes=num_classes)
 
         results.pred_boxes = Boxes(boxes)
         results.scores = scores
@@ -627,13 +676,22 @@ class PanelSegRetinaNet(nn.Module):
         return results
 
 
-    def preprocess_image(self, batched_inputs):
+    def preprocess_image(self, batched_inputs: List[dict]) -> ImageList:
         """
         Normalize, pad and batch the input images.
+
+        Args:
+            batched_inputs (List[dict]):    A list, batched outputs of :class:`DatasetMapper`.
+                                                Each item in the list contains the inputs for one
+                                                image.
+
+        Returns:
+            images (ImageList): The transformed images.
         """
         images = [x["image"].to(self.device) for x in batched_inputs]
         images = [(x - self.pixel_mean) / self.pixel_std for x in images]
         images = ImageList.from_tensors(images, self.panel_fpn.size_divisibility)
+
         return images
 
 
@@ -641,6 +699,12 @@ class RetinaNetHead(nn.Module):
     """
     The head used in RetinaNet for object classification and box regression.
     It has two subnets for the two tasks, with a common structure but separate parameters.
+
+    Attributes:
+        cls_subnet (nn.Module):     Classification subnetwork.
+        bbox_subnet (nn.Module):    Regression subnetwork.
+        cls_score (nn.Module):      Convolutional layer outputing scores.
+        bbox_pred (nn.Module):      Convolutional layer outputing bbox positions.
     """
 
     def __init__(self,
@@ -654,9 +718,8 @@ class RetinaNetHead(nn.Module):
         num_convs = cfg.MODEL.RETINANET.NUM_CONVS
         prior_prob = cfg.MODEL.RETINANET.PRIOR_PROB
 
-        assert (
-            len(set(num_anchors)) == 1
-        ), "Using different number of anchors between levels is not currently supported!"
+        assert len(set(num_anchors)) == 1, "Using different number of anchors between levels is"\
+                                           " not currently supported!"
         num_anchors = num_anchors[0]
 
         cls_subnet = []
@@ -702,25 +765,31 @@ class RetinaNetHead(nn.Module):
         torch.nn.init.constant_(self.cls_score.bias, bias_value)
 
 
-    def forward(self, features):
+    def forward(self,
+                features: List[torch.Tensor]
+                ) -> Tuple[List[torch.Tensor], List[torch.Tensor]]:
         """
         Args:
-            features (list[Tensor]): FPN feature map tensors in high to low resolution.
-                Each tensor in the list correspond to different feature levels.
+            features (list[Tensor]):    FPN feature map tensors in high to low resolution.
+                                            Each tensor in the list correspond to different
+                                            feature levels.
 
         Returns:
-            logits (list[Tensor]): #lvl tensors, each has shape (N, AxK, Hi, Wi).
-                The tensor predicts the classification probability
-                at each spatial position for each of the A anchors and K object
-                classes.
-            bbox_reg (list[Tensor]): #lvl tensors, each has shape (N, Ax4, Hi, Wi).
-                The tensor predicts 4-vector (dx,dy,dw,dh) box
-                regression values for every anchor. These values are the
-                relative offset between the anchor and the ground truth box.
+            logits (list[torch.Tensor]):    #lvl tensors, each has shape (N, AxK, Hi, Wi).
+                                                The tensor predicts the classification probability
+                                                at each spatial position for each of the A anchors
+                                                and K object classes.
+            bbox_reg (list[torch.Tensor]):  #lvl tensors, each has shape (N, Ax4, Hi, Wi).
+                                                The tensor predicts 4-vector (dx,dy,dw,dh) box
+                                                regression values for every anchor. These values
+                                                are the relative offset between the anchor and the
+                                                ground truth box.
         """
         logits = []
         bbox_reg = []
+
         for feature in features:
             logits.append(self.cls_score(self.cls_subnet(feature)))
             bbox_reg.append(self.bbox_pred(self.bbox_subnet(feature)))
+
         return logits, bbox_reg

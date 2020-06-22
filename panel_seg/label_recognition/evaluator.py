@@ -1,20 +1,37 @@
 """
-TODO
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+#########################################
+Evaluator for the label recognition task.
 """
 
 from typing import List
 
-from panel_seg.utils.figure.panel import DetectedPanel
-
-from panel_seg.utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
-
-from panel_seg.label_recognition.evaluate import evaluate_detections
-from panel_seg.utils.figure.label_class import CLASS_LABEL_MAPPING
-from panel_seg.utils.figure.figure import Figure
+from ..utils.figure import Figure, DetectedPanel, CLASS_LABEL_MAPPING
+from ..utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
+from .evaluate import evaluate_detections
 
 
 class LabelRecogEvaluator(PanelSegAbstractEvaluator):
     """
+    Evaluator for the label recognition task.
     Perform the evaluation of label recognition metrics on a given test set.
     """
 
@@ -22,6 +39,9 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
         """
         Init function.
         Call the init function of the parent function (PanelSegAbstractEvaluator).
+
+        Args:
+            dataset_name (str): The name of the data set to evaluate.
         """
         super().__init__(dataset_name=dataset_name,
                          task_name='label_recog',
@@ -42,12 +62,13 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
         for input, output in zip(inputs, outputs):
             image_id = input["image_id"]
             instances = output["instances"].to(self._cpu_device)
+
+            # Get prediction data.
             boxes = instances.pred_boxes.tensor.numpy()
-            # print("boxes =", boxes)
             scores = instances.scores.tolist()
-            # print("scores =", scores)
             classes = instances.pred_classes.tolist()
-            # print("classes =", classes)
+
+            # Store predictions.
             predicted_panels = []
             for box, score, cls in zip(boxes, scores, classes):
                 prediction = {}
@@ -68,7 +89,7 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
             predictions (dict): The dict containing the predictions from the model.
 
         Yields:
-            figure (Figure): Figure objects augmented with predictions.
+            figure (Figure):    Figure objects augmented with predictions.
         """
         for figure in self._figure_generator:
 

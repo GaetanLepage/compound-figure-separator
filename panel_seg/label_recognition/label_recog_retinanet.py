@@ -1,8 +1,33 @@
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+"""
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+##########################################################
+Custom variation of RetinaNet to handle label recognition.
+
+[WiP]
+"""
+
 import logging
 import math
-import numpy as np
 from typing import List, Tuple
+import numpy as np
 import torch
 from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss
 from torch import nn
@@ -31,31 +56,22 @@ __all__ = ["LabelRecogRetinaNet"]
 
 
 def build_fpn_backbone(cfg: CfgNode,
-                       input_shape: ShapeSpec) -> Tuple[nn.Module, nn.Module]:
+                       input_shape: ShapeSpec) -> nn.Module:
     """
-    TODO
+    Build the Resnet 50 backbone and the FPN:
+    Label FPN:
+      * Input:  C2, C3, C4
+      * Output: P2, P3, P4
 
     Args:
         cfg (CfgNode): a detectron2 CfgNode
         input_shape (ShapeSpec): TODO
 
     Returns:
-        backbone (Backbone): backbone module, must be a subclass of :class:`Backbone`.
+        backbone (Backbone):    backbone module, must be a subclass of :class:`Backbone`.
     """
     # Build the feature extractor (Resnet 50)
     bottom_up = build_resnet_backbone(cfg, input_shape)
-
-    # Panel FPN
-    panel_in_features = cfg.MODEL.PANEL_FPN.IN_FEATURES
-    panel_out_channels = cfg.MODEL.PANEL_FPN.OUT_CHANNELS
-    in_channels_p6p7 = bottom_up.output_shape()["res5"].channels
-    panel_fpn = FPN(bottom_up=bottom_up,
-                    in_features=panel_in_features,
-                    out_channels=panel_out_channels,
-                    norm=cfg.MODEL.FPN.NORM,
-                    top_block=LastLevelP6P7(in_channels_p6p7, panel_out_channels),
-                    fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
-
 
     # Label FPN
     label_in_features = cfg.MODEL.LABEL_FPN.IN_FEATURES
@@ -67,7 +83,7 @@ def build_fpn_backbone(cfg: CfgNode,
                     top_block=None,
                     fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
 
-    return panel_fpn, label_fpn
+    return label_fpn
 
 
 class LabelRecogRetinaNet(nn.Module):
@@ -141,9 +157,8 @@ class LabelRecogRetinaNet(nn.Module):
         """
         from detectron2.utils.visualizer import Visualizer
 
-        assert len(batched_inputs) == len(
-            results
-        ), "Cannot visualize inputs and results of different sizes"
+        assert len(batched_inputs) == len(results), "Cannot visualize inputs and results of"\
+                                                    " different sizes"
         storage = get_event_storage()
         max_boxes = 20
 
@@ -184,17 +199,19 @@ class LabelRecogRetinaNet(nn.Module):
 
                 * "height", "width" (int): the output resolution of the model, used in inference.
                   See :meth:`postprocess` for details.
+
         Returns:
-            dict[str: Tensor]:
-                mapping from a named loss to a tensor storing the loss. Used during training only.
+            dict[str: Tensor]:  mapping from a named loss to a tensor storing the loss. Used during
+                                    training only.
         """
         images = self.preprocess_image(batched_inputs)
         if "instances" in batched_inputs[0]:
             gt_instances = [x["instances"].to(self.device) for x in batched_inputs]
         elif "targets" in batched_inputs[0]:
-            log_first_n(
-                logging.WARN, "'targets' in the model inputs is now renamed to 'instances'!", n=10
-            )
+            log_first_n(lvl=logging.WARN,
+                        msg="'targets' in the model inputs is now renamed to 'instances'!",
+                        n=10)
+
             gt_instances = [x["targets"].to(self.device) for x in batched_inputs]
         else:
             gt_instances = None
@@ -249,8 +266,10 @@ class LabelRecogRetinaNet(nn.Module):
                 "loss_cls" and "loss_box_reg"
         """
         pred_class_logits, pred_anchor_deltas = permute_all_cls_and_box_to_N_HWA_K_and_concat(
-            pred_class_logits, pred_anchor_deltas, self.num_classes
-        )  # Shapes: (N x R, K) and (N x R, 4), respectively.
+            pred_class_logits,
+            pred_anchor_deltas,
+            self.num_classes)
+        # Shapes: (N x R, K) and (N x R, 4), respectively.
 
         gt_classes = gt_classes.flatten()
         gt_anchors_deltas = gt_anchors_deltas.view(-1, 4)
@@ -433,7 +452,7 @@ class LabelRecogRetinaNet(nn.Module):
                            scores=scores_all,
                            idxs=torch.ones(size=class_idxs_all.shape),
                            iou_threshold=self.nms_threshold)
-        keep = keep[: self.max_detections_per_image]
+        keep = keep[:self.max_detections_per_image]
 
         result = Instances(image_size)
         result.pred_boxes = Boxes(boxes_all[keep])
@@ -452,6 +471,7 @@ class LabelRecogRetinaNet(nn.Module):
         return images
 
 
+# TODO import from detectron2 directly as we should not need to change the head.
 class RetinaNetHead(nn.Module):
     """
     The head used in RetinaNet for object classification and box regression.
@@ -461,11 +481,11 @@ class RetinaNetHead(nn.Module):
     def __init__(self, cfg, input_shape: List[ShapeSpec]):
         super().__init__()
         # fmt: off
-        in_channels      = input_shape[0].channels
-        num_classes      = cfg.MODEL.RETINANET.NUM_CLASSES
-        num_convs        = cfg.MODEL.RETINANET.NUM_CONVS
-        prior_prob       = cfg.MODEL.RETINANET.PRIOR_PROB
-        num_anchors      = build_anchor_generator(cfg, input_shape).num_cell_anchors
+        in_channels = input_shape[0].channels
+        num_classes = cfg.MODEL.RETINANET.NUM_CLASSES
+        num_convs = cfg.MODEL.RETINANET.NUM_CONVS
+        prior_prob = cfg.MODEL.RETINANET.PRIOR_PROB
+        num_anchors = build_anchor_generator(cfg, input_shape).num_cell_anchors
         # fmt: on
         assert (
             len(set(num_anchors)) == 1
@@ -513,6 +533,7 @@ class RetinaNetHead(nn.Module):
         # Use prior in model initialization to improve stability
         bias_value = -math.log((1 - prior_prob) / prior_prob)
         torch.nn.init.constant_(self.cls_score.bias, bias_value)
+
 
     def forward(self, features):
         """

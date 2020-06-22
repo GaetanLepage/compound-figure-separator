@@ -1,4 +1,24 @@
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+###################################################################################
 Constants and function to deal with characters of caption labels and their classes.
 """
 
@@ -62,10 +82,10 @@ def map_label(char: str) -> str:
     Map the provided character to the right class.
 
     Args:
-        c: a character [0-9][a-z][A-Z]
+        char (str): A character [0-9][a-z][A-Z].
 
     Returns:
-        The class to which belongs the character.
+        char_class (str):   The class to which belongs the character.
     """
 
     char_classes = [
@@ -89,17 +109,17 @@ def map_label(char: str) -> str:
     # If the character is from a single character class, we return it
     return char
 
-def case_same_label(char):
+def case_same_label(char: str) -> bool:
     """
-    Check if  `char` belongs to a "dual class".
+    Check if `char` belongs to a "dual class".
 
     Args:
-        c: a character [0-9][a-z][A-Z]
+        char (str): A character [0-9][a-z][A-Z].
 
     Returns:
         bool which tells whether `char` belongs to a "dual class".
     """
-    # If the given character belongs to a "dual class", return True
+    # If the given character belongs to a "dual class", return True.
     if char in (
             'c', 'C',
             'k', 'K',
@@ -114,5 +134,5 @@ def case_same_label(char):
             'z', 'Z'):
         return True
 
-    # Else, return False
+    # Else, return False.
     return False

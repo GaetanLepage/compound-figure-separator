@@ -1,13 +1,31 @@
-
 """
-TODO
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+###########################################
+Figure generator handling a list of images.
 """
 
 import os
 import logging
 
-
-from panel_seg.utils.figure.figure import Figure
+from ...utils.figure.figure import Figure
 from .figure_generator import FigureGenerator
 
 
@@ -15,23 +33,31 @@ class ImageListFigureGenerator(FigureGenerator):
     """
     Generator of Figure objects from an image list.
     This generator does not load any annotations.
+
+    Attributes:
+        data_dir (str):             The path to the directory where the image data sets are
+                                        stored.
+        current_index (int):        Index of the currently handled figure. This helps knowing the
+                                        "progression" of the data loading process.
+        image_list_txt (str):       The path to the list of images to be loaded.
+        image_directory_path (str): The path to the directory where the images are stored.
     """
 
     def __init__(self,
                  image_list_txt: str,
                  image_directory_path: str = None):
         """
-        TODO
+        Init for ImageListFigureGenerator.
 
         Args:
-            image_list_txt (str):   The path of the list of images to be loaded.
-
+            image_list_txt (str):       The path to the list of images to be loaded.
+            image_directory_path (str): The path to the directory where the images are stored.
         """
         super().__init__()
 
         if not os.path.isfile(image_list_txt):
             raise FileNotFoundError("The evaluation list file does not exist :"\
-                "\n\t {}".format(image_list_txt))
+                                    "\n\t {}".format(image_list_txt))
 
         self.image_directory_path = image_directory_path
 
@@ -43,13 +69,14 @@ class ImageListFigureGenerator(FigureGenerator):
         Generator of Figure objects from a single csv annotation file.
 
         Yields:
-            figure (Figure): Figure objects without annotations.
+            figure (Figure):    Figure objects without annotations.
         """
 
         with open(self.image_list_txt, 'r') as image_list_file:
 
             for image_counter, line in enumerate(image_list_file.readlines()):
 
+                # Compute image path.
                 if self.image_directory_path is not None:
                     image_file_path = os.path.join(self.image_directory_path, line[:-1])
                 elif os.path.isfile(line):

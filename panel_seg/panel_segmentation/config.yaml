@@ -2,12 +2,12 @@
 OUTPUT_DIR: "panel_seg/panel_segmentation/output"
 
 MODEL:
-  META_ARCHITECTURE: "RetinaNet"
+  META_ARCHITECTURE: 'RetinaNet'
   BACKBONE:
     NAME: "build_retinanet_resnet_fpn_backbone"
     FREEZE_AT: 0
   RESNETS:
-    OUT_FEATURES: ["res2", "res3", "res4", "res5"]
+    OUT_FEATURES: ['res2', 'res3', 'res4', 'res5']
   PANEL_ANCHOR_GENERATOR:
     SIZES: !!python/object/apply:eval ["[[x, x * 2**(1.0/3), x * 2**(2.0/3) ] for x in [32, 64, 128, 256, 512]]"]
     ASPECT_RATIOS: !!python/object/apply:eval ["[[0.5, 1.0, 2.0]]"]
@@ -15,10 +15,10 @@ MODEL:
     SIZES: !!python/object/apply:eval ["[[x, x * 2**(1.0/3), x * 2**(2.0/3) ] for x in [16, 32, 64]]"]
     ASPECT_RATIOS: !!python/object/apply:eval ["[[0.5, 1.0, 2.0]]"]
   PANEL_FPN:
-    IN_FEATURES: ["res3", "res4", "res5"]
+    IN_FEATURES: ['res3', 'res4', 'res5']
     OUT_CHANNELS: 256
   LABEL_FPN:
-    IN_FEATURES: ["res2", "res3", "res4"]
+    IN_FEATURES: ['res2', 'res3', 'res4']
     OUT_CHANNELS: 64
   RETINANET:
     IOU_THRESHOLDS: [0.4, 0.5]
@@ -26,13 +26,13 @@ MODEL:
     NUM_LABEL_CLASSES: 50
     NMS_THRESH_TEST: 0.1
 
-    PANEL_IN_FEATURES: ["p3", "p4", "p5", "p6", "p7"]
-    LABEL_IN_FEATURES: ["p2", "p3", "p4"]
+    PANEL_IN_FEATURES: ['p3', 'p4', 'p5', 'p6', 'p7']
+    LABEL_IN_FEATURES: ['p2', 'p3', 'p4']
 
 DATASETS:
-  TRAIN: ("zou_panel_seg_train",)
-  TEST: ("zou_panel_seg_test",)
-  #TEST: ("pubmed",)
+  TRAIN: ('zou_panel_seg_train',)
+  TEST: ('zou_panel_seg_test',)
+  #TEST: ('pubmed',)
 
 SOLVER:
   # TODO I don't know why we can only fit 1 img/GPU here...

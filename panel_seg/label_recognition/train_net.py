@@ -1,6 +1,26 @@
 #!/usr/bin/env python
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+############################################
 Label Recognition detection training script.
 
 This scripts reads a given config file and runs the training or evaluation.
@@ -22,10 +42,8 @@ from detectron2.evaluation import verify_results
 from detectron2.data.build import build_detection_test_loader
 from detectron2.data.dataset_mapper import DatasetMapper
 
-from panel_seg.label_recognition.load_datasets import register_label_recognition_dataset
-from panel_seg.utils.detectron_utils.loss_eval_hook import LossEvalHook
-from panel_seg.label_recognition.evaluator import LabelRecogEvaluator
-from panel_seg.utils.detectron_utils.config import add_validation_config
+from panel_seg.label_recognition import register_label_recognition_dataset, LabelRecogEvaluator
+from panel_seg.utils.detectron_utils import LossEvalHook, add_validation_config
 
 
 class Trainer(DefaultTrainer):
@@ -45,9 +63,9 @@ class Trainer(DefaultTrainer):
         Builds the LabelRecogEvaluator that will be called at test time.
 
         Args:
-            cfg (CfgNode):       The config node filled with necessary options.
-            dataset_name (str):  The name of the test data set.
-            output_folder (str): The path of the output folder where to store the results
+            cfg (CfgNode):          The config node filled with necessary options.
+            dataset_name (str):     The name of the test data set.
+            output_folder (str):    The path of the output folder where to store the results
 
         Returns:
             LabelRecogEvaluator: The evaluator for testing label recognition results.
@@ -74,7 +92,9 @@ class Trainer(DefaultTrainer):
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            data_set_mapper = DatasetMapper(cfg=self.cfg, is_train=True)
+            data_set_mapper = DatasetMapper(cfg=self.cfg,
+                                            is_train=True)
+
             data_loader = build_detection_test_loader(cfg=self.cfg,
                                                       dataset_name=self.cfg.DATASETS.VALIDATION,
                                                       mapper=data_set_mapper)
@@ -107,6 +127,7 @@ def setup(args: List[str]) -> CfgNode:
     cfg.merge_from_list(args.opts)
     cfg.freeze()
     default_setup(cfg, args)
+
     return cfg
 
 

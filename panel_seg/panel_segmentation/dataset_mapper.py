@@ -197,8 +197,6 @@ class PanelSegDatasetMapper:
         # but not efficient on large generic data structures due to the use of pickle & mp.Queue.
         # Therefore it's important to use torch.Tensor.
         dataset_dict['image'] = torch.as_tensor(np.ascontiguousarray(image.transpose(2, 0, 1)))
-        dataset_dict.pop('file_name')
-        dataset_dict.pop('image_id')
 
         if not self.is_train:
             dataset_dict.pop('annotations', None)

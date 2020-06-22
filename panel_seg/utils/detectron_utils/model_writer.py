@@ -1,7 +1,28 @@
 """
-TODO
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+###########################################################################
+Custom hook to write the model graph (architecture) in TensorBoard storage.
 """
 
+from torch import nn
 from torch.utils.tensorboard import SummaryWriter
 
 from detectron2.engine.hooks import HookBase
@@ -10,18 +31,30 @@ from detectron2.engine.hooks import HookBase
 
 class ModelWriter(HookBase):
     """
-    TODO
+    Custom hook to write the model graph (architecture) in TensorBoard storage.
     """
 
-    def __init__(self, model, input_example, log_dir):
+    def __init__(self,
+                 model: nn.Module,
+                 input_example: dict,
+                 log_dir: str):
         """
-        TODO
+        Init function for the ModelWriter.
+
+        Args:
+            model (nn.Module):      The model to display in Tensorboard.
+            input_example (dict):   An exemple of a model input to infer the input shape.
+            log_dir (str):          The path to the folder where to store the output log.
         """
         self._model = model
         self._input_example = input_example
         self._log_dir = log_dir
 
-    def before_train(self):
 
+    def before_train(self):
+        """
+        Called at the beginning of the training process.
+        Write the model shape to the summary writer.
+        """
         SummaryWriter(log_dir=self._log_dir).add_graph(self._model,
                                                        self._input_example)

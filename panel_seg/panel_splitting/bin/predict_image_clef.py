@@ -1,67 +1,92 @@
 #!/usr/bin/env python3
+
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+##################################################################################
 Script to perform and evaluate the panel splitting task on the ImageCLEF data set.
 """
 
 import sys
-import argparse
+from argparse import ArgumentParser
+from typing import List
 
 sys.path.append(".")
 
-from panel_seg.data.figure_generators import image_clef_xml_figure_generator
+from panel_seg.data.figure_generators import ImageClefXmlFigureGenerator
 from panel_seg.panel_splitting.predict import predict
-from panel_seg.panel_splitting.evaluate import evaluate_predictions
+from panel_seg.panel_splitting.evaluate import evaluate_detections
 
 
-def parse_args(args):
+def parse_args(args: List[str]) -> ArgumentParser:
     """
     Parse the arguments from the command line.
 
     Args:
-        args: The arguments from the command line call.
+        args (List[str]):   The arguments from the command line call.
 
     Returns:
-        Populated namespace
+        parser (ArgumentParser):   Populated namespace.
     """
-    parser = argparse.ArgumentParser(description='Run panel splitting predictions for the"\
-                                                " ImageCLEF dataset and evaluate performance.')
+    parser = ArgumentParser(description="Run panel splitting predictions for the"\
+                                        " ImageCLEF dataset and evaluate performance.")
 
     parser.add_argument('--annotation_xml',
-                        help='The path to the xml annotation file.',
-                        default='data/ImageCLEF/test/FigureSeparationTest2016GT.xml',
+                        help="The path to the xml annotation file.",
+                        default="data/ImageCLEF/test/FigureSeparationTest2016GT.xml",
                         type=str)
 
     parser.add_argument('--image_directory_path',
-                        help='The path to the directory whre the images are stored.',
-                        default='data/ImageCLEF/test/FigureSeparationTest2016/',
+                        help="The path to the directory whre the images are stored.",
+                        default="data/ImageCLEF/test/FigureSeparationTest2016/",
                         type=str)
 
     return parser.parse_args(args)
 
 
-def main(args=None):
+def main(args: List[str] = None):
     """
     Load figures from ImageCLEF xml annotation files and test a model for the
     panel splitting task.
+
+    Args:
+        args (List[str]):   The arguments from the command line call.
     """
 
-    # parse arguments
+    # Parse arguments.
     if args is None:
         args = sys.argv[1:]
     args = parse_args(args)
 
     # Create the figure generator handling xml annotation files
-    figure_generator = image_clef_xml_figure_generator(
+    figure_generator = ImageClefXmlFigureGenerator(
         xml_annotation_file_path=args.annotation_xml,
         image_directory_path=args.image_directory_path)
 
     # Augment Figures by predicting panel locations
-    augmented_figure_generators = predict(figure_generator=figure_generator,
+    augmented_figure_generators = predict(figure_generator=figure_generator(),
                                           predict_function=None,
                                           pre_processing_function=None)
 
     # Evaluate predictions
-    evaluate_predictions(figure_generator=augmented_figure_generators)
+    evaluate_detections(figure_generator=augmented_figure_generators)
 
 
 if __name__ == '__main__':

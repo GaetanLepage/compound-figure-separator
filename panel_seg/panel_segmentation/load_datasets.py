@@ -1,16 +1,33 @@
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+#########################################################################################
 Load PanelSeg data set to be used with the Detectron API for the panel segmentation task.
 """
 
 from detectron2.data import DatasetCatalog, MetadataCatalog
 
-from panel_seg.data.figure_generators import IphotodrawXmlFigureGenerator
+from ..data.figure_generators import IphotodrawXmlFigureGenerator
 
-# TODO remove
-from panel_seg.data.figure_generators import ImageListFigureGenerator
-
-from panel_seg.data.export import export_figures_to_detectron_dict
-from panel_seg.utils.figure.label_class import LABEL_CLASS_MAPPING
+from ..data.export import export_figures_to_detectron_dict
+from ..utils.figure.label_class import LABEL_CLASS_MAPPING
 
 
 def register_panel_segmentation_dataset(dataset_name):

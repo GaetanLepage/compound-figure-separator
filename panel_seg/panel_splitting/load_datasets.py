@@ -1,15 +1,34 @@
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+###############################################################################
 Load ImageCLEF and PanelSeg data sets to be used with the Detectron API for the
 panel splitting task.
 """
 
 from detectron2.data import DatasetCatalog, MetadataCatalog
 
-from panel_seg.data.figure_generators import (
+from ..data.figure_generators import (
     ImageClefXmlFigureGenerator,
     IphotodrawXmlFigureGenerator)
-
-from panel_seg.data.export import export_figures_to_detectron_dict
+from ..data.export import export_figures_to_detectron_dict
 
 
 def register_panel_splitting_dataset(dataset_name: str):
@@ -20,14 +39,15 @@ def register_panel_splitting_dataset(dataset_name: str):
     TODO: get detectron logger and WARN if dataset name is not valid
 
     Args:
-        dataset_name (str): The name of the data set to register. Has to belong to accepted ones.
+        dataset_name (str): The name of the data set to register.
+                                Has to belong to accepted ones.
     """
-
     # ImageCLEF dataset
     if "image_clef" in dataset_name:
 
         if dataset_name == "image_clef_train":
-            xml_annotation_file_path = "data/ImageCLEF/training/FigureSeparationTraining2016-GT.xml"
+            xml_annotation_file_path = \
+                "data/ImageCLEF/training/FigureSeparationTraining2016-GT.xml"
             image_directory_path = "data/ImageCLEF/training/FigureSeparationTraining2016/"
 
         elif dataset_name == "image_clef_test":
@@ -41,8 +61,7 @@ def register_panel_splitting_dataset(dataset_name: str):
             # TODO warn the user in this case
             pass
 
-        # TODO might be useful to implement generators as a class
-        # Create two instances of the figure_generator so that one is given to the metadata
+        # Instanciate the FigureGenerator
         figure_generator = ImageClefXmlFigureGenerator(
             xml_annotation_file_path=xml_annotation_file_path,
             image_directory_path=image_directory_path)
@@ -59,6 +78,7 @@ def register_panel_splitting_dataset(dataset_name: str):
             # TODO warn the user in this case
             pass
 
+        # Instanciate the FigureGenerator
         figure_generator = IphotodrawXmlFigureGenerator(eval_list_txt=eval_list_txt)
 
     else:

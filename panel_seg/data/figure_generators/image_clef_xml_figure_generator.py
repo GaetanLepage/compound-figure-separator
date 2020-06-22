@@ -1,20 +1,50 @@
 """
-TODO
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+#################################################
+Figure generator handling the ImageCLEF data set.
 """
 
 import os
-import sys
 import logging
 import xml.etree.ElementTree as ET
 
-from panel_seg.utils.figure.figure import Figure
-from panel_seg.utils.figure.panel import Panel
+from ...utils.figure.figure import Figure
+from ...utils.figure.panel import Panel
 from .figure_generator import FigureGenerator
 
 
 class ImageClefXmlFigureGenerator(FigureGenerator):
     """
-    TODO
+    Generator of Figure objects from the ImageCLEF data set.
+
+    Attributes:
+        data_dir (str):                         The path to the directory where the image data
+                                                    sets are stored.
+        current_index (int):                    Index of the currently handled figure. This helps
+                                                    knowing the "progression" of the data loading
+                                                    process.
+        annotation_items (List[ET.Element]):    List of annotations for the whole data set.
+        num_images (int):                       The number of images in the data set.
+        image_directory_path (str):             Path to the directory where image files are
+                                                    stored.
     """
 
     def __init__(self,
@@ -24,38 +54,50 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
         Generator of Figure objects from ImageCLEF data set.
 
         Args:
-            xml_annotation_file_path (str):     The path of the xml annotation file.
-            image_directory_path (str):         The path of the directory where the images are
-                                                    stored.
+            xml_annotation_file_path (str): The path of the xml annotation file.
+            image_directory_path (str):     The path of the directory where the images are stored.
 
         Yields:
             figure (Figure): Figure objects with annotations.
         """
 
-        # Open and parse the xml annotation file
+        # Open and parse the xml annotation file.
         tree = ET.parse(xml_annotation_file_path)
 
-        # get root element
+        # Get root element.
         root = tree.getroot()
 
+        # Get the annotation data from the parsed xml.
         self.annotation_items = root.findall('./annotation')
 
         # Total number of images
         self.num_images = len(self.annotation_items)
 
+        # path of the directory where the images are stored.
         self.image_directory_path = image_directory_path
 
 
     def __call__(self) -> Figure:
+        """
+        'Generator' method yielding annotated figures from the ImageCLEF data set.
 
+        Yields:
+            figure (Figure): Figure objects with annotations.
+        """
+
+        # Loop over the annotation items.
         for annotation_index, annotation_item in enumerate(self.annotation_items):
+
+            # Image filename
             filename_item = annotation_item.find('./filename')
             image_filename = filename_item.text
 
+            # Image path
             image_path = os.path.join(
                 self.image_directory_path,
                 image_filename + '.jpg')
 
+            # TODO maybe set up a verbose mode
             # print('Processing Image {}/{} : {}'.format(
                 # annotation_index + 1,
                 # num_images,
@@ -73,7 +115,7 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
                 continue
 
             # Loop over the panels (object_items)
-            panels = list()
+            panels = []
             object_items = annotation_item.findall('./object')
             for object_item in object_items:
 

@@ -1,14 +1,37 @@
 """
-Export tools for panel-seg datasets
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+####################################
+Export tools for panel-seg datasets.
 """
+
+from typing import Iterable
 
 import csv
 import tensorflow as tf
 
+from ..utils.figure import Figure
 from ..utils.figure.label_class import LABEL_CLASS_MAPPING
 
 
-def export_figures_to_csv(figure_generator: iter,
+def export_figures_to_csv(figure_generator: Iterable[Figure],
                           output_csv_file: str,
                           individual_export: bool = False,
                           individual_export_csv_directory: str = None):
@@ -17,7 +40,7 @@ def export_figures_to_csv(figure_generator: iter,
     This may be used for keras-retinanet.
 
     Args:
-        figure_generator (iter):                A generator yielding figure objects
+        figure_generator (Iterable[Figure]):    A generator yielding figure objects
         output_csv_file (str):                  The path of the csv file containing the
                                                     annotations
         individual_csv (bool):                  If True, also export the annotation to a single
@@ -60,14 +83,14 @@ def export_figures_to_csv(figure_generator: iter,
                         csv_export_dir=individual_export_csv_directory)
 
 
-def export_figures_to_tf_record(figure_generator: iter,
+def export_figures_to_tf_record(figure_generator: Iterable[Figure],
                                 tf_record_filename: str):
     """
     Convert a set of figures to a a TensorFlow records file.
 
     Args:
-        figure_generator (iter):    A generator yielding figure objects.
-        tf_record_filename (str):   Path to the output tf record file.
+        figure_generator (Iterable[Figure]):    A generator yielding figure objects.
+        tf_record_filename (str):               Path to the output tf record file.
     """
 
     with tf.io.TFRecordWriter(tf_record_filename) as writer:
@@ -79,14 +102,14 @@ def export_figures_to_tf_record(figure_generator: iter,
             writer.write(tf_example.SerializeToString())
 
 
-def export_figures_to_detectron_dict(figure_generator: iter,
+def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
                                      task: str = 'panel_splitting') -> dict:
     """
     Export a set of Figure objects to a dict which is compatible with Facebook Detectron 2.
 
     Args:
-        figure_generator (iter):    A generator yielding figure objects.
-        task (str):                 The task for which to export the figures.
+        figure_generator (Iterable[Figure]):    A generator yielding figure objects.
+        task (str):                             The task for which to export the figures.
 
     Returns:
         dataset_dicts (dict): A dict representing the data set.
@@ -101,10 +124,10 @@ def export_figures_to_detectron_dict(figure_generator: iter,
     for index, figure in enumerate(figure_generator):
         record = {}
 
-        record["file_name"] = figure.image_path
-        record["image_id"] = index
-        record["height"] = figure.image_height
-        record["width"] = figure.image_width
+        record['file_name'] = figure.image_path
+        record['image_id'] = index
+        record['height'] = figure.image_height
+        record['width'] = figure.image_width
 
         objs = []
 
@@ -114,9 +137,9 @@ def export_figures_to_detectron_dict(figure_generator: iter,
 
                 if task == 'panel_splitting':
                     obj = {
-                        "bbox": panel.panel_rect,
-                        "bbox_mode": BoxMode.XYXY_ABS,
-                        "category_id": 0
+                        'bbox': panel.panel_rect,
+                        'bbox_mode': BoxMode.XYXY_ABS,
+                        'category_id': 0
                     }
 
                 elif task == 'label_recog':
@@ -126,9 +149,9 @@ def export_figures_to_detectron_dict(figure_generator: iter,
                         continue
 
                     obj = {
-                        "bbox": panel.label_rect,
-                        "bbox_mode": BoxMode.XYXY_ABS,
-                        "category_id": LABEL_CLASS_MAPPING[panel.label]
+                        'bbox': panel.label_rect,
+                        'bbox_mode': BoxMode.XYXY_ABS,
+                        'category_id': LABEL_CLASS_MAPPING[panel.label]
                     }
 
                 # panel segmentation task

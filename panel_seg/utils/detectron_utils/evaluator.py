@@ -1,18 +1,37 @@
 """
-TODO
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+################################################################
+Definition of a meta-evaluator for the panel segmentation tasks.
 """
 
 import logging
-from typing import List
+from typing import List, Dict
 from collections import defaultdict, OrderedDict
 from pprint import pprint
-
 import torch
 
 from detectron2.data import MetadataCatalog
 from detectron2.evaluation.evaluator import DatasetEvaluator
 from detectron2.utils import comm
-from panel_seg.utils.figure.figure import Figure
+from ..figure.figure import Figure
 
 class PanelSegAbstractEvaluator(DatasetEvaluator):
     """
@@ -24,21 +43,21 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
 
     def __init__(self,
-                 dataset_name,
-                 task_name,
-                 evaluation_function):
+                 dataset_name: str,
+                 task_name: str,
+                 evaluation_function: callable):
         """
-        init function.
+        Init function.
 
-        # TODO change default value for tasks
-        # TODO manage output results in csv or xml or other
-        # TODO test if outputed xml gives same results (metrics) if using the java tool from
+        TODO change default value for tasks
+        TODO manage output results in csv or xml or other
+        TODO test if outputed xml gives same results (metrics) if using the java tool from
         ImageCLEF
 
         Args:
-            dataset_name (str):             name of the dataset.
-            task_name (str):                name of the task.
-            evaluation_function (function): function taking a figure generator as input and
+            dataset_name (str):             Name of the dataset.
+            task_name (str):                Name of the task.
+            evaluation_function (function): Function taking a figure generator as input and
                                                 returning a dict of metric results.
         """
         self._dataset_name = dataset_name
@@ -70,12 +89,13 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         Process the pair of inputs and outputs.
         If they contain batches, the pairs can be consumed one-by-one using `zip`:
 
-        This method has to be implemented.
+        This method is abstract and has to be implemented.
 
         Args:
-            inputs (list): the inputs that's used to call the model.
-            outputs (list): the return value of `model(inputs)`
+            inputs (List[dict]):    The inputs that's used to call the model.
+            outputs (List[dict]):   The return value of `model(inputs)`.
         """
+        raise NotImplementedError("This method should be implmented in each subclass.")
 
 
     def _augmented_figure_generator(self,
@@ -92,29 +112,33 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         Yields:
             figure (Figure): Figure objects augmented with predictions.
         """
+        raise NotImplementedError("This method is abstract and needs to be implemented.")
 
 
-    def evaluate(self) -> dict:
+    def evaluate(self) -> Dict[str, Dict[str, int]]:
         """
-        Evaluate/summarize the performance, after processing all input/output pairs.
+        Evaluate/summarize the performance after processing all input/output pairs.
 
         Returns:
-            dict:   A dict containing the computed metrics.
-                        * key:      The name of the task ('panel_splitting', 'label_recognition',
-                                        'panel_segmentation')
-                        * value:    A dict of {metric name: score}, e.g.: {"AP50": 80}
+            dict (Dict[str, Dict[str, int]]):
+                A dict containing the computed metrics.
+                    * key (str):                The name of the task ('panel_splitting',
+                                                    'label_recognition', 'panel_segmentation').
+                    * value (Dict[str, int]):   A dict of {metric name: score},
+                                                    e.g.: {"AP50": 80}.
         """
-        # Gathering
+        # Gather predictions on the main device.
         all_predictions = comm.gather(self._predictions, dst=0)
         if not comm.is_main_process():
-            # TODO maybe return None instead of nothing
             return
+
         predictions = defaultdict(dict)
         for predictions_per_rank in all_predictions:
             for clsid, lines in predictions_per_rank.items():
                 predictions[clsid] = lines
         del all_predictions
 
+        # Evaluate the metrics on the predictions.
         metrics_dict = self._evaluation_function(
             figure_generator=self._augmented_figure_generator(predictions))
 

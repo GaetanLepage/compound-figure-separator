@@ -1,4 +1,26 @@
+#!/usr/bin/env python3
+
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+#######################################################################
 Script to visualize a "csv annotated" data set by displaying the images
 along with the corresponding bounding boxes and labels.
 """
@@ -10,8 +32,8 @@ from typing import List
 
 sys.path.append('.')
 
-from panel_seg.data.figure_generators import GlobalCsvFigureGenerator
-from panel_seg.data.figure_viewer import parse_viewer_args, view_data_set
+from ..figure_generators import GlobalCsvFigureGenerator
+from ..figure_viewer import parse_viewer_args, view_data_set
 
 
 def parse_args(args: List[str]) -> ArgumentParser:
@@ -19,10 +41,10 @@ def parse_args(args: List[str]) -> ArgumentParser:
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]): The arguments from the command line call.
+        args (List[str]):   The arguments from the command line call.
 
     Returns:
-        (ArgumentParser): Populated namespace.
+        parser (ArgumentParser):    Populated namespace.
     """
     parser = ArgumentParser(description="Preview all the figures from a data set"\
                                         " represented by a csv annotation file.")
@@ -41,10 +63,10 @@ def main(args: List[str] = None):
     Launch previsualization of a csv data set.
 
     Args:
-        args (List[str]): Arguments from the command line.
+        args (List[str]):   Arguments from the command line.
     """
 
-    # parse arguments
+    # Parse arguments.
     if args is None:
         args = sys.argv[1:]
     args = parse_args(args)

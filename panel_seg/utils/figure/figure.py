@@ -1,4 +1,24 @@
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+############################
 Class representing a figure.
 """
 
@@ -7,14 +27,12 @@ import csv
 import logging
 import io
 import hashlib
-from typing import List
+from typing import List, Tuple
 import xml.etree.ElementTree as ET
 
+import numpy as np
 import PIL.Image
-
-
 import tensorflow as tf
-
 from cv2 import cv2
 
 from .panel import Panel
@@ -26,22 +44,31 @@ from . import label_class
 
 class Figure:
     """
-    A class for a Figure
+    A class representing a Figure (and eventually ground truth and/or predicted annotations).
 
     Attributes:
-        image_path: is the path to the figure image file
-        id: is the unique id to each figure
-        image_orig: is the original color image
-        panels: contain all panels
+        index (int):                            The unique id to each figure.
+        image_path (str):                       The path to the figure image file.
+        image_filename (str):                   Image file name.
+        image_format (str):                     The format of the image file (jpg, png,...).
+        image (np.ndarray):                     The image data.
+        image_width (int):                      The image width (in pixels).
+        image_height (int):                     The image height (in pixels).
+        preview_image (np.ndarray):             The preview image (image + bounding boxes)
+        gt_panels (List[Panel]):                Ground truth panel objects.
+        detected_panels (List[DetectedPanel]):  Detected panel objects.
     """
 
-    def __init__(self, image_path: str, index: int):
+    def __init__(self,
+                 image_path: str,
+                 index: int):
         """
-        Constructor for a Figure object.
+        Init for a Figure object.
+        Neither the image or the annotations are loaded at this stage.
 
         Args:
-            image_path: path to the image file
-            index:      A unique index to identify the figure within the data set
+            image_path (str): The path to the figure image file.
+            index (int):      A unique index to identify the figure within the data set.
         """
 
         # Figure identifier
@@ -72,18 +99,17 @@ class Figure:
 
     def load_image(self):
         """
-        Load the image using `self.image_path` and stores it
-        in `self.image`.
+        Load the image using `self.image_path` and stores it in `self.image`.
         """
 
+        # No need to reload the image if it has already been done.
         if self.image is not None:
             return
 
         # check if the image file exists
         if not os.path.isfile(self.image_path):
-            raise FileNotFoundError(
-                "The following image file does not exist and thus"\
-                    " cannot be loaded:\n\t{}".format(self.image_path))
+            raise FileNotFoundError("The following image file does not exist and thus"\
+                                    " cannot be loaded:\n\t{}".format(self.image_path))
 
         # Open the file
         img = cv2.imread(self.image_path)
@@ -101,20 +127,21 @@ class Figure:
 
     def load_annotation_from_csv(self,
                                  annotations_folder: str,
-                                 is_ground_truth=True):
+                                 is_ground_truth: bool = True):
         """
         Load figure annotations from the given (individual) csv file.
 
         Args:
-            annotations_folder: Path to an annotation file (csv format).
-            is_ground_truth:    Tells whether annotations are ground truth or predictions
-                                    If True, annotations will be stored in `self.gt_panels`
-                                    else, in `self.detected_panels`
+            annotations_folder (str):   Path to an annotation file (csv format).
+            is_ground_truth (bool):     Tells whether annotations are ground truth or predictions.
+                                            If True, annotations will be stored in
+                                            `self.gt_panels` else, in `self.detected_panels`.
         """
-
+        # Get image file base name (without extension).
         base_name = os.path.splitext(self.image_filename)[0]
 
-        annotation_csv = os.path.join(annotations_folder, base_name)
+        # Compute the path to the annotation csv file.
+        annotation_csv = os.path.join(annotations_folder, base_name, '.csv')
 
         if not os.path.isfile(annotation_csv):
             raise FileNotFoundError("The annotation csv file does not exist :"\
@@ -134,12 +161,14 @@ class Figure:
                 if len(row) == 11:
                     label_coordinates = [int(x) for x in row[6:10]]
                     label = label_class.map_label(row[10])
+
                 # Panel splitting only
                 elif len(row) == 6:
                     label_coordinates = None
                     label = None
                 else:
-                    raise ValueError("Row should be of length 6 or 11")
+                    raise ValueError("Row should be of length 6 or 11.\n\t"\
+                                     f"Current row has length {len(row)}: {row}")
 
                 image_path = row[0]
                 panel_coordinates = [int(x) for x in row[1:5]]
@@ -147,9 +176,8 @@ class Figure:
                 assert panel_class == 'panel'
 
                 assert image_path == self.image_path, "Wrong image path in csv:"\
-                    "\n\timage file name : {}"\
-                    "\n\timage in csv row : {}".format(self.image_path,
-                                                       image_path)
+                    f"\n\timage file name : {self.image_path}"\
+                    f"\n\timage in csv row : {image_path}"
 
                 # Instanciate Panel object
                 panel = Panel(panel_rect=panel_coordinates,
@@ -158,6 +186,7 @@ class Figure:
 
                 panels.append(panel)
 
+        # Store the Panel objects in the right class attribute.
         if is_ground_truth:
             self.gt_panels = panels
         else:
@@ -169,41 +198,41 @@ class Figure:
                                         annotation_file_path: str):
         """
         Load iPhotoDraw annotation.
-        Deal with Zou's data set
+        Deal with PanelSeg data set.
 
         Args:
-            annotation_file_path
+            annotation_file_path (str): The path to the xml file containing annotations.
         """
 
-        def extract_bbox_from_iphotodraw_node(item):
+        def extract_bbox_from_iphotodraw_node(item: ET.Element) -> Tuple[int, int, int, int]:
             """
             Extract bounding box information from Element item (ElementTree).
             It also makes sure that the bounding box is within the image.
 
             Args:
-                item (Element item): Either a panel or label item extracted from
-                                        an iPhotoDraw xml annotation file.
-                image_width (int):   The width of the image
-                image_height (int):  The height of the image
+                item (ET.Element):  Either a panel or label item extracted from an iPhotoDraw
+                                        xml annotation file.
 
             Returns:
-                return (x_min, y_min, x_max, y_max): The coordinates of the bounding box
+                x_min, y_min, x_max, y_max (Tuple[int, int, int, int]): The coordinates of the
+                                                                            bounding box
             """
             extent_item = item.find('./Data/Extent')
 
-            # Get data from the xml item
+            # Get data from the xml item.
             height_string = extent_item.get('Height')
             width_string = extent_item.get('Width')
 
             x_string = extent_item.get('X')
             y_string = extent_item.get('Y')
 
-            # Compute coordinates of the bounding box
+            # Compute coordinates of the bounding box.
             x_min = round(float(x_string))
             y_min = round(float(y_string))
             x_max = x_min + round(float(width_string))
             y_max = y_min + round(float(height_string))
 
+            # Clip values with respect to the image shape.
             if x_min < 0:
                 x_min = 0
             if y_min < 0:
@@ -221,7 +250,7 @@ class Figure:
             Extract information from and validate all panel items
 
             Returns:
-                panels: a list of Panel objects
+                panels (List[Panel]): A list of Panel objects.
             """
             panels = []
             for panel_item in panel_items:
@@ -230,7 +259,7 @@ class Figure:
                 label_text = label_text.strip()
                 words = label_text.split(' ')
 
-                # Panels can only have 1 or 2 words :
+                # Panels can only have 1 or 2 words:
                 # *) The first one is "panel"
                 # *) The second one is the label letter
                 if len(words) > 2:
@@ -254,13 +283,12 @@ class Figure:
                             # annotation_file_path,
                             # label_text)
 
-                # The text only contains a single panel
+                # The text only contains a single panel.
                 # => no label
                 else:
                     label_text = ''
 
-                x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(
-                    item=panel_item)
+                x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(item=panel_item)
 
                 if x_max <= x_min or y_max <= y_min:
                     # TODO check what to do in this case
@@ -272,10 +300,9 @@ class Figure:
 
                 # Create Panel object
                 panel_rect = [x_min, y_min, x_max, y_max]
-                panel = Panel(
-                    label=label_text,
-                    panel_rect=panel_rect,
-                    label_rect=None)
+                panel = Panel(label=label_text,
+                              panel_rect=panel_rect,
+                              label_rect=None)
 
                 panels.append(panel)
 
@@ -284,10 +311,10 @@ class Figure:
 
         def extract_label_info() -> List[Panel]:
             """
-            Extract information from and validate all label items
+            Extract information from and validate all label items.
 
             Returns:
-                A list of Panel objects representing the detected labels.
+                labels (List[Panel]):   A list of Panel objects representing the detected labels.
             """
             labels = []
             for label_item in label_items:
@@ -312,22 +339,18 @@ class Figure:
 
                 label_text = label_class.map_label(label_text)
 
-                x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(
-                    item=label_item)
+                x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(item=label_item)
 
                 if x_max <= x_min or y_max <= y_min:
-                    logging.error(
-                        '%s: label %s rect is not correct!',
-                        annotation_file_path,
-                        label_text)
+                    logging.error(f"{annotation_file_path}: label {label_text} rect is not"\
+                                   " correct!")
                     continue
 
                 label_rect = [x_min, y_min, x_max, y_max]
                 # We use Panel objects temporarily
-                label = Panel(
-                    label=label_text,
-                    panel_rect=None,
-                    label_rect=label_rect)
+                label = Panel(label=label_text,
+                              panel_rect=None,
+                              label_rect=label_rect)
 
                 labels.append(label)
 
@@ -338,45 +361,42 @@ class Figure:
                                      labels: List[Panel]) -> List[Panel]:
             """
             Match both lists to get a unique list of panels containing
-            information of their matching label
+            information of their matching label.
 
             Args:
-                panels: list of panels without label information
-                labels: list of labels without panel information
+                panels (List[Panel]):   List of panels without label information.
+                labels (List[Panel]):   List of labels without panel information.
 
             Returns:
-                Updated list of panels
+                panels (List[Panel]):   Updated list of panels.
             """
             if len(labels) != 0 and len(labels) != len(panels):
-                logging.warning(
-                    "%s: has different panel and label rects. Most likely there"\
-                        " are mixes with-label and without-label panels",
-                    annotation_file_path)
+                logging.warning(f"{annotation_file_path}: has different panel and label rects."\
+                                 " Most likely there are mixes with-label and without-label"\
+                                 " panels.")
 
-            # collect all panel label characters
+            # Collect all panel label characters.
             char_set = set()
             for panel in panels:
                 if len(panel.label) != 0:
                     char_set.add(panel.label)
 
-            # build panel dictionary according to labels
+            # Build panel dictionary according to labels.
             panel_dict = {s: [] for s in char_set}
             for panel in panels:
                 if len(panel.label) != 0:
                     panel_dict[panel.label].append(panel)
 
-            # build label dictionary according to labels
+            # Build label dictionary according to labels.
             label_dict = {s: [] for s in char_set}
             for label in labels:
                 label_dict[label.label].append(label)
 
-            # assign labels to panels
+            # Assign labels to panels.
             for label_char in char_set:
                 if len(panel_dict[label_char]) != len(label_dict[label_char]):
-                    logging.error(
-                        '%s: panel %s does not have same matching labels!',
-                        annotation_file_path,
-                        label_char)
+                    logging.error(f"{annotation_file_path}: panel {label_char} does not have"\
+                                   " same matching labels!")
                     continue
 
 
@@ -395,10 +415,10 @@ class Figure:
             return panels
 
 
-        # create element tree object
+        # Create element tree object.
         tree = ET.parse(annotation_file_path)
 
-        # get root element
+        # Get root element.
         root = tree.getroot()
 
         shape_items = root.findall('./Layers/Layer/Shapes/Shape')
@@ -417,19 +437,18 @@ class Figure:
                 self._logger.error('%s: has unknown <shape> xml items %s',
                                    annotation_file_path, text)
 
-        # Extract information from and validate all panel items
+        # Extract information from and validate all panel items.
         panels = extract_panel_info()
 
-        # Extract information from and validate all label items
+        # Extract information from and validate all label items.
         labels = extract_label_info()
 
         # Match both lists to get a unique list of panels containing
-        #   information of their matching label
+        # information of their matching label.
         # Save this list of panels in tha appropriate attribute of
-        #   the figure object
+        # the figure object.
         self.gt_panels = match_panels_with_labels(panels=panels,
                                                   labels=labels)
-
 
 ##############
 # EVALUATION #
@@ -439,20 +458,19 @@ class Figure:
                                                     iou_threshold: float = 0.5,
                                                     overlap_threshold: float = 0.66):
         """
-        TODO: update doc as this method radically changed.
-        Compute the number of rightly predicted panels for the figure according to one of the
-        following criteria:
-            * A predicted panel which has an IoU > `iou_threshold` (0.5 by default) with a
-                ground truth panel is counted as a positive match regarding the "IoU criterion".
-                => This criterion is the one to compute precision, recall, mAP.
+        Match the detected panels with a ground truth one.
+        The `self.detected_panels` attribute is modified by side effect.
+        * A predicted panel which has an IoU > `iou_threshold` (0.5 by default) with a
+            ground truth panel is counted as a positive match regarding the "IoU criterion".
+            => This criterion is the one to compute precision, recall, mAP.
 
-            * A predicted panel which has an overlap > `overlap_threshold` (0.66 by default) with
-                a ground truth panel is counted as a positive match regarding the
-                "ImageCLEF citerion".
-                => This criterion is the one to compute the ImageCLEF accuracy.
-                (see http://ceur-ws.org/Vol-1179/CLEF2013wn-ImageCLEF-SecoDeHerreraEt2013b.pdf)
+        * A predicted panel which has an overlap > `overlap_threshold` (0.66 by default) with
+            a ground truth panel is counted as a positive match regarding the
+            "ImageCLEF citerion".
+            => This criterion is the one to compute the ImageCLEF accuracy.
+            (see http://ceur-ws.org/Vol-1179/CLEF2013wn-ImageCLEF-SecoDeHerreraEt2013b.pdf)
 
-        ==> Use this to evaluate the 'panel splitting' task.
+        ==> Panel splitting task.
 
         Args:
             iou_threshold (float):      Threshold above which a prediction is considered to be
@@ -460,7 +478,7 @@ class Figure:
             overlap_threshold (float):  Threshold above which a prediction is considered to be
                                             true with respect to the overlap value.
         """
-
+        # Keep track of the associations.
         picked_gt_panels_overlap = [False] * len(self.gt_panels)
         picked_gt_panels_iou = [False] * len(self.gt_panels)
 
@@ -483,6 +501,7 @@ class Figure:
                 # --> Using ImageCLEF metric (overlap)
                 overlap = intersection_area / detected_panel_area
 
+                # Potential match
                 if overlap > max_overlap:
                     max_overlap = overlap
                     best_matching_gt_panel_overlap_index = gt_panel_index
@@ -490,105 +509,131 @@ class Figure:
                 # --> Using IoU (common for object detection)
                 iou = box.iou(gt_panel.panel_rect, detected_panel.panel_rect)
 
+                # Potential match
                 if iou > max_iou:
                     max_iou = iou
                     best_matching_gt_panel_iou_index = gt_panel_index
 
-
+            # Check that gt and detected panels are overlapping enough.
+            # ==> True positive (w.r.t IoU criterion)
             if max_iou > iou_threshold \
                     and not picked_gt_panels_iou[best_matching_gt_panel_iou_index]:
                 picked_gt_panels_iou[best_matching_gt_panel_iou_index] = True
                 detected_panel.panel_is_true_positive_iou = True
 
+            # ==> False positive (w.r.t IoU criterion)
             else:
                 detected_panel.panel_is_true_positive_iou = False
 
+            # Check that gt and detected panels are overlapping enough.
+            # ==> True positive (w.r.t overlap criterion)
             if max_overlap > overlap_threshold \
                     and not picked_gt_panels_overlap[best_matching_gt_panel_overlap_index]:
                 picked_gt_panels_overlap[best_matching_gt_panel_overlap_index] = True
                 detected_panel.panel_is_true_positive_overlap = True
 
+            # ==> False positive (w.r.t overlap criterion)
             else:
                 detected_panel.panel_is_true_positive_overlap = False
 
 
     def match_detected_and_gt_labels(self, iou_threshold: float = 0.5):
         """
-        TODO
-        Compute the number of rightly predicted labels for the figure :
-        A predicted panel which has an IoU > `threshold` (0.5 by default) with a
-        ground truth panel is counted as a positive match
+        Match the detected labels (and their label) with a ground truth one.
+        The comparison criterion is the IoU which is maximized.
+        The `self.detected_panels` attribute is modified by side effect.
 
-        ==> Use this to evaluate the 'label recognition' task.
+        ==> Label recognition task.
 
-        TODO comment the code
-
-        Returns:
-            num_correct (int): The number of accurate predictions.
+        Args:
+            iou_threshold (float):  IoU threshold above which a prediction is considered to be
+                                        true.
         """
-
+        # Keep track of the associations.
         picked_gt_panels_indices = [False] * len(self.gt_panels)
 
+        # Loop over detected labels.
         for detected_panel in self.detected_panels:
             max_iou = -1
             best_matching_gt_panel_index = -1
 
             for gt_panel_index, gt_panel in enumerate(self.gt_panels):
 
+                # TODO laverage the 'single-character label' restriction.
                 if gt_panel.label_rect is None or len(gt_panel.label) != 1:
                     continue
 
-                # If the label classes do not match, no need to compute the IoU
+                # If the label classes do not match, no need to compute the IoU.
                 if gt_panel.label != detected_panel.label:
                     continue
 
+                # Compute IoU between detection and ground truth.
                 iou = box.iou(gt_panel.label_rect, detected_panel.label_rect)
 
+                # Potential match
                 if iou > max_iou:
                     max_iou = iou
                     best_matching_gt_panel_index = gt_panel_index
 
+            # Check that gt and detected panels are overlapping enough.
+            # ==> True positive
             if max_iou > iou_threshold\
                     and not picked_gt_panels_indices[best_matching_gt_panel_index]:
                 picked_gt_panels_indices[best_matching_gt_panel_index] = True
                 detected_panel.label_is_true_positive = True
 
+            # ==> False positive
             else:
                 detected_panel.label_is_true_positive = False
 
 
-    # Panel segmentation
     def match_detected_and_gt_panels_segmentation_task(self,
                                                        iou_threshold: float = 0.5):
         """
-        TODO
+        Match the detected panels (and their label) with a ground truth one.
+        The comparison criterion is the IoU which is maximized.
+        The `self.detected_panels` attribute is modified by side effect.
+
+        ==> Panel segmentation task.
+
+        Args:
+            iou_threshold (float):  IoU threshold above which a prediction is considered to be
+                                        true.
         """
+        # Keep track of the associations.
         picked_gt_panels_indices = [False] * len(self.gt_panels)
 
+        # Loop over detected panels.
         for detected_panel in self.detected_panels:
             max_iou = -1
             best_matching_gt_panel_index = -1
 
             for gt_panel_index, gt_panel in enumerate(self.gt_panels):
 
+                # TODO laverage the 'single-character label' restriction.
                 if gt_panel.label_rect is None or len(gt_panel.label) != 1:
                     continue
 
-                # If the label classes do not match, no need to compute the IoU
+                # If the label classes do not match, no need to compute the IoU.
                 if gt_panel.label != detected_panel.label:
                     continue
 
+                # Compute IoU between detection and ground truth.
                 iou = box.iou(gt_panel.panel_rect, detected_panel.panel_rect)
 
+                # Potential match
                 if iou > max_iou:
                     max_iou = iou
                     best_matching_gt_panel_index = gt_panel_index
 
+            # Check that gt and detected panels are overlapping enough.
+            # ==> True positive
             if max_iou > iou_threshold\
                     and not picked_gt_panels_indices[best_matching_gt_panel_index]:
                 picked_gt_panels_indices[best_matching_gt_panel_index] = True
                 detected_panel.panel_is_true_positive = True
 
+            # ==> False positive
             else:
                 detected_panel.panel_is_true_positive = False
 
@@ -597,7 +642,7 @@ class Figure:
 # PREVIEW FIGURE #
 ##################
 
-    def get_preview(self, mode='gt'):
+    def get_preview(self, mode='gt') -> np.ndarray:
         """
         Generate an image preview for the figure.
         It consists in drawing the panels (and labels, if applicable) bounding boxes
@@ -610,7 +655,7 @@ class Figure:
                     * 'both': both predicted and ground truth annotations.
 
         Returns:
-            preview_img: the preview image
+            preview_img (np.ndarray): the preview image
         """
 
         if mode not in ('gt', 'pred', 'both'):
@@ -675,18 +720,21 @@ class Figure:
         return preview_img
 
 
-    def show_preview(self, mode='gt', delay=0, window_name=None):
+    def show_preview(self,
+                     mode: str = 'gt',
+                     delay: int = 0,
+                     window_name: str = None):
         """
         Display a preview of the image along with the panels and labels drawn on top.
 
         Args:
-            mode: Select which information to display:
-                    * 'gt': only the ground truth
-                    * 'pred': only the predictions
-                    * 'both': both predicted and ground truth annotations.
-            delay:       The number of seconds after which the window is closed
-                if 0, the delay is disabled.
-            window_name: Name of the image display window.
+            mode (str):         Select which information to display:
+                                    * 'gt': only the ground truth
+                                    * 'pred': only the predictions
+                                    * 'both': both predicted and ground truth annotations.
+            delay (int):        The number of seconds after which the window is closed
+                                    if 0, the delay is disabled.
+            window_name (str):  Name of the image display window.
         """
 
         image_preview = self.get_preview(mode)
@@ -699,24 +747,29 @@ class Figure:
         cv2.destroyAllWindows()
 
 
-    def save_preview(self, mode='gt', folder: str = None):
+    def save_preview(self,
+                     mode: str = 'gt',
+                     folder: str = None):
         """
         Save the annotation preview at folder.
 
         Args:
-            folder (str): The folder where to store the image preview.
-            mode (str): Select which information to display:
-                        * 'gt': only the ground truth
-                        * 'pred': only the predictions
-                        * 'both': both predicted and ground truth annotations.
+            mode (str):     Select which information to display:
+                                * 'gt': only the ground truth
+                                * 'pred': only the predictions
+                                * 'both': both predicted and ground truth annotations.
+            folder (str):   The folder where to store the image preview.
         """
+        # Get the preview image.
         preview_img = self.get_preview(mode)
 
+        # Default output directory.
         if folder is None:
             folder = os.path.join(os.path.dirname(self.image_path),
                                   'preview/')
 
 
+        # Create the preview directory (if needed).
         if not os.path.isdir(folder):
             os.makedirs(folder)
 
@@ -742,41 +795,38 @@ class Figure:
         Export the ground truth annotation of the figure to an individual csv file.
 
         Args:
-            csv_export_dir: path to the directory where to export the csv file.
+            csv_export_dir (str):   Path to the directory where to export the csv file.
         """
 
         # By default the csv is at the same location
         if csv_export_dir is None:
             csv_export_dir = os.path.dirname(self.image_path)
 
-        # check if directory exists
+        # Check if directory exists.
         if not os.path.isdir(csv_export_dir):
-            logging.error(
-                "Export directory does not exist : %s",
-                csv_export_dir)
+            logging.error(f"Export directory does not exist : {csv_export_dir}")
 
-        # Remove extension from original figure image file name
-        csv_export_file_name = os.path.splitext(
-            self.image_filename)[0] + '.csv'
+        # Remove extension from original figure image file name.
+        csv_export_file_name = os.path.splitext(self.image_filename)[0] + '.csv'
 
-        csv_file_path = os.path.join(
-            csv_export_dir,
-            csv_export_file_name)
+        # Compute csv annotation file path.
+        csv_file_path = os.path.join(csv_export_dir,
+                                     csv_export_file_name)
 
-        # check if file already exists
+        # Check if file already exists.
         if os.path.isfile(csv_file_path):
-            logging.warning(
-                "The csv individual annotation file already exist :%s\n\t==> Skipping.",
-                csv_file_path)
+            logging.warning(f"The csv individual annotation file already exist : {csv_file_path}"\
+                            "\n\t==> Skipping.")
             return
 
         with open(csv_file_path, 'w', newline='') as csvfile:
 
             csv_writer = csv.writer(csvfile, delimiter=',')
 
-            # Looping over Panel objects
+            # Looping over Panel objects.
             for panel in self.gt_panels:
 
+                # Panel information
                 csv_row = [
                     self.image_path,
                     panel.panel_rect[0],
@@ -786,6 +836,7 @@ class Figure:
                     'panel'
                     ]
 
+                # Label information
                 if panel.label is not None and panel.label_rect is not None:
                     csv_row.append(panel.label_rect[0])
                     csv_row.append(panel.label_rect[1])
@@ -797,13 +848,14 @@ class Figure:
                 csv_writer.writerow(csv_row)
 
 
-    def convert_to_tf_example(self):
+    def convert_to_tf_example(self) -> tf.train.Example:
         """
-        Convert the figure to a TensorFlow example which is compatible with the TensorFlow
-        Object Detection API.
+        Convert the figure (only panel info) to a TensorFlow example which is compatible with the
+        TensorFlow Object Detection API.
+        This is deprecated since the project relies on Detectron 2 (PyTorch).
 
         Returns:
-            example: The corresponding tf example.
+            example (tf.train.Example): The corresponding tf example.
         """
 
         # Load image

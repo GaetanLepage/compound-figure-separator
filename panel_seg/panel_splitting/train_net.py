@@ -1,6 +1,26 @@
 #!/usr/bin/env python
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+##########################################
 Panel Splitting detection training script.
 
 This scripts reads a given config file and runs the training or evaluation.
@@ -23,10 +43,10 @@ from detectron2.evaluation import verify_results
 from detectron2.data.build import build_detection_test_loader
 from detectron2.data.dataset_mapper import DatasetMapper
 
-from panel_seg.panel_splitting.load_datasets import register_panel_splitting_dataset
-from panel_seg.utils.detectron_utils.loss_eval_hook import LossEvalHook
-from panel_seg.panel_splitting.evaluator import PanelSplitEvaluator
-from panel_seg.utils.detectron_utils.config import add_validation_config
+from .load_datasets import register_panel_splitting_dataset
+from ..utils.detectron_utils.loss_eval_hook import LossEvalHook
+from .evaluator import PanelSplitEvaluator
+from ..utils.detectron_utils.config import add_validation_config
 
 
 class Trainer(DefaultTrainer):
@@ -95,10 +115,10 @@ def setup(args: List[str]) -> CfgNode:
     Create configs and perform basic setups.
 
     Args:
-        args (List[str]): Arguments from the command line.
+        args (List[str]):   Arguments from the command line.
 
     Retuns:
-        cfg (CfgNode): A config node filled with necessary options.
+        cfg (CfgNode):  A config node filled with necessary options.
     """
     cfg = get_cfg()
 
@@ -117,7 +137,7 @@ def register_datasets(cfg: CfgNode):
     Register the data sets needed for panel splitting in Detectron 2's registry.
 
     Args:
-        cfg (CfgNode): The config node filled with necessary options.
+        cfg (CfgNode):  The config node filled with necessary options.
     """
     # Training
     for dataset_name in cfg.DATASETS.TRAIN:
@@ -137,11 +157,11 @@ def main(args: List[str]) -> dict:
     Launch training/testing for the panel splitting task on a single device.
 
     Args:
-        args (List[str]): Arguments from the command line.
+        args (List[str]):   Arguments from the command line.
 
     Returns:
-        If training: OrderedDict of results, if evaluation is enabled. Otherwise None.
-        If test: a dict of result metrics.
+        If training:    OrderedDict of results, if evaluation is enabled. Otherwise None.
+        If test:    A dict of result metrics.
     """
     cfg = setup(args)
 

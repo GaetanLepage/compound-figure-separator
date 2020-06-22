@@ -1,6 +1,26 @@
 #!/usr/bin/env python
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+#############################################
 Panel Segmentation detection training script.
 
 This scripts reads a given config file and runs the training or evaluation.
@@ -11,6 +31,7 @@ from typing import List
 
 import torch
 from torch.utils.data import DataLoader
+from torch import nn
 
 import detectron2.utils.comm as comm
 from detectron2.utils.logger import setup_logger
@@ -35,7 +56,6 @@ from panel_seg.utils.detectron_utils import (
 from panel_seg.panel_segmentation.evaluator import PanelSegEvaluator
 from panel_seg.utils.detectron_utils.config import add_validation_config
 from panel_seg.panel_segmentation.config import add_panel_seg_config
-
 from panel_seg.panel_segmentation.panel_seg_retinanet import PanelSegRetinaNet
 
 
@@ -61,7 +81,7 @@ class Trainer(DefaultTrainer):
             output_folder (str):    The path to the folder where to store the inference results.
 
         Returns:
-            DatasetEvaluator: The evaluator for testing label recognition results.
+            PanelSegEvaluator:  The evaluator for testing label recognition results.
         """
         # TODO implement export functionnality
         if output_folder is None:
@@ -143,7 +163,7 @@ class Trainer(DefaultTrainer):
 
 
     @classmethod
-    def build_model(cls, cfg):
+    def build_model(cls, cfg: CfgNode) -> nn.Module:
         """
         Instanciate and return the PanelSegRetinaNet model.
 
@@ -151,7 +171,7 @@ class Trainer(DefaultTrainer):
             cfg (CfgNode):  The global config.
 
         Returns:
-            model (torch.nn.Module): the PanelSegRetinaNet model.
+            model (nn.Module):  The PanelSegRetinaNet model.
         """
         model = PanelSegRetinaNet(cfg)
         model.to(torch.device(cfg.MODEL.DEVICE))
@@ -166,10 +186,10 @@ def setup(args: List[str]) -> CfgNode:
     Create configs and perform basic setups.
 
     Args:
-        args (List[str]): Arguments from the command line.
+        args (List[str]):   Arguments from the command line.
 
     Retuns:
-        cfg (CfgNode): A config node filled with necessary options.
+        cfg (CfgNode):  A config node filled with necessary options.
     """
     cfg = get_cfg()
 

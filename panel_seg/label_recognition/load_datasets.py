@@ -1,13 +1,32 @@
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+########################################################################################
 Load PanelSeg data set to be used with the Detectron API for the label recognition task.
 """
 
 from detectron2.data import DatasetCatalog, MetadataCatalog
 
-from panel_seg.data.figure_generators import IphotodrawXmlFigureGenerator
-
-from panel_seg.data.export import export_figures_to_detectron_dict
-from panel_seg.utils.figure.label_class import LABEL_CLASS_MAPPING
+from ..utils.figure import LABEL_CLASS_MAPPING
+from ..data.figure_generators import IphotodrawXmlFigureGenerator
+from ..data.export import export_figures_to_detectron_dict
 
 
 def register_label_recognition_dataset(dataset_name: str):
@@ -21,9 +40,6 @@ def register_label_recognition_dataset(dataset_name: str):
         dataset_name (str): The name of the data set to register.
                                 Has to belong to accepted ones.
     """
-    # TODO: manage validation
-    # TODO: get detectron logger and WARN if dataset name is not valid
-
     if not 'zou' in dataset_name:
         # TODO warn the user in this case
         pass
@@ -39,7 +55,7 @@ def register_label_recognition_dataset(dataset_name: str):
         # TODO warn the user in this case
         pass
 
-    # Create a first instance of the figure generator for the data set samples to be loaded.
+    # Instanciate the FigureGenerator
     figure_generator = IphotodrawXmlFigureGenerator(
         eval_list_txt=eval_list_txt)
 

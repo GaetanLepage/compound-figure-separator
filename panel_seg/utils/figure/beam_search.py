@@ -1,24 +1,45 @@
 """
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+####################################################
 Beam search algorithm for mapping panels and labels.
 """
 
 import math
 from typing import List
 
-from panel_seg.utils import box
-from panel_seg.utils.figure.panel import Panel
+from ...utils import box
+from ...utils.figure.panel import Panel
 
 
-def compute_panel_label_distances(panels: List[Panel], labels: List[Panel]):
+def _compute_panel_label_distances(panels: List[Panel],
+                                   labels: List[Panel]) -> List[List[float]]:
     """
     Compute distances between each label and each panel.
 
     Args:
-        panels: The list of Panel objects with
-        labels:
+        panels (List[Panel]):   The list of Panel objects with panel information.
+        labels (List[Panel]):   The list of Panel objects with label information.
 
     Returns:
-        The matrix containing the distances.
+        distances (List[List[float]]):  The matrix containing the distances.
     """
     # calculate distance from panels to labels
     distances = []
@@ -31,10 +52,10 @@ def compute_panel_label_distances(panels: List[Panel], labels: List[Panel]):
             label_rect = label.label_rect
             label_center = box.get_center(label_rect)
 
-            distance = math.hypot(
-                panel_center[0] - label_center[0],
-                panel_center[1] - label_center[1])
+            distance = math.hypot(panel_center[0] - label_center[0],
+                                  panel_center[1] - label_center[1])
             dists.append(distance)
+
         distances.append(dists)
 
     return distances
@@ -45,19 +66,20 @@ def assign_labels_to_panels(panels: List[Panel],
                             beam_length: int = 100):
     """
     Use beam search to assign labels to panels according to the overall distance
-    Assign labels.label_rect to panels.label_rect
-    panels and labels must have the same length
+    Assign labels.label_rect to panels.label_rect.
+    panels and labels must have the same length.
+    TODO: solve the problem when length differs.
 
     Args:
-        panels (List[Panel]):   Panels having the same label character.
-        labels (List[Panel]):   Labels having the same label character.
+        panels (List[Panel]):   List of panels.
+        labels (List[Panel]):   List of labels.
         beam_length (int):      TODO
     """
     # TODO remove
     # print("###########")
 
     # Compute the distance matrix.
-    distances = compute_panel_label_distances(panels, labels)
+    distances = _compute_panel_label_distances(panels, labels)
 
     # Beam search
 
@@ -103,6 +125,7 @@ def assign_labels_to_panels(panels: List[Panel],
         # print("panel index:", panel_idx)
         # print("all_item_pairs:", all_item_pairs)
 
+    # TODO remove
     # check the last item_pairs
     # print(all_item_pairs)
     # all_item_pairs[-1] : last "layer" (complete paths)
