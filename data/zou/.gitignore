@@ -1,0 +1,10 @@
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
+
+# and the sample lists
+!train.txt
+!train.csv
+!eval.txt
+!eval.csv
