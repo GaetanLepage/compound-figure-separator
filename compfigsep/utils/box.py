@@ -19,47 +19,46 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
 ##################################################################################
-Functions to deal with coordinates and areas of union, intersection of rectangles.
+Functions to deal with coordinates and areas of union, intersection of boxes.
 
-In every 'box' function, rectangles should respect the format [x1, y1, x2, y2].
+In every 'box' function, boxes should respect the format [x1, y1, x2, y2].
 """
 
 from typing import Tuple
-Rectangle = Tuple[int, int, int, int]
+Box = Tuple[int, int, int, int]
 Point = Tuple[float, float]
 
-def get_center(rectangle: Rectangle) -> Point:
+def get_center(box: Box) -> Point:
     """
-    Compute the coordinates of the rectangle center.
+    Compute the coordinates of the box center.
 
     Args:
-        rectangle (Rectangle):  A rectangle [x1, y1, x2, y2].
+        box (Box):  A box [x1, y1, x2, y2].
 
     Returns:
         x_center, y_center (Point): The coordinates of the center.
     """
-    return (rectangle[0] + rectangle[2]) / 2.0,\
-           (rectangle[1] + rectangle[3]) / 2.0
+    return (box[0] + box[2]) / 2.0,\
+           (box[1] + box[3]) / 2.0
 
 
-def union(rectangle_1: Rectangle,
-          rectangle_2: Rectangle) -> Rectangle:
+def union(box_1: Box,
+          box_2: Box) -> Box:
     """
-    Compute the coordinates of the smallest rectangle
-    containing both rectangle_1 and rectangle_2.
+    Compute the coordinates of the smallest box containing both box_1 and box_2.
 
     Args:
-        rectangle_1 (Rectangle): rectangle [x1, y1, x2, y2].
-        rectangle_2 (Rectangle): rectangle [x1, y1, x2, y2].
+        box_1 (Box):    box [x1, y1, x2, y2].
+        box_2 (Box):    box [x1, y1, x2, y2].
 
     Returns:
-        union (Rectangle):  The union of rectangle_1 and rectangle_2 [x, y, x+w, y+h].
+        union (Box):    The union of box_1 and box_2 [x, y, x+w, y+h].
     """
 
-    x_union = min(rectangle_1[0], rectangle_2[0])
-    y_union = min(rectangle_1[1], rectangle_2[1])
-    width_union = max(rectangle_1[2], rectangle_2[2]) - x_union
-    height_union = max(rectangle_1[3], rectangle_2[3]) - y_union
+    x_union = min(box_1[0], box_2[0])
+    y_union = min(box_1[1], box_2[1])
+    width_union = max(box_1[2], box_2[2]) - x_union
+    height_union = max(box_1[3], box_2[3]) - y_union
 
     return [
         x_union,
@@ -68,25 +67,25 @@ def union(rectangle_1: Rectangle,
         y_union + height_union]
 
 
-def intersection(rectangle_1: Rectangle,
-                 rectangle_2: Rectangle) -> Rectangle:
+def intersection(box_1: Box,
+                 box_2: Box) -> Box:
     """
-    Compute the coordinates of the intersection of ractangles rectangle_1 and rectangle_2.
+    Compute the coordinates of the intersection of ractangles box_1 and box_2.
 
     Args:
-        rectangle_1 (Rectangle):    rectangle [x1, y1, x2, y2].
-        rectangle_2 (Rectangle):    rectangle [x1, y1, x2, y2].
+        box_1 (Box):    box [x1, y1, x2, y2].
+        box_2 (Box):    box [x1, y1, x2, y2].
 
     Returns:
-        intersection (Rectangle):   The intersection of rectangle_1 and rectangle_2
-                                        [x, y, x+w, y+h].
+        intersection (Box): The intersection of box_1 and box_2
+                                [x, y, x+w, y+h].
     """
 
-    # rectangle_1 and rectangle_2 should be [x1, y1, x2, y2]
-    x_intersect = max(rectangle_1[0], rectangle_2[0])
-    y_intersect = max(rectangle_1[1], rectangle_2[1])
-    width_intersect = min(rectangle_1[2], rectangle_2[2]) - x_intersect
-    height_intersect = min(rectangle_1[3], rectangle_2[3]) - y_intersect
+    # box_1 and box_2 should be [x1, y1, x2, y2]
+    x_intersect = max(box_1[0], box_2[0])
+    y_intersect = max(box_1[1], box_2[1])
+    width_intersect = min(box_1[2], box_2[2]) - x_intersect
+    height_intersect = min(box_1[3], box_2[3]) - y_intersect
 
     if width_intersect < 0 or height_intersect < 0:
         return [0, 0, 0, 0]
@@ -98,60 +97,60 @@ def intersection(rectangle_1: Rectangle,
         y_intersect + height_intersect]
 
 
-def area(rectangle: Rectangle) -> float:
+def area(box: Box) -> float:
     """
-    Compute the area of the given rectangle.
+    Compute the area of the given box.
 
     Args:
-        rectangle (Rectangle):  rectangle [x1, y1, x2, y2].
+        box (Box):  box [x1, y1, x2, y2].
 
     Returns:
-        area (float):   The area of the rectangle.
+        area (float):   The area of the box.
     """
 
-    return (rectangle[2] - rectangle[0]) * (rectangle[3] - rectangle[1])
+    return (box[2] - box[0]) * (box[3] - box[1])
 
 
-def union_area(rectangle_1: Rectangle,
-               rectangle_2: Rectangle,
+def union_area(box_1: Box,
+               box_2: Box,
                area_intersection: float) -> float:
     """
-    Compute the area of the union of the ractangles rectangle_1 and rectangle_2.
+    Compute the area of the union of the ractangles box_1 and box_2.
 
     Args:
-        rectangle_1 (Rectangle):    rectangle [x1, y1, x2, y2].
-        rectangle_2 (Rectangle):    rectangle [x1, y1, x2, y2].
-        area_intersection (float):  The area of the intersection of rectangle_1 and rectangle_2.
+        box_1 (Box):    box [x1, y1, x2, y2].
+        box_2 (Box):    box [x1, y1, x2, y2].
+        area_intersection (float):  The area of the intersection of box_1 and box_2.
 
     Returns:
-        union_area (float): The area of the union of rectangle_1 and rectangle_2.
+        union_area (float): The area of the union of box_1 and box_2.
     """
 
-    area_1 = area(rectangle_1)
-    area_2 = area(rectangle_2)
+    area_1 = area(box_1)
+    area_2 = area(box_2)
 
     area_union = area_1 + area_2 - area_intersection
 
     return area_union
 
 
-def intersection_area(rectangle_1: Rectangle,
-                      rectangle_2: Rectangle) -> float:
+def intersection_area(box_1: Box,
+                      box_2: Box) -> float:
     """
-    Compute the area of the intersection between rectangle_1 and rectangle_2.
+    Compute the area of the intersection between box_1 and box_2.
 
     Args:
-        rectangle_1 (Rectangle):    rectangle [x1,y1,x2,y2].
-        rectangle_2 (Rectangle):    rectangle [x1,y1,x2,y2].
+        box_1 (Box):    box [x1,y1,x2,y2].
+        box_2 (Box):    box [x1,y1,x2,y2].
 
     Returns:
-        intersection_area (float):  The area of the intersection of rectangle_1 and rectangle_2.
+        intersection_area (float):  The area of the intersection of box_1 and box_2.
     """
 
-    x_intersect = max(rectangle_1[0], rectangle_2[0])
-    y_intersect = max(rectangle_1[1], rectangle_2[1])
-    width_intersect = min(rectangle_1[2], rectangle_2[2]) - x_intersect
-    height_intersect = min(rectangle_1[3], rectangle_2[3]) - y_intersect
+    x_intersect = max(box_1[0], box_2[0])
+    y_intersect = max(box_1[1], box_2[1])
+    width_intersect = min(box_1[2], box_2[2]) - x_intersect
+    height_intersect = min(box_1[3], box_2[3]) - y_intersect
 
     if width_intersect < 0 or height_intersect < 0:
         return 0
@@ -159,26 +158,26 @@ def intersection_area(rectangle_1: Rectangle,
     return width_intersect * height_intersect
 
 
-def iou(rectangle_1: Rectangle,
-        rectangle_2: Rectangle) -> float:
+def iou(box_1: Box,
+        box_2: Box) -> float:
     """
-    Compute the 'intersection over union' (IoU) between rectangle_1 and rectangle_2.
+    Compute the 'intersection over union' (IoU) between box_1 and box_2.
 
     Args:
-        rectangle_1 (Rectangle):    rectangle [x1,y1,x2,y2].
-        rectangle_2 (Rectangle):    rectangle [x1,y1,x2,y2].
+        box_1 (Box):    box [x1,y1,x2,y2].
+        box_2 (Box):    box [x1,y1,x2,y2].
 
     Returns:
-        iou (float):    The IoU between rectangle_1 and rectangle_2.
+        iou (float):    The IoU between box_1 and box_2.
     """
 
-    if rectangle_1[0] >= rectangle_1[2] \
-            or rectangle_2[1] >= rectangle_2[3] \
-            or rectangle_2[0] >= rectangle_2[2] \
-            or rectangle_2[1] >= rectangle_2[3]:
+    if box_1[0] >= box_1[2] \
+            or box_2[1] >= box_2[3] \
+            or box_2[0] >= box_2[2] \
+            or box_2[1] >= box_2[3]:
         return 0.0
 
-    area_i = intersection_area(rectangle_1, rectangle_2)
-    area_u = union_area(rectangle_1, rectangle_2, area_i)
+    area_i = intersection_area(box_1, box_2)
+    area_u = union_area(box_1, box_2, area_i)
 
     return float(area_i) / float(area_u + 1e-6)

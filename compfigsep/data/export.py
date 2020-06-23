@@ -55,26 +55,28 @@ def export_figures_to_csv(figure_generator: Iterable[Figure],
         # Looping over Figure objects thanks to generator
         for figure in figure_generator:
 
-            # Looping over Panel objects
-            for panel in figure.gt_panels:
+            # Looping over SubFigure objects
+            for subfigure in figure.gt_subfigures:
 
+                panel = subfigure.panel
                 csv_row = [
                     figure.image_path,
-                    panel.panel_rect[0],
-                    panel.panel_rect[1],
-                    panel.panel_rect[2],
-                    panel.panel_rect[3],
+                    panel.box[0],
+                    panel.box[1],
+                    panel.box[2],
+                    panel.box[3],
                     'panel'
                     ]
 
-                if panel.label is not None and panel.label_rect is not None:
-                    csv_row.append(panel.label_rect[0])
-                    csv_row.append(panel.label_rect[1])
-                    csv_row.append(panel.label_rect[2])
-                    csv_row.append(panel.label_rect[3])
-                    csv_row.append(panel.label)
+                label = subfigure.label
+                if label is not None and label.box is not None:
+                    csv_row.append(label.box[0])
+                    csv_row.append(label.box[1])
+                    csv_row.append(label.box[2])
+                    csv_row.append(label.box[3])
+                    csv_row.append(label.text)
                 else:
-                    csv_row += ['']*5
+                    csv_row += [''] * 5
                 csv_writer.writerow(csv_row)
 
                 if individual_export:
@@ -134,25 +136,28 @@ def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
 
         if figure.gt_panels is not None:
 
-            for panel in figure.gt_panels:
+            for subfigure in figure.gt_subfigures:
+
+                panel = subfigure.panel
+                label = subfigure.label
 
                 if task == 'panel_splitting':
                     obj = {
-                        'bbox': panel.panel_rect,
+                        'bbox': panel.box,
                         'bbox_mode': BoxMode.XYXY_ABS,
                         'category_id': 0
                     }
 
                 elif task == 'label_recog':
-                    if panel.label_rect is None or len(panel.label) != 1:
+                    if label.box is None or len(label.text) != 1:
                         # We ensure that, for this task, the labels are valid
                         # (they have been previously checked while loading annotations)
                         continue
 
                     obj = {
-                        'bbox': panel.label_rect,
+                        'bbox': label.box,
                         'bbox_mode': BoxMode.XYXY_ABS,
-                        'category_id': LABEL_CLASS_MAPPING[panel.label]
+                        'category_id': LABEL_CLASS_MAPPING[label.text]
                     }
 
                 # panel segmentation task
@@ -160,15 +165,15 @@ def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
                     # category_id is artificially set to zero to satisfy the Detectron API.
                     # The actual label (if any) is stored in 'label'.
                     obj = {
-                        'panel_bbox': panel.panel_rect,
+                        'panel_bbox': panel.box,
                         'bbox_mode': BoxMode.XYXY_ABS
                     }
 
-                    if panel.label_rect is not None and len(panel.label) == 1:
+                    if label.box is not None and len(label.box) == 1:
                         # If there is no valid label, it won't be considered for training.
                         # TODO: later, we would like to handle >1 length labels
-                        obj['label_bbox'] = panel.label_rect
-                        obj['label'] = LABEL_CLASS_MAPPING[panel.label]
+                        obj['label_bbox'] = label.box
+                        obj['label'] = LABEL_CLASS_MAPPING[label.text]
 
 
                 objs.append(obj)

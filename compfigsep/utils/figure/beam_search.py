@@ -26,17 +26,17 @@ import math
 from typing import List
 
 from ...utils import box
-from ...utils.figure.panel import Panel
+from ...utils.figure.subfigure import Panel, Label, SubFigure
 
 
 def _compute_panel_label_distances(panels: List[Panel],
-                                   labels: List[Panel]) -> List[List[float]]:
+                                   labels: List[Label]) -> List[List[float]]:
     """
     Compute distances between each label and each panel.
 
     Args:
-        panels (List[Panel]):   The list of Panel objects with panel information.
-        labels (List[Panel]):   The list of Panel objects with label information.
+        panels (List[Panel]):   The list of panels.
+        labels (List[Label]):   The list of labels.
 
     Returns:
         distances (List[List[float]]):  The matrix containing the distances.
@@ -45,12 +45,10 @@ def _compute_panel_label_distances(panels: List[Panel],
     distances = []
     for panel in panels:
         dists = []
-        panel_rect = panel.panel_rect
-        panel_center = box.get_center(panel_rect)
+        panel_center = box.get_center(panel.box)
 
         for label in labels:
-            label_rect = label.label_rect
-            label_center = box.get_center(label_rect)
+            label_center = box.get_center(label.box)
 
             distance = math.hypot(panel_center[0] - label_center[0],
                                   panel_center[1] - label_center[1])
@@ -62,8 +60,8 @@ def _compute_panel_label_distances(panels: List[Panel],
 
 
 def assign_labels_to_panels(panels: List[Panel],
-                            labels: List[Panel],
-                            beam_length: int = 100):
+                            labels: List[Label],
+                            beam_length: int = 100) -> List[SubFigure]:
     """
     Use beam search to assign labels to panels according to the overall distance
     Assign labels.label_rect to panels.label_rect.
@@ -72,8 +70,11 @@ def assign_labels_to_panels(panels: List[Panel],
 
     Args:
         panels (List[Panel]):   List of panels.
-        labels (List[Panel]):   List of labels.
+        labels (List[Label]):   List of labels.
         beam_length (int):      TODO
+
+    Returns:
+        subfigures (List[SubFigure]):   TODO
     """
     # TODO remove
     # print("###########")
@@ -132,5 +133,12 @@ def assign_labels_to_panels(panels: List[Panel],
     # all_item_pairs[-1][0] : pair which has the shortest path (it was sorted)
     # all_item_pairs[-1][0][1] : the complete path from this pair
     best_path = all_item_pairs[-1][0][1]
+
+    subfigures = []
+
     for panel_index, panel in enumerate(panels):
-        panel.add_label_info(label=labels[best_path[panel_index]])
+        # panel.add_label_info(label=labels[best_path[panel_index]])
+        matched_label = labels[best_path[panel_index]]
+
+        subfigures.append(SubFigure(panel=panel,
+                                    label=matched_label))

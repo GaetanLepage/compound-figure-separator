@@ -147,7 +147,7 @@ def predict(figure_generator: Iterable[Figure],
         detected_panels = []
         for box in boxes:
 
-            panel = Panel(panel_rect=box)
+            panel = SubFigure(panel_rect=box)
 
             detected_panels.append(panel)
 

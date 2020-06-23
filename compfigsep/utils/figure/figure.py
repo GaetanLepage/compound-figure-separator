@@ -27,14 +27,14 @@ import csv
 import logging
 import io
 import hashlib
-from typing import List, Tuple
+from typing import List, Dict
 import xml.etree.ElementTree as ET
 
 import numpy as np
 import PIL.Image
 from cv2 import cv2
 
-from .panel import Panel
+from .subfigure import Panel, Label, SubFigure
 from . import beam_search
 from .. import box
 from . import label_class
@@ -45,16 +45,20 @@ class Figure:
     A class representing a Figure (and eventually ground truth and/or predicted annotations).
 
     Attributes:
-        index (int):                            The unique id to each figure.
-        image_path (str):                       The path to the figure image file.
-        image_filename (str):                   Image file name.
-        image_format (str):                     The format of the image file (jpg, png,...).
-        image (np.ndarray):                     The image data.
-        image_width (int):                      The image width (in pixels).
-        image_height (int):                     The image height (in pixels).
-        preview_image (np.ndarray):             The preview image (image + bounding boxes)
-        gt_panels (List[Panel]):                Ground truth panel objects.
-        detected_panels (List[DetectedPanel]):  Detected panel objects.
+        index (int):                                    The unique id to each figure.
+        image_path (str):                               The path to the figure image file.
+        image_filename (str):                           Image file name.
+        image_format (str):                             The format of the image file
+                                                            (jpg, png,...).
+        image (np.ndarray):                             The image data.
+        image_width (int):                              The image width (in pixels).
+        image_height (int):                             The image height (in pixels).
+        caption (str):                                  The complete caption.
+        preview_image (np.ndarray):                     The preview image (image + bounding boxes)
+        gt_subfigures (List[SubFigure]):                Ground truth subfigure objects.
+        detected_panels (List[DetectedPanel]):          Detected panel objects.
+        detected_labels (List[DetectedLabel]):          Detected label objects.
+        detected_subfigures (List[DetectedSubFigure]):  Detected subfigure objects.
     """
 
     def __init__(self,
@@ -81,15 +85,23 @@ class Figure:
         self.image_width = 0
         self.image_height = 0
 
+        # Caption
+        self.caption = None
 
         # Can contain a preview of the image with its bounding boxes.
         self.preview_image = None
 
-        # Ground truth panel annotations
-        self.gt_panels = None
+        # Ground truth subfigure annotations.
+        self.gt_subfigures = None
 
-        # Predicted panels
+        # Detected panels
         self.detected_panels = None
+
+        # Detected labels
+        self.detected_labels = None
+
+        # Detected subfigures
+        self.detected_subfigures = None
 
         # Logger
         self._logger = logging.getLogger(__name__)
@@ -133,7 +145,8 @@ class Figure:
             annotations_folder (str):   Path to an annotation file (csv format).
             is_ground_truth (bool):     Tells whether annotations are ground truth or predictions.
                                             If True, annotations will be stored in
-                                            `self.gt_panels` else, in `self.detected_panels`.
+                                            `self.gt_subfigures` else, in
+                                            `self.detected_subfigures`.
         """
         # Get image file base name (without extension).
         base_name = os.path.splitext(self.image_filename)[0]
@@ -145,8 +158,8 @@ class Figure:
             raise FileNotFoundError("The annotation csv file does not exist :"\
                 "\n\tShould be {}".format(annotation_csv))
 
-        # Create empty list of panels
-        panels = []
+        # Create empty list of subfigures
+        subfigures = []
 
         # Open the csv file containing annotations
         with open(annotation_csv, 'r') as annotation_csv_file:
@@ -178,17 +191,20 @@ class Figure:
                     f"\n\timage in csv row : {image_path}"
 
                 # Instanciate Panel object
-                panel = Panel(panel_rect=panel_coordinates,
-                              label_rect=label_coordinates,
-                              label=label)
+                panel = Panel(box=panel_coordinates)
+                label = Label(text=label,
+                              box=label_coordinates)
 
-                panels.append(panel)
+                panel = SubFigure(panel=Panel,
+                                  label=Label)
+
+                subfigures.append(panel)
 
         # Store the Panel objects in the right class attribute.
         if is_ground_truth:
-            self.gt_panels = panels
+            self.gt_subfigures = subfigures
         else:
-            self.detected_panels = panels
+            self.detected_subfigures = subfigures
 
 
 
@@ -202,7 +218,7 @@ class Figure:
             annotation_file_path (str): The path to the xml file containing annotations.
         """
 
-        def extract_bbox_from_iphotodraw_node(item: ET.Element) -> Tuple[int, int, int, int]:
+        def extract_bbox_from_iphotodraw_node(item: ET.Element) -> box.Box:
             """
             Extract bounding box information from Element item (ElementTree).
             It also makes sure that the bounding box is within the image.
@@ -212,8 +228,7 @@ class Figure:
                                         xml annotation file.
 
             Returns:
-                x_min, y_min, x_max, y_max (Tuple[int, int, int, int]): The coordinates of the
-                                                                            bounding box
+                x_min, y_min, x_max, y_max (box.Box):   The coordinates of the bounding box.
             """
             extent_item = item.find('./Data/Extent')
 
@@ -243,14 +258,14 @@ class Figure:
             return x_min, y_min, x_max, y_max
 
 
-        def extract_panel_info() -> List[Panel]:
+        def extract_panel_info() -> Dict[str, Panel]:
             """
             Extract information from and validate all panel items
 
             Returns:
-                panels (List[Panel]): A list of Panel objects.
+                panels (Dict[str, Panel]):    A dict linking Panel objects to their labels.
             """
-            panels = []
+            panels = {}
             for panel_item in panel_items:
                 text_item = panel_item.find('./BlockText/Text')
                 label_text = text_item.text
@@ -298,21 +313,19 @@ class Figure:
 
                 # Create Panel object
                 panel_rect = [x_min, y_min, x_max, y_max]
-                panel = Panel(label=label_text,
-                              panel_rect=panel_rect,
-                              label_rect=None)
+                panel = Panel(box=panel_rect)
 
-                panels.append(panel)
+                panels[label_text] = panel
 
             return panels
 
 
-        def extract_label_info() -> List[Panel]:
+        def extract_label_info() -> List[Label]:
             """
             Extract information from and validate all label items.
 
             Returns:
-                labels (List[Panel]):   A list of Panel objects representing the detected labels.
+                labels (List[Label]):   A list of Label objects representing the detected labels.
             """
             labels = []
             for label_item in label_items:
@@ -346,27 +359,28 @@ class Figure:
 
                 label_rect = [x_min, y_min, x_max, y_max]
                 # We use Panel objects temporarily
-                label = Panel(label=label_text,
-                              panel_rect=None,
-                              label_rect=label_rect)
+                label = Label(text=label_text,
+                              box=label_rect)
 
                 labels.append(label)
 
             return labels
 
 
-        def match_panels_with_labels(panels: List[Panel],
-                                     labels: List[Panel]) -> List[Panel]:
+        def match_panels_with_labels(panels: Dict[str, Panel],
+                                     labels: List[Label]
+                                     ) -> List[SubFigure]:
             """
             Match both lists to get a unique list of panels containing
             information of their matching label.
 
             Args:
-                panels (List[Panel]):   List of panels without label information.
-                labels (List[Panel]):   List of labels without panel information.
+                panels (Dict[str, Panel]):  Dict linking panels and their label.
+                labels (List[Label]):       List of labels.
 
             Returns:
-                panels (List[Panel]):   Updated list of panels.
+                panels (List[SubFigure]):   List of subfigures (containing panel and label
+                                                information).
             """
             if len(labels) != 0 and len(labels) != len(panels):
                 logging.warning(f"{annotation_file_path}: has different panel and label rects."\
@@ -375,21 +389,22 @@ class Figure:
 
             # Collect all panel label characters.
             char_set = set()
-            for panel in panels:
-                if len(panel.label) != 0:
-                    char_set.add(panel.label)
+            for panel_label in panels.keys():
+                if len(panel_label) != 0:
+                    char_set.add(panel_label)
 
             # Build panel dictionary according to labels.
             panel_dict = {s: [] for s in char_set}
-            for panel in panels:
-                if len(panel.label) != 0:
-                    panel_dict[panel.label].append(panel)
+            for panel_label, panel in panels.items():
+                if len(panel_label) != 0:
+                    panel_dict[panel_label].append(panel)
 
             # Build label dictionary according to labels.
             label_dict = {s: [] for s in char_set}
             for label in labels:
-                label_dict[label.label].append(label)
+                label_dict[label.text].append(label)
 
+            subfigures = []
             # Assign labels to panels.
             for label_char in char_set:
                 if len(panel_dict[label_char]) != len(label_dict[label_char]):
@@ -397,20 +412,20 @@ class Figure:
                                    " same matching labels!")
                     continue
 
+                if len(panel_dict[label_char]) > 1:
+                    print(panel_dict)
 
-                # Beam search algorithm to map labels to panels
-                # ==> This is only useful when there are several panels with the same label in a
-                # single image. In Zou's data set, this is never the case
-                beam_search.assign_labels_to_panels(panels=panel_dict[label_char],
-                                                    labels=label_dict[label_char])
+                panel = panel_dict[label_char][0]
 
-            # expand the panel_rect to always include label_rect
-            for panel in panels:
-                if panel.label_rect is not None:
-                    panel.panel_rect = box.union(rectangle_1=panel.label_rect,
-                                                 rectangle_2=panel.panel_rect)
+            # Expand the panel_rect to always include label_rect.
+            for subfigure in subfigures:
+                panel = subfigure.panel
+                label = subfigure.label
+                if label.box is not None:
+                    panel.box = box.union(box_1=panel.box,
+                                          box_2=label.box)
 
-            return panels
+            return subfigures
 
 
         # Create element tree object.
@@ -445,8 +460,8 @@ class Figure:
         # information of their matching label.
         # Save this list of panels in tha appropriate attribute of
         # the figure object.
-        self.gt_panels = match_panels_with_labels(panels=panels,
-                                                  labels=labels)
+        self.gt_subfigures = match_panels_with_labels(panels=panels,
+                                                      labels=labels)
 
 ##############
 # EVALUATION #
@@ -477,8 +492,8 @@ class Figure:
                                             true with respect to the overlap value.
         """
         # Keep track of the associations.
-        picked_gt_panels_overlap = [False] * len(self.gt_panels)
-        picked_gt_panels_iou = [False] * len(self.gt_panels)
+        picked_gt_panels_overlap = [False] * len(self.gt_subfigures)
+        picked_gt_panels_iou = [False] * len(self.gt_subfigures)
 
         for detected_panel in self.detected_panels:
             max_iou = -1
@@ -487,14 +502,16 @@ class Figure:
             best_matching_gt_panel_iou_index = -1
             best_matching_gt_panel_overlap_index = -1
 
-            for gt_panel_index, gt_panel in enumerate(self.gt_panels):
+            for gt_panel_index, gt_subfigure in enumerate(self.gt_subfigures):
 
-                intersection_area = box.intersection_area(gt_panel.panel_rect,
-                                                          detected_panel.panel_rect)
+                gt_panel = gt_subfigure.panel
+
+                intersection_area = box.intersection_area(gt_panel.box,
+                                                          detected_panel.box)
                 if intersection_area == 0:
                     continue
 
-                detected_panel_area = box.area(detected_panel.panel_rect)
+                detected_panel_area = box.area(detected_panel.box)
 
                 # --> Using ImageCLEF metric (overlap)
                 overlap = intersection_area / detected_panel_area
@@ -505,7 +522,7 @@ class Figure:
                     best_matching_gt_panel_overlap_index = gt_panel_index
 
                 # --> Using IoU (common for object detection)
-                iou = box.iou(gt_panel.panel_rect, detected_panel.panel_rect)
+                iou = box.iou(gt_panel.box, detected_panel.box)
 
                 # Potential match
                 if iou > max_iou:
@@ -517,22 +534,22 @@ class Figure:
             if max_iou > iou_threshold \
                     and not picked_gt_panels_iou[best_matching_gt_panel_iou_index]:
                 picked_gt_panels_iou[best_matching_gt_panel_iou_index] = True
-                detected_panel.panel_is_true_positive_iou = True
+                detected_panel.is_true_positive_iou = True
 
             # ==> False positive (w.r.t IoU criterion)
             else:
-                detected_panel.panel_is_true_positive_iou = False
+                detected_panel.is_true_positive_iou = False
 
             # Check that gt and detected panels are overlapping enough.
             # ==> True positive (w.r.t overlap criterion)
             if max_overlap > overlap_threshold \
                     and not picked_gt_panels_overlap[best_matching_gt_panel_overlap_index]:
                 picked_gt_panels_overlap[best_matching_gt_panel_overlap_index] = True
-                detected_panel.panel_is_true_positive_overlap = True
+                detected_panel.is_true_positive_overlap = True
 
             # ==> False positive (w.r.t overlap criterion)
             else:
-                detected_panel.panel_is_true_positive_overlap = False
+                detected_panel.is_true_positive_overlap = False
 
 
     def match_detected_and_gt_labels(self, iou_threshold: float = 0.5):
@@ -548,49 +565,51 @@ class Figure:
                                         true.
         """
         # Keep track of the associations.
-        picked_gt_panels_indices = [False] * len(self.gt_panels)
+        picked_gt_labels_indices = [False] * len(self.gt_subfigures)
 
         # Loop over detected labels.
-        for detected_panel in self.detected_panels:
+        for detected_label in self.detected_labels:
             max_iou = -1
-            best_matching_gt_panel_index = -1
+            best_matching_gt_label_index = -1
 
-            for gt_panel_index, gt_panel in enumerate(self.gt_panels):
+            for gt_label_index, gt_subfigure in enumerate(self.gt_subfigures):
+
+                gt_label = gt_subfigure.label
 
                 # TODO laverage the 'single-character label' restriction.
-                if gt_panel.label_rect is None or len(gt_panel.label) != 1:
+                if gt_label.box is None or len(gt_label.text) != 1:
                     continue
 
                 # If the label classes do not match, no need to compute the IoU.
-                if gt_panel.label != detected_panel.label:
+                if gt_label.text != detected_label.text:
                     continue
 
                 # Compute IoU between detection and ground truth.
-                iou = box.iou(gt_panel.label_rect, detected_panel.label_rect)
+                iou = box.iou(gt_label.box, detected_label.box)
 
                 # Potential match
                 if iou > max_iou:
                     max_iou = iou
-                    best_matching_gt_panel_index = gt_panel_index
+                    best_matching_gt_label_index = gt_label_index
 
-            # Check that gt and detected panels are overlapping enough.
+            # Check that gt and detected labels are overlapping enough.
             # ==> True positive
             if max_iou > iou_threshold\
-                    and not picked_gt_panels_indices[best_matching_gt_panel_index]:
-                picked_gt_panels_indices[best_matching_gt_panel_index] = True
-                detected_panel.label_is_true_positive = True
+                    and not picked_gt_labels_indices[best_matching_gt_label_index]:
+                picked_gt_labels_indices[best_matching_gt_label_index] = True
+                detected_label.is_true_positive = True
 
             # ==> False positive
             else:
-                detected_panel.label_is_true_positive = False
+                detected_label.is_true_positive = False
 
 
     def match_detected_and_gt_panels_segmentation_task(self,
                                                        iou_threshold: float = 0.5):
         """
-        Match the detected panels (and their label) with a ground truth one.
-        The comparison criterion is the IoU which is maximized.
-        The `self.detected_panels` attribute is modified by side effect.
+        Match the detected subfigures with a ground truth one.
+        The comparison criterion is the IoU between panels which is maximized.
+        The `self.detected_subfigures` attribute is modified by side effect.
 
         ==> Panel segmentation task.
 
@@ -599,41 +618,47 @@ class Figure:
                                         true.
         """
         # Keep track of the associations.
-        picked_gt_panels_indices = [False] * len(self.gt_panels)
+        picked_gt_subfigures_indices = [False] * len(self.gt_subfigures)
 
-        # Loop over detected panels.
-        for detected_panel in self.detected_panels:
+        # Loop over detected subfigures.
+        for detected_subfigure in self.detected_subfigures:
             max_iou = -1
-            best_matching_gt_panel_index = -1
+            best_matching_gt_subfigure_index = -1
 
-            for gt_panel_index, gt_panel in enumerate(self.gt_panels):
+            detected_panel = detected_subfigure.panel
+            detected_label = detected_subfigure.label
+
+            for gt_subfigure_index, gt_subfigure in enumerate(self.gt_subfigures):
+
+                gt_panel = gt_subfigure.panel
+                gt_label = gt_subfigure.label
 
                 # TODO laverage the 'single-character label' restriction.
-                if gt_panel.label_rect is None or len(gt_panel.label) != 1:
+                if gt_label.box is None or len(gt_label.text) != 1:
                     continue
 
                 # If the label classes do not match, no need to compute the IoU.
-                if gt_panel.label != detected_panel.label:
+                if gt_label.text != detected_label.text:
                     continue
 
                 # Compute IoU between detection and ground truth.
-                iou = box.iou(gt_panel.panel_rect, detected_panel.panel_rect)
+                iou = box.iou(gt_panel.box, detected_panel.box)
 
                 # Potential match
                 if iou > max_iou:
                     max_iou = iou
-                    best_matching_gt_panel_index = gt_panel_index
+                    best_matching_gt_subfigure_index = gt_subfigure_index
 
             # Check that gt and detected panels are overlapping enough.
             # ==> True positive
             if max_iou > iou_threshold\
-                    and not picked_gt_panels_indices[best_matching_gt_panel_index]:
-                picked_gt_panels_indices[best_matching_gt_panel_index] = True
-                detected_panel.panel_is_true_positive = True
+                    and not picked_gt_subfigures_indices[best_matching_gt_subfigure_index]:
+                picked_gt_subfigures_indices[best_matching_gt_subfigure_index] = True
+                detected_subfigure.is_true_positive = True
 
             # ==> False positive
             else:
-                detected_panel.panel_is_true_positive = False
+                detected_subfigure.is_true_positive = False
 
 
 ##################
@@ -655,41 +680,13 @@ class Figure:
         Returns:
             preview_img (np.ndarray): the preview image
         """
-
-        if mode not in ('gt', 'pred', 'both'):
-            raise ValueError("mode should be either 'gt', 'pred', or 'both'.")
-
         # Load image if necessary
         if self.image is None:
             self.load_image()
         preview_img = self.image.copy()
 
-        if mode == 'both':
 
-            for panel in self.gt_panels:
-                # Green for ground truth panels
-                panel.draw_elements(image=preview_img,
-                                    color=(0, 255, 0))
-
-            if self.detected_panels is None:
-                self._logger.warning("No detected panels exist for this figure." \
-                    " Hence, they cannot be displayed.")
-                return preview_img
-
-            for panel in self.detected_panels:
-                # Yellow for predicted panels
-                panel.draw_elements(image=preview_img,
-                                    color=(0, 0, 200))
-
-            return preview_img
-
-        if mode == 'gt':
-            panels = self.gt_panels
-
-        # mode = 'pred'
-        else:
-            panels = self.detected_panels
-
+        # Prepare set of colors for drawing elements:
         shape_colors = [
             (255, 0, 0),
             (0, 255, 0),
@@ -699,18 +696,83 @@ class Figure:
             (0, 255, 255),
         ]
 
+        # 1st case ('both'): Display both gt and detections.
+        if mode == 'both':
 
-        if panels is None:
-            raise ValueError(f"{mode} panels are None. Cannot display")
+            # Display ground truth subfigures.
+            for subfigure in self.gt_subfigures:
+                subfigure.draw_elements(image=preview_img)
 
-        for panel_index, panel in enumerate(panels):
+            # If this figure contains detected subfigures, they are considered to be
+            # the relevant detections to display.
+            if self.detected_subfigures is not None:
 
-            # Select color
-            color = shape_colors[panel_index % len(shape_colors)]
+                for detected_subfigure in self.detected_subfigures:
+                    detected_subfigure.draw_elements(image=preview_img)
 
-            panel.draw_elements(image=preview_img,
-                                color=color)
+            # Else, we display the available detected elements.
+            else:
+                if self.detected_panels is not None:
+                    for panel in self.detected_panels:
+                        panel.draw(image=preview_img)
 
+                if self.detected_labels is not None:
+                    for label in self.detected_labels:
+                        label.draw(image=preview_img)
+
+
+        # 2nd case ('gt'): Display ground-truth subfigures.
+        elif mode == 'gt':
+
+            # Display ground truth subfigures.
+            for subfigure_index, subfigure in enumerate(self.gt_subfigures):
+
+                # Select color.
+                color = shape_colors[subfigure_index % len(shape_colors)]
+
+                # Draw subfigure.
+                subfigure.draw_elements(image=preview_img,
+                                        color=color)
+
+
+        # 3rd case ('pred'): Display detections.
+        elif mode == 'pred':
+
+            # If this figure contains detected subfigures, they are considered to be
+            # the relevant detections to display.
+            if self.detected_subfigures is not None:
+
+                for subfigure_index, detected_subfigure in enumerate(self.detected_subfigures):
+                    # Select color.
+                    color = shape_colors[subfigure_index % len(shape_colors)]
+
+                    # Draw element.
+                    detected_subfigure.draw_elements(image=preview_img,
+                                                     color=color)
+
+            # Else, we display the available detected elements.
+            else:
+                if self.detected_panels is not None:
+                    for panel_index, panel in enumerate(self.detected_panels):
+                        # Select color.
+                        color = shape_colors[panel_index % len(shape_colors)]
+
+                        # Draw element.
+                        panel.draw(image=preview_img,
+                                   color=color)
+
+                if self.detected_labels is not None:
+                    for label_index, label in enumerate(self.detected_labels):
+                        # Select color.
+                        color = shape_colors[label_index % len(shape_colors)]
+
+                        # Draw element.
+                        label.draw(image=preview_img,
+                                   color=color)
+
+        # Invalid mode.
+        else:
+            raise ValueError("`mode` should be either 'gt', 'pred', or 'both'.")
 
         # Store the computed image
         self.preview_image = preview_img
@@ -822,27 +884,30 @@ class Figure:
             csv_writer = csv.writer(csvfile, delimiter=',')
 
             # Looping over Panel objects.
-            for panel in self.gt_panels:
+            for subfigure in self.gt_subfigures:
 
                 # Panel information
                 csv_row = [
                     self.image_path,
-                    panel.panel_rect[0],
-                    panel.panel_rect[1],
-                    panel.panel_rect[2],
-                    panel.panel_rect[3],
+                    subfigure.panel.box[0],
+                    subfigure.panel.box[1],
+                    subfigure.panel.box[2],
+                    subfigure.panel.box[3],
                     'panel'
                     ]
 
                 # Label information
-                if panel.label is not None and panel.label_rect is not None:
-                    csv_row.append(panel.label_rect[0])
-                    csv_row.append(panel.label_rect[1])
-                    csv_row.append(panel.label_rect[2])
-                    csv_row.append(panel.label_rect[3])
-                    csv_row.append(panel.label)
+                if subfigure.label is not None:
+                    # Label bounding box
+                    csv_row.append(subfigure.label.box[0])
+                    csv_row.append(subfigure.label.box[1])
+                    csv_row.append(subfigure.label.box[2])
+                    csv_row.append(subfigure.label.box[3])
 
-                # Writting to csv file
+                    # Label text
+                    csv_row.append(subfigure.label.text)
+
+                # Writting to csv file.
                 csv_writer.writerow(csv_row)
 
 
@@ -879,12 +944,15 @@ class Figure:
         ymax = []
         classes = []
         classes_text = []
-        for panel in self.gt_panels:
+        for subfigure in self.gt_subfigures:
+
+            panel = subfigure.panel
+
             # Bounding box
-            xmin.append(float(panel.panel_rect[0]) / self.image_width)
-            ymin.append(float(panel.panel_rect[1]) / self.image_height)
-            xmax.append(float(panel.panel_rect[2]) / self.image_width)
-            ymax.append(float(panel.panel_rect[3]) / self.image_height)
+            xmin.append(float(panel.box[0]) / self.image_width)
+            ymin.append(float(panel.box[1]) / self.image_height)
+            xmax.append(float(panel.box[2]) / self.image_width)
+            ymax.append(float(panel.box[3]) / self.image_height)
 
             # Class information
             class_name = 'panel'

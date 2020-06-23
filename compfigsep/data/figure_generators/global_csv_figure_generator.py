@@ -26,7 +26,7 @@ import os
 import logging
 import csv
 
-from ...utils.figure import Panel, Figure
+from ...utils.figure import Panel, Label, SubFigure, Figure
 from .figure_generator import FigureGenerator
 
 
@@ -71,7 +71,7 @@ class GlobalCsvFigureGenerator(FigureGenerator):
         with open(self.csv_annotation_file_path, 'r') as csv_annotation_file:
             csv_reader = csv.reader(csv_annotation_file, delimiter=',')
 
-            panels = []
+            subfigures = []
             image_path = ''
             figure = None
 
@@ -82,7 +82,7 @@ class GlobalCsvFigureGenerator(FigureGenerator):
                 # New figure
                 if not image_path.endswith(row[0]):
                     if figure is not None:
-                        figure.gt_panels = panels
+                        figure.gt_subfigures = subfigures
                         yield figure
 
                         image_counter += 1
@@ -103,21 +103,21 @@ class GlobalCsvFigureGenerator(FigureGenerator):
                         logging.error(exception)
                         continue
 
-                    panels = []
+                    # Create empty list of subfigures.
+                    subfigures = []
 
 
                 # Panel segmentation + panel splitting
                 if len(row) == 11:
                     try:
-                        label_coordinates = [int(x) for x in row[6:10]]
-                        label = row[10]
+                        # Instanciate Label object
+                        label = Label(text=row[10],
+                                      box=[int(x) for x in row[6:10]])
                     except ValueError:
-                        label_coordinates = None
                         label = None
 
                 # Panel splitting only
                 elif len(row) == 6:
-                    label_coordinates = None
                     label = None
                 else:
                     raise ValueError("Row should be of length 6 or 11")
@@ -127,12 +127,12 @@ class GlobalCsvFigureGenerator(FigureGenerator):
                 assert panel_class == 'panel'
 
                 # Instanciate Panel object
-                panel = Panel(panel_rect=panel_coordinates,
-                              label_rect=label_coordinates,
-                              label=label)
+                panel = Panel(box=panel_coordinates)
 
-                panels.append(panel)
+                subfigures.append(SubFigure(panel=panel,
+                                            label=label))
 
-            # set panels for the last figure
-            figure.gt_panels = panels
+            # set subfigures for the last figure
+            figure.gt_subfigures = subfigures
+
             yield figure

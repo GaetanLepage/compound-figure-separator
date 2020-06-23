@@ -26,8 +26,7 @@ import os
 import logging
 import xml.etree.ElementTree as ET
 
-from ...utils.figure.figure import Figure
-from ...utils.figure.panel import Panel
+from ...utils.figure import Figure, Panel, SubFigure
 from .figure_generator import FigureGenerator
 
 
@@ -115,26 +114,22 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
                 continue
 
             # Loop over the panels (object_items)
-            panels = []
+            subfigures = []
             object_items = annotation_item.findall('./object')
             for object_item in object_items:
 
                 point_items = object_item.findall('./point')
 
                 # Create Panel object
-                panel = Panel(
-                    panel_rect=[
-                        int(point_items[0].get('x')),
-                        int(point_items[0].get('y')),
-                        int(point_items[3].get('x')),
-                        int(point_items[3].get('y'))
-                        ]
-                    )
+                panel = Panel(box=[int(point_items[0].get('x')),
+                                   int(point_items[0].get('y')),
+                                   int(point_items[3].get('x')),
+                                   int(point_items[3].get('y'))])
 
                 # Add this panel to the list of panels
-                panels.append(panel)
+                subfigures.append(SubFigure(panel=panel))
 
             # Store the list of panels in the Figure object
-            figure.gt_panels = panels
+            figure.gt_subfigures = subfigures
 
             yield figure

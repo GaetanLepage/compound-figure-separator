@@ -24,7 +24,7 @@ Evaluator for the label recognition task.
 
 from typing import List
 
-from ..utils.figure import Figure, DetectedPanel, CLASS_LABEL_MAPPING
+from ..utils.figure import Figure, DetectedSubFigure, CLASS_LABEL_MAPPING
 from ..utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 from .evaluate import evaluate_detections
 
@@ -100,7 +100,7 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
             for prediction in predicted_panels:
 
                 # Instanciate a Panel object.
-                panel = DetectedPanel(label=CLASS_LABEL_MAPPING[prediction['cls']],
+                panel = DetectedSubFigure(label=CLASS_LABEL_MAPPING[prediction['cls']],
                                       label_rect=prediction['box'],
                                       label_detection_score=prediction['score'])
 
