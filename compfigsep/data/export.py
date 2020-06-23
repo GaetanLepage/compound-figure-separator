@@ -134,7 +134,7 @@ def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
 
         objs = []
 
-        if figure.gt_panels is not None:
+        if figure.gt_subfigures is not None:
 
             for subfigure in figure.gt_subfigures:
 
