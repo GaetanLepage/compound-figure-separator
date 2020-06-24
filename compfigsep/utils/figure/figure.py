@@ -274,27 +274,22 @@ class Figure:
 
                 # Panels can only have 1 or 2 words:
                 # *) The first one is "panel"
-                # *) The second one is the label letter
+                # *) The second one is the label text
                 if len(words) > 2:
                     # TODO check what to do in this case
-                    # logging.error(
-                        # '%s: %s is not correct',
-                        # annotation_file_path,
-                        # label_text)
+                    self._logger.error(f"{annotation_file_path}: {label_text} is not correct")
                     continue
 
                 # If the label text contains two words,
                 # then the second one is the label text
-                if len(words) == 2:
+                elif len(words) == 2:
                     label_text = label_class.map_label(words[1])
 
                     # TODO check what to do in this case
-                    # if len(label_text) != 1:
+                    if len(label_text) != 1:
                         # # Now we process single character panel label only (a, b, c...)
-                        # logging.warning(
-                            # '%s: panel %s is not single character',
-                            # annotation_file_path,
-                            # label_text)
+                        self._logger.warning(f"{annotation_file_path}: panel {label_text}"\
+                                              " is not single character")
 
                 # The text only contains a single panel.
                 # => no label
@@ -305,17 +300,18 @@ class Figure:
 
                 if x_max <= x_min or y_max <= y_min:
                     # TODO check what to do in this case
-                    # logging.error(
-                        # '%s: panel %s rect is not correct!',
-                        # annotation_file_path,
-                        # label_text)
+                    self._logger.error(f"{annotation_file_path}: panel {label_text} rect is not"\
+                                   " correct!")
                     continue
 
                 # Create Panel object
                 panel_rect = [x_min, y_min, x_max, y_max]
                 panel = Panel(box=panel_rect)
 
-                panels[label_text] = panel
+                if label_text in panels:
+                    panels[label_text].append(panel)
+                else:
+                    panels[label_text] = [panel]
 
             return panels
 
@@ -333,32 +329,32 @@ class Figure:
                 label_text = text_item.text
                 label_text = label_text.strip()
                 words = label_text.split(' ')
+
+                # Labels can only have 1 or 2 words:
+                # *) The first one is "label"
+                # *) The second one is the label text
                 if len(words) != 2:
-                    logging.error(
-                        '%s: %s is not correct',
-                        annotation_file_path,
-                        label_text)
+                    self._logger.error(f"{annotation_file_path}: {label_text} is not correct")
                     continue
                 label_text = words[1]
                 # Now we process single character panel label only
                 # TODO check what to do in this case
-                # if len(label_text) != 1:
-                    # logging.warning(
-                        # '%s: label %s is not single character',
-                        # annotation_file_path,
-                        # label_text)
+                if len(label_text) != 1:
+                    self._logger.warning(f"{annotation_file_path}: label {label_text} is not"\
+                                          " single character")
 
                 label_text = label_class.map_label(label_text)
 
                 x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(item=label_item)
 
                 if x_max <= x_min or y_max <= y_min:
-                    logging.error(f"{annotation_file_path}: label {label_text} rect is not"\
-                                   " correct!")
+                    self._logger.error(f"{annotation_file_path}: label {label_text} rect is not"\
+                                        " correct!")
                     continue
 
                 label_rect = [x_min, y_min, x_max, y_max]
-                # We use Panel objects temporarily
+
+                # Instanciate Label object.
                 label = Label(text=label_text,
                               box=label_rect)
 
@@ -379,13 +375,13 @@ class Figure:
                 labels (List[Label]):       List of labels.
 
             Returns:
-                panels (List[SubFigure]):   List of subfigures (containing panel and label
-                                                information).
+                subfigures (List[SubFigure]):   List of subfigures (containing panel and label
+                                                    information).
             """
             if len(labels) != 0 and len(labels) != len(panels):
-                logging.warning(f"{annotation_file_path}: has different panel and label rects."\
-                                 " Most likely there are mixes with-label and without-label"\
-                                 " panels.")
+                self._logger.warning(f"{annotation_file_path}: has different panel and label"\
+                                      " rects. Most likely there are mixes with-label and"\
+                                      " without-label panels.")
 
             # Collect all panel label characters.
             char_set = set()
@@ -408,12 +404,12 @@ class Figure:
             # Assign labels to panels.
             for label_char in char_set:
                 if len(panel_dict[label_char]) != len(label_dict[label_char]):
-                    logging.error(f"{annotation_file_path}: panel {label_char} does not have"\
-                                   " same matching labels!")
+                    self._logger.error(f"{annotation_file_path}: panel {label_char} does not"\
+                                        " have same matching labels!")
                     continue
 
-                if len(panel_dict[label_char]) > 1:
-                    print(panel_dict)
+                # if len(panel_dict[label_char]) > 1:
+                    # print(panel_dict)
 
                 panel = panel_dict[label_char][0]
 
@@ -447,14 +443,20 @@ class Figure:
             elif text.startswith('label'):
                 label_items.append(shape_item)
             else:
-                self._logger.error('%s: has unknown <shape> xml items %s',
-                                   annotation_file_path, text)
+                self._logger.error("{annotation_file_path}: has unknown <shape> xml items {text}")
 
         # Extract information from and validate all panel items.
         panels = extract_panel_info()
+        # if len(panel_items) != len(panels):
+            # print(f"len(panel_items) = {len(panel_items)}")
+            # print(f"panel_items = {panel_items}")
+            # print(f"panels = {panels}")
 
         # Extract information from and validate all label items.
         labels = extract_label_info()
+        # if len(label_items) != len(labels):
+            # # print(f"label_items = {label_items}")
+            # print(f"labels = {labels}")
 
         # Match both lists to get a unique list of panels containing
         # information of their matching label.

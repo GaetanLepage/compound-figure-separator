@@ -79,6 +79,27 @@ class Panel:
                           thickness=2)
 
 
+    def __str__(self) -> str:
+        """
+        str method for a Panel.
+
+        Returns:
+            string (str):   A string containing the Panel information.
+        """
+        string = f"{type(self).__name__}:"
+        string += f" box: {self.box}"
+
+        return string
+
+
+    def __repr__(self):
+        """
+        TODO
+        """
+        return str(self)
+
+
+
 class DetectedPanel(Panel):
     """
     TODO
@@ -125,16 +146,29 @@ class DetectedPanel(Panel):
 
     def __str__(self):
         """
-        TODO
+        str method for a DetectedPanel.
+
+        Returns:
+            string (str):   A string containing the DetectedPanel information.
         """
         string = super().__str__()
 
         if self.detection_score is not None:
-            string += f"=> detection_score = {self.detection_score}"
+            string += f", detection_score: {self.detection_score}"
+
         if self.is_true_positive_overlap is not None:
-            string += f"=> panel_is_true_positive_overlap = {self.is_true_positive_overlap}"
+            string += f", is_true_positive_overlap: {self.is_true_positive_overlap}"
+
         if self.is_true_positive_iou is not None:
-            string += f"=> panel_is_true_positive_iou = {self.is_true_positive_iou}"
+            string += f", is_true_positive_iou: {self.is_true_positive_iou}"
+
+
+    def __repr__(self):
+        """
+        TODO
+        """
+        return str(self)
+
 
 
 class Label:
@@ -183,6 +217,28 @@ class Label:
                         color=color)
 
 
+    def __str__(self) -> str:
+        """
+        str method for a Label.
+
+        Returns:
+            string (str):   A string containing the Label information.
+        """
+        string = f"{type(self).__name__}:"
+        string += f" box: {self.box}"
+        string += f", text: {self.text}"
+
+        return string
+
+
+    def __repr__(self):
+        """
+        TODO
+        """
+        return str(self)
+
+
+
 class DetectedLabel(Label):
     """
     TODO
@@ -223,6 +279,30 @@ class DetectedLabel(Label):
         super().draw(image, color)
 
 
+    def __str__(self):
+        """
+        str method for a DetectedLabel.
+
+        Returns:
+            string (str):   A string containing the DetectedLabel information.
+        """
+        string = super().__str__()
+
+        if self.detection_score is not None:
+            string += f", detection_score: {self.detection_score}"
+
+        if self.is_true_positive is not None:
+            string += f", is_true_positive: {self.is_true_positive}"
+
+
+    def __repr__(self):
+        """
+        TODO
+        """
+        return str(self)
+
+
+
 class SubFigure:
     """
     A class for a sub-figure (a subpart of a compound figure).
@@ -251,22 +331,6 @@ class SubFigure:
         self.caption = caption
 
 
-    def __str__(self) -> str:
-        """
-        str method for a SubFigure object.
-
-        Returns:
-            string (str):   A pretty representation of the SubFigure information.
-        """
-        string = f"{type(self).__name__}:"
-
-        string += f"\n\tPanel:   {self.panel}"
-        string += f"\n\tLabel:   {self.label}"
-        string += f"\n\tCaption: {self.caption}"
-
-        return string
-
-
     def draw_elements(self,
                       image: np.ndarray,
                       color: Color = DEFAULT_GT_COLOR):
@@ -283,6 +347,30 @@ class SubFigure:
 
         if self.label is not None:
             self.label.draw(image=image, color=color)
+
+
+    def __str__(self) -> str:
+        """
+        str method for a SubFigure object.
+
+        Returns:
+            string (str):   A pretty representation of the SubFigure information.
+        """
+        string = f"{type(self).__name__}:"
+
+        string += f" Panel:   {self.panel}"
+        string += f", Label:   {self.label}"
+        string += f", Caption: {self.caption}"
+
+        return string
+
+
+    def __repr__(self) -> str:
+        """
+        TODO
+        """
+        return str(self)
+
 
 
 class DetectedSubFigure(SubFigure):
@@ -312,3 +400,25 @@ class DetectedSubFigure(SubFigure):
         self.is_true_positive = False
 
         self.caption_is_positive = False
+
+
+    def __str__(self) -> str:
+        """
+        str method for a DetectedSubFigure object.
+
+        Returns:
+            string (str):   A pretty representation of the SubFigure information.
+        """
+        string = super().__str__()
+
+        string += f", is_true_positive: {self.is_true_positive}"
+        string += f", caption_is_positive: {self.caption_is_positive}"
+
+        return string
+
+
+    def __repr__(self) -> str:
+        """
+        TODO
+        """
+        return str(self)

@@ -121,7 +121,7 @@ def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
 
     if task not in ['panel_splitting', 'label_recog', 'panel_seg']:
         raise ValueError("`task` has to be one of ['panel_splitting', 'label_recog',"\
-            f" 'panel_seg'] but is {task}")
+                        f" 'panel_seg'] but is {task}")
 
     dataset_dicts = []
     for index, figure in enumerate(figure_generator):
@@ -137,6 +137,9 @@ def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
         if figure.gt_subfigures is not None:
 
             for subfigure in figure.gt_subfigures:
+
+                # TODO remove
+                print(subfigure)
 
                 panel = subfigure.panel
                 label = subfigure.label
