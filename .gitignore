@@ -1,6 +1,9 @@
 # Tensorflow files
 **/models/*
 
+# Data set archives
+*.zip
+
 
 *.iml
 # models/
