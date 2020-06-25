@@ -54,7 +54,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
                         type=str)
 
     parser.add_argument('--image_directory_path',
-                        help="The path to the directory whre the images are stored.",
+                        help="The path to the directory where the images are stored.",
                         default="data/ImageCLEF/test/FigureSeparationTest2016/",
                         type=str)
 
