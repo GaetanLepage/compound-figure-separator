@@ -1,5 +1,5 @@
 _BASE_: "../utils/detectron_utils/Base-RetinaNet.yaml"
-OUTPUT_DIR: "panel_seg/label_recognition/output"
+OUTPUT_DIR: "compfigsep/label_recognition/output"
 MODEL:
   RESNETS:
     OUT_FEATURES: ['res2', 'res3', 'res4']

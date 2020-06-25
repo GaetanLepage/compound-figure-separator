@@ -1,5 +1,5 @@
 #_BASE_: "/home/gaetan/hevs/implementations/object_detection/detectron2/configs/COCO-Detection/retinanet_R_50_FPN_1x.yaml"
-OUTPUT_DIR: "panel_seg/panel_segmentation/output"
+OUTPUT_DIR: "compfigsep/panel_segmentation/output"
 
 MODEL:
   META_ARCHITECTURE: 'RetinaNet'
