@@ -1,19 +1,27 @@
-# General purpose libraries
+#############################
+# General purpose libraries #
+#############################
 numpy
 sortedcontainers
 
-# Deep learning
+#################
+# Deep learning #
+#################
 torch
---find-links https://dl.fbaipublicfiles.com/detectron2/wheels/cu102/torch1.5/index.html
-detectron2
+# Detectron2:
+git+https://github.com/facebookresearch/detectron2.git
 # Detectron2 requirements:
     torchvision
     pycocotools
 
-# Image
+#########
+# Image #
+#########
 Pillow
 opencv-python
 
-# Documentation generation
+############################
+# Documentation generation #
+############################
 Sphinx
 sphinx_rtd_theme
