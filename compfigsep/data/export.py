@@ -27,7 +27,7 @@ from typing import Iterable
 import csv
 
 from ..utils.figure import Figure
-from ..utils.figure.label_class import LABEL_CLASS_MAPPING
+from ..utils.figure.label_class import map_label, LABEL_CLASS_MAPPING
 
 
 def export_figures_to_csv(figure_generator: Iterable[Figure],
@@ -138,9 +138,6 @@ def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
 
             for subfigure in figure.gt_subfigures:
 
-                # TODO remove
-                print(subfigure)
-
                 panel = subfigure.panel
                 label = subfigure.label
 
@@ -152,6 +149,10 @@ def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
                     }
 
                 elif task == 'label_recog':
+
+                    if label is None:
+                        continue
+
                     if label.box is None or len(label.text) != 1:
                         # We ensure that, for this task, the labels are valid
                         # (they have been previously checked while loading annotations)
@@ -172,11 +173,13 @@ def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
                         'bbox_mode': BoxMode.XYXY_ABS
                     }
 
-                    if label.box is not None and len(label.box) == 1:
+                    if label is not None\
+                        and label.box is not None\
+                        and len(label.text) == 1:
                         # If there is no valid label, it won't be considered for training.
                         # TODO: later, we would like to handle >1 length labels
                         obj['label_bbox'] = label.box
-                        obj['label'] = LABEL_CLASS_MAPPING[label.text]
+                        obj['label'] = LABEL_CLASS_MAPPING[map_label(label.text)]
 
 
                 objs.append(obj)
