@@ -142,3 +142,5 @@ def assign_labels_to_panels(panels: List[Panel],
 
         subfigures.append(SubFigure(panel=panel,
                                     label=matched_label))
+
+    return subfigures

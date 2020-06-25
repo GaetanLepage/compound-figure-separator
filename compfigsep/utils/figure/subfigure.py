@@ -295,10 +295,7 @@ class DetectedLabel(Label):
             string += f", is_true_positive: {self.is_true_positive}"
 
 
-    def __repr__(self):
-        """
-        TODO
-        """
+    def __repr__(self) -> str:
         return str(self)
 
 

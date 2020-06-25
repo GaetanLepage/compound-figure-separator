@@ -64,10 +64,7 @@ class Figure:
     def __init__(self,
                  image_path: str,
                  index: int):
-        """
-        Init for a Figure object.
-        Neither the image or the annotations are loaded at this stage.
-
+        """ Init for a Figure object.  Neither the image or the annotations are loaded at this stage.
         Args:
             image_path (str): The path to the figure image file.
             index (int):      A unique index to identify the figure within the data set.
@@ -263,9 +260,9 @@ class Figure:
             Extract information from and validate all panel items
 
             Returns:
-                panels (Dict[str, Panel]):    A dict linking Panel objects to their labels.
+                panel_dict (Dict[str, Panel]):  A dict linking Panel objects to their labels.
             """
-            panels = {}
+            panel_dict = {}
             for panel_item in panel_items:
                 text_item = panel_item.find('./BlockText/Text')
                 label_text = text_item.text
@@ -276,20 +273,14 @@ class Figure:
                 # *) The first one is "panel"
                 # *) The second one is the label text
                 if len(words) > 2:
-                    # TODO check what to do in this case
+                    # The panel annotation is not valid. Skip it.
                     self._logger.error(f"{annotation_file_path}: {label_text} is not correct")
                     continue
 
                 # If the label text contains two words,
                 # then the second one is the label text
-                elif len(words) == 2:
-                    label_text = label_class.map_label(words[1])
-
-                    # TODO check what to do in this case
-                    if len(label_text) != 1:
-                        # # Now we process single character panel label only (a, b, c...)
-                        self._logger.warning(f"{annotation_file_path}: panel {label_text}"\
-                                              " is not single character")
+                if len(words) == 2:
+                    label_text = words[1]
 
                 # The text only contains a single panel.
                 # => no label
@@ -301,49 +292,43 @@ class Figure:
                 if x_max <= x_min or y_max <= y_min:
                     # TODO check what to do in this case
                     self._logger.error(f"{annotation_file_path}: panel {label_text} rect is not"\
-                                   " correct!")
+                                        " correct!")
                     continue
 
                 # Create Panel object
                 panel_rect = [x_min, y_min, x_max, y_max]
                 panel = Panel(box=panel_rect)
 
-                if label_text in panels:
-                    panels[label_text].append(panel)
+                if label_text in panel_dict:
+                    panel_dict[label_text].append(panel)
                 else:
-                    panels[label_text] = [panel]
+                    panel_dict[label_text] = [panel]
 
-            return panels
+            return panel_dict
 
 
-        def extract_label_info() -> List[Label]:
+        def extract_label_info() -> Dict[str, List[Label]]:
             """
             Extract information from and validate all label items.
 
             Returns:
-                labels (List[Label]):   A list of Label objects representing the detected labels.
+                label_dict (Dict[str, List[Label]]):    A list of Label objects representing the
+                                                            detected labels.
             """
-            labels = []
+            label_dict = {}
             for label_item in label_items:
                 text_item = label_item.find('./BlockText/Text')
                 label_text = text_item.text
                 label_text = label_text.strip()
                 words = label_text.split(' ')
 
-                # Labels can only have 1 or 2 words:
+                # Labels can only have 2 words:
                 # *) The first one is "label"
                 # *) The second one is the label text
                 if len(words) != 2:
                     self._logger.error(f"{annotation_file_path}: {label_text} is not correct")
                     continue
                 label_text = words[1]
-                # Now we process single character panel label only
-                # TODO check what to do in this case
-                if len(label_text) != 1:
-                    self._logger.warning(f"{annotation_file_path}: label {label_text} is not"\
-                                          " single character")
-
-                label_text = label_class.map_label(label_text)
 
                 x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(item=label_item)
 
@@ -358,66 +343,94 @@ class Figure:
                 label = Label(text=label_text,
                               box=label_rect)
 
-                labels.append(label)
+                if label_text in label_dict:
+                    label_dict[label_text].append(label)
+                else:
+                    label_dict[label_text] = [label]
 
-            return labels
+            return label_dict
 
 
-        def match_panels_with_labels(panels: Dict[str, Panel],
-                                     labels: List[Label]
+        def match_panels_with_labels(panel_dict: Dict[str, List[Panel]],
+                                     label_dict: Dict[str, List[Panel]],
                                      ) -> List[SubFigure]:
             """
-            Match both lists to get a unique list of panels containing
-            information of their matching label.
+            Match both lists to get a unique list of subfigures.
 
             Args:
-                panels (Dict[str, Panel]):  Dict linking panels and their label.
-                labels (List[Label]):       List of labels.
+                panel_dict (Dict[str, List[Panel]]):    Dict linking Panel objects to the
+                                                            associated label text.
+                label_dict (Dict[str, List[Panel]]):    Dict linking Label objects to their
+                                                            associated label text.
 
             Returns:
                 subfigures (List[SubFigure]):   List of subfigures (containing panel and label
                                                     information).
             """
-            if len(labels) != 0 and len(labels) != len(panels):
-                self._logger.warning(f"{annotation_file_path}: has different panel and label"\
-                                      " rects. Most likely there are mixes with-label and"\
-                                      " without-label panels.")
+            # Resulting list of subfigures.
+            subfigures = []
+
+            # First, extract unlabeled panels
+            if '' in panel_dict:
+                unlabeled_panels = panel_dict.pop('')
+                subfigures.extend(SubFigure(panel=panel) for panel in unlabeled_panels)
+
+            # Case where the figure has no labels.
+            if len(label_dict) == 0:
+                if len(panel_dict) != 0:
+                    self._logger.error(f"{annotation_file_path}: Some panels have label"\
+                                       f" annotations ({panel_dict}) but there are no labels.")
+
+                return subfigures
+
+            # Case where the figure contains labels.
+            # => Check that there are as many labeled panels as there are labels.
+            num_labeled_panels = sum(len(panels) for panels in panel_dict.values())
+            num_labels = sum(len(labels) for labels in label_dict.values())
+
+            if num_labeled_panels != num_labels:
+                self._logger.error(f"{annotation_file_path}: has a different number of labeled"\
+                                   f" panels and labels:\n{panel_dict}\n{label_dict}")
+                return subfigures
 
             # Collect all panel label characters.
-            char_set = set()
-            for panel_label in panels.keys():
-                if len(panel_label) != 0:
-                    char_set.add(panel_label)
+            label_texts = set(panel_dict.keys())
 
-            # Build panel dictionary according to labels.
-            panel_dict = {s: [] for s in char_set}
-            for panel_label, panel in panels.items():
-                if len(panel_label) != 0:
-                    panel_dict[panel_label].append(panel)
-
-            # Build label dictionary according to labels.
-            label_dict = {s: [] for s in char_set}
-            for label in labels:
-                label_dict[label.text].append(label)
-
-            subfigures = []
             # Assign labels to panels.
-            for label_char in char_set:
-                if len(panel_dict[label_char]) != len(label_dict[label_char]):
-                    self._logger.error(f"{annotation_file_path}: panel {label_char} does not"\
-                                        " have same matching labels!")
+            for label_text in label_texts:
+                # Check if, for the same label, the number of panels and labels is the same
+                # (should be 1).
+                if len(panel_dict[label_text]) != len(label_dict[label_text]):
+
+                    self._logger.error(f"{annotation_file_path}: For label {label_text}, there"\
+                                        " is not the same number of panels"\
+                                       f" ({panel_dict[label_text]}) and labels"\
+                                       f" ({label_dict[label_dict]}) have same matching labels!")
                     continue
 
-                # if len(panel_dict[label_char]) > 1:
-                    # print(panel_dict)
+                # Multiple panel/label pairs for the same label text.
+                if len(panel_dict[label_text]) > 1:
+                    self._logger.info(f"{annotation_file_path}: Multiple panels/labels with"\
+                                      f" same label {label_text}. Matching them with beam"\
+                                       " search.")
 
-                panel = panel_dict[label_char][0]
+                    subfigures.extend(beam_search.assign_labels_to_panels(
+                        panels=panel_dict[label_text],
+                        labels=label_dict[label_text]))
+
+                # Single panel and label for the same label text.
+                else:
+                    panel = panel_dict[label_text][0]
+                    label = label_dict[label_text][0]
+
+                    subfigures.append(SubFigure(panel=panel,
+                                                label=label))
 
             # Expand the panel_rect to always include label_rect.
             for subfigure in subfigures:
                 panel = subfigure.panel
                 label = subfigure.label
-                if label.box is not None:
+                if label is not None and label.box is not None:
                     panel.box = box.union(box_1=panel.box,
                                           box_2=label.box)
 
@@ -446,24 +459,17 @@ class Figure:
                 self._logger.error("{annotation_file_path}: has unknown <shape> xml items {text}")
 
         # Extract information from and validate all panel items.
-        panels = extract_panel_info()
-        # if len(panel_items) != len(panels):
-            # print(f"len(panel_items) = {len(panel_items)}")
-            # print(f"panel_items = {panel_items}")
-            # print(f"panels = {panels}")
+        panel_dict = extract_panel_info()
 
         # Extract information from and validate all label items.
-        labels = extract_label_info()
-        # if len(label_items) != len(labels):
-            # # print(f"label_items = {label_items}")
-            # print(f"labels = {labels}")
+        label_dict = extract_label_info()
 
         # Match both lists to get a unique list of panels containing
         # information of their matching label.
         # Save this list of panels in tha appropriate attribute of
         # the figure object.
-        self.gt_subfigures = match_panels_with_labels(panels=panels,
-                                                      labels=labels)
+        self.gt_subfigures = match_panels_with_labels(panel_dict=panel_dict,
+                                                      label_dict=label_dict)
 
 ##############
 # EVALUATION #

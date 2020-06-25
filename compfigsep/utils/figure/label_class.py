@@ -87,6 +87,7 @@ def map_label(char: str) -> str:
     Returns:
         char_class (str):   The class to which belongs the character.
     """
+    assert len(char) > 1, f"Char should be of length 1: {char}"
 
     char_classes = [
         ('c', 'C'),
