@@ -40,36 +40,37 @@ def panel_splitting_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
         stat_dict (Dict[str, any]): A dict containing panel splitting evaluation stats
                                         It will be updated by this function.
     """
+    stat_dict['num_samples'] += 1
 
     # Perform matching on this figure
     # This tests whether a detected panel is true positive or false positive
     figure.match_detected_and_gt_panels_splitting_task()
 
-    stat_dict['overall_gt_count'] += len(figure.gt_panels)
+    stat_dict['overall_gt_count'] += len(figure.gt_subfigures)
     stat_dict['overall_detected_count'] += len(figure.detected_panels)
 
     # TODO remove
-    print("Number of GT panels :", len(figure.gt_panels))
+    print("Number of GT panels :", len(figure.gt_subfigures))
     print("Number of detected panels :", len(figure.detected_panels))
 
     num_correct_imageclef = 0
     num_correct_iou_thresh = 0
 
     for detected_panel in figure.detected_panels:
-        num_correct_imageclef += int(detected_panel.panel_is_true_positive_overlap)
+        num_correct_imageclef += int(detected_panel.is_true_positive_overlap)
 
-        num_correct_iou_thresh += int(detected_panel.panel_is_true_positive_iou)
+        num_correct_iou_thresh += int(detected_panel.is_true_positive_iou)
 
         # Add this detection in the sorted list
-        stat_dict['detections'].add((detected_panel.panel_detection_score,
-                                     detected_panel.panel_is_true_positive_iou))
+        stat_dict['detections'].add((detected_panel.detection_score,
+                                     detected_panel.is_true_positive_iou))
 
     # TODO remove
     print("Number of imageCLEF correct panels :", num_correct_imageclef)
     print("Number of IoU correct panels :", num_correct_iou_thresh)
 
     # ImageCLEF accuracy (based on overlap 0.66 threshold)
-    k = max(len(figure.gt_panels), len(figure.detected_panels))
+    k = max(len(figure.gt_subfigures), len(figure.detected_panels))
     imageclef_accuracy = num_correct_imageclef / k
 
     stat_dict['sum_imageclef_accuracies'] += imageclef_accuracy
@@ -84,10 +85,12 @@ def panel_splitting_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
                                         detections.
 
     Returns:
-        imageclef_accuracy (int):   TODO
-        precision (int):            TODO
-        recall (int):               TODO
-        mAP (int):                  TODO
+        imageclef_accuracy (int):   The ImageCLEF accuracy as presented in this paper:
+                                        (http://ceur-ws.org/Vol-1179/CLEF2013wn-ImageCLEF-
+                                        SecoDeHerreraEt2013b.pdf).
+        precision (int):            Precision value (TP / TP + FP).
+        recall (int):               Recall value (TP / TP + FP).
+        mAP (int):                  Mean average precision value.
     """
     # 1) ImageCLEF accuracy
     imageclef_accuracy = stat_dict['sum_imageclef_accuracies'] / stat_dict['num_samples']
@@ -129,9 +132,6 @@ def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
     Returns:
         metrics (Dict[str, float]): A dict containing the computed metrics.
     """
-
-    num_samples = 0
-
     stats = {
         'num_samples': 0,
         'overall_gt_count': 0,
@@ -145,8 +145,7 @@ def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
         panel_splitting_figure_eval(figure, stats)
 
     imageclef_accuracy, precision, recall, mean_average_precision = panel_splitting_metrics(
-        stat_dict=stats,
-        num_samples=num_samples)
+        stat_dict=stats)
 
     print(f"ImageCLEF Accuracy (overlap threshold = 0.66): {imageclef_accuracy:.3f}\n"\
           f"Precision: {precision:.3f}\n"\

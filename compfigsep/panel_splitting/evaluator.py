@@ -24,7 +24,7 @@ Evaluator for the panel splitting task.
 
 from typing import List
 
-from ..utils.figure import Figure, DetectedSubFigure
+from ..utils.figure import Figure, DetectedPanel
 from ..utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 from .evaluate import evaluate_detections
 
@@ -100,8 +100,8 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
             for prediction in predicted_panels:
 
                 # Instanciate a Panel object.
-                panel = DetectedSubFigure(panel_rect=prediction['box'],
-                                      panel_detection_score=prediction['score'])
+                panel = DetectedPanel(box=prediction['box'],
+                                      detection_score=prediction['score'])
 
                 predicted_panel_objects.append(panel)
 

@@ -44,14 +44,21 @@ def label_recognition_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
     # This tests whether a detected label is true positive or false positive
     figure.match_detected_and_gt_labels()
 
+    # TODO remove
+    num_gt_labels = 0
+
     # Keep track of the number of gt labels for each class
-    for gt_panel in figure.gt_panels:
+    for gt_subfigure in figure.gt_subfigures:
+
+        gt_label = gt_subfigure.label
 
         # Drop useless panels for this task
-        if gt_panel.label_rect is None or len(gt_panel.label) != 1:
+        if gt_label.box is None or len(gt_label.text) != 1:
             continue
 
-        cls = gt_panel.label
+        # TODO remove
+        num_gt_labels += 1
+        cls = gt_label.text
 
         stat_dict['overall_gt_count'] += 1
 
@@ -61,17 +68,17 @@ def label_recognition_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
             stat_dict['gt_count_by_class'][cls] += 1
 
 
-    stat_dict['overall_detected_count'] += len(figure.detected_panels)
+    stat_dict['overall_detected_count'] += len(figure.detected_labels)
 
     # TODO remove
-    print("Number of GT labels :", len(figure.gt_panels))
-    print("Number of detected labels :", len(figure.detected_panels))
+    print("Number of GT labels :", len(num_gt_labels))
+    print("Number of detected labels :", len(figure.detected_labels))
 
     num_correct = 0
-    for detected_panel in figure.detected_panels:
-        num_correct += int(detected_panel.label_is_true_positive)
+    for detected_label in figure.detected_labels:
+        num_correct += int(detected_label.is_true_positive)
 
-        cls = detected_panel.label
+        cls = detected_label.text
 
         # initialize the dict entry for this class if necessary
         # it is sorting the predictions in the decreasing order of their score
@@ -79,8 +86,8 @@ def label_recognition_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
             stat_dict['detections_by_class'][cls] = SortedKeyList(key=lambda u: -u[0])
 
         # Add this detection in the sorted list
-        stat_dict['detections_by_class'][cls].add((detected_panel.label_detection_score,
-                                                   detected_panel.label_is_true_positive))
+        stat_dict['detections_by_class'][cls].add((detected_label.detection_score,
+                                                   detected_label.is_true_positive))
 
     print("Number of correct detections :", num_correct)
     stat_dict['overall_correct_count'] += num_correct
@@ -94,7 +101,6 @@ def multi_class_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
     Args:
         stat_dict (Dict[str, any]): A dict containing the stats gathered while looping over
                                         detections.
-
 
     Returns:
         precision (int):    Precision value (TP / TP + FN).
@@ -141,6 +147,7 @@ def multi_class_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
     mAP /= len(stat_dict['detections_by_class'])
 
     return precision, recall, mAP
+
 
 def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
     """

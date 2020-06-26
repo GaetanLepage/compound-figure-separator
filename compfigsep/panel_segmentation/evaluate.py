@@ -22,15 +22,14 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel segmentation task metrics.
 """
 
-from typing import Dict
+from typing import Dict, Iterable
 from pprint import pprint
 from sortedcontainers import SortedKeyList
 
 from ..panel_splitting.evaluate import panel_splitting_figure_eval, panel_splitting_metrics
 from ..label_recognition.evaluate import label_recognition_figure_eval, multi_class_metrics
-from ..utils.figure.figure import Figure
-from ..utils.figure import beam_search
-
+from ..utils.figure import Figure, beam_search
+from ..utils.figure.subfigure import Label
 
 def panel_segmentation_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
     """
@@ -42,15 +41,20 @@ def panel_segmentation_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
                                         It will be updated by this function.
     """
     # Keep track of the number of gt panels for each class
-    for gt_panel in figure.gt_panels:
+    for gt_subfigure in figure.gt_subfigures:
 
         # When panels don't have (valid) label annotation, just set None for label
-        if gt_panel.label_rect is None or len(gt_panel.label) != 1:
-            # TODO: this choice might not be smart
-            # `None` stands for "no label"
-            gt_panel.label = None
+        if gt_subfigure.label is None:
+            gt_subfigure.label = Label(box=None,
+                                       text='')
+        gt_label = gt_subfigure.label
 
-        cls = gt_panel.label
+        if len(gt_label.text) != 1:
+            # TODO: this choice might not be smart
+            # "" stands for "no label"
+            gt_label.text = ''
+
+        cls = gt_label.text
 
         stat_dict['overall_gt_count'] += 1
 
@@ -60,23 +64,23 @@ def panel_segmentation_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
             stat_dict['gt_count_by_class'][cls] += 1
 
 
-    stat_dict['overall_detected_count'] += len(figure.detected_panels)
-    for detected_panel in figure.detected_panels:
-        stat_dict['overall_correct_count'] += int(detected_panel.label_is_true_positive)
+    stat_dict['overall_detected_count'] += len(figure.detected_subfigures)
+    for detected_subfigure in figure.detected_subfigures:
+        stat_dict['overall_correct_count'] += int(detected_subfigure.is_true_positive)
 
-        cls = detected_panel.label
+        cls = detected_subfigure.label.text
 
         # initialize the dict entry for this class if necessary
         # it is sorting the predictions in the decreasing order of their score
         if cls not in stat_dict['detections_by_class']:
             stat_dict['detections_by_class'][cls] = SortedKeyList(key=lambda u: -u[0])
 
-        # Add this detection in the sorted list
-        stat_dict['detections_by_class'][cls].add((detected_panel.panel_detection_score,
-                                                   detected_panel.panel_is_true_positive_iou))
+        # Add this detection in the sorted list.
+        stat_dict['detections_by_class'][cls].add((detected_subfigure.detection_score,
+                                                   detected_subfigure.is_true_positive))
 
 
-def evaluate_detections(figure_generator: iter) -> dict:
+def evaluate_detections(figure_generator: Iterable[Figure]) -> dict:
     """
     Compute the metrics (precision, recall and mAP) from a given set of panel segmentation
     detections.
@@ -124,7 +128,6 @@ def evaluate_detections(figure_generator: iter) -> dict:
         # print("##############################")
 
         # 1) Panel splitting
-        figure.detected_panels = figure.raw_detected_panels
         print("\nPanel splitting figure stats")
         panel_splitting_figure_eval(figure, stats['panel_splitting'])
         detected_panels = figure.detected_panels
@@ -132,8 +135,7 @@ def evaluate_detections(figure_generator: iter) -> dict:
         # figure.show_preview(mode='both', window_name='panel_splitting')
 
         # 2) Label recognition
-        figure.detected_panels = figure.raw_detected_labels
-        # print("\nLabel recognition figure stats")
+        print("\nLabel recognition figure stats")
         label_recognition_figure_eval(figure, stats['label_recognition'])
         detected_labels = figure.detected_panels
         # pprint(stats['label_recognition'])
@@ -143,10 +145,8 @@ def evaluate_detections(figure_generator: iter) -> dict:
         # Assign detected labels to detected panels using the beam search algorithm
         # TODO manage the case where no labels have been detected
         # if len(detected_labels) > 0:
-        beam_search.assign_labels_to_panels(detected_panels,
-                                            detected_labels)
-
-        figure.detected_panels = detected_panels
+        figure.detected_subfigures = beam_search.assign_labels_to_panels(detected_panels,
+                                                                         detected_labels)
 
         #print("\nPanel segmentation figure stats")
         panel_segmentation_figure_eval(figure, stats['panel_segmentation'])

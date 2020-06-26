@@ -24,9 +24,10 @@ Evaluator for the panel segmentation task.
 
 from typing import List
 
-from ..utils.figure import Figure, DetectedSubFigure, CLASS_LABEL_MAPPING
+from ..utils.figure import Figure, DetectedPanel, DetectedLabel, CLASS_LABEL_MAPPING
 from ..utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 from .evaluate import evaluate_detections
+
 
 class PanelSegEvaluator(PanelSegAbstractEvaluator):
     """
@@ -117,13 +118,13 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
 
 
             # Convert panels and labels from dict to DetectedPanel objects
-            figure.raw_detected_panels = [DetectedSubFigure(panel_rect=panel['box'],
-                                                        panel_detection_score=panel['score'])
+            figure.raw_detected_panels = [DetectedPanel(box=panel['box'],
+                                                        detection_score=panel['score'])
                                           for panel in detected_panels]
 
-            figure.raw_detected_labels = [DetectedSubFigure(label_rect=label['box'],
-                                                        label_detection_score=label['score'],
-                                                        label=CLASS_LABEL_MAPPING[label['label']])
+            figure.raw_detected_labels = [DetectedLabel(text=CLASS_LABEL_MAPPING[label['label']],
+                                                        box=label['box'],
+                                                        detection_score=label['score'])
                                           for label in detected_labels]
 
             # ==> Those two sets of "half" objects will be merged to give
