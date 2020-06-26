@@ -887,6 +887,7 @@ class Figure:
                             "\n\t==> Skipping.")
             return
 
+        # Open annotation file
         with open(csv_file_path, 'w', newline='') as csvfile:
 
             csv_writer = csv.writer(csvfile, delimiter=',')

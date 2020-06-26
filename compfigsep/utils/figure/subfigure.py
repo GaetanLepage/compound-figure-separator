@@ -36,7 +36,6 @@ DEFAULT_GT_COLOR = (0, 255, 0)
 DEFAULT_DETECTION_COLOR = (0, 0, 200)
 
 
-
 class Panel:
     """
     TODO
@@ -305,9 +304,9 @@ class SubFigure:
     A class for a sub-figure (a subpart of a compound figure).
 
     Attributes:
-        panel (Panel):  TODO
-        label (Label):  TODO
-        caption (str):  TODO
+        panel (Panel):  Panel object.
+        label (Label):  Label object.
+        caption (str):  Caption text.
     """
 
     def __init__(self,
@@ -318,9 +317,9 @@ class SubFigure:
         Init for a `SubFigure` object.
 
         Args:
-            panel (Panel):  TODO
-            label (Label):  TODO
-            caption (str):  TODO
+            panel (Panel):  Panel object.
+            label (Label):  Label object.
+            caption (str):  Caption text.
         """
 
         self.panel = panel
@@ -363,9 +362,6 @@ class SubFigure:
 
 
     def __repr__(self) -> str:
-        """
-        TODO
-        """
         return str(self)
 
 
@@ -376,7 +372,9 @@ class DetectedSubFigure(SubFigure):
     Add association attributes (to link detections to ground truth elements).
 
     Attributes:
-        TODO
+        panel (DetectedPanel):      Panel object.
+        label (DetectedLabel):      Label object.
+        caption (str):              Caption text.
         is_true_positive (bool):    TODO
     """
 
@@ -415,7 +413,4 @@ class DetectedSubFigure(SubFigure):
 
 
     def __repr__(self) -> str:
-        """
-        TODO
-        """
         return str(self)
