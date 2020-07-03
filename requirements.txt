@@ -3,6 +3,7 @@
 #############################
 numpy
 sortedcontainers
+progressbar2
 
 #################
 # Deep learning #

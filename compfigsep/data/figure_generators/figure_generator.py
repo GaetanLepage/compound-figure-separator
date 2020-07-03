@@ -36,6 +36,7 @@ PROJECT_DIR = os.path.join(
 DATA_DIR = os.path.join(
     PROJECT_DIR,
     "data/")
+DATA_DIR = os.path.realpath(DATA_DIR)
 
 
 class FigureGenerator(ABC):

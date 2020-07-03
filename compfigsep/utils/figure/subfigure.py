@@ -354,8 +354,8 @@ class SubFigure:
         """
         string = f"{type(self).__name__}:"
 
-        string += f" Panel:   {self.panel}"
-        string += f", Label:   {self.label}"
+        string += f" {self.panel}"
+        string += f", {self.label}"
         string += f", Caption: {self.caption}"
 
         return string

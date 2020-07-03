@@ -69,17 +69,17 @@ def register_panel_splitting_dataset(dataset_name: str):
     # Dataset from Zou
     elif "zou" in dataset_name:
         if dataset_name == "zou_panel_splitting_train":
-            eval_list_txt = "data/zou/train.txt"
+            file_list_txt = "data/zou/train.txt"
 
         elif dataset_name == "zou_panel_splitting_test":
-            eval_list_txt = "data/zou/eval.txt"
+            file_list_txt = "data/zou/eval.txt"
 
         else:
             # TODO warn the user in this case
             pass
 
         # Instanciate the FigureGenerator
-        figure_generator = IphotodrawXmlFigureGenerator(eval_list_txt=eval_list_txt)
+        figure_generator = IphotodrawXmlFigureGenerator(file_list_txt=file_list_txt)
 
     else:
         # TODO warn the user in this case

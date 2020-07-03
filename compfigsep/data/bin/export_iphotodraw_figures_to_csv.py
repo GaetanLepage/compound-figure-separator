@@ -49,7 +49,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
     parser = ArgumentParser(description="Convert annotations from individual iPhotoDraw"\
                                         " xml annotation files. to a CSV annotations file.")
 
-    parser.add_argument('--eval_list_txt',
+    parser.add_argument('--file_list_txt',
                         help="The path to the txt file listing the images.",
                         default="data/zou/eval.txt",
                         type=str)
@@ -92,7 +92,7 @@ def main(args: List[str] = None):
 
     # Create the figure generator handling xml annotation files.
     figure_generator = IphotodrawXmlFigureGenerator(
-        eval_list_txt=args.eval_list_txt,
+        file_list_txt=args.file_list_txt,
         image_directory_path=args.image_directory_path)
 
     # Export figures to csv.

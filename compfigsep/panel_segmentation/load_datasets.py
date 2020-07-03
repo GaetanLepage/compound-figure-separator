@@ -46,11 +46,11 @@ def register_panel_segmentation_dataset(dataset_name):
 
     # Dataset from Zou
     if dataset_name == "zou_panel_seg_train":
-        eval_list_txt = "data/zou/train.txt"
+        file_list_txt = "data/zou/train.txt"
         image_directory_path = "data/zou/"
 
     elif dataset_name == "zou_panel_seg_test":
-        eval_list_txt = "data/zou/eval.txt"
+        file_list_txt = "data/zou/eval.txt"
         image_directory_path = "data/zou/"
 
     else:
@@ -58,14 +58,14 @@ def register_panel_segmentation_dataset(dataset_name):
 
     # Create the figure generator to feed the dictionary
     figure_generator = IphotodrawXmlFigureGenerator(
-        eval_list_txt=eval_list_txt)
+        file_list_txt=file_list_txt)
 
     # TODO remove
     # if dataset_name == "pubmed":
-        # eval_list_txt = "data/pubmed_extract/eval_list.txt"
+        # file_list_txt = "data/pubmed_extract/eval_list.txt"
         # image_directory_path = "data/pubmed_extract/image/data/dmli-from-comp-reclassification-captions-prostate/"
 
-    # figure_generator = ImageListFigureGenerator(eval_list_txt, image_directory_path)
+    # figure_generator = ImageListFigureGenerator(file_list_txt, image_directory_path)
 
     DatasetCatalog.register(name=dataset_name,
                             func=lambda: export_figures_to_detectron_dict(

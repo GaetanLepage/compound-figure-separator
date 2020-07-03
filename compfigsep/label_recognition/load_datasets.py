@@ -46,10 +46,10 @@ def register_label_recognition_dataset(dataset_name: str):
 
     # Dataset from Zou
     if dataset_name == "zou_label_recog_train":
-        eval_list_txt = "data/zou/train.txt"
+        file_list_txt = "data/zou/train.txt"
 
     elif dataset_name == "zou_label_recog_test":
-        eval_list_txt = "data/zou/eval.txt"
+        file_list_txt = "data/zou/eval.txt"
 
     else:
         # TODO warn the user in this case
@@ -57,7 +57,7 @@ def register_label_recognition_dataset(dataset_name: str):
 
     # Instanciate the FigureGenerator
     figure_generator = IphotodrawXmlFigureGenerator(
-        eval_list_txt=eval_list_txt)
+        file_list_txt=file_list_txt)
 
     # Register the data set.
     DatasetCatalog.register(name=dataset_name,

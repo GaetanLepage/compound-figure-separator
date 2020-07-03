@@ -26,6 +26,8 @@ import os
 import sys
 import logging
 
+import progressbar
+
 from ...utils.figure.figure import Figure
 from .figure_generator import FigureGenerator
 
@@ -45,30 +47,32 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
     """
 
     def __init__(self,
-                 eval_list_txt: str = None,
-                 image_directory_path: str = None):
+                 file_list_txt: str = None,
+                 image_directory_path: str = None,
+                 caption_annotation_file: str = None):
         """
         Init for IphotodrawXmlFigureGenerator.
 
         Args:
-            eval_list_txt (str):            The path of the list of figures which annotations
+            file_list_txt (str):            The path of the list of figures which annotations
                                                 have to be loaded.
             image_directory_path (str):     The path of the directory where the images are stored
+            caption_annotation_file (str):  The path to the caption annotation file.
         """
         # Call base class method.
         super().__init__()
 
         # Check argument consistency
-        if eval_list_txt is not None and image_directory_path is not None:
-            logging.error("Both `eval_list_txt` and `input_directory` options cannot be"\
+        if file_list_txt is not None and image_directory_path is not None:
+            logging.error("Both `file_list_txt` and `input_directory` options cannot be"\
                           " simultaneously True.")
             sys.exit(1)
 
         # If a list of image files was provided, read it and store the image files.
-        if eval_list_txt is not None:
+        if file_list_txt is not None:
 
             # Read list of image files
-            with open(eval_list_txt, 'r') as eval_list_file:
+            with open(file_list_txt, 'r') as eval_list_file:
                 eval_list_lines = eval_list_file.read().splitlines()
 
             self.image_paths = [line if os.path.isfile(line)
@@ -84,9 +88,15 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
                                 ]
 
         else:
-            logging.error("Either one of `eval_list_txt` and `input_directory` options"\
+            logging.error("Either one of `file_list_txt` and `input_directory` options"\
                           " has to be set.")
             sys.exit(1)
+
+        # Caption annotations
+        if caption_annotation_file is not None:
+            with open(caption_annotation_file, 'r') as caption_annotation_file:
+                self.caption_lines = caption_annotation_file.readlines()
+
 
 
 
@@ -99,12 +109,7 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
         """
 
         # Looping over the list of image paths.
-        for image_index, image_path in enumerate(self.image_paths):
-
-            # TODO maybe set up a verbose mode
-            # print('Processing Image {}/{} : {}'.format(image_index + 1,
-                                                       # num_images,
-                                                       # image_path))
+        for image_index, image_path in enumerate(progressbar.progressbar(self.image_paths)):
 
             # Create figure object.
             figure = Figure(image_path=image_path,
@@ -118,8 +123,11 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
                 continue
 
             # Load annotation file.
-            xml_path = os.path.join(figure.image_path.replace('.jpg', '_data.xml'))
+            xml_path = figure.image_path.replace('.jpg', '_data.xml')
             # Load figure annotations.
             figure.load_annotation_from_iphotodraw(xml_path)
+
+            # Load the caption and, if available, the annotations.
+            figure.load_caption_annotation()
 
             yield figure

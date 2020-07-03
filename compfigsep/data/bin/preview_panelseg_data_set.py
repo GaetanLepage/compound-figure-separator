@@ -48,7 +48,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
     """
     parser = ArgumentParser(description="Preview all the figures from an iPhotoDraw data set.")
 
-    parser.add_argument('--eval_list_txt',
+    parser.add_argument('--file_list_txt',
                         help="The path to the txt file listing the images.",
                         default="data/zou/eval.txt",
                         type=str)
@@ -78,12 +78,12 @@ def main(args: List[str] = None):
 
     # Create the figure generator handling iPhotoDraw annotation files.
     figure_generator = IphotodrawXmlFigureGenerator(
-        eval_list_txt=args.eval_list_txt,
+        file_list_txt=args.file_list_txt,
         image_directory_path=args.image_directory_path)
 
     if args.save_preview:
-        if args.eval_list_txt is not None:
-            preview_folder = os.path.dirname(args.eval_list_txt)
+        if args.file_list_txt is not None:
+            preview_folder = os.path.dirname(args.file_list_txt)
         else:
             preview_folder = args.image_directory_path
         preview_folder = os.path.join(preview_folder, 'preview')
