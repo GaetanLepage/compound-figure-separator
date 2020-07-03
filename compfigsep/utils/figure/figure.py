@@ -38,6 +38,7 @@ from .subfigure import Panel, Label, SubFigure
 from . import beam_search
 from .. import box
 from . import label_class
+from .labels_structure import LabelStructureEnum, LabelStructure
 
 
 class Figure:
@@ -53,6 +54,8 @@ class Figure:
         image (np.ndarray):                             The image data.
         image_width (int):                              The image width (in pixels).
         image_height (int):                             The image height (in pixels).
+        labels_structure (LabelStructure):              Object defining entirely the labels of the
+                                                            figure.
         caption (str):                                  The complete caption.
         preview_image (np.ndarray):                     The preview image (image + bounding boxes)
         gt_subfigures (List[SubFigure]):                Ground truth subfigure objects.
@@ -64,7 +67,9 @@ class Figure:
     def __init__(self,
                  image_path: str,
                  index: int):
-        """ Init for a Figure object.  Neither the image or the annotations are loaded at this stage.
+        """
+        Init for a Figure object.  Neither the image or the annotations are loaded at this stage.
+
         Args:
             image_path (str): The path to the figure image file.
             index (int):      A unique index to identify the figure within the data set.
@@ -82,8 +87,12 @@ class Figure:
         self.image_width = 0
         self.image_height = 0
 
+        # Structure of the labels
+        self.labels_structure = None
+
         # Caption
         self.caption = None
+        self.detected_captions = None
 
         # Can contain a preview of the image with its bounding boxes.
         self.preview_image = None
@@ -187,6 +196,9 @@ class Figure:
                     f"\n\timage file name : {self.image_path}"\
                     f"\n\timage in csv row : {image_path}"
 
+                # Add label text to labels list.
+                self.labels_list.append(label)
+
                 # Instanciate Panel object
                 panel = Panel(box=panel_coordinates)
                 label = Label(text=label,
@@ -202,7 +214,6 @@ class Figure:
             self.gt_subfigures = subfigures
         else:
             self.detected_subfigures = subfigures
-
 
 
     def load_annotation_from_iphotodraw(self,
@@ -471,6 +482,69 @@ class Figure:
         self.gt_subfigures = match_panels_with_labels(panel_dict=panel_dict,
                                                       label_dict=label_dict)
 
+
+    def load_caption_annotation(self):
+        """
+        TODO
+        """
+        caption_annotation_file_path = self.image_path.replace('.jpg', '_caption.txt')
+
+        if not os.path.isfile(caption_annotation_file_path):
+            # logging.warning("Caption file missing:"\
+                            # f"\nNo such file as {caption_annotation_file_path}.")
+            return
+
+        with open(caption_annotation_file_path, 'r') as caption_annotation_file:
+            lines = caption_annotation_file.readlines()
+
+        if len(lines) == 0:
+            logging.warning(f"Caption annotation file {caption_annotation_file_path} seems to"\
+                             " be empty.")
+            return
+
+        self.caption = lines[0]
+
+        if len(lines) > 1:
+            labels_line = lines[1]
+            labels_list = [label.strip() for label in labels_line.split(',')]
+            labels_structure = LabelStructure.from_labels_list(labels_list)
+
+            if self.labels_structure is not None:
+                assert labels_structure == self.labels_structure,\
+                    "LabelStructure do not correspond:"\
+                    f"\n{labels_structure} != {self.labels_structure}"
+
+            else:
+                self.labels_structure = labels_structure
+
+            caption_dict = {}
+            for caption_line in lines[2:]:
+                label, text = caption_line.split(':', maxsplit=1)
+                label = label.strip()
+                text = text.strip()
+                caption_dict[label] = text
+
+            # Loop over gt_subfigures.
+            for gt_subfigure in self.gt_subfigures:
+
+                # If it has a label,
+                if gt_subfigure.label is not None:
+                    label_object = gt_subfigure.label
+
+                    # and if that label has a valid label text,
+                    if label_object.text is not None and len(label_object.text) > 1:
+
+                        # Look for a matching caption.
+                        for caption_label in caption_dict:
+
+                            # If the labels "match":
+                            if caption_label in label_object.text:
+
+                                # Augment the Label object with the caption text.
+                                gt_subfigure.caption = caption_dict.pop(caption_label)
+                                break
+
+
 ##############
 # EVALUATION #
 ##############
@@ -562,9 +636,9 @@ class Figure:
 
     def match_detected_and_gt_labels(self, iou_threshold: float = 0.5):
         """
-        Match the detected labels (and their label) with a ground truth one.
+        Match the detected labels with a ground truth one.
         The comparison criterion is the IoU which is maximized.
-        The `self.detected_panels` attribute is modified by side effect.
+        The `self.detected_labels` attribute is modified by side effect.
 
         ==> Label recognition task.
 
@@ -667,6 +741,53 @@ class Figure:
             # ==> False positive
             else:
                 detected_subfigure.is_true_positive = False
+
+
+    def match_detected_and_gt_captions(self, iou_threshold: float = 0.8):
+        """
+        Match the detected captions with a ground truth one.
+        The comparison criterion is the IoU (adapted to text) which is maximized.
+        The `self.detected_captions` attribute is modified by side effect.
+
+        ==> Label recognition task.
+
+        Args:
+            iou_threshold (float):  IoU threshold above which a prediction is considered to be
+                                        true.
+        """
+        # Keep track of the associations.
+        picked_gt_captions_indices = [False] * len(self.gt_subfigures)
+
+        # Loop over detected labels.
+        for detected_caption in self.detected_captions:
+            max_iou = -1
+            best_matching_gt_caption_index = -1
+
+            for gt_caption_index, gt_subfigure in enumerate(self.gt_subfigures):
+
+                gt_caption = gt_subfigure.caption
+
+                if gt_caption is None or gt_caption == "":
+                    continue
+
+                # Compute IoU between detection and ground truth.
+                iou = text.iou(gt_caption, detected_caption)
+
+                # Potential match
+                if iou > max_iou:
+                    max_iou = iou
+                    best_matching_gt_label_index = gt_label_index
+
+            # Check that gt and detected labels are overlapping enough.
+            # ==> True positive
+            if max_iou > iou_threshold\
+                    and not picked_gt_labels_indices[best_matching_gt_label_index]:
+                picked_gt_labels_indices[best_matching_gt_label_index] = True
+                detected_label.is_true_positive = True
+
+            # ==> False positive
+            else:
+                detected_label.is_true_positive = False
 
 
 ##################
