@@ -34,7 +34,10 @@ import numpy as np
 import PIL.Image
 from cv2 import cv2
 
-from .subfigure import Panel, Label, SubFigure
+from .sub_figure import SubFigure, DetectedSubFigure
+from .panel import Panel, DetectedPanel
+from .label import Label, DetectedLabel
+
 from . import beam_search
 from .. import box
 from . import label_class
@@ -113,6 +116,42 @@ class Figure:
         self._logger = logging.getLogger(__name__)
 
 
+    @classmethod
+    def from_dict(cls,
+                  figure_dict: Dict,
+                  index: int) -> 'Figure':
+        """
+        TODO
+        """
+        figure = Figure(image_path=figure_dict['image_path'],
+                        index=index)
+
+        figure.image_width = figure_dict['image_width']
+        figure.image_height = figure_dict['image_height']
+
+        if 'gt_subfigures' in figure_dict:
+            figure.gt_subfigures = [SubFigure.from_dict(subfigure_dict)
+                                    for subfigure_dict in figure_dict['gt_subfigures']]
+
+        if 'detected_subfigures' in figure_dict:
+            figure.detected_subfigures = [DetectedSubFigure.from_dict(detected_subfigure_dict)
+                                          for detected_subfigure_dict
+                                          in figure_dict['detected_subfigures']]
+
+        figure.caption = figure_dict.get('caption')
+
+        if 'detected_panels' in figure_dict:
+            figure.detected_panels = [DetectedPanel.from_dict(panel_dict)
+                                      for panel_dict in figure_dict['detected_panels']]
+
+        if 'detected_labels' in figure_dict:
+            figure.detected_labels = [DetectedLabel.from_dict(label_dict)
+                                      for label_dict in figure_dict['detected_labels']]
+
+
+        return figure
+
+
     def load_image(self):
         """
         Load the image using `self.image_path` and stores it in `self.image`.
@@ -131,7 +170,6 @@ class Figure:
         img = cv2.imread(self.image_path)
 
         # BGR image, we need to convert it to RGB image
-        # self.image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.image = img
 
         # Store the image size
@@ -490,8 +528,8 @@ class Figure:
         caption_annotation_file_path = self.image_path.replace('.jpg', '_caption.txt')
 
         if not os.path.isfile(caption_annotation_file_path):
-            # logging.warning("Caption file missing:"\
-                            # f"\nNo such file as {caption_annotation_file_path}.")
+            logging.info("Caption file missing:"\
+                        f"\nNo such file as {caption_annotation_file_path}.")
             return
 
         with open(caption_annotation_file_path, 'r') as caption_annotation_file:
@@ -659,7 +697,7 @@ class Figure:
                 gt_label = gt_subfigure.label
 
                 # TODO laverage the 'single-character label' restriction.
-                if gt_label.box is None or len(gt_label.text) != 1:
+                if gt_label is None or gt_label.box is None or len(gt_label.text) != 1:
                     continue
 
                 # If the label classes do not match, no need to compute the IoU.
@@ -794,7 +832,7 @@ class Figure:
 # PREVIEW FIGURE #
 ##################
 
-    def get_preview(self, mode='gt') -> np.ndarray:
+    def get_preview(self, mode='both') -> np.ndarray:
         """
         Generate an image preview for the figure.
         It consists in drawing the panels (and labels, if applicable) bounding boxes
@@ -824,6 +862,12 @@ class Figure:
             (255, 0, 255),
             (0, 255, 255),
         ]
+
+        # Automatically set mode to 'gt' if there is no detected elements.
+        if mode == 'both' and self.detected_subfigures is None and self.detected_panels is None\
+            and self.detected_labels is None:
+
+            mode = 'gt'
 
         # 1st case ('both'): Display both gt and detections.
         if mode == 'both':
@@ -1039,6 +1083,39 @@ class Figure:
 
                 # Writting to csv file.
                 csv_writer.writerow(csv_row)
+
+
+    def to_dict(self) -> Dict:
+        """
+        TODO
+        """
+
+        output_dict = {
+            'image_path': self.image_path,
+            'image_width': self.image_width,
+            'image_height': self.image_height
+        }
+
+        if self.gt_subfigures is not None:
+            output_dict['gt_subfigures'] = [subfigure.to_dict()
+                                            for subfigure in self.gt_subfigures]
+
+        if self.detected_subfigures is not None:
+            output_dict['detected_subfigures'] = [subfigure.to_dict()
+                                                  for subfigure in self.detected_subfigures]
+
+        if self.caption is not None:
+            output_dict['caption'] = self.caption
+
+        if self.detected_panels is not None:
+            output_dict['detected_panels'] = [panel.to_dict()
+                                              for panel in self.detected_panels]
+
+        if self.detected_labels is not None:
+            output_dict['detected_labels'] = [label.to_dict()
+                                              for label in self.detected_labels]
+
+        return output_dict
 
 
     def convert_to_tf_example(self) -> 'tf.train.Example':

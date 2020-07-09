@@ -21,6 +21,11 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 ##########################
 Panel segmentation module.
 Separate compound figures into multiple panels.
+
+Input: Compound (i.e. multi-panel) figure/image.
+
+Output: A list of sub-figures including :
+    * Panel location
 """
 
 from .load_datasets import *

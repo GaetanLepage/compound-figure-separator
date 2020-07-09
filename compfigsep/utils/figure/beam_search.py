@@ -26,7 +26,9 @@ import math
 from typing import List
 
 from ...utils import box
-from ...utils.figure.subfigure import Panel, Label, SubFigure
+from ...utils.figure.panel import Panel
+from ...utils.figure.label import Label
+from ...utils.figure.sub_figure import SubFigure
 
 
 def _compute_panel_label_distances(panels: List[Panel],

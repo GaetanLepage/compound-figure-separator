@@ -18,7 +18,7 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-##################################################################################
+#############################################################################
 Functions to deal with coordinates and areas of union, intersection of boxes.
 
 In every 'box' function, boxes should respect the format [x1, y1, x2, y2].

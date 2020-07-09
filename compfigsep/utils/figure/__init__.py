@@ -22,8 +22,10 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 Module to represent figures and associated objects.
 """
 
+from .panel import *
+from .label import *
+from .sub_figure import *
 from .figure import *
-from .subfigure import *
 from .beam_search import *
 from .label_class import *
 
