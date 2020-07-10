@@ -20,7 +20,7 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-#############################################
+###########################################################################
 Panel Segmentation detection training script.
 
 This scripts reads a given config file and runs the training or evaluation.
@@ -71,6 +71,7 @@ class Trainer(DefaultTrainer):
     def build_evaluator(cls,
                         cfg: CfgNode,
                         dataset_name: str,
+                        export: bool = True,
                         output_folder: str = None) -> PanelSegEvaluator:
         """
         Builds the PanelSegEvaluator that will be called at test time.
@@ -78,16 +79,18 @@ class Trainer(DefaultTrainer):
         Args:
             cfg (CfgNode):          The global config.
             dataset_name (str):     The name of the test data set.
+            export (bool):          Whether or not to export predictions as a JSON file.
             output_folder (str):    The path to the folder where to store the inference results.
 
         Returns:
             PanelSegEvaluator:  The evaluator for testing label recognition results.
         """
-        # TODO implement export functionnality
         if output_folder is None:
-            output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
+            output_folder = cfg.OUTPUT_DIR
 
-        return PanelSegEvaluator(dataset_name)
+        return PanelSegEvaluator(dataset_name=dataset_name,
+                                 export=export,
+                                 export_dir=output_folder)
 
 
     @classmethod
@@ -265,6 +268,10 @@ def main(args: List[str]) -> dict:
 
 if __name__ == "__main__":
     parser = default_argument_parser()
+    parser.add_argument('--export-only',
+                        action='store_true',
+                        help="Do not compute metrics, just store the raw predictions of panel"\
+                             "segmentation.")
 
     args = parser.parse_args()
     print("Command Line Args:", args)

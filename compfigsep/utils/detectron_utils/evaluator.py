@@ -31,7 +31,10 @@ import torch
 from detectron2.data import MetadataCatalog
 from detectron2.evaluation.evaluator import DatasetEvaluator
 from detectron2.utils import comm
+
 from ..figure.figure import Figure
+from ...data.export import export_figures_to_json
+
 
 class PanelSegAbstractEvaluator(DatasetEvaluator):
     """
@@ -39,13 +42,24 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
     It is further subclassed for each specific task (panel splitting, label recognition,
     panel segmentation)
-    """
 
+    Attributes:
+        dataset_name (str):             The name of the data set for evaluation.
+        task_name (str):                The name of the task ('panel_splitting',
+                                            'panel_segmentation' or 'label_recognition').
+        evaluation_function (callable): Function taking a figure generator as input and
+                                            returning a dict of metric results.
+        export (bool):                  Whether or not to export predictions as a JSON file.
+        export_dir (str):               Path to the directory where to store the inference
+                                            results.
+    """
 
     def __init__(self,
                  dataset_name: str,
                  task_name: str,
-                 evaluation_function: callable):
+                 evaluation_function: callable = None,
+                 export: bool = False,
+                 export_dir: str = None):
         """
         Init function.
 
@@ -59,9 +73,12 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
             task_name (str):                Name of the task.
             evaluation_function (function): Function taking a figure generator as input and
                                                 returning a dict of metric results.
+            export (bool):                  Whether or not to export predictions as a JSON file.
+            export_dir (str):               Path to the directory where to store the inference
+                                                results.
         """
         self._dataset_name = dataset_name
-        meta = MetadataCatalog.get(dataset_name)
+        data_set = MetadataCatalog.get(dataset_name)
         self._cpu_device = torch.device("cpu")
         self._logger = logging.getLogger(__name__)
         self._predictions = dict()
@@ -70,8 +87,12 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         self._evaluation_function = evaluation_function
 
         # The figure generator corresponding to the dataset
-        # TODO Not possible to handle LIST of validation data sets.
-        self._figure_generator = meta.figure_generator
+        # Not possible to handle LIST of validation data sets.
+        self._figure_generator = data_set.figure_generator
+
+        # Export
+        self.export = export
+        self.export_dir = export_dir
 
 
     def reset(self):
@@ -140,7 +161,13 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
         # Evaluate the metrics on the predictions.
         metrics_dict = self._evaluation_function(
-            figure_generator=self._augmented_figure_generator(predictions))
+                            figure_generator=self._augmented_figure_generator(predictions))\
+                       if self._evaluation_function is not None else None
+
+        # Export predictions and gt in a single JSON file
+        if self.export:
+            export_figures_to_json(figure_generator=self._augmented_figure_generator(predictions),
+                                   json_output_directory=self.export_dir)
 
         # Print the results
         pprint(metrics_dict)

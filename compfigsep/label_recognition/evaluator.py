@@ -35,17 +35,19 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
     Perform the evaluation of label recognition metrics on a given test set.
     """
 
-    def __init__(self, dataset_name: str):
+    def __init__(self, dataset_name: str, export: bool = False):
         """
         Init function.
         Call the init function of the parent function (PanelSegAbstractEvaluator).
 
         Args:
             dataset_name (str): The name of the data set to evaluate.
+            export (bool):      Whether or not to export predictions as a JSON file.
         """
         super().__init__(dataset_name=dataset_name,
                          task_name='label_recog',
-                         evaluation_function=evaluate_detections)
+                         evaluation_function=evaluate_detections,
+                         export=export)
 
 
     def process(self,

@@ -18,19 +18,27 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-####################################
-Export tools for panel-seg datasets.
+#####################################
+Export tools for compfigseg datasets.
 """
 
-from typing import Iterable
-
 import csv
+import json
+import os
+import logging
+import datetime
 
 from ..utils.figure import Figure
+from .figure_generators import FigureGenerator
 from ..utils.figure.label_class import map_label, LABEL_CLASS_MAPPING
 
 
-def export_figures_to_csv(figure_generator: Iterable[Figure],
+import compfigsep
+PROJECT_DIR = os.path.join(
+    os.path.dirname(compfigsep.__file__),
+    os.pardir)
+
+def export_figures_to_csv(figure_generator: FigureGenerator,
                           output_csv_file: str,
                           individual_export: bool = False,
                           individual_export_csv_directory: str = None):
@@ -39,7 +47,7 @@ def export_figures_to_csv(figure_generator: Iterable[Figure],
     This may be used for keras-retinanet.
 
     Args:
-        figure_generator (Iterable[Figure]):    A generator yielding figure objects
+        figure_generator (FigureGenerator):     A generator yielding figure objects
         output_csv_file (str):                  The path of the csv file containing the
                                                     annotations
         individual_csv (bool):                  If True, also export the annotation to a single
@@ -84,35 +92,75 @@ def export_figures_to_csv(figure_generator: Iterable[Figure],
                         csv_export_dir=individual_export_csv_directory)
 
 
-def export_figures_to_tf_record(figure_generator: Iterable[Figure],
+def export_figures_to_json(figure_generator: FigureGenerator,
+                           json_output_filename: str = None,
+                           json_output_directory: str = None):
+    """
+    TODO
+
+    Args:
+        figure_generator (FigureGenerator): A generator yielding figure objects.
+        json_output_filename (str):         Name of the JSON output file.
+        json_output_directory (str):        Path to the directory where to save the JSON
+                                                output file.
+    """
+
+    if json_output_directory is None:
+        json_output_directory = os.path.join(PROJECT_DIR, "output/")
+
+    if not os.path.isdir(json_output_directory):
+        os.mkdir(json_output_directory)
+
+    if json_output_filename is None:
+        json_output_filename = "compfigsep_experiment_{date:%Y-%B-%d_%H:%M:%S}.json".format(
+            date=datetime.datetime.now())
+
+    json_output_path = os.path.join(json_output_directory, json_output_filename)
+
+    if os.path.isfile(json_output_path):
+        logging.warning(f"JSON output file already exist ({json_output_path})."\
+                         "\nAborting export.")
+
+    output_dict = {}
+
+    # Loop over the figure from the generator and add their dict representation to the output
+    # dictionnary.
+    for figure in figure_generator:
+        output_dict[figure.image_filename] = figure.to_dict()
+
+    with open (json_output_path, 'w') as json_file:
+        json.dump(output_dict, json_file)
+
+
+
+def export_figures_to_tf_record(figure_generator: FigureGenerator,
                                 tf_record_filename: str):
     """
     Convert a set of figures to a a TensorFlow records file.
 
     Args:
-        figure_generator (Iterable[Figure]):    A generator yielding figure objects.
-        tf_record_filename (str):               Path to the output tf record file.
+        figure_generator (FigureGenerator): A generator yielding figure objects.
+        tf_record_filename (str):           Path to the output tf record file.
     """
-    # Import TensorFlow.
     import tensorflow as tf
 
     with tf.io.TFRecordWriter(tf_record_filename) as writer:
 
-        for figure in figure_generator:
+        for figure in figure_generator():
 
             tf_example = figure.convert_to_tf_example()
 
             writer.write(tf_example.SerializeToString())
 
 
-def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
+def export_figures_to_detectron_dict(figure_generator: FigureGenerator,
                                      task: str = 'panel_splitting') -> dict:
     """
     Export a set of Figure objects to a dict which is compatible with Facebook Detectron 2.
 
     Args:
-        figure_generator (Iterable[Figure]):    A generator yielding figure objects.
-        task (str):                             The task for which to export the figures.
+        figure_generator (FigureGenerator): A generator yielding figure objects.
+        task (str):                         The task for which to export the figures.
 
     Returns:
         dataset_dicts (dict): A dict representing the data set.
@@ -124,7 +172,7 @@ def export_figures_to_detectron_dict(figure_generator: Iterable[Figure],
                         f" 'panel_seg'] but is {task}")
 
     dataset_dicts = []
-    for index, figure in enumerate(figure_generator):
+    for index, figure in enumerate(figure_generator()):
         record = {}
 
         record['file_name'] = figure.image_path

@@ -35,17 +35,19 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
     Perform the evaluation of panel splitting metrics on a given test set.
     """
 
-    def __init__(self, dataset_name: str):
+    def __init__(self, dataset_name: str, export: bool = False):
         """
         Init function.
         Call the init function of the parent class (PanelSegAbstractEvaluator).
 
         Args:
             dataset_name (str): The name of the data set to evaluate.
+            export (bool):      Whether or not to export predictions as a JSON file.
         """
         super().__init__(dataset_name=dataset_name,
                          task_name='panel_splitting',
-                         evaluation_function=evaluate_detections)
+                         evaluation_function=evaluate_detections,
+                         export=export)
 
 
     def process(self,
