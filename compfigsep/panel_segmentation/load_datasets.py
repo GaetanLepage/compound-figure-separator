@@ -69,10 +69,10 @@ def register_panel_segmentation_dataset(dataset_name):
 
     DatasetCatalog.register(name=dataset_name,
                             func=lambda: export_figures_to_detectron_dict(
-                                figure_generator=figure_generator(),
+                                figure_generator=figure_generator,
                                 task='panel_seg'))
 
-    MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator())
+    MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator)
 
     # TODO remove if it is indeed useless
     # Add the class names as metadata.

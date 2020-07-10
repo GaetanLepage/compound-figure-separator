@@ -22,6 +22,8 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 ##################################################################################
 Script to perform and evaluate the panel splitting task on the ImageCLEF data set.
+
+TODO remove this file
 """
 
 import sys
@@ -81,7 +83,7 @@ def main(args: List[str] = None):
         image_directory_path=args.image_directory_path)
 
     # Augment Figures by predicting panel locations
-    augmented_figure_generators = predict(figure_generator=figure_generator(),
+    augmented_figure_generators = predict(figure_generator=figure_generator,
                                           predict_function=None,
                                           pre_processing_function=None)
 

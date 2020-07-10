@@ -36,8 +36,6 @@ class GlobalCsvFigureGenerator(FigureGenerator):
 
     Attributes:
         data_dir (str):         The path to the directory where the image data sets are stored.
-        current_index (int):    Index of the currently handled figure. This helps knowing the
-                                     "progression" of the data loading process.
         csv_annotation_file_path (str): The path to the csv annotation file.
     """
 

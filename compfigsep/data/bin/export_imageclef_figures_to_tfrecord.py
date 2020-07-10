@@ -20,7 +20,7 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-#########################################################################
+############################################################################
 Script to export the ImageCLEF dataset to a tfrecord file compatible with
 Tensorflow's Object Detection API.
 (https://github.com/tensorflow/models/tree/master/official/vision/detection)
@@ -89,7 +89,7 @@ def main(args: List[str] = None):
         image_directory_path=args.image_directory_path)
 
     # Export figures to csv
-    export_figures_to_tf_record(figure_generator=figure_generator(),
+    export_figures_to_tf_record(figure_generator=figure_generator,
                                 tf_record_filename=args.output_tfrecord)
 
 

@@ -96,7 +96,7 @@ def main(args: List[str] = None):
         image_directory_path=args.image_directory_path)
 
     # Export figures to csv.
-    export_figures_to_csv(figure_generator=figure_generator(),
+    export_figures_to_csv(figure_generator=figure_generator,
                           output_csv_file=args.output_csv,
                           individual_export=args.individual_csv,
                           individual_export_csv_directory=args.individual_export_csv_directory)

@@ -41,8 +41,6 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
     Attributes:
         data_dir (str):             The path to the directory where the image data sets are
                                         stored.
-        current_index (int):        Index of the currently handled figure. This helps knowing the
-                                        "progression" of the data loading process.
         image_paths (List[str]):    List of the image paths.
     """
 

@@ -35,17 +35,25 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
     Perform the evaluation of panel segmentation metrics on a given test set.
     """
 
-    def __init__(self, dataset_name: str):
+    def __init__(self,
+                 dataset_name: str,
+                 export: bool = False,
+                 export_dir: str = None):
         """
         Init function.
         Call the init function of the parent class (PanelSegAbstractEvaluator).
 
         Args:
             dataset_name (str): The name of the data set to evaluate.
+            export (bool):      Whether or not to export predictions as a JSON file.
+            export_dir (str):   Path to the directory where to store the inference results.
         """
         super().__init__(dataset_name=dataset_name,
                          task_name='panel_seg',
-                         evaluation_function=evaluate_detections)
+                         evaluation_function=evaluate_detections,
+                         export=export,
+                         export_dir=export_dir)
+
 
     def process(self,
                 inputs: List[dict],
@@ -108,7 +116,7 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
         Yields:
             figure (Figure): Figure objects augmented with predictions.
         """
-        for figure in self._figure_generator:
+        for figure in self._figure_generator():
 
             try:
                 detected_panels = predictions[figure.index]['panels']
@@ -118,25 +126,13 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
 
 
             # Convert panels and labels from dict to DetectedPanel objects
-            figure.raw_detected_panels = [DetectedPanel(box=panel['box'],
-                                                        detection_score=panel['score'])
-                                          for panel in detected_panels]
+            figure.detected_panels = [DetectedPanel(box=panel['box'],
+                                                    detection_score=panel['score'])
+                                      for panel in detected_panels]
 
-            figure.raw_detected_labels = [DetectedLabel(text=CLASS_LABEL_MAPPING[label['label']],
-                                                        box=label['box'],
-                                                        detection_score=label['score'])
-                                          for label in detected_labels]
-
-            # ==> Those two sets of "half" objects will be merged to give
-            # complete DetectedPanel objects (with label, panel_rect and label_rect fields).
-
-            # TODO remove !
-            # figure.save_preview(folder='data/pubmed_extract/preview/',
-                                # mode='pred')
-
-            # figure.show_preview(mode='pred', delay=0)
-
-            # TODO do some post processing here maybe
-
+            figure.detected_labels = [DetectedLabel(text=CLASS_LABEL_MAPPING[label['label']],
+                                                    box=label['box'],
+                                                    detection_score=label['score'])
+                                      for label in detected_labels]
 
             yield figure

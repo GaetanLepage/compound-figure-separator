@@ -22,7 +22,7 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import Iterable, Tuple, Dict
+from typing import Tuple, Dict
 from sortedcontainers import SortedKeyList
 import numpy as np
 
@@ -53,7 +53,7 @@ def label_recognition_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
         gt_label = gt_subfigure.label
 
         # Drop useless panels for this task
-        if gt_label.box is None or len(gt_label.text) != 1:
+        if gt_label is None or gt_label.box is None or len(gt_label.text) != 1:
             continue
 
         # TODO remove
@@ -71,7 +71,7 @@ def label_recognition_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
     stat_dict['overall_detected_count'] += len(figure.detected_labels)
 
     # TODO remove
-    print("Number of GT labels :", len(num_gt_labels))
+    print("Number of GT labels :", num_gt_labels)
     print("Number of detected labels :", len(figure.detected_labels))
 
     num_correct = 0
@@ -149,14 +149,14 @@ def multi_class_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
     return precision, recall, mAP
 
 
-def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
+def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
     """
     Compute the metrics (precision, recall and mAP) from a given set of label recognition
     detections.
 
     Args:
-        figure_generator (Iterable[Figure]):    A figure generator yielding Figure objects
-                                                    augmented with detected labels.
+        figure_generator (FigureGenerator): A figure generator yielding Figure objects
+                                                augmented with detected labels.
 
     Returns:
         metrics (Dict[str, float]): A dict containing the computed metrics.
@@ -172,7 +172,7 @@ def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
         'gt_count_by_class': {}
     }
 
-    for figure in figure_generator:
+    for figure in figure_generator():
 
         label_recognition_figure_eval(figure, stats)
 

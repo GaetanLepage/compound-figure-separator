@@ -20,7 +20,7 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-##########################################
+###########################################################################
 Panel Splitting detection training script.
 
 This scripts reads a given config file and runs the training or evaluation.

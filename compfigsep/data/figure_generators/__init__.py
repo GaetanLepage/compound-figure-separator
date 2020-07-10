@@ -21,10 +21,11 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 ###############################################################################
 Implementation of multiple Figure generators handling the CompFigSep data sets.
 """
-from .figure_generator import DATA_DIR
-from .global_csv_figure_generator import GlobalCsvFigureGenerator
-from .image_clef_xml_figure_generator import ImageClefXmlFigureGenerator
-from .iphotodraw_xml_figure_generator import IphotodrawXmlFigureGenerator
-from .image_list_figure_generator import ImageListFigureGenerator
+from .figure_generator import *
+from .global_csv_figure_generator import *
+from .image_clef_xml_figure_generator import *
+from .image_list_figure_generator import *
+from .iphotodraw_xml_figure_generator import *
+from .json_figure_generator import *
 
 __all__ = [k for k in globals().keys() if not k.startswith("_")]

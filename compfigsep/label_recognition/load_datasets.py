@@ -62,10 +62,10 @@ def register_label_recognition_dataset(dataset_name: str):
     # Register the data set.
     DatasetCatalog.register(name=dataset_name,
                             func=lambda: export_figures_to_detectron_dict(
-                                figure_generator=figure_generator(),
+                                figure_generator=figure_generator,
                                 task='label_recog'))
 
-    MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator())
+    MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator)
 
     # Add the class names as metadata.
     MetadataCatalog.get(name=dataset_name).set(thing_classes=list(LABEL_CLASS_MAPPING.keys()))

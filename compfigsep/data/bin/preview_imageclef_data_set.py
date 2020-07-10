@@ -83,7 +83,7 @@ def main(args: List[str] = None):
         image_directory_path=args.image_directory_path)
 
     # Preview the data set.
-    view_data_set(figure_generator=figure_generator(),
+    view_data_set(figure_generator=figure_generator,
                   mode=args.mode,
                   save_preview=args.save_preview,
                   preview_folder=os.path.join(args.image_directory_path, "preview"),

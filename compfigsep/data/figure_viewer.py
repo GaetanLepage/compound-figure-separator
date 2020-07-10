@@ -24,8 +24,8 @@ along with the annotations.
 """
 
 from argparse import ArgumentParser
-from typing import Iterable
 
+from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
 
 
@@ -48,7 +48,7 @@ def parse_viewer_args(parser: ArgumentParser) -> ArgumentParser:
                             " ['gt': only the ground truth,"\
                             " 'pred': only the predictions,"\
                             " 'both': both predicted and ground truth annotations]",
-                        default='gt')
+                        default='both')
 
     parser.add_argument('--delay',
                         help="The number of seconds after which the window is closed."\
@@ -63,8 +63,8 @@ def parse_viewer_args(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def view_data_set(figure_generator: Iterable[Figure],
-                  mode: str = 'gt',
+def view_data_set(figure_generator: FigureGenerator,
+                  mode: str = 'both',
                   *,
                   save_preview: bool = False,
                   preview_folder: str = None,
@@ -75,25 +75,24 @@ def view_data_set(figure_generator: Iterable[Figure],
     The image is displayed along with the bounding boxes (panels and, if present, labels).
 
     Args:
-        figure_generator (Iterable[Figure]):    A generator of Figure objects.
-        mode (str):                             Select which information to display:
-                                                    * 'gt': only the ground truth
-                                                    * 'pred': only the predictions
-                                                    * 'both': both predicted and ground truth
-                                                                annotations.
-        save_preview (bool):                    If true, saves the preview as an image.
-        preview_folder (str):                   The path to the folder where to store the preview
-                                                    images.
-        delay (int):                            The number of seconds after which the window is
-                                                    closed if 0, the delay is disabled.
-        window_name (str):                      Name of the image display window.
+        figure_generator (FigureGenerator): A generator of Figure objects.
+        mode (str):                         Select which information to display:
+                                                * 'gt': only the ground truth
+                                                * 'pred': only the predictions
+                                                * 'both': both predicted and ground truth
+                                                            annotations.
+        save_preview (bool):                If true, saves the preview as an image.
+        preview_folder (str):               The path to the folder where to store the preview
+                                                images.
+        delay (int):                        The number of seconds after which the window is
+                                                closed if 0, the delay is disabled.
+        window_name (str):                  Name of the image display window.
     """
 
     for figure in figure_generator:
-        # TODO uncomment
-        # figure.show_preview(mode=mode,
-                            # delay=delay,
-                            # window_name=window_name)
+        figure.show_preview(mode=mode,
+                            delay=delay,
+                            window_name=window_name)
 
         if save_preview:
             figure.save_preview(folder=preview_folder)

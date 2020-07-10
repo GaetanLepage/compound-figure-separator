@@ -92,7 +92,7 @@ def main(args: List[str] = None):
 
 
     # Preview the data set.
-    view_data_set(figure_generator=figure_generator(),
+    view_data_set(figure_generator=figure_generator,
                   mode=args.mode,
                   save_preview=args.save_preview,
                   preview_folder=preview_folder,

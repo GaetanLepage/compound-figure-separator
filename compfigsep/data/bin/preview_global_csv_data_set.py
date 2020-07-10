@@ -76,7 +76,7 @@ def main(args: List[str] = None):
         csv_annotation_file_path=args.annotation_csv)
 
     # Preview the data set.
-    view_data_set(figure_generator=figure_generator(),
+    view_data_set(figure_generator=figure_generator,
                   mode=args.mode,
                   delay=args.delay,
                   window_name="CSV data preview")

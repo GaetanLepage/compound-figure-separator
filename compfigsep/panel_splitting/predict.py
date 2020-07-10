@@ -19,11 +19,13 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
 #######################################
+TODO remove this file
 """
 
-from typing import List, Tuple, Iterable
+from typing import List, Tuple
 import numpy as np
 
+from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure, Panel
 
 Box = List[int, int, int, int]
@@ -107,25 +109,25 @@ def _post_processing(boxes: List[Box],
     return boxes, scores, labels
 
 
-def predict(figure_generator: Iterable[Figure],
+def predict(figure_generator: FigureGenerator,
             predict_function: callable,
             pre_processing_function: callable = None) -> Figure:
     """
     Predicts the sub figures locations (bounding boxes) and yields the augmented Figure object.
 
     Args:
-        figure_generator (Iterable[Figure]):    A generator yielding figures.
-        predict_function (callable):            A function taking an image as input and predicting
-                                                    the panels locations and returning
-                                                    [boxes, scores, labels].
-        pre_processing_function (callable):     A function taking an image as input and applying
-                                                    preprocessing on this image.
+        figure_generator (FigureGenerator): A generator yielding figures.
+        predict_function (callable):        A function taking an image as input and predicting
+                                                the panels locations and returning
+                                                [boxes, scores, labels].
+        pre_processing_function (callable): A function taking an image as input and applying
+                                                preprocessing on this image.
 
     Yields:
         annotated Figure objects augmented with predicted panels.
     """
 
-    for figure in figure_generator:
+    for figure in figure_generator():
 
         # Load image.
         image = figure.image
