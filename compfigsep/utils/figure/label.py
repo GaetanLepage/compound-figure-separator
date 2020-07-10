@@ -18,9 +18,8 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-##########################################
-Classes for subfigures, panels and labels.
-Also handles the detection information.
+################################
+Classes Label and DetectedLabel.
 """
 
 from typing import Tuple, Dict
@@ -38,18 +37,20 @@ DEFAULT_DETECTION_COLOR = (0, 0, 200)
 
 class Label:
     """
-    TODO
+    Class representing a label.
 
     Attributes:
-        text (str): TODO
-        box (Box):  TODO
+        text (str): The label text ('A' or '1' or 'ii'...).
+        box (Box):  The bounding box localizing the label on the image.
     """
 
     def __init__(self,
                  text: str = None,
                  box: Box = None):
         """
-        TODO
+        Args:
+            text (str): The label text ('A' or '1' or 'ii'...).
+            box (Box):  The bounding box localizing the label on the image.
         """
         self.text = text
 
@@ -97,10 +98,13 @@ class Label:
              image: np.ndarray,
              color: Color = DEFAULT_GT_COLOR):
         """
-        TODO
+        Draw the label bounding box and text on the image.
+        The image is affected by side-effect.
+
+        Args:
+            image (np.ndarray): Image to override with annotations.
+            color (Color):      Color to draw the element with (in RGB format).
         """
-        if color is None:
-            color = DEFAULT_GT_COLOR
         # Draw label box
         if self.box is not None:
             cv2.rectangle(img=image,
@@ -121,12 +125,6 @@ class Label:
 
 
     def __str__(self) -> str:
-        """
-        str method for a Label.
-
-        Returns:
-            string (str):   A string containing the Label information.
-        """
         string = f"{type(self).__name__}:"
         string += f" box: {self.box}"
         string += f", text: {self.text}"
@@ -141,13 +139,13 @@ class Label:
 
 class DetectedLabel(Label):
     """
-    TODO
+    Class representing a detected label.
 
     Attributes:
-        text (str):                 TODO
-        box (Box):                  TODO
-        detection_score (float):    TODO
-        is_true_positive (bool):    TODO
+        text (str):                 The label text ('A' or '1' or 'ii'...).
+        box (Box):                  The bounding box localizing the label on the image.
+        detection_score (float):    Detection score (confidence).
+        is_true_positive (bool):    Whether this is a correct label detection.
     """
 
     def __init__(self,
@@ -155,9 +153,13 @@ class DetectedLabel(Label):
                  box: Box = None,
                  detection_score: float = None):
         """
-        TODO
+        Args:
+            text (str):                 The label text ('A' or '1' or 'ii'...).
+            box (Box):                  The bounding box localizing the label on the image.
+            detection_score (float):    Detection score (confidence).
         """
-        super().__init__(text=text, box=box)
+        super().__init__(text=text,
+                         box=box)
 
         self.detection_score = detection_score
         self.is_true_positive = None
@@ -166,7 +168,13 @@ class DetectedLabel(Label):
     @classmethod
     def from_normal_label(cls, label: Label) -> 'DetectedLabel':
         """
-        TODO
+        Build a DetectedLabel object from a normal Label object.
+
+        Args:
+            label (Label):  A Label object.
+
+        Returns:
+            DetectedLabel:  The resulting DetectedLabel object.
         """
         # If it is already a DetectedLabel, no need to do anything.
         if isinstance(label, DetectedLabel):
@@ -177,6 +185,7 @@ class DetectedLabel(Label):
 
         return DetectedLabel(text=label.text,
                              box=label.box)
+
 
     @classmethod
     def from_dict(cls, label_dict: Dict) -> 'DetectedLabel':
@@ -226,25 +235,17 @@ class DetectedLabel(Label):
              image: np.ndarray,
              color: Color = DEFAULT_DETECTION_COLOR):
         """
-        TODO
+        Draw the label bounding box and text on the image.
+        the image is affected by side-effect.
 
-        Args:
-            image (np.ndarray): TODO
-            color (Color):      TODO
+        args:
+            image (np.ndarray): image to override with annotations.
+            color (color):      color to draw the element with.
         """
-        if color is None:
-            color = DEFAULT_DETECTION_COLOR
-
         super().draw(image, color)
 
 
     def __str__(self):
-        """
-        str method for a DetectedLabel.
-
-        Returns:
-            string (str):   A string containing the DetectedLabel information.
-        """
         string = super().__str__()
 
         if self.detection_score is not None:

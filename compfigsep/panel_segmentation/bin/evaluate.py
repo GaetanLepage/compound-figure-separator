@@ -20,9 +20,8 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-##################################################################################################
-Script to visualize a JSON data set by displaying the images along with the corresponding bounding
-boxes.
+##############################################################################
+Script to evaluate panel segmentation predictions from a JSON annotation file.
 """
 
 import sys
@@ -31,10 +30,14 @@ from argparse import ArgumentParser
 
 from typing import List
 
+import compfigsep
+
 sys.path.append('.')
 
-from compfigsep.data.figure_generators import JsonFigureGenerator
-from compfigsep.data.figure_viewer import parse_viewer_args, view_data_set
+MODULE_DIR = os.path.dirname(compfigsep.__file__)
+
+from compfigsep.data.figure_generators import JsonFigureGenerator, get_most_recent_json
+from compfigsep.panel_segmentation.evaluate import evaluate_detections
 
 
 def parse_args(args: List[str]) -> ArgumentParser:
@@ -47,22 +50,23 @@ def parse_args(args: List[str]) -> ArgumentParser:
     Returns:
         parser (ArgumentParser):    Populated namespace.
     """
-    parser = ArgumentParser(description="Preview all the figures from an ImageCLEF data set.")
+    parser = ArgumentParser(description="Evaluate panel segmentation detections.")
 
     # TODO check default path
     parser.add_argument('--json',
                         help="The path to the json annotation file.",
-                        default="experiments/panel_segmentation/test.json",
+                        default=get_most_recent_json(
+                            folder_path=os.path.join(
+                                MODULE_DIR,
+                                'panel_segmentation/output/')),
                         type=str)
-
-    parser = parse_viewer_args(parser)
 
     return parser.parse_args(args)
 
 
 def main(args: List[str] = None):
     """
-    Launch previsualization of a JSON data set.
+    Launch evaluation of the panel segmentation task on a JSON data set.
 
     Args:
         args (List[str]):   Arguments from the command line.
@@ -73,17 +77,12 @@ def main(args: List[str] = None):
         args = sys.argv[1:]
     args = parse_args(args)
 
-    # Create the figure generator handling ImageCLEF xml annotation files.
+    # Create the figure generator handling JSON annotation files.
     figure_generator = JsonFigureGenerator(
         json_annotation_file_path=args.json)
 
-    # Preview the data set.
-    view_data_set(figure_generator=figure_generator,
-                  mode=args.mode,
-                  save_preview=args.save_preview,
-                  preview_folder=args.json.replace('.json', '_preview/'),
-                  delay=args.delay,
-                  window_name="JSON data preview")
+    # Evaluate the data set.
+    evaluate_detections(figure_generator=figure_generator)
 
 
 if __name__ == '__main__':

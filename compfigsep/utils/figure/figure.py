@@ -523,7 +523,7 @@ class Figure:
 
     def load_caption_annotation(self):
         """
-        TODO
+        Load caption text and the ground truth for sub captions (if available).
         """
         caption_annotation_file_path = self.image_path.replace('.jpg', '_caption.txt')
 
@@ -781,17 +781,13 @@ class Figure:
                 detected_subfigure.is_true_positive = False
 
 
-    def match_detected_and_gt_captions(self, iou_threshold: float = 0.8):
+    def match_detected_and_gt_captions(self):
         """
         Match the detected captions with a ground truth one.
         The comparison criterion is the IoU (adapted to text) which is maximized.
         The `self.detected_captions` attribute is modified by side effect.
 
-        ==> Label recognition task.
-
-        Args:
-            iou_threshold (float):  IoU threshold above which a prediction is considered to be
-                                        true.
+        ==> Caption splitting task.
         """
         # Keep track of the associations.
         picked_gt_captions_indices = [False] * len(self.gt_subfigures)
@@ -1087,7 +1083,10 @@ class Figure:
 
     def to_dict(self) -> Dict:
         """
-        TODO
+        Export to a dict.
+
+        Returns:
+            output_dict (Dict): A Dict representing the figure information.
         """
 
         output_dict = {

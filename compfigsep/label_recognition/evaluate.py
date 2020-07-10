@@ -26,6 +26,7 @@ from typing import Tuple, Dict
 from sortedcontainers import SortedKeyList
 import numpy as np
 
+from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
 from ..utils.average_precision import compute_average_precision
 

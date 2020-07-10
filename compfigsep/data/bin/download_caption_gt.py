@@ -59,7 +59,6 @@ def parse_args(args: List[str]) -> ArgumentParser:
                         default="data/zou/eval.txt",
                         type=str)
 
-    # TODO
     parser.add_argument('--override',
                         help="Override caption txt file if exists.",
                         action='store_true')
@@ -70,11 +69,11 @@ def parse_args(args: List[str]) -> ArgumentParser:
 def get_captions(file_list_txt: str,
                  override: bool = False):
     """
-    TODO
+    Download caption data from PubMedCentral data base.
 
     Args:
-        file_list_txt (str):    TODO.
-        override (bool):        TODO.
+        file_list_txt (str):    The path to the txt file listing the images.
+        override (bool):        Override caption txt file if exists.
     """
 
     # Read the file list and store the image names.

@@ -89,7 +89,7 @@ def view_data_set(figure_generator: FigureGenerator,
         window_name (str):                  Name of the image display window.
     """
 
-    for figure in figure_generator:
+    for figure in figure_generator():
         figure.show_preview(mode=mode,
                             delay=delay,
                             window_name=window_name)

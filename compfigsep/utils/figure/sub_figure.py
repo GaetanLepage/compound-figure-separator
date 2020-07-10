@@ -82,7 +82,7 @@ class SubFigure:
 
         label = None
         if 'label' in sub_figure_dict:
-            panel = Label.from_dict(sub_figure_dict['label'])
+            label = Label.from_dict(sub_figure_dict['label'])
 
 
         return SubFigure(panel=panel,

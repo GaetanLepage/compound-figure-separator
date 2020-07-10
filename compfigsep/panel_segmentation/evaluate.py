@@ -33,7 +33,8 @@ from ..utils.figure import Figure, beam_search
 from ..utils.figure import DetectedSubFigure, Label
 
 
-def panel_segmentation_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
+def panel_segmentation_figure_eval(figure: Figure,
+                                   stat_dict: Dict[str, any]):
     """
     Evaluate panel segmentation metrics on a single figure.
 

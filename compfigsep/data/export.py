@@ -132,7 +132,6 @@ def export_figures_to_json(figure_generator: FigureGenerator,
         json.dump(output_dict, json_file)
 
 
-
 def export_figures_to_tf_record(figure_generator: FigureGenerator,
                                 tf_record_filename: str):
     """

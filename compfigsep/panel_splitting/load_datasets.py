@@ -35,9 +35,6 @@ def register_panel_splitting_dataset(dataset_name: str):
     """
     Register the appropriate data set for panel splitting in the Detectron `DatasetCatalog`.
 
-    TODO: manage validation
-    TODO: get detectron logger and WARN if dataset name is not valid
-
     Args:
         dataset_name (str): The name of the data set to register.
                                 Has to belong to accepted ones.

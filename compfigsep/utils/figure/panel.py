@@ -18,8 +18,8 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-###################################
-Classes panels and detected panels.
+################################
+Classes Panel and DetectedPanel.
 """
 
 from typing import Tuple, Dict
@@ -37,18 +37,16 @@ DEFAULT_DETECTION_COLOR = (0, 0, 200)
 
 class Panel:
     """
-    TODO
+    Class representing a lanel.
 
     Attributes:
-        box (Box):  The bounding box localizing the panel.
+        box (Box):  The bounding box localizing the panel on the image.
     """
 
     def __init__(self, box: Box = None):
         """
-        Init for a Panel.
-
         Args:
-            box (Box):  The bounding box localizing the panel.
+            box (Box):  The bounding box localizing the panel on the image.
         """
         if isinstance(box, np.ndarray):
             box = box.tolist()
@@ -92,16 +90,12 @@ class Panel:
              color: Color = DEFAULT_GT_COLOR):
         """
         Draw the panel bounding box.
-        This function does not return anything but affect the given image by side-effect.
+        The image is affected by side-effect.
 
         Args:
             image (np.ndarray): The base image that will be used as a background.
-            color (Color):      The color of the drawn elements (in RGB format).
+            color (Color):      Color to draw the element with (in RGB format).
         """
-        # Set default color if needed.
-        if color is None:
-            color = DEFAULT_GT_COLOR
-
         # Draw the panel box if it exists.
         if self.box is not None:
             cv2.rectangle(img=image,
@@ -112,12 +106,6 @@ class Panel:
 
 
     def __str__(self) -> str:
-        """
-        str method for a Panel.
-
-        Returns:
-            string (str):   A string containing the Panel information.
-        """
         string = f"{type(self).__name__}:"
         string += f" box: {self.box}"
 
@@ -131,10 +119,10 @@ class Panel:
 
 class DetectedPanel(Panel):
     """
-    TODO
+    Class representing a detected panel.
 
     Attributes:
-        box (Box):                          The bounding box localizing the panel.
+        box (Box):                          The bounding box localizing the panel on the image.
         detection_score (float):            Detection score (confidence).
         is_true_positive_iou (bool):        Whether this is a correct panel detection (panel
                                                 splitting and panel segmentation tasks).
@@ -146,10 +134,8 @@ class DetectedPanel(Panel):
                  box: Box = None,
                  detection_score: float = None):
         """
-        Init for a DetectedPanel.
-
         Args:
-            box (Box):                  The bounding box localizing the panel.
+            box (Box):                  The bounding box localizing the panel on the image.
             detection_score (float):    Detection score (confidence).
         """
         super().__init__(box=box)
@@ -163,7 +149,13 @@ class DetectedPanel(Panel):
     @classmethod
     def from_normal_panel(cls, panel: Panel) -> 'DetectedPanel':
         """
-        TODO
+        Build a DetectedPanel object from a normal Panel object.
+
+        Args:
+            panel (Panel):  A Panel object.
+
+        Returns:
+            DetectedPanel:  The resulting DetectedPanel object.
         """
         # If it is already a DetectedPanel, no need to do anything.
         if isinstance(panel, DetectedPanel):
@@ -227,7 +219,12 @@ class DetectedPanel(Panel):
              image: np.ndarray,
              color: Color = DEFAULT_DETECTION_COLOR):
         """
-        TODO
+        Draw the panel bounding box on the image.
+        the image is affected by side-effect.
+
+        args:
+            image (np.ndarray): image to override with annotations.
+            color (color):      color to draw the element with.
         """
         # Set default color if needed.
         if color is None:
@@ -237,12 +234,6 @@ class DetectedPanel(Panel):
 
 
     def __str__(self):
-        """
-        str method for a DetectedPanel.
-
-        Returns:
-            string (str):   A string containing the DetectedPanel information.
-        """
         string = super().__str__()
 
         if self.detection_score is not None:
