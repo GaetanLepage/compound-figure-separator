@@ -26,7 +26,8 @@ import math
 from typing import List, Tuple, Dict
 import torch
 from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss
-from torch import nn
+from torch import nn, Tensor
+from torch.nn import functional as F
 
 from detectron2.layers import ShapeSpec, batched_nms, cat
 from detectron2.structures import Boxes, ImageList, Instances, pairwise_iou
@@ -39,10 +40,7 @@ from detectron2.modeling.box_regression import Box2BoxTransform
 from detectron2.modeling.matcher import Matcher
 
 from detectron2.modeling.backbone.fpn import FPN, LastLevelP6P7
-from detectron2.modeling.meta_arch.retinanet import (
-    permute_to_N_HWA_K,
-    permute_all_cls_and_box_to_N_HWA_K_and_concat
-)
+from detectron2.modeling.meta_arch.retinanet import permute_to_N_HWA_K
 
 __all__ = ["PanelSegRetinaNet"]
 
@@ -125,7 +123,7 @@ class PanelSegRetinaNet(nn.Module):
                                                 Compute anchors for label detection.
         label_head (RetinaNet):                 RetinaNetHead handling panels prediction.
         box2box_transform (Box2BoxTransform):   Box2box transformation as defined in R-CNN.
-        matcher (Matcher):                      Match predicted element to a ground-truth element.
+        anchor_matcher (Matcher):               Match predicted element to a ground-truth element.
         loss_normalizer (int):                  Reasonable number of foreground examples.
         loss_normalizer_momentum (float):       The loss normalizer momentum.
     """
@@ -186,14 +184,14 @@ class PanelSegRetinaNet(nn.Module):
         # Matching and loss
         # TODO maybe have to duplicate those as well
         self.box2box_transform = Box2BoxTransform(weights=cfg.MODEL.RPN.BBOX_REG_WEIGHTS)
-        self.matcher = Matcher(cfg.MODEL.RETINANET.IOU_THRESHOLDS,
+        self.anchor_matcher = Matcher(cfg.MODEL.RETINANET.IOU_THRESHOLDS,
                                cfg.MODEL.RETINANET.IOU_LABELS,
                                allow_low_quality_matches=True)
 
         self.register_buffer("pixel_mean",
-                             torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
+                             Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
         self.register_buffer("pixel_std",
-                             torch.Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1))
+                             Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1))
 
         """
         In Detectron1, loss is normalized by number of foreground samples in the batch.
@@ -216,7 +214,7 @@ class PanelSegRetinaNet(nn.Module):
         return self.pixel_mean.device
 
 
-    def forward(self, batched_inputs: List[dict]) -> Dict[str, torch.Tensor]:
+    def forward(self, batched_inputs: List[dict]) -> Dict[str, Tensor]:
         """
         Args:
             batched_inputs (List[dict]):
@@ -243,13 +241,23 @@ class PanelSegRetinaNet(nn.Module):
         panel_features = self.panel_fpn(images.tensor)
         panel_features = [panel_features[f] for f in self.panel_in_features]
         panel_anchors = self.panel_anchor_generator(panel_features)
-        panel_cls, panel_box_delta = self.panel_head(panel_features)
+        panel_pred_logits, panel_pred_anchor_deltas = self.panel_head(panel_features)
+        # Transpose the Hi*Wi*A dimension to the middle:
+        panel_pred_logits = [permute_to_N_HWA_K(x, K=1)
+                             for x in panel_pred_logits]
+        panel_pred_anchor_deltas = [permute_to_N_HWA_K(x, K=4)
+                                    for x in panel_pred_anchor_deltas]
 
         # detected labels
         label_features = self.label_fpn(images.tensor)
         label_features = [label_features[f] for f in self.label_in_features]
         label_anchors = self.label_anchor_generator(label_features)
-        label_cls, label_box_delta = self.label_head(label_features)
+        label_pred_logits, label_pred_anchor_deltas = self.label_head(label_features)
+        # Transpose the Hi*Wi*A dimension to the middle:
+        label_pred_logits = [permute_to_N_HWA_K(x, K=self.num_label_classes)
+                             for x in label_pred_logits]
+        label_pred_anchor_deltas = [permute_to_N_HWA_K(x, K=4)
+                                    for x in label_pred_anchor_deltas]
 
         # Training
         if self.training:
@@ -257,17 +265,19 @@ class PanelSegRetinaNet(nn.Module):
             # Panels
             panel_gt_instances = [x['panel_instances'].to(self.device)
                                   for x in batched_inputs]
-            panel_gt_classes, panel_gt_anchors_reg_deltas = self.get_ground_truth(
-                panel_anchors,
+            panel_gt_classes, panel_gt_boxes = self.get_ground_truth(
+                anchors=panel_anchors,
                 gt_instances=panel_gt_instances,
                 num_classes=1)
 
             panel_loss_cls, panel_loss_box_reg = self._compute_single_head_losses(
+                anchors=panel_anchors,
+                pred_logits=panel_pred_logits,
                 gt_classes=panel_gt_classes,
-                gt_anchors_deltas=panel_gt_anchors_reg_deltas,
-                pred_class_logits=panel_cls,
-                pred_anchor_deltas=panel_box_delta,
+                pred_anchor_deltas=panel_pred_anchor_deltas,
+                gt_boxes=panel_gt_boxes,
                 num_classes=1)
+
 
             loss_dict = {
                 'panel_loss_cls': panel_loss_cls,
@@ -278,15 +288,17 @@ class PanelSegRetinaNet(nn.Module):
             label_gt_instances = [x['label_instances'].to(self.device)
                                   for x in batched_inputs]
 
-            label_gt_classes, label_gt_anchors_reg_deltas = self.get_ground_truth(
-                label_anchors,
+            label_gt_classes, label_gt_boxes = self.get_ground_truth(
+                anchors=label_anchors,
                 gt_instances=label_gt_instances,
                 num_classes=self.num_label_classes)
+
             label_loss_cls, label_loss_box_reg = self._compute_single_head_losses(
+                anchors=label_anchors,
+                pred_logits=label_pred_logits,
                 gt_classes=label_gt_classes,
-                gt_anchors_deltas=label_gt_anchors_reg_deltas,
-                pred_class_logits=label_cls,
-                pred_anchor_deltas=label_box_delta,
+                pred_anchor_deltas=label_pred_anchor_deltas,
+                gt_boxes=label_gt_boxes,
                 num_classes=self.num_label_classes)
 
             loss_dict['label_loss_cls'] = label_loss_cls
@@ -295,14 +307,17 @@ class PanelSegRetinaNet(nn.Module):
             return loss_dict
 
         # Otherwise, do inference.
-        batched_inference_results = self.inference(panel_cls,
-                                                   panel_box_delta,
-                                                   panel_anchors,
-                                                   label_cls,
-                                                   label_box_delta,
-                                                   label_anchors,
-                                                   images.image_sizes)
+        batched_inference_results = self.inference(
+            panel_anchors=panel_anchors,
+            panel_pred_logits=panel_pred_logits,
+            panel_pred_anchor_deltas=panel_pred_anchor_deltas,
+            label_anchors=label_anchors,
+            label_pred_logits=label_pred_logits,
+            label_pred_anchor_deltas=label_pred_anchor_deltas,
+            image_sizes=images.image_sizes)
+
         processed_results = []
+
         for inference_results, input_per_image, image_size in zip(
                 batched_inference_results,
                 batched_inputs,
@@ -340,66 +355,91 @@ class PanelSegRetinaNet(nn.Module):
 
 
     def _compute_single_head_losses(self,
-                                    gt_classes: torch.Tensor,
-                                    gt_anchors_deltas: torch.Tensor,
-                                    pred_class_logits: torch.Tensor,
-                                    pred_anchor_deltas: torch.Tensor,
+                                    anchors: List[Boxes],
+                                    pred_logits: List[Tensor],
+                                    gt_classes: Tensor,
+                                    pred_anchor_deltas: List[Tensor],
+                                    gt_boxes: Tensor,
                                     num_classes: int) -> Tuple[float, float]:
         """
         Compute the loss dict for a single RetinaNet branch (one classification head and one
         regression head).
 
         N is the number of images in the batch.
-        R is the total number of anchors.
-        The total number of anchors across levels, i.e. sum(Hi x Wi x A)
+        R is the total number of anchors across levels, i.e. sum(Hi x Wi x Ai)
 
         Args:
-            gt_classes (torch.Tensor):          Ground truth classes.
-                                                    shape=(N, R).
-            gt_anchors_deltas (torch.Tensor):   Ground truth box deltas.
-                                                    shape=(N, R, 4).
-            pred_class_logits (torch.Tensor):   Predicted classes for the batch images.
-                                                    shape=(N, R).
-            pred_anchor_deltas (torch.Tensor):  Predicted box deltas.
-                                                    shape=(N, R, 4).
+            anchors (List[Boxes]):              A list of #features level Boxes.
+            pred_logits (List[Tensor]):         Predicted classes for the batch images.
+                                                    shape=(N, Hi * Wi * Ai, num_classes)
+            gt_classes (Tensor):                Ground truth classes. shape=(N, R).
+            pred_anchor_deltas (List[Tensor]):  Predicted box deltas.
+                                                    shape=(N, Hi * Wi * Ai, 4)
+            gt_boxes (Tensor):                  Ground truth box deltas. shape=(N, R, 4).
+            num_classes (int):                  The number of classes.
 
         Returns:
             loss_cls, loss_box_reg (Tuple[float, float]):   The value of the loss for each head
                                                                 (classification and regression).
         """
 
-        pred_class_logits, pred_anchor_deltas = permute_all_cls_and_box_to_N_HWA_K_and_concat(
-            box_cls=pred_class_logits,
-            box_delta=pred_anchor_deltas,
-            num_classes=num_classes)
+        # pred_class_logits, pred_anchor_deltas = permute_all_cls_and_box_to_N_HWA_K_and_concat(
+            # box_cls=pred_class_logits,
+            # box_delta=pred_anchor_deltas,
+            # num_classes=num_classes)
 
-        gt_classes = gt_classes.flatten()
-        gt_anchors_deltas = gt_anchors_deltas.view(-1, 4)
+        # gt_classes = gt_classes.flatten()
+        # gt_anchors_deltas = gt_anchors_deltas.view(-1, 4)
 
-        valid_idxs = gt_classes >= 0
-        foreground_idxs = (gt_classes >= 0) & (gt_classes != num_classes)
-        num_foreground = foreground_idxs.sum().item()
-        get_event_storage().put_scalar("num_foreground", num_foreground)
-        self.loss_normalizer = (
-            self.loss_normalizer_momentum * self.loss_normalizer
-            + (1 - self.loss_normalizer_momentum) * num_foreground
-        )
+        # valid_idxs = gt_classes >= 0
+        # foreground_idxs = (gt_classes >= 0) & (gt_classes != num_classes)
+        # num_foreground = foreground_idxs.sum().item()
+        # get_event_storage().put_scalar("num_foreground", num_foreground)
+        # self.loss_normalizer = (
+            # self.loss_normalizer_momentum * self.loss_normalizer
+            # + (1 - self.loss_normalizer_momentum) * num_foreground
+        # )
 
-        gt_classes_target = torch.zeros_like(pred_class_logits)
-        gt_classes_target[foreground_idxs, gt_classes[foreground_idxs]] = 1
+        # gt_classes_target = torch.zeros_like(pred_class_logits)
+        # gt_classes_target[foreground_idxs, gt_classes[foreground_idxs]] = 1
+
+        num_images = len(gt_classes)
+
+        # shape(gt_classes) = (N, R)
+        gt_classes = torch.stack(gt_classes)
+
+        # shape(anchors) = (R, 4)
+        anchors = type(anchors[0]).cat(anchors).tensor
+        gt_anchor_deltas = [self.box2box_transform.get_deltas(anchors, k)
+                            for k in gt_boxes]
+        # shape(gt_anchor_deltas) = (N, R, 4)
+        gt_anchor_deltas = torch.stack(gt_anchor_deltas)
+
+        valid_mask = gt_classes >= 0
+        pos_mask = (gt_classes >= 0) & (gt_classes != num_classes)
+        num_pos_anchors = pos_mask.sum().item()
+        get_event_storage().put_scalar("num_pos_anchors",
+                                       num_pos_anchors / num_images)
+        self.loss_normalizer = self.loss_normalizer_momentum * self.loss_normalizer\
+                                + (1 - self.loss_normalizer_momentum) * max(num_pos_anchors, 1)
+
+        # classification and regression loss
+        # no loss for the last (background) class --> [:, :-1]
+        gt_labels_target = F.one_hot(gt_classes[valid_mask],
+                                     num_classes=self.num_classes + 1)[:, :-1]
 
         # logits loss
-        loss_cls = sigmoid_focal_loss_jit(pred_class_logits[valid_idxs],
-                                          gt_classes_target[valid_idxs],
+        loss_cls = sigmoid_focal_loss_jit(inputs=cat(pred_logits, dim=1)[valid_mask],
+                                          targets=gt_labels_target.to(pred_logits[0].dtype),
                                           alpha=self.focal_loss_alpha,
                                           gamma=self.focal_loss_gamma,
-                                          reduction="sum") / max(1, self.loss_normalizer)
+                                          reduction="sum") / self.loss_normalizer
 
         # regression loss
-        loss_box_reg = smooth_l1_loss(pred_anchor_deltas[foreground_idxs],
-                                      gt_anchors_deltas[foreground_idxs],
+        loss_box_reg = smooth_l1_loss(input=cat(pred_anchor_deltas, dim=1)[pos_mask],
+                                      target=gt_anchor_deltas[pos_mask],
                                       beta=self.smooth_l1_loss_beta,
-                                      reduction="sum") / max(1, self.loss_normalizer)
+                                      reduction="sum") / self.loss_normalizer
 
         return loss_cls, loss_box_reg
 
@@ -408,44 +448,37 @@ class PanelSegRetinaNet(nn.Module):
     def get_ground_truth(self,
                          anchors: List[Boxes],
                          gt_instances: List[Instances],
-                         num_classes: int) -> Tuple[torch.Tensor, torch.Tensor]:
+                         num_classes: int) -> Tuple[List[Tensor], List[Tensor]]:
         """
-        Extract the ground truth classes and deltas from a list of Instances objects.
+        Extract the ground truth classes and boxes from a list of Instances objects.
 
         Args:
-            anchors (list[Boxes]):      A list of #feature level Boxes. The Boxes contains
-                                            anchors of this image on the specific feature level.
-            targets (list[Instances]):  A list of N `Instances`s. The i-th `Instances` contains
-                                            the ground-truth per-instance annotations for the
-                                            i-th input image.  Specify `targets` during training
-                                            only.
-            num_classes (int):          The number of classes.
+            anchors (List[Boxes]):          A list of #feature level Boxes. The Boxes contains
+                                                anchors of this image on the specific feature
+                                                level.
+            gt_instances (List[Instances]): A list of N `Instances`s. The i-th `Instances`
+                                                contains the ground-truth per-instance annotations
+                                                for the i-th input image.
+            num_classes (int):              The number of classes.
 
         Returns:
-            gt_classes (torch.Tensor):          An integer tensor of shape (N, R) storing
-                                                    ground-truth labels for each anchor.
-                                                    R is the total number of anchors, i.e. the
-                                                    sum of Hi x Wi x A for all levels.
-                                                    Anchors with an IoU with some target higher
-                                                    than the foreground threshold are assigned
-                                                    their corresponding label in the [0, K-1]
-                                                    range.
-                                                    Anchors whose IoU are below the background
-                                                    threshold are assigned the label "K".
-                                                    Anchors whose IoU are between the foreground
-                                                    and background thresholds are assigned a
-                                                    label "-1", i.e. ignore.
-            gt_anchors_deltas (torch.Tensor):   Shape (N, R, 4). The last dimension represents
-                                                    ground-truth box2box transform targets
-                                                    (dx, dy, dw, dh) that map each anchor to its
-                                                    matched ground-truth box.
-                                                    The values in the tensor are meaningful only
-                                                    when the corresponding anchor is labeled as
-                                                    foreground.
+            gt_classes (List[Tensor]):          List of #img tensors. i-th element is a vector of
+                                                    classes whose length is the total number of
+                                                    anchors across all feature maps
+                                                    (sum(Hi * Wi * A)).
+                                                    Label values are in {-1, 0, ..., K}, with -1
+                                                    means ignore, and K means background.
+            matched_gt_boxes (List[Tensor]):    i-th element is a Rx4 tensor, where R is the total
+                                                    number of anchors across feature maps.
+                                                    The values are the matched gt boxes for each
+                                                    anchor.
+                                                    Values are undefined for those anchors not
+                                                    labeled as foreground.
         """
-        output_gt_classes = []
-        output_gt_anchors_deltas = []
-        anchors = Boxes.cat(anchors)  # Rx4
+        gt_classes = []
+        matched_gt_boxes = []
+
+        # TODO remove
         # print("############")
         # if num_classes == 1:
             # print("This is a panel")
@@ -455,69 +488,69 @@ class PanelSegRetinaNet(nn.Module):
         # print("anchors:", anchors.tensor.shape)
         # print("instances:", gt_instances)
 
+        for gt_instance in gt_instances:
+            match_quality_matrix = pairwise_iou(gt_instance.gt_boxes,
+                                                anchors)
+            matched_idxs, anchor_classes = self.anchor_matcher(match_quality_matrix)
+            del match_quality_matrix
 
-        for image_gt_instances in gt_instances:
-            match_quality_matrix = pairwise_iou(image_gt_instances.gt_boxes, anchors)
-            gt_matched_idxs, anchor_labels = self.matcher(match_quality_matrix)
+            if len(gt_instance) > 0:
+                matched_gt_boxes_i = gt_instance.gt_boxes.tensor[matched_idxs]
 
-            # print("GT CLASSES:", gt_classes_per_img)
-            # print("GT BOXES:", gt_boxes_per_img)
+                gt_classes_i = gt_instance.gt_classes[matched_idxs]
 
-            # print("gt_classes_per_img", gt_classes_per_img.shape)
-            # print("gt_boxes_per_img", gt_boxes_per_img.tensor.shape)
-
-            # print("match_quality_matrix", match_quality_matrix.shape)
-            # print("gt_matched_idxs", gt_matched_idxs.shape)
-
-            has_gt = len(image_gt_instances) > 0
-            if has_gt:
-                # ground truth box regression
-                matched_gt_boxes = image_gt_instances.gt_boxes[gt_matched_idxs]
-                gt_anchors_reg_deltas_i = self.box2box_transform.get_deltas(
-                    src_boxes=anchors.tensor,
-                    target_boxes=matched_gt_boxes.tensor)
-                gt_classes_i = image_gt_instances.gt_classes[gt_matched_idxs]
-                # Anchors with label 0 are treated as background.
-                gt_classes_i[anchor_labels == 0] = num_classes
-                # Anchors with label -1 are ignored.
-                gt_classes_i[anchor_labels == -1] = -1
-                # print("gt_classes_i", gt_classes_i.shape)
+                # Anchors with class 0 are treated as background.
+                gt_classes_i[anchor_classes == 0] = num_classes
+                # Anchors with class -1 are ignored.
+                gt_classes_i[anchor_classes == -1] = -1
+                # TODO remove
+                # print("gt_labels_i", gt_classes_i.shape)
                 # print("gt_boxes_i", matched_gt_boxes.tensor.shape)
 
             else:
-                gt_classes_i = torch.zeros_like(gt_matched_idxs) + num_classes
-                gt_anchors_reg_deltas_i = torch.zeros_like(anchors.tensor)
+                matched_gt_boxes_i = torch.zeros_like(anchors.tensor)
+                gt_classes_i = torch.zeros_like(matched_idxs) + num_classes
 
-            output_gt_classes.append(gt_classes_i)
-            output_gt_anchors_deltas.append(gt_anchors_reg_deltas_i)
+            gt_classes.append(gt_classes_i)
+            matched_gt_boxes.append(matched_gt_boxes_i)
 
-        return torch.stack(output_gt_classes), torch.stack(output_gt_anchors_deltas)
+        return gt_classes, matched_gt_boxes
 
 
     def inference(self,
-                  panel_box_cls: List[torch.Tensor],
-                  panel_box_delta: List[torch.Tensor],
                   panel_anchors: List[Boxes],
-                  label_box_cls: List[torch.Tensor],
-                  label_box_delta: List[torch.Tensor],
+                  panel_pred_logits: List[Tensor],
+                  panel_pred_anchor_deltas: List[Tensor],
                   label_anchors: List[Boxes],
+                  label_pred_logits: List[Tensor],
+                  label_pred_anchor_deltas: List[Tensor],
                   image_sizes: List[torch.Size]) -> List[Tuple[Instances, Instances]]:
         """
         Perform inference using the raw batched outputs from the heads.
 
         Args:
-            panel_box_cls (List[torch.Tensor]):     Output class predictions from the panel head.
-            panel_box_delta (List[torch.Tensor]):   Output box delta predictions from the panel
-                                                        head.
-            panel_anchors (List[Boxes]):            A list of #feature level Boxes.
-                                                        The Boxes contain anchors of this image on
-                                                        the specific feature level.
-            label_box_cls (List[torch.Tensor]):     Output class predictions from the label head.
-            label_box_delta (List[torch.Tensor]):   Output box delta predictions from the label
-                                                        head.
-            label_anchors (List[Boxes]):            A list of #feature level Boxes.
-                                                        The Boxes contain anchors of this image on
-                                                        the specific feature level.
+            panel_anchors (List[Boxes]):                A list of #feature level Boxes.
+                                                            The Boxes contain anchors of this
+                                                            image on the specific feature level.
+            panel_pred_logits (List[Tensor]):           Output class predictions from the panel
+                                                            head.
+                                                            One tensor per level.
+                                                            shape=(N, Hi * Wi * Ai, 1)
+            panel_pred_anchor_deltas (List[Tensor]):    Output box delta predictions from the
+                                                            panel head.
+                                                            One tensor per level.
+                                                            shape=(N, Hi * Wi * Ai, 4)
+            label_anchors (List[Boxes]):                A list of #feature level Boxes.
+                                                            The Boxes contain anchors of this
+                                                            image on the specific feature level.
+            label_pred_logits (List[Tensor]):           Output class predictions from the label
+                                                            head.
+                                                            One tensor per level.
+                                                            shape=(N, Hi * Wi * Ai, num_classes)
+            label_pred_anchor_deltas (List[Tensor]):    Output box delta predictions from the
+                                                            label head.
+                                                            One tensor per level.
+                                                            shape=(N, Hi * Wi * Ai, 4)
             image_sizes (List[torch.Size]):         The input image sizes.
 
         Returns:
@@ -525,63 +558,59 @@ class PanelSegRetinaNet(nn.Module):
         """
         results = []
 
-        panel_box_cls = [permute_to_N_HWA_K(x, K=1) for x in panel_box_cls]
-        panel_box_delta = [permute_to_N_HWA_K(x, K=4) for x in panel_box_delta]
-        # list[Tensor], one per level, each has shape (N, Hi x Wi x A, K or 4)
-        label_box_cls = [permute_to_N_HWA_K(x, K=self.num_label_classes) for x in label_box_cls]
-        label_box_delta = [permute_to_N_HWA_K(x, K=4) for x in label_box_delta]
-
         for img_idx, image_size in enumerate(image_sizes):
             # Panels
-            panel_box_cls_per_image = [box_cls_per_level[img_idx]
-                                       for box_cls_per_level in panel_box_cls]
-            panel_box_reg_per_image = [box_reg_per_level[img_idx]
-                                       for box_reg_per_level in panel_box_delta]
+            panel_pred_logits_per_image = [x[img_idx]
+                                           for x in panel_pred_logits]
+            panel_deltas_per_image = [x[img_idx]
+                                      for x in panel_pred_anchor_deltas]
 
-            panel_results = self._inference_single_image(box_cls=panel_box_cls_per_image,
-                                                         box_delta=panel_box_reg_per_image,
-                                                         anchors=panel_anchors,
-                                                         image_size=tuple(image_size),
-                                                         num_classes=1)
+            panel_results_per_image = self._inference_single_image(
+                anchors=panel_anchors,
+                box_cls=panel_pred_logits_per_image,
+                box_delta=panel_deltas_per_image,
+                image_size=tuple(image_size),
+                num_classes=1)
 
             # Labels
-            label_box_cls_per_image = [box_cls_per_level[img_idx]
-                                       for box_cls_per_level in label_box_cls]
-            label_box_reg_per_image = [box_reg_per_level[img_idx]
-                                       for box_reg_per_level in label_box_delta]
+            label_pred_logits_per_image = [x[img_idx]
+                                           for x in label_pred_logits]
+            label_deltas_per_image = [x[img_idx]
+                                      for x in label_pred_anchor_deltas]
 
-            label_results = self._inference_single_image(box_cls=label_box_cls_per_image,
-                                                         box_delta=label_box_reg_per_image,
-                                                         anchors=label_anchors,
-                                                         image_size=tuple(image_size),
-                                                         num_classes=self.num_label_classes)
+            label_results_per_image = self._inference_single_image(
+                anchors=label_anchors,
+                box_cls=label_pred_logits_per_image,
+                box_delta=label_deltas_per_image,
+                image_size=tuple(image_size),
+                num_classes=self.num_label_classes)
 
-            results.append((panel_results, label_results))
+            results.append((panel_results_per_image, label_results_per_image))
 
         return results
 
 
     def _filter_detections(self,
-                           box_cls: List[torch.Tensor],
-                           box_delta: List[torch.Tensor],
+                           box_cls: List[Tensor],
+                           box_delta: List[Tensor],
                            anchors: List[Boxes],
-                           num_classes: int) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+                           num_classes: int) -> Tuple[Tensor, Tensor, Tensor]:
         """
         Filters raw detections to discard unlikely/poor ones.
 
         Args:
-            box_cls (List[torch.Tensor]):   List of #feature levels. Each entry contains tensor of
+            box_cls (List[Tensor]):   List of #feature levels. Each entry contains tensor of
                                                 size (H x W x A, K).
-            box_delta (List[torch.Tensor]): Same shape as 'box_cls' except that K becomes 4.
+            box_delta (List[Tensor]): Same shape as 'box_cls' except that K becomes 4.
             anchors (List[Boxes]):          List of #feature levels. Each entry contains a Boxes
                                                 object, which contains all the anchors for that
                                                 image in that feature level.
             num_classes (int):              The number of classes.
 
         Returns:
-            boxes (torch.Tensor): TODO
-            scores (torch.Tensor):
-            classes (torch.Tensor):
+            boxes (Tensor): TODO
+            scores (Tensor):
+            classes (Tensor):
         """
         boxes_all = []
         scores_all = []
@@ -638,9 +667,9 @@ class PanelSegRetinaNet(nn.Module):
 
 
     def _inference_single_image(self,
-                                box_cls: List[torch.Tensor],
-                                box_delta: List[torch.Tensor],
                                 anchors: List[Boxes],
+                                box_cls: List[Tensor],
+                                box_delta: List[Tensor],
                                 image_size: Tuple[int, int],
                                 num_classes: int
                                 ) -> Instances:
@@ -650,12 +679,12 @@ class PanelSegRetinaNet(nn.Module):
         suppression (NMS).
 
         Args:
-            box_cls (List[torch.Tensor]):   List of #feature levels. Each entry contains tensor of
-                                                size (H x W x A, K).
-            box_delta (List[torch.Tensor]): Same shape as 'box_cls' except that K becomes 4.
             anchors (List[Boxes]):          List of #feature levels. Each entry contains a Boxes
-                                                object, which contains all the anchors for that
-                                                image in that feature level.
+                                                object, which contains all the anchors in that
+                                                feature level.
+            box_cls (List[Tensor]):         List of #feature levels. Each entry contains tensor of
+                                                size (H x W x A, K).
+            box_delta (List[Tensor]):       Same shape as 'box_cls' except that K becomes 4.
             image_size (Tuple[int, int]):   A tuple of the image height and width (H, W).
             num_classes (int):              The number of classes.
 
@@ -766,8 +795,8 @@ class RetinaNetHead(nn.Module):
 
 
     def forward(self,
-                features: List[torch.Tensor]
-                ) -> Tuple[List[torch.Tensor], List[torch.Tensor]]:
+                features: List[Tensor]
+                ) -> Tuple[List[Tensor], List[Tensor]]:
         """
         Args:
             features (list[Tensor]):    FPN feature map tensors in high to low resolution.
@@ -775,11 +804,11 @@ class RetinaNetHead(nn.Module):
                                             feature levels.
 
         Returns:
-            logits (list[torch.Tensor]):    #lvl tensors, each has shape (N, AxK, Hi, Wi).
+            logits (list[Tensor]):    #lvl tensors, each has shape (N, AxK, Hi, Wi).
                                                 The tensor predicts the classification probability
                                                 at each spatial position for each of the A anchors
                                                 and K object classes.
-            bbox_reg (list[torch.Tensor]):  #lvl tensors, each has shape (N, Ax4, Hi, Wi).
+            bbox_reg (list[Tensor]):  #lvl tensors, each has shape (N, Ax4, Hi, Wi).
                                                 The tensor predicts 4-vector (dx,dy,dw,dh) box
                                                 regression values for every anchor. These values
                                                 are the relative offset between the anchor and the

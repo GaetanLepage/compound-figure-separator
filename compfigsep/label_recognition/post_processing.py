@@ -18,18 +18,15 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-################################################
-Label recognition module.
-Locate and analyze labels (if they exist).
-
-Input: Compound (i.e. multi-panel) figure/image.
-
-Output: A list of sub-figures including :
-    * Label location
-    * Label text detected from the image
+#################################################
+Post-processing tools to filter label detections.
 """
 
-from .load_datasets import *
-from .evaluator import *
+from ..data.figure_generators import FigureGenerator
+from ..utils.figure import Figure
 
-__all__ = [k for k in globals().keys() if not k.startswith("_")]
+
+def filter_labels(figure_generator: FigureGenerator):
+    """
+    TODO
+    """

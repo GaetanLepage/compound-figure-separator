@@ -1,8 +1,29 @@
 """
-This file contains the mapping that's applied to panel segmentation dataset dicts.
+#############################
+#        CompFigSep         #
+# Compound Figure Separator #
+#############################
+
+GitHub:         https://github.com/GaetanLepage/compound-figure-separator
+
+Author:         Gaétan Lepage
+Email:          gaetan.lepage@grenoble-inp.org
+Date:           Spring 2020
+
+Master's project @HES-SO (Sierre, SW)
+
+Supervisors:    Henning Müller (henning.mueller@hevs.ch)
+                Manfredo Atzori (manfredo.atzori@hevs.ch)
+
+Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+
+
+###################################################################################
+This file contains the mapping that is applied to panel segmentation dataset dicts.
+
+Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 """
 
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from typing import List
 
 import copy
@@ -59,43 +80,6 @@ class PanelSegDatasetMapper:
         self.img_format = cfg.INPUT.FORMAT
 
         self.is_train = is_train
-
-
-    # @staticmethod
-    # def _transform_instance_annotations(annotation: dict,
-                                        # transforms: TransformList) -> dict:
-        # """
-        # Apply transforms to box annotations of a single instance.
-
-        # It will use `transforms.apply_box` for the box.
-        # If you need anything more specially designed for each data structure,
-        # you'll need to implement your own version of this function or the transforms.
-
-        # Args:
-            # annotation (dict):          dict of instance annotations for a single instance.
-                                            # It will be modified in-place.
-            # transforms (TransformList): The list of tranformations to apply on the given instance.
-            # image_size (tuple):         The height, width of the transformed image
-
-        # Returns:
-            # dict: the same input dict with field "bbox" transformed according to `transforms`.
-                        # The "bbox_mode" field will be set to XYXY_ABS.
-        # """
-        # panel_bbox = BoxMode.convert(box=annotation['panel_bbox'],
-                                     # from_mode=annotation['bbox_mode'],
-                                     # to_mode=BoxMode.XYXY_ABS)
-        # # Note that bbox is 1d (per-instance bounding box)
-        # annotation['panel_bbox'] = transforms.apply_box([panel_bbox])[0]
-
-        # if 'label_box' in annotation:
-            # label_bbox = BoxMode.convert(box=annotation['label_bbox'],
-                                         # from_mode=annotation['bbox_mode'],
-                                         # to_mode=BoxMode.XYXY_ABS)
-            # annotation['label_bbox'] = transforms.apply_box([label_bbox])[0]
-
-        # annotation['bbox_mode'] = BoxMode.XYXY_ABS
-
-        # return annotation
 
 
     @staticmethod

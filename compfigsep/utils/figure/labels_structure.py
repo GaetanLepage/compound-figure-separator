@@ -103,7 +103,7 @@ class LabelStructure:
 
     @classmethod
     def from_labels_list(cls,
-                         labels_list: List[str]):
+                         labels_list: List[str]) -> 'LabelStructure':
         """
         TODO
         """

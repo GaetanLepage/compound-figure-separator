@@ -18,9 +18,16 @@ Supervisors:    Henning Müller (henning.mueller@hevs.ch)
 Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 
-##########################
+################################################
 Panel segmentation module.
 Locate panels, labels and match them together.
+
+Input: Compound (i.e. multi-panel) figure/image.
+
+Output: A list of sub-figures including :
+    * Panel location
+    * Label location
+    * Label text detected from the image
 """
 
 from .load_datasets import *
