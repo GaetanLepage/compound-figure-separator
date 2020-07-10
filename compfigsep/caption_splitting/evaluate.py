@@ -22,10 +22,11 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluation tool for caption splitting.
 """
 
-from typing import Dict, Iterable
+from typing import Dict
 import textdistance
 
 from ..utils.figure import Figure
+from ..data.figure_generators import FigureGenerator
 
 
 def caption_splitting_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
@@ -33,9 +34,11 @@ def caption_splitting_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
     Evaluate caption splitting metrics on a single figure.
 
     Args:
-        figure (Figure):            The figure on which to evaluate the caption splitting task.
-        stat_dict (Dict[str, any]): A dict containing caption splitting evaluation stats
-                                        It will be updated by this function.
+        figure (Figure):            The figure on which to evaluate the caption
+                                        splitting task.
+        stat_dict (Dict[str, any]): A dict containing caption splitting
+                                        evaluation stats It will be updated by
+                                        this function.
     """
 
     for gt_subfigure in figure.gt_subfigures:
@@ -43,13 +46,13 @@ def caption_splitting_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
             pass
 
 
-def evaluate_predictions(figure_generator: Iterable[Figure]):
+def evaluate_predictions(figure_generator: FigureGenerator):
     """
     Compute the metrics from a given set of predicted sub captions.
 
     Args:
-        figure_generator (iter):   A figure generator yielding Figure objects augmented with
-                                        detected sub captions.
+        figure_generator (FigureGenerator): A figure generator yielding Figure objects
+                                                augmented with detected sub captions.
 
     Returns:
         metrics (dict): A dict containing the computed metrics.
@@ -58,6 +61,6 @@ def evaluate_predictions(figure_generator: Iterable[Figure]):
     stat_dict = {
     }
 
-    for figure in figure_generator:
+    for figure in figure_generator():
 
         caption_splitting_figure_eval(figure, stat_dict)

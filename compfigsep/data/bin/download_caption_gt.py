@@ -94,26 +94,29 @@ def get_captions(file_list_txt: str,
         # This script only manages images from PubMedCentral.
         if image_filename.startswith('PMC'):
 
-            # Extract PMC id and original image file name from the full file name.
+            # Extract PMC id and original image file name from the full file
+            # name.
             # The file name format is : PMCxxxxx_yyyyyy.jpg
             # new_pmc_id = PMCxxxxx
             # target_file_name = yyyyyy
-            new_pmc_id, target_file_name = image_filename.split('_', maxsplit=1)
+            new_pmc_id, target_file_name = image_filename.split('_',
+                                                                maxsplit=1)
 
 
             # Path to the txt file that will contain the caption text.
-            caption_annotation_file_path = image_path.replace('.jpg', '_caption.txt')
+            caption_annotation_file_path = image_path.replace('.jpg',
+                                                              '_caption.txt')
 
             if os.path.isfile(caption_annotation_file_path) and not override:
-                logging.warning(f"Caption file {caption_annotation_file_path} for image"\
-                                f" {image_path} already exists."\
+                logging.warning(f"Caption file {caption_annotation_file_path}"\
+                                f" for image {image_path} already exists."\
                                 "\n==> As `override` has been set to False,"\
                                 " this image is skipped.")
                 continue
 
 
-            # If it is the same article as the previous iteration, no need to re-download the
-            # xml data.
+            # If it is the same article as the previous iteration, no need to
+            # re-download the xml data.
             if new_pmc_id != pmc_id:
                 pmc_id = new_pmc_id
                 xml_url = BASE_URL + pmc_id
@@ -128,7 +131,8 @@ def get_captions(file_list_txt: str,
                 file_base_name = next(v for k, v in graphic_element.attrib.items()
                                       if k.endswith('href'))
 
-                # No need to go further if this figure_element corresponds to another figure.
+                # No need to go further if this figure_element corresponds to
+                # another figure.
                 if file_base_name != target_file_name:
                     found_matching_figure_element = False
                     continue
@@ -138,7 +142,8 @@ def get_captions(file_list_txt: str,
                 caption_element = figure_element.find('caption')
                 if caption_element is not None:
 
-                    # Gather all the text (possibly nested) from the caption_element.
+                    # Gather all the text (possibly nested) from the
+                    # caption_element.
                     caption_text = ''.join(caption_element.itertext()).lstrip()
 
                     # Remove multiple spaces and '\t' from the caption.
@@ -147,7 +152,8 @@ def get_captions(file_list_txt: str,
                     with open(caption_annotation_file_path, 'w') as output_file:
                         output_file.write(caption_text)
 
-                # Arriving at this line means the caption has been succesfully written.
+                # Arriving at this line means the caption has been succesfully
+                # written.
                 # No need to keep looping over the figures from this article.
                 break
 
