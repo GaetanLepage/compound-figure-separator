@@ -24,7 +24,7 @@ Evaluator for the label recognition task.
 
 from typing import List
 
-from ..utils.figure import Figure, DetectedSubFigure, CLASS_LABEL_MAPPING
+from ..utils.figure import Figure, DetectedLabel, CLASS_LABEL_MAPPING
 from ..utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 from .evaluate import evaluate_detections
 
@@ -54,7 +54,7 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
                 inputs: List[dict],
                 outputs: List[dict]):
         """
-        Process the pair of inputs and outputs.
+        Process pairs of inputs and outputs.
 
         Args:
             inputs (List[dict]):    The inputs that's used to call the model.
@@ -95,21 +95,21 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
         """
         for figure in self._figure_generator:
 
-            predicted_panels = predictions[figure.index]
+            detected_labels = predictions[figure.index]
 
-            predicted_panel_objects = []
+            detected_label_objects = []
 
-            for prediction in predicted_panels:
+            for detected_label in detected_labels:
 
-                # Instanciate a Panel object.
-                panel = DetectedSubFigure(label=CLASS_LABEL_MAPPING[prediction['cls']],
-                                      label_rect=prediction['box'],
-                                      label_detection_score=prediction['score'])
+                # Instanciate a DetectedLabel object.
+                detected_label = DetectedLabel(text=CLASS_LABEL_MAPPING[detected_label['cls']],
+                                               box=detected_label['box'],
+                                               detection_score=detected_label['score'])
 
-                predicted_panel_objects.append(panel)
+                detected_label_objects.append(detected_label)
 
                 # TODO do some post processing here maybe
 
-            figure.detected_panels = predicted_panel_objects
+            figure.detected_labels = detected_label_objects
 
             yield figure

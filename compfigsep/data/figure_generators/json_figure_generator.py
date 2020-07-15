@@ -125,11 +125,6 @@ def get_most_recent_json(folder_path: str = None) -> str:
 
 
 
-
-
-
-
-
 class JsonFigureGenerator(FigureGenerator):
     """
     Generator of Figure objects from a JSON annotation file.

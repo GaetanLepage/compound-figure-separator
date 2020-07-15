@@ -59,7 +59,7 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
                 inputs: List[dict],
                 outputs: List[dict]):
         """
-        Process the pair of inputs and outputs.
+        Process pairs of inputs and outputs.
 
         Args:
             inputs (List[dict]):    The inputs that's used to call the model.

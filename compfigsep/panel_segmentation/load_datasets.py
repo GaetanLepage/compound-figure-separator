@@ -34,15 +34,12 @@ def register_panel_segmentation_dataset(dataset_name):
     """
     Register the appropriate data set for panel splitting in the Detectron `DatasetCatalog`.
 
-    TODO: manage validation
-    TODO: get detectron logger and WARN if dataset name is not valid
-
     Args:
         dataset_name (str): The name of the data set to register. Has to belong to accepted ones.
     """
     if not 'zou' in dataset_name:
         # TODO warn the user in this case
-        pass
+        return
 
     # Dataset from Zou
     if dataset_name == "zou_panel_seg_train":
@@ -54,19 +51,14 @@ def register_panel_segmentation_dataset(dataset_name):
         image_directory_path = "data/zou/"
 
     else:
-        pass
+        return
 
     # Create the figure generator to feed the dictionary
     figure_generator = IphotodrawXmlFigureGenerator(
         file_list_txt=file_list_txt)
 
-    # TODO remove
-    # if dataset_name == "pubmed":
-        # file_list_txt = "data/pubmed_extract/eval_list.txt"
-        # image_directory_path = "data/pubmed_extract/image/data/dmli-from-comp-reclassification-captions-prostate/"
 
-    # figure_generator = ImageListFigureGenerator(file_list_txt, image_directory_path)
-
+    # Register the data set and set the ingest function to convert Figures to Detectron dict.
     DatasetCatalog.register(name=dataset_name,
                             func=lambda: export_figures_to_detectron_dict(
                                 figure_generator=figure_generator,

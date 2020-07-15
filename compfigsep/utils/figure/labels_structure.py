@@ -50,6 +50,7 @@ UC_ROMAN_TO_INT = {char: int_value
                                                     len(UC_ROMAN) + 1)
                                               )
                    }
+
 # {1: 'I', 2: 'II',..., 20: 'XX'}
 UC_ROMAN_FROM_INT = {value: char for char, value in UC_ROMAN_TO_INT.items()}
 
@@ -80,6 +81,7 @@ class LabelStructureEnum(Enum):
     ROMAN_LC = 5
 
     OTHER = 6
+
 
 class LabelStructure:
     """
@@ -164,7 +166,9 @@ class LabelStructure:
 
     def get_core_label_list(self) -> List[str]:
         """
-        TODO
+        Returns:
+            core_label_list (List[str]):    The list of labels corresponding to this
+                                                LabelStructure.
         """
         if self.labels_type is None:
             return []

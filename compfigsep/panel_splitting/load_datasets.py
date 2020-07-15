@@ -63,7 +63,7 @@ def register_panel_splitting_dataset(dataset_name: str):
             xml_annotation_file_path=xml_annotation_file_path,
             image_directory_path=image_directory_path)
 
-    # Dataset from Zou
+    # PanelSeg data set
     elif "zou" in dataset_name:
         if dataset_name == "zou_panel_splitting_train":
             file_list_txt = "data/zou/train.txt"
@@ -82,11 +82,13 @@ def register_panel_splitting_dataset(dataset_name: str):
         # TODO warn the user in this case
         pass
 
+    # Register the data set and set the ingest function to convert Figures to Detectron dict.
     DatasetCatalog.register(name=dataset_name,
                             func=lambda: export_figures_to_detectron_dict(
                                 figure_generator=figure_generator,
                                 task='panel_splitting'))
 
+    # Provide the figure generator to the DataSet for later evaluation.
     MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator)
 
     # Add the class names (here, only 'panel') as metadata.

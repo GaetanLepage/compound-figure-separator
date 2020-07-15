@@ -20,6 +20,10 @@ Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
 
 ########################################################
 Miscellaneous functions related to TensorFlow data sets.
+
+Those functions are deprecated since the comp-fig-sep project is now using the Detectron2 API
+which is based on PyTorch.
+If you would like to do experiments with TensorFlow, please, feel free to use those.
 """
 
 from typing import List
