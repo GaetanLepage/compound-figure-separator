@@ -15,7 +15,8 @@ Master's project @HES-SO (Sierre, SW)
 Supervisors:    Henning Müller (henning.mueller@hevs.ch)
                 Manfredo Atzori (manfredo.atzori@hevs.ch)
 
-Collaborator:   Niccolò Marini (niccolo.marini@hevs.ch)
+Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
+                Stefano Marchesin (stefano.marchesin@unipd.it)
 
 
 #################################################
