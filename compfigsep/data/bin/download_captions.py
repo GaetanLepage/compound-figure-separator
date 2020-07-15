@@ -166,7 +166,7 @@ def get_captions(file_list_txt: str,
 
 def main(args: List[str] = None):
     """
-    TODO
+    Download caption data from PubMedCentral data base.
 
     Args:
         args (List[str]):   Arguments from the command line.
