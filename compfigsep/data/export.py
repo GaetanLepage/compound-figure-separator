@@ -96,7 +96,8 @@ def export_figures_to_json(figure_generator: FigureGenerator,
                            json_output_filename: str = None,
                            json_output_directory: str = None):
     """
-    TODO
+    Export a data set that can contain ground truth and/or detected annotations for any task to a
+    JSON file.
 
     Args:
         figure_generator (FigureGenerator): A generator yielding figure objects.
@@ -129,7 +130,9 @@ def export_figures_to_json(figure_generator: FigureGenerator,
         output_dict[figure.image_filename] = figure.to_dict()
 
     with open (json_output_path, 'w') as json_file:
-        json.dump(output_dict, json_file)
+        json.dump(obj=output_dict,
+                  fp=json_file,
+                  indent=4)
 
 
 def export_figures_to_tf_record(figure_generator: FigureGenerator,

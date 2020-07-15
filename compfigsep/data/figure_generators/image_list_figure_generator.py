@@ -35,10 +35,6 @@ class ImageListFigureGenerator(FigureGenerator):
     This generator does not load any annotations.
 
     Attributes:
-        data_dir (str):             The path to the directory where the image data sets are
-                                        stored.
-        current_index (int):        Index of the currently handled figure. This helps knowing the
-                                        "progression" of the data loading process.
         image_list_txt (str):       The path to the list of images to be loaded.
         image_directory_path (str): The path to the directory where the images are stored.
     """
@@ -47,8 +43,6 @@ class ImageListFigureGenerator(FigureGenerator):
                  image_list_txt: str,
                  image_directory_path: str = None):
         """
-        Init for ImageListFigureGenerator.
-
         Args:
             image_list_txt (str):       The path to the list of images to be loaded.
             image_directory_path (str): The path to the directory where the images are stored.
@@ -65,12 +59,6 @@ class ImageListFigureGenerator(FigureGenerator):
 
 
     def __call__(self) -> Figure:
-        """
-        Generator of Figure objects from a single csv annotation file.
-
-        Yields:
-            figure (Figure):    Figure objects without annotations.
-        """
 
         with open(self.image_list_txt, 'r') as image_list_file:
 

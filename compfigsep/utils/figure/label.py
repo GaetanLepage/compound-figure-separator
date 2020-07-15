@@ -55,8 +55,12 @@ class Label:
         self.text = text
 
         if isinstance(box, np.ndarray):
-            box = box.tolist()
-        self.box = [round(val) for val in box]
+                box = box.tolist()
+
+        self.box = box
+
+        if self.box is not None:
+            self.box = [round(val) for val in box]
 
 
     @classmethod
