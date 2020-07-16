@@ -23,7 +23,8 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluation tool for caption splitting.
 """
 
-from typing import Dict
+from typing import Dict, Tuple
+
 import textdistance
 
 from ..utils.figure import Figure
@@ -46,8 +47,20 @@ def caption_splitting_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
         if gt_subfigure.caption is not None:
             pass
 
+def caption_splitting_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
+    """
+    Compute the metrics for the caption splitting task.
 
-def evaluate_predictions(figure_generator: FigureGenerator):
+    Args:
+        stat_dict (Dict[str, any]): A dict containing the stats gathered while looping over
+                                        detections.
+
+    Returns:
+        levenshtein_metric (float):  The averaged levenshtein metric.
+    """
+
+
+def evaluate_detections(figure_generator: FigureGenerator):
     """
     Compute the metrics from a given set of predicted sub captions.
 
@@ -65,3 +78,9 @@ def evaluate_predictions(figure_generator: FigureGenerator):
     for figure in figure_generator():
 
         caption_splitting_figure_eval(figure, stat_dict)
+
+    TODO = caption_splitting_metrics(stat_dict=stat_dict)
+
+    metrics = {
+        'TODO': TODO
+    }

@@ -47,10 +47,9 @@ def is_roman(string: str) -> bool:
     return string in UC_ROMAN or string in LC_ROMAN
 
 
-## 1st step: label identification
 def label_identification(caption: str) -> List['str']:
     """
-    TODO
+    Given a caption text, identify the labels.
 
     Args:
         caption (str):  The caption text from which to extract captions.
@@ -58,22 +57,25 @@ def label_identification(caption: str) -> List['str']:
     Returns:
         label_list (List[str]): A list of detected labels.
     """
-    print("\n## Step 1")
     # Detect alphanumerical labels.
     characters_raw = regex_definitions.RE_CHARACTERS.findall(caption)
-    print(characters_raw)
+    print("characters_raw:", characters_raw)
+
     characters_cleaned = []
+
     if characters_raw:
         # Get the list of alphanumerical labels.
         characters_list = []
         for raw in characters_raw:
             characters_list.append(raw[0])
-        # clean the list
+        # Clean the list.
         for element in characters_list:
             characters_cleaned.append(re.sub(r'[().:]', '', element))
-        # remove duplicates
+
+        # Remove duplicates.
         characters_cleaned = list(set(characters_cleaned))
-        # sort the list of characters
+
+        # Sort the list of characters.
         characters_cleaned.sort()
         print("characters_cleaned:", characters_cleaned)
 
@@ -146,7 +148,6 @@ def label_identification(caption: str) -> List['str']:
     return None
 
 
-## 2nd step: label expansion
 def label_expansion(caption,
                     detected_labels):
     """
@@ -233,8 +234,12 @@ def label_expansion(caption,
 
 
     # Merge the lists containing the expanded ranges and the single labels.
-    # (union operation between sets).
-    labels = list(set(ranges) | set(digits_cleaned) | set(romans_cleaned) | set(characters_cleaned))
+    # ('|' is the union operation between sets).
+    labels = list(set(ranges)\
+                  | set(digits_cleaned)\
+                  | set(romans_cleaned)\
+                  | set(characters_cleaned)
+                  )
     labels.sort()
     # Split the labels list into three sublists: digits, alphanumeric & roman.
     labels_digits = []

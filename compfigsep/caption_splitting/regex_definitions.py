@@ -48,8 +48,8 @@ RE_CONJUNCTIONS = re.compile(r"((\b|\.|\()((" + ANY_LABEL + r")[0-9]?(\)|\.|:)?)
 # Define the regular expressions that match Part Of Speech (POS) labels.
 # => single labels
 RE_CHARACTERS_POS = re.compile(r"((in|from|panel(s)?)\s?\(?(" + ANY_CHAR + r")(?![^).:0-9])[0-9]?(\)|\.|:|\b)?)")
-RE_ROMAN_POS = re.compile(r"((in|from|panel(s)?)\s?\(?("      + ANY_ROMAN +         r")(?![^).:])(\)|\.|:|\b)?)")
-RE_DIGITS_POS = re.compile(r"((in|from|panel(s)?)\s?\(?([1-9])                (?![^).:0-9])[0-9]?(\)|\.|:|\b)?)")
+RE_ROMAN_POS = re.compile(r"     ((in|from|panel(s)?)\s?\(?("      + ANY_ROMAN +    r")(?![^).:])(\)|\.|:|\b)?)")
+RE_DIGITS_POS = re.compile(r"    ((in|from|panel(s)?)\s?\(?([1-9])            (?![^).:0-9])[0-9]?(\)|\.|:|\b)?)")
 # => range labels
 RE_HYPHEN_POS = re.compile(r"((in|from|panel(s)?)\s?\(?(" + ANY_LABEL + r")[0-9]?-([" + ANY_LABEL + r")[0-9]?\)?)")
 
