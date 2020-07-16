@@ -72,7 +72,7 @@ Learn more by reading this [README.md](data/README.md).
 
 I have been realizing this project from April to August 2020 within the [Medgift team](http://medgift.hevs.ch/wordpress/) from [HES-SO](https://www.hevs.ch/) for my Masters project. I worked under the supervision of [Henning Müller](http://medgift.hevs.ch/wordpress/team/henning-mueller/) and [Manfredo Atzori](http://medgift.hevs.ch/wordpress/team/manfredo-atzori/).
 
-[Niccolò Marini](http://medgift.hevs.ch/wordpress/team/niccolo-marini/) also offered his helpful contribution.
+[Niccolò Marini](http://medgift.hevs.ch/wordpress/team/niccolo-marini/) and [Stefano Marchesin](http://www.dei.unipd.it/~marches1/index.html) also offered an helpful contribution.
 
 
 ## Acknowledgement
