@@ -35,7 +35,7 @@ from typing import List
 sys.path.append('.')
 
 from compfigsep.data.figure_generators import JsonFigureGenerator
-from compfigsep.data.figure_viewer import parse_viewer_args, view_data_set
+from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
 
 
 def parse_args(args: List[str]) -> ArgumentParser:
@@ -56,7 +56,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
                         default="experiments/panel_segmentation/test.json",
                         type=str)
 
-    parser = parse_viewer_args(parser)
+    add_viewer_args(parser)
 
     return parser.parse_args(args)
 
@@ -76,7 +76,7 @@ def main(args: List[str] = None):
 
     # Create the figure generator handling ImageCLEF xml annotation files.
     figure_generator = JsonFigureGenerator(
-        json_annotation_file_path=args.json)
+        json_path=args.json)
 
     # Preview the data set.
     view_data_set(figure_generator=figure_generator,

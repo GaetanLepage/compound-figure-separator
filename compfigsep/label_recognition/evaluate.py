@@ -32,7 +32,8 @@ from ..utils.figure import Figure
 from ..utils.average_precision import compute_average_precision
 
 
-def label_recognition_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
+def label_recognition_figure_eval(figure: Figure,
+                                  stat_dict: Dict[str, any]):
     """
     Evaluate label recognition metrics on a single figure.
 

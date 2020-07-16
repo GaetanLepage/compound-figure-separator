@@ -35,7 +35,7 @@ from typing import List
 sys.path.append('.')
 
 from compfigsep.data.figure_generators import ImageClefXmlFigureGenerator
-from compfigsep.data.figure_viewer import parse_viewer_args, view_data_set
+from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
 
 
 def parse_args(args: List[str]) -> ArgumentParser:
@@ -60,7 +60,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
                         default="data/ImageCLEF/test/FigureSeparationTest2016/",
                         type=str)
 
-    parser = parse_viewer_args(parser)
+    add_viewer_args(parser)
 
     return parser.parse_args(args)
 

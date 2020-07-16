@@ -71,27 +71,20 @@ class Trainer(DefaultTrainer):
     @classmethod
     def build_evaluator(cls,
                         cfg: CfgNode,
-                        dataset_name: str,
-                        export: bool = True,
-                        output_folder: str = None) -> PanelSegEvaluator:
+                        dataset_name: str) -> PanelSegEvaluator:
         """
         Builds the PanelSegEvaluator that will be called at test time.
 
         Args:
             cfg (CfgNode):          The global config.
             dataset_name (str):     The name of the test data set.
-            export (bool):          Whether or not to export predictions as a JSON file.
-            output_folder (str):    The path to the folder where to store the inference results.
 
         Returns:
             PanelSegEvaluator:  The evaluator for testing label recognition results.
         """
-        if output_folder is None:
-            output_folder = cfg.OUTPUT_DIR
-
         return PanelSegEvaluator(dataset_name=dataset_name,
-                                 export=export,
-                                 export_dir=output_folder)
+                                 export=True,
+                                 export_dir=cfg.OUTPUT_DIR)
 
 
     @classmethod

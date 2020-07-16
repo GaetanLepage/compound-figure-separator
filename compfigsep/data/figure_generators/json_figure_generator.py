@@ -29,6 +29,8 @@ import json
 import re
 from time import strptime
 import datetime
+from argparse import ArgumentParser
+
 import progressbar
 
 import compfigsep
@@ -42,9 +44,13 @@ from ...utils.figure import (
 
 from .figure_generator import FigureGenerator
 
+MODULE_DIR = os.path.dirname(compfigsep.__file__)
 PROJECT_DIR = os.path.join(
-    os.path.dirname(compfigsep.__file__),
+    MODULE_DIR,
     os.pardir)
+
+DEFAULT_JSON_FOLDER = os.path.relpath(os.path.join(MODULE_DIR,
+                                                   "compound_figure_separation/output/"))
 
 
 def get_most_recent_json(folder_path: str = None) -> str:
@@ -57,20 +63,20 @@ def get_most_recent_json(folder_path: str = None) -> str:
     Returns:
         json_path (str):    The path to the most recent JSON annotation file.
     """
-    default_path = os.path.join(PROJECT_DIR, 'output')
+    default_path = DEFAULT_JSON_FOLDER
 
     if folder_path is None:
         folder_path = default_path
         logging.info(f"No folder_path given: using default : {default_path}")
 
     elif not os.path.isdir(folder_path):
-        logging.info(f"Given folder_path {folder_path} is not a valid directory."\
-                      " Using default: {default_path}")
+        logging.warning(f"Given folder_path {folder_path} is not a valid directory."\
+                         " Using default: {default_path}")
         folder_path = default_path
 
     if not os.path.isdir(folder_path):
         logging.error(f"folder_path {folder_path} does not exist. Aborting.")
-        return
+        raise ValueError(f"folder_path {folder_path} does not exist. Aborting.")
 
     regexp_time_stamp_file_names = \
         r".*_[0-9]{4}-[A-Za-z]+-[0-3][0-9]_[0-2][0-9]:[0-5][0-9]:[0-5][0-9].json"
@@ -125,6 +131,37 @@ def get_most_recent_json(folder_path: str = None) -> str:
     return os.path.join(folder_path, most_recent_file_name)
 
 
+def add_json_arg(parser: ArgumentParser,
+                 json_default_path: str = None,
+                 folder_default_relative_path: str = None):
+    """
+    Parse the argument for loading a json file.
+
+    Args:
+        parser (ArgumentParser):            An ArgumentParser.
+        json_default_path (str):            Default path to a json file.
+        folder_default_relative_path (str): Default folder relative path where to look for the
+                                                most recent json file.
+    """
+
+    if json_default_path is None:
+
+        if folder_default_relative_path is None:
+            folder_default_relative_path = "compound_figure_separation/output/"
+
+        folder_default_path = os.path.join(MODULE_DIR,
+                                           folder_default_relative_path)
+
+        folder_default_path = os.path.relpath(folder_default_path)
+
+        json_default_path = get_most_recent_json(folder_path=folder_default_path)
+
+
+    parser.add_argument('--json',
+                        help="The path to the json annotation file.",
+                        default=json_default_path,
+                        type=str)
+
 
 class JsonFigureGenerator(FigureGenerator):
     """
@@ -134,22 +171,26 @@ class JsonFigureGenerator(FigureGenerator):
         json_annotation_file_path (str):    The path to the json annotation file.
     """
 
-    def __init__(self, json_annotation_file_path: str):
+    def __init__(self, json_path: str):
         """
         Init function.
         Call the init function of the abstract parent class.
 
         Args:
-            json_annotation_file_path (str):    The path to the json annotation file.
+            json (str): The path to a json annotation file OR to a folder where to look for the
+                            most recent file.
         """
+        if os.path.isfile(json_path) and json_path.endswith('.json'):
+            self.json_annotation_file_path = json_path
 
-        self.json_annotation_file_path = json_annotation_file_path
+        elif os.path.isdir(json_path):
+            self.json_annotation_file_path = get_most_recent_json(folder_path=json_path)
 
         super().__init__()
 
-        if not os.path.isfile(json_annotation_file_path):
+        if not os.path.isfile(self.json_annotation_file_path):
             raise FileNotFoundError("The annotation json file does not exist :"\
-                "\n\t {}".format(json_annotation_file_path))
+                "\n\t {}".format(self.json_annotation_file_path))
 
 
     def __call__(self) -> Figure:

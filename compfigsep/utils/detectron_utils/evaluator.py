@@ -23,6 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Definition of a meta-evaluator for the panel segmentation tasks.
 """
 
+import os
 import logging
 from typing import List, Dict
 from collections import defaultdict, OrderedDict
@@ -33,9 +34,11 @@ from detectron2.data import MetadataCatalog
 from detectron2.evaluation.evaluator import DatasetEvaluator
 from detectron2.utils import comm
 
+import compfigsep
 from ..figure.figure import Figure
 from ...data.export import export_figures_to_json
 
+MODULE_DIR = os.path.dirname(compfigsep.__file__)
 
 class PanelSegAbstractEvaluator(DatasetEvaluator):
     """
@@ -59,7 +62,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
                  dataset_name: str,
                  task_name: str,
                  evaluation_function: callable = None,
-                 export: bool = False,
+                 export: bool = True,
                  export_dir: str = None):
         """
         Init function.
@@ -93,6 +96,9 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
         # Export
         self.export = export
+        if export_dir is None:
+            export_dir = os.path.join(MODULE_DIR,
+                                      task_name + '/output/')
         self.export_dir = export_dir
 
 
@@ -162,7 +168,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
         # Evaluate the metrics on the predictions.
         metrics_dict = self._evaluation_function(
-                            figure_generator=self._augmented_figure_generator(predictions))\
+                figure_generator=lambda: self._augmented_figure_generator(predictions))\
                        if self._evaluation_function is not None else None
 
         # Export predictions and gt in a single JSON file

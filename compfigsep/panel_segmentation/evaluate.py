@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel segmentation task metrics.
 """
 
-from typing import Dict
+from typing import Dict, Iterable
 from pprint import pprint
 from sortedcontainers import SortedKeyList
 
@@ -69,13 +69,15 @@ def panel_segmentation_figure_eval(figure: Figure,
 
 
     stat_dict['overall_detected_count'] += len(figure.detected_subfigures)
+
     for detected_subfigure in figure.detected_subfigures:
+
         stat_dict['overall_correct_count'] += int(detected_subfigure.is_true_positive)
 
         cls = detected_subfigure.label.text
 
-        # initialize the dict entry for this class if necessary
-        # it is sorting the predictions in the decreasing order of their score
+        # Initialize the dict entry for this class if necessary.
+        # It is sorting the predictions in the decreasing order of their score.
         if cls not in stat_dict['detections_by_class']:
             stat_dict['detections_by_class'][cls] = SortedKeyList(key=lambda u: -u[0])
 
@@ -87,14 +89,14 @@ def panel_segmentation_figure_eval(figure: Figure,
                                                    detected_subfigure.is_true_positive))
 
 
-def evaluate_detections(figure_generator: FigureGenerator) -> dict:
+def evaluate_detections(figure_generator: Iterable[Figure]) -> dict:
     """
     Compute the metrics (precision, recall and mAP) from a given set of panel segmentation
     detections.
 
     Args:
-        figure_generator (FigureGenerator): A figure generator yielding Figure objects augmented
-                                                with detected panels and labels.
+        figure_generator (Iterable[Figure]):    A figure generator yielding Figure objects
+                                                    augmented with detected panels and labels.
 
     Returns:
         metrics (dict): A dict containing the computed metrics.
@@ -127,7 +129,9 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     }
 
 
-    for figure in figure_generator():
+    for figure in figure_generator:
+
+        # TODO : clean this function
 
         # print("##############################")
 

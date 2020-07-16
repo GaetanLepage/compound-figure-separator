@@ -30,18 +30,15 @@ from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
 
 
-def parse_viewer_args(parser: ArgumentParser) -> ArgumentParser:
+def add_viewer_args(parser: ArgumentParser):
     """
-    Parse the argument relative to the preview options :
+    Add to the given parser the arguments relative to the preview options :
         * mode ('gt', 'pred' or 'both')
         * delay
         * save_preview
 
     Args:
         parser (ArgumentParser):    An ArgumentParser.
-
-    Returns:
-        parser (ArgumentParser):    The 'given' parser augmented with the options.
     """
 
     parser.add_argument('--mode',
@@ -60,8 +57,6 @@ def parse_viewer_args(parser: ArgumentParser) -> ArgumentParser:
     parser.add_argument('--save_preview',
                         help="Save the image previews in image files.",
                         action='store_true')
-
-    return parser
 
 
 def view_data_set(figure_generator: FigureGenerator,

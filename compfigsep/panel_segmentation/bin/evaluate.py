@@ -31,13 +31,12 @@ from argparse import ArgumentParser
 
 from typing import List
 
-import compfigsep
 
 sys.path.append('.')
 
-MODULE_DIR = os.path.dirname(compfigsep.__file__)
 
-from compfigsep.data.figure_generators import JsonFigureGenerator, get_most_recent_json
+from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
+
 from compfigsep.panel_segmentation.evaluate import evaluate_detections
 
 
@@ -53,14 +52,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
     """
     parser = ArgumentParser(description="Evaluate panel segmentation detections.")
 
-    # TODO check default path
-    parser.add_argument('--json',
-                        help="The path to the json annotation file.",
-                        default=get_most_recent_json(
-                            folder_path=os.path.join(
-                                MODULE_DIR,
-                                'panel_segmentation/output/')),
-                        type=str)
+    add_json_arg(folder_default_relative_path='panel_segmentation/output/')
 
     return parser.parse_args(args)
 

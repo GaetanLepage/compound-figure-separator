@@ -117,7 +117,8 @@ def export_figures_to_json(figure_generator: FigureGenerator,
         json_output_filename = "compfigsep_experiment_{date:%Y-%B-%d_%H:%M:%S}.json".format(
             date=datetime.datetime.now())
 
-    json_output_path = os.path.join(json_output_directory, json_output_filename)
+    json_output_path = os.path.join(json_output_directory,
+                                    json_output_filename)
 
     if os.path.isfile(json_output_path):
         logging.warning(f"JSON output file already exist ({json_output_path})."\

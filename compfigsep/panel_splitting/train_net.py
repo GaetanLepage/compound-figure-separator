@@ -59,24 +59,20 @@ class Trainer(DefaultTrainer):
     @classmethod
     def build_evaluator(cls,
                         cfg: CfgNode,
-                        dataset_name: str,
-                        output_folder: str = None) -> PanelSplitEvaluator:
+                        dataset_name: str) -> PanelSplitEvaluator:
         """
         Builds the PanelSplitEvaluator that will be called at test time.
 
         Args:
             cfg (CfgNode):          The config node filled with necessary options.
             dataset_name (str):     The name of the test data set.
-            output_folder (str):    The path of the output folder where to store the results.
 
         Returns:
             PanelSplitEvaluator: The evaluator for testing label recognition results.
         """
-        # TODO implement export functionnality
-        if output_folder is None:
-            output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
-
-        return PanelSplitEvaluator(dataset_name)
+        return PanelSplitEvaluator(dataset_name=dataset_name,
+                                   export=True,
+                                   export_dir=cfg.OUTPUT_DIR)
 
 
     def build_hooks(self) -> List[HookBase]:

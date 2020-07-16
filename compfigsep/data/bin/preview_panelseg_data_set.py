@@ -33,7 +33,7 @@ from argparse import ArgumentParser
 from typing import List
 
 from compfigsep.data.figure_generators import IphotodrawXmlFigureGenerator
-from compfigsep.data.figure_viewer import parse_viewer_args, view_data_set
+from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
 
 sys.path.append(".")
 
@@ -59,7 +59,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
                         default=None,
                         type=str)
 
-    parser = parse_viewer_args(parser)
+    add_viewer_args(parser)
 
     return parser.parse_args(args)
 

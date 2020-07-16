@@ -37,7 +37,7 @@ sys.path.append('.')
 
 MODULE_DIR = os.path.dirname(compfigsep.__file__)
 
-from compfigsep.data.figure_generators import JsonFigureGenerator, get_most_recent_json
+from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
 from compfigsep.label_recognition.evaluate import evaluate_detections
 
 
@@ -53,14 +53,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
     """
     parser = ArgumentParser(description="Evaluate label recognition detections.")
 
-    # TODO check default path
-    parser.add_argument('--json',
-                        help="The path to the json annotation file.",
-                        default=get_most_recent_json(
-                            folder_path=os.path.join(
-                                MODULE_DIR,
-                                'label_recognition/output/')),
-                        type=str)
+    add_json_arg(folder_default_relative_path='label_recognition/output/')
 
     return parser.parse_args(args)
 
@@ -80,7 +73,7 @@ def main(args: List[str] = None):
 
     # Create the figure generator handling JSON annotation files.
     figure_generator = JsonFigureGenerator(
-        json_annotation_file_path=args.json)
+        json_path=args.json)
 
     # Evaluate the data set.
     evaluate_detections(figure_generator=figure_generator)

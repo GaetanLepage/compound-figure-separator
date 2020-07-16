@@ -36,7 +36,10 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
     Perform the evaluation of panel splitting metrics on a given test set.
     """
 
-    def __init__(self, dataset_name: str, export: bool = False):
+    def __init__(self,
+                 dataset_name: str,
+                 export: bool = False,
+                 export_dir: str = None):
         """
         Init function.
         Call the init function of the parent class (PanelSegAbstractEvaluator).
@@ -44,11 +47,14 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
         Args:
             dataset_name (str): The name of the data set to evaluate.
             export (bool):      Whether or not to export predictions as a JSON file.
+            export_dir (str):   Path to the directory where to store the inference
+                                    results.
         """
         super().__init__(dataset_name=dataset_name,
                          task_name='panel_splitting',
                          evaluation_function=evaluate_detections,
-                         export=export)
+                         export=export,
+                         export_dir=export_dir)
 
 
     def process(self,
@@ -94,7 +100,7 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
         Yields:
             figure (Figure):    Figure objects augmented with predictions.
         """
-        for figure in self._figure_generator:
+        for figure in self._figure_generator():
 
             predicted_panels = predictions[figure.index]
 
