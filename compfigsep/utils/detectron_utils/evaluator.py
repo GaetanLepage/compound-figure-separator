@@ -168,7 +168,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
         # Evaluate the metrics on the predictions.
         metrics_dict = self._evaluation_function(
-                figure_generator=lambda: self._augmented_figure_generator(predictions))\
+                figure_generator=self._augmented_figure_generator(predictions))\
                        if self._evaluation_function is not None else None
 
         # Export predictions and gt in a single JSON file

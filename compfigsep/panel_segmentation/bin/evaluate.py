@@ -52,7 +52,8 @@ def parse_args(args: List[str]) -> ArgumentParser:
     """
     parser = ArgumentParser(description="Evaluate panel segmentation detections.")
 
-    add_json_arg(folder_default_relative_path='panel_segmentation/output/')
+    add_json_arg(parser=parser,
+                 folder_default_relative_path='panel_segmentation/output/')
 
     return parser.parse_args(args)
 
@@ -72,10 +73,10 @@ def main(args: List[str] = None):
 
     # Create the figure generator handling JSON annotation files.
     figure_generator = JsonFigureGenerator(
-        json_annotation_file_path=args.json)
+        json_path=args.json)
 
     # Evaluate the data set.
-    evaluate_detections(figure_generator=figure_generator)
+    evaluate_detections(figure_generator=figure_generator())
 
 
 if __name__ == '__main__':
