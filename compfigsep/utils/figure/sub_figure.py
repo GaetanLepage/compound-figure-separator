@@ -132,12 +132,7 @@ class SubFigure:
 
 
     def __str__(self) -> str:
-        """
-        str method for a SubFigure object.
 
-        Returns:
-            string (str):   A pretty representation of the SubFigure information.
-        """
         string = f"{type(self).__name__}:"
 
         string += f" {self.panel}"
@@ -186,20 +181,24 @@ class DetectedSubFigure(SubFigure):
     @classmethod
     def from_normal_sub_figure(cls, subfigure: SubFigure) -> 'DetectedSubFigure':
         """
-        TODO
+        Build a DetectedSubFigure object from a normal Figure object.
+
+        Args:
+            subfigure (SubFigure):  A SubFigure object.
+
+        Returns:
+            DetectedSubFigure:  The resulting DetectedSubFigure object.
         """
         # If it is already a DetectedSubFigure, no need to do anything.
         if isinstance(subfigure, DetectedSubFigure):
             return subfigure
 
-        if subfigure.panel is None:
-            panel = None
-        else:
+        panel = None
+        if subfigure.panel is not None:
             panel = DetectedPanel.from_normal_panel(subfigure.panel)
 
-        if subfigure.label is None:
-            label = None
-        else:
+        label = None
+        if subfigure.label is not None:
             label = DetectedLabel.from_normal_label(subfigure.label)
 
         return DetectedSubFigure(panel=panel,
@@ -260,12 +259,7 @@ class DetectedSubFigure(SubFigure):
 
 
     def __str__(self) -> str:
-        """
-        str method for a DetectedSubFigure object.
 
-        Returns:
-            string (str):   A pretty representation of the SubFigure information.
-        """
         string = super().__str__()
 
         string += f", is_true_positive: {self.is_true_positive}"

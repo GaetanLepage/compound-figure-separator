@@ -19,8 +19,8 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
                 Stefano Marchesin (stefano.marchesin@unipd.it)
 
 
-###################################################
-Module to represent figures and associated objects.
+############################################################
+Module to represent compound figures and associated objects.
 """
 
 from .panel import *

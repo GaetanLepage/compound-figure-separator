@@ -113,6 +113,9 @@ class Figure:
         # Detected subfigures
         self.detected_subfigures = None
 
+        # Matched figures
+        self.matched_subfigures = None
+
         # Logger
         self._logger = logging.getLogger(__name__)
 
@@ -122,7 +125,13 @@ class Figure:
                   figure_dict: Dict,
                   index: int) -> 'Figure':
         """
-        TODO
+        Create a Figure object from a dictionnary.
+
+        Args:
+            figure_dict (Dict): A dictionnary representing the figure information.
+
+        Returns:
+            figure (Figure):    The resulting Figure object.
         """
         figure = Figure(image_path=figure_dict['image_path'],
                         index=index)
@@ -787,6 +796,8 @@ class Figure:
         Match the detected captions with a ground truth one.
         The comparison criterion is the IoU (adapted to text) which is maximized.
         The `self.detected_captions` attribute is modified by side effect.
+
+        TODO: better match panels and labels and then, evaluate caption splitting.
 
         ==> Caption splitting task.
         """

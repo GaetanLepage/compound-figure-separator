@@ -86,7 +86,9 @@ class LabelStructureEnum(Enum):
 
 class LabelStructure:
     """
-    TODO
+    Class representing the label structure for a compound figure.
+    With only two information (the type of labels and the number) it is possible
+    to qualify the label structure of a figure.
 
     Attributes:
         labels_type (LabelStructureEnum):   The type of label structure.
@@ -97,7 +99,9 @@ class LabelStructure:
                  labels_type: LabelStructureEnum = None,
                  num_labels: int = None):
         """
-        TODO
+        Args:
+            labels_type (LabelStructureEnum):   The type of labels.
+            num_labels (int):                   The number of labels.
         """
 
         self.labels_type = labels_type
@@ -108,7 +112,14 @@ class LabelStructure:
     def from_labels_list(cls,
                          labels_list: List[str]) -> 'LabelStructure':
         """
-        TODO
+        Create a LabelStructure object from a list of labels.
+
+        Args:
+            labels_list (List[str]):    A list of labels (text).
+
+        Returns:
+            label_structure (LabelStructure):   An instance of the corresponding LabelStructure
+                                                    object.
         """
         # Case where there are no named labels.
         if labels_list == ['_'] * len(labels_list):
@@ -194,15 +205,7 @@ class LabelStructure:
 
 
     def __eq__(self, other: 'LabelStructure') -> bool:
-        """
-        Define the equality operation for LabelStructure.
 
-        Args:
-            other (LabelStructure): Another LabelStructure with whom to compare.
-
-        Returns:
-            is_equal (bool):    Whether `self` and `other` define the same LabelStructure.
-        """
         if isinstance(other, LabelStructure):
             return self.labels_type == other.labels_type and self.num_labels == other.num_labels
 

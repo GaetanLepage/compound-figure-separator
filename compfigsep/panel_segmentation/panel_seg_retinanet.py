@@ -58,8 +58,8 @@ def build_fpn_backbones(cfg: CfgNode,
         * Output: P2, P3, P4
 
     Args:
-        cfg (CfgNode): a detectron2 CfgNode
-        input_shape (ShapeSpec): TODO
+        cfg (CfgNode):              A detectron2 CfgNode.
+        input_shape (ShapeSpec):    The input shaoe of the backbone.
 
     Returns:
         backbone (Backbone):    backbone module, must be a subclass of :class:`Backbone`.
@@ -609,9 +609,9 @@ class PanelSegRetinaNet(nn.Module):
             num_classes (int):              The number of classes.
 
         Returns:
-            boxes (Tensor): TODO
-            scores (Tensor):
-            classes (Tensor):
+            boxes (Tensor):     The filtered bounding boxes.
+            scores (Tensor):    The detection scores.
+            classes (Tensor):   The detections classes.
         """
         boxes_all = []
         scores_all = []
