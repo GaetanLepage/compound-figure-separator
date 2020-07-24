@@ -23,12 +23,13 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Classes Label and DetectedLabel.
 """
 
-from typing import Tuple, Dict
+from __future__ import annotations
+from typing import cast, Tuple, Dict
 
-import cv2
-import numpy as np
+import cv2 # type: ignore
+import numpy as np # type: ignore
 
-from ..box import Box
+from ...box import Box
 
 Color = Tuple[int, int, int]
 
@@ -47,7 +48,8 @@ class Label:
 
     def __init__(self,
                  text: str = None,
-                 box: Box = None):
+                 box: Box = None
+                 ) -> None:
         """
         Args:
             text (str): The label text ('A' or '1' or 'ii'...).
@@ -56,16 +58,17 @@ class Label:
         self.text = text
 
         if isinstance(box, np.ndarray):
-                box = box.tolist()
+            box = box.tolist()
 
         self.box = box
 
-        if self.box is not None:
-            self.box = [round(val) for val in box]
+        if box is not None:
+            self.box = cast(Box,
+                            tuple([round(val) for val in box]))
 
 
     @classmethod
-    def from_dict(cls, label_dict: Dict) -> 'Label':
+    def from_dict(cls, label_dict: Dict) -> Label:
         """
         Instanciate a Label object from a dictionnary.
 
@@ -88,7 +91,7 @@ class Label:
             output_dict (Dict): A Dict representing the label information.
         """
 
-        output_dict = {}
+        output_dict: Dict = {}
 
         if self.text is not None:
             output_dict['text'] = self.text
@@ -118,15 +121,15 @@ class Label:
                           color=color,
                           thickness=2)
 
-        # Draw label text
-        if self.text is not None:
-            cv2.putText(img=image,
-                        text=self.text,
-                        org=(int(self.box[2]) + 10,
-                             int(self.box[3])),
-                        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                        fontScale=1,
-                        color=color)
+            # Draw label text
+            if self.text is not None:
+                cv2.putText(img=image,
+                            text=self.text,
+                            org=(int(self.box[2]) + 10,
+                                 int(self.box[3])),
+                            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                            fontScale=1,
+                            color=color)
 
 
     def __str__(self) -> str:
@@ -137,7 +140,7 @@ class Label:
         return string
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
 
@@ -171,7 +174,7 @@ class DetectedLabel(Label):
 
 
     @classmethod
-    def from_normal_label(cls, label: Label) -> 'DetectedLabel':
+    def from_normal_label(cls, label: Label) -> DetectedLabel:
         """
         Build a DetectedLabel object from a normal Label object.
 
@@ -193,7 +196,7 @@ class DetectedLabel(Label):
 
 
     @classmethod
-    def from_dict(cls, label_dict: Dict) -> 'DetectedLabel':
+    def from_dict(cls, label_dict: Dict) -> DetectedLabel:
         """
         Instanciate a DetectedLabel object from a dictionnary.
 

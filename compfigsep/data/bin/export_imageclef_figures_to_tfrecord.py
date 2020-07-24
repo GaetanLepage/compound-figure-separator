@@ -28,7 +28,7 @@ Tensorflow's Object Detection API.
 """
 
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
 from typing import List
 
@@ -38,7 +38,7 @@ from compfigsep.data.figure_generators import ImageClefXmlFigureGenerator
 from compfigsep.data.export import export_figures_to_tf_record
 
 
-def parse_args(args: List[str]) -> ArgumentParser:
+def parse_args(args: List[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
@@ -46,7 +46,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
         args (List[str]):   The arguments from the command line call.
 
     Returns:
-        parser (ArgumentParser):   Populated namespace.
+        namespace (Namespace):  Populated namespace.
     """
     parser = ArgumentParser(description="Convert the ImageCLEF dataset to a"\
                                         " TFRecord file.")

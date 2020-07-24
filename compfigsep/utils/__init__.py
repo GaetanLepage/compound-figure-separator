@@ -22,3 +22,8 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 #####################################################
 General purpose utilities for the CompFigSeg project.
 """
+
+from .box import *
+from .logger import *
+
+__all__ = [k for k in globals().keys() if not k.startswith("_")]

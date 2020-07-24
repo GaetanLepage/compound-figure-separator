@@ -26,8 +26,10 @@ Figure generator handling the ImageCLEF data set.
 import os
 import logging
 import xml.etree.ElementTree as ET
+from typing import cast, Iterable, Tuple
 
 from ...utils.figure import Figure, Panel, SubFigure
+from ...utils.box import Box
 from .figure_generator import FigureGenerator
 
 
@@ -49,7 +51,8 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
 
     def __init__(self,
                  xml_annotation_file_path: str,
-                 image_directory_path: str) -> Figure:
+                 image_directory_path: str
+                 ) -> None:
         """
         Generator of Figure objects from ImageCLEF data set.
 
@@ -77,12 +80,12 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
         self.image_directory_path = image_directory_path
 
 
-    def __call__(self) -> Figure:
+    def __call__(self) -> Iterable[Figure]:
         """
         'Generator' method yielding annotated figures from the ImageCLEF data set.
 
-        Yields:
-            figure (Figure): Figure objects with annotations.
+        Returns:
+            Iterable[Figure]:   Figure objects with annotations.
         """
 
         # Loop over the annotation items.
@@ -121,11 +124,20 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
 
                 point_items = object_item.findall('./point')
 
+                str_coordinates = [
+                    point_items[0].get('x'),
+                    point_items[0].get('y'),
+                    point_items[3].get('x'),
+                    point_items[3].get('y')
+                ]
+
+                if not all([type(coord) == str
+                            for coord in str_coordinates]):
+                    continue
+
                 # Create Panel object
-                panel = Panel(box=[int(point_items[0].get('x')),
-                                   int(point_items[0].get('y')),
-                                   int(point_items[3].get('x')),
-                                   int(point_items[3].get('y'))])
+                panel = Panel(box=cast(Box,
+                                       (int(coord) for coord in str_coordinates)))
 
                 # Add this panel to the list of panels
                 subfigures.append(SubFigure(panel=panel))

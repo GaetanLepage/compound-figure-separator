@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Iterable
 from sortedcontainers import SortedKeyList
 import numpy as np
 
@@ -152,14 +152,14 @@ def multi_class_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
     return precision, recall, mAP
 
 
-def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
+def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
     """
     Compute the metrics (precision, recall and mAP) from a given set of label recognition
     detections.
 
     Args:
-        figure_generator (FigureGenerator): A figure generator yielding Figure objects
-                                                augmented with detected labels.
+        figure_generator (Iterable[Figure]):    A figure generator yielding Figure objects
+                                                    augmented with detected labels.
 
     Returns:
         metrics (Dict[str, float]): A dict containing the computed metrics.
@@ -175,7 +175,7 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
         'gt_count_by_class': {}
     }
 
-    for figure in figure_generator():
+    for figure in figure_generator:
 
         label_recognition_figure_eval(figure, stats)
 

@@ -31,13 +31,12 @@ import datetime
 
 from ..utils.figure import Figure
 from .figure_generators import FigureGenerator
-from ..utils.figure.label_class import map_label, LABEL_CLASS_MAPPING
+from ..utils.figure.label import map_label, LABEL_CLASS_MAPPING
 
 
 import compfigsep
-PROJECT_DIR = os.path.join(
-    os.path.dirname(compfigsep.__file__),
-    os.pardir)
+PROJECT_DIR = os.path.join(os.path.dirname(compfigsep.__file__),
+                           os.pardir)
 
 def export_figures_to_csv(figure_generator: FigureGenerator,
                           output_csv_file: str,

@@ -26,6 +26,7 @@ Figure generator handling the PanelSeg (Zou) data set.
 import os
 import sys
 import logging
+from typing import Iterable
 
 import progressbar
 
@@ -48,7 +49,8 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
     def __init__(self,
                  file_list_txt: str = None,
                  image_directory_path: str = None,
-                 caption_annotation_file: str = None):
+                 caption_annotation_file: str = None
+                 ) -> None:
         """
         Init for IphotodrawXmlFigureGenerator.
 
@@ -93,18 +95,16 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
 
         # Caption annotations
         if caption_annotation_file is not None:
-            with open(caption_annotation_file, 'r') as caption_annotation_file:
-                self.caption_lines = caption_annotation_file.readlines()
+            with open(caption_annotation_file, 'r') as caption_annotation_file_:
+                self.caption_lines = caption_annotation_file_.readlines()
 
 
-
-
-    def __call__(self) -> Figure:
+    def __call__(self) -> Iterable[Figure]:
         """
         'Generator' method yielding annotated figures from the PanelSeg data set.
 
-        Yields:
-            figure (Figure): Figure objects with annotations.
+        Returns:
+            Iterable[Figure]:   Figure objects with annotations.
         """
 
         # Looping over the list of image paths.

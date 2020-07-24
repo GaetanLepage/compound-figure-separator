@@ -28,6 +28,5 @@ from .label import *
 from .sub_figure import *
 from .figure import *
 from .beam_search import *
-from .label_class import *
 
 __all__ = [k for k in globals().keys() if not k.startswith("_")]

@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Function to compute the average precision.
 """
 
-import numpy as np
+import numpy as np # type: ignore
 
 def compute_average_precision(recall: np.ndarray,
                               precision: np.ndarray) -> float:
@@ -33,10 +33,10 @@ def compute_average_precision(recall: np.ndarray,
 
     Args:
         recall (np.array[float]):       The list of recall values.
-        precision (np.array[float]): TODO
+        precision (np.array[float]):    TODO.
 
     Returns:
-        AP (float): the resulting average precision.
+        average_precision (float):  The resulting average precision.
     """
 
     assert len(recall) == len(precision), "`recall` and `precision` should have the same"\
@@ -57,6 +57,6 @@ def compute_average_precision(recall: np.ndarray,
     i = np.where(mrec[1:] != mrec[:-1])[0]
 
     # Sum (delta recall) * prec.
-    ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
+    average_precision = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
 
-    return ap
+    return average_precision

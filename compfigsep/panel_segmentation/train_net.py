@@ -38,12 +38,11 @@ import detectron2.utils.comm as comm
 from detectron2.utils.logger import setup_logger
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import CfgNode, get_cfg
-from detectron2.engine import (
-    DefaultTrainer,
-    default_argument_parser,
-    default_setup,
-    launch,
-    HookBase)
+from detectron2.engine import (DefaultTrainer,
+                               default_argument_parser,
+                               default_setup,
+                               launch,
+                               HookBase)
 from detectron2.evaluation import verify_results
 from detectron2.data.build import build_detection_train_loader, build_detection_test_loader
 

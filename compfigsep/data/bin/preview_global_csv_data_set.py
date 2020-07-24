@@ -27,7 +27,7 @@ along with the corresponding bounding boxes and labels.
 """
 
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
 from typing import List
 
@@ -37,7 +37,7 @@ from compfigsep.data.figure_generators import GlobalCsvFigureGenerator
 from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
 
 
-def parse_args(args: List[str]) -> ArgumentParser:
+def parse_args(args: List[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
@@ -45,7 +45,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
         args (List[str]):   The arguments from the command line call.
 
     Returns:
-        parser (ArgumentParser):    Populated namespace.
+        parser (Namespace): Populated namespace.
     """
     parser = ArgumentParser(description="Preview all the figures from a data set"\
                                         " represented by a csv annotation file.")
@@ -70,16 +70,16 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    args = parse_args(args)
+    parsed_args = parse_args(args)
 
     # Create the figure generator handling a csv annotation file.
     figure_generator = GlobalCsvFigureGenerator(
-        csv_annotation_file_path=args.annotation_csv)
+        csv_annotation_file_path=parsed_args.annotation_csv)
 
     # Preview the data set.
     view_data_set(figure_generator=figure_generator,
-                  mode=args.mode,
-                  delay=args.delay,
+                  mode=parsed_args.mode,
+                  delay=parsed_args.delay,
                   window_name="CSV data preview")
 
 

@@ -28,7 +28,7 @@ boxes.
 
 import sys
 import os
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
 from typing import List
 
@@ -38,7 +38,7 @@ from compfigsep.data.figure_generators import JsonFigureGenerator
 from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
 
 
-def parse_args(args: List[str]) -> ArgumentParser:
+def parse_args(args: List[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
@@ -46,7 +46,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
         args (List[str]):   The arguments from the command line call.
 
     Returns:
-        parser (ArgumentParser):    Populated namespace.
+        namespace (Namespace):  Populated namespace.
     """
     parser = ArgumentParser(description="Preview all the figures from an ImageCLEF data set.")
 

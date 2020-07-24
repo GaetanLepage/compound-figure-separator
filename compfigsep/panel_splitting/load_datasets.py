@@ -26,9 +26,8 @@ panel splitting task.
 
 from detectron2.data import DatasetCatalog, MetadataCatalog
 
-from ..data.figure_generators import (
-    ImageClefXmlFigureGenerator,
-    IphotodrawXmlFigureGenerator)
+from ..data.figure_generators import (ImageClefXmlFigureGenerator,
+                                      IphotodrawXmlFigureGenerator)
 from ..data.export import export_figures_to_detectron_dict
 
 

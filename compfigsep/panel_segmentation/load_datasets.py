@@ -28,7 +28,7 @@ from detectron2.data import DatasetCatalog, MetadataCatalog
 from ..data.figure_generators import IphotodrawXmlFigureGenerator
 
 from ..data.export import export_figures_to_detectron_dict
-from ..utils.figure.label_class import LABEL_CLASS_MAPPING
+from ..utils.figure.label import LABEL_CLASS_MAPPING
 
 
 def register_panel_segmentation_dataset(dataset_name):

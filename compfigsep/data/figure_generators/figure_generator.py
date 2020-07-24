@@ -25,18 +25,17 @@ Definition of an abstract class to handle figure data loading from various sourc
 
 import os
 from abc import ABC, abstractmethod
+from typing import Iterable
 
 import compfigsep
 
 from ...utils.figure.figure import Figure
 
 # Localize data folder
-PROJECT_DIR = os.path.join(
-    os.path.dirname(compfigsep.__file__),
-    os.pardir)
-DATA_DIR = os.path.join(
-    PROJECT_DIR,
-    "data/")
+PROJECT_DIR = os.path.join(os.path.dirname(compfigsep.__file__),
+                           os.pardir)
+DATA_DIR = os.path.join(PROJECT_DIR,
+                        "data/")
 DATA_DIR = os.path.realpath(DATA_DIR)
 
 
@@ -61,12 +60,12 @@ class FigureGenerator(ABC):
 
 
     @abstractmethod
-    def __call__(self) -> Figure:
+    def __call__(self) -> Iterable[Figure]:
         """
         Abstract method that has to be implemented.
         It has to be an iterable (generator function) that yields Figure objects.
 
-        Yields:
-            Figure: figure objects with or without annotations (and or detections).
+        Returns:
+            Iterable[Figure]:   figure objects with or without annotations (and or detections).
         """
         raise NotImplementedError('This method has to be implemented for each subclass.')

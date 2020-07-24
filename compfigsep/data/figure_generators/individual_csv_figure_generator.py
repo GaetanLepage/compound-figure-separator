@@ -23,6 +23,8 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Figure generator for individual csv annotation files.
 """
 
+from typing import Iterable
+
 from ...utils.figure.figure import Figure
 from .figure_generator import FigureGenerator
 
@@ -40,7 +42,9 @@ class IndividualCsvFigureGenerator(FigureGenerator):
                                             files.
     """
 
-    def __init__(self, csv_annotation_directory: str):
+    def __init__(self,
+                 csv_annotation_directory: str
+                 ) -> None:
         """
         Init for IndividualCsvFigureGenerator.
 
@@ -53,10 +57,10 @@ class IndividualCsvFigureGenerator(FigureGenerator):
         self.csv_annotation_directory = csv_annotation_directory
 
 
-    def __call__(self) -> Figure:
+    def __call__(self) -> Iterable[Figure]:
         """
-        Yields:
-            figure (Figure): Figure objects with annotations.
+        Returns:
+            Iterable[Figure]:   Yields Figure objects with annotations.
         """
         # TODO implement the call method for the IndividualCsvFigureGenerator.
         raise NotImplementedError

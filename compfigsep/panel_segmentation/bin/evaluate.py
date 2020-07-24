@@ -26,8 +26,7 @@ Script to evaluate panel segmentation predictions from a JSON annotation file.
 """
 
 import sys
-import os
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
 from typing import List
 
@@ -40,7 +39,7 @@ from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
 from compfigsep.panel_segmentation.evaluate import evaluate_detections
 
 
-def parse_args(args: List[str]) -> ArgumentParser:
+def parse_args(args: List[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
@@ -48,7 +47,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
         args (List[str]):   The arguments from the command line call.
 
     Returns:
-        parser (ArgumentParser):    Populated namespace.
+        parser (Namespace):    Populated namespace.
     """
     parser = ArgumentParser(description="Evaluate panel segmentation detections.")
 

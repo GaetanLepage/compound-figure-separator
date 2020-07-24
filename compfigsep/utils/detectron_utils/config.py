@@ -23,21 +23,19 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Additional config options to handle the evaluation of a validation set during training.
 """
 
-from detectron2.config import CfgNode
+from detectron2.config import CfgNode # type: ignore
 
-def add_validation_config(cfg: CfgNode):
+def add_validation_config(cfg: CfgNode) -> None:
     """
     Add config for the evaluation feature.
 
     Args:
         cfg (CfgNode):  The config node that will be extended.
     """
-    _C = cfg
-
     # Name of the validation data set
-    _C.DATASETS.VALIDATION = ""
+    cfg.DATASETS.VALIDATION = ""
 
-    _C.VALIDATION = CfgNode()
+    cfg.VALIDATION = CfgNode()
 
     # The time between each evaluation
-    _C.VALIDATION.VALIDATION_PERIOD = 0
+    cfg.VALIDATION.VALIDATION_PERIOD = 0

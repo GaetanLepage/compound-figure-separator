@@ -24,12 +24,11 @@ Classes for subfigures, panels and labels.
 Also handles the detection information.
 """
 
+from __future__ import annotations
 from typing import Tuple, Dict
 
-import cv2
-import numpy as np
+import numpy as np # type: ignore
 
-from ..box import Box
 from . import Panel, DetectedPanel, Label, DetectedLabel
 
 Color = Tuple[int, int, int]
@@ -51,7 +50,7 @@ class SubFigure:
     def __init__(self,
                  panel: Panel = None,
                  label: Label = None,
-                 caption: str = None):
+                 caption: str = None) -> None:
         """
         Init for a `SubFigure` object.
 
@@ -67,7 +66,7 @@ class SubFigure:
 
 
     @classmethod
-    def from_dict(cls, sub_figure_dict: Dict) -> 'SubFigure':
+    def from_dict(cls, sub_figure_dict: Dict) -> SubFigure:
         """
         Instanciate a SubFigure object from a dictionnary.
 
@@ -99,7 +98,7 @@ class SubFigure:
             output_dict (Dict): A Dict representing the sub-figure information.
         """
 
-        output_dict = {}
+        output_dict: Dict = {}
 
         if self.panel is not None:
             output_dict['panel'] = self.panel.to_dict()
@@ -115,7 +114,7 @@ class SubFigure:
 
     def draw_elements(self,
                       image: np.ndarray,
-                      color: Color = DEFAULT_GT_COLOR):
+                      color: Color = DEFAULT_GT_COLOR) -> None:
         """
         Draw the panel bounding box and (if applicable) its associated label bounding box.
         This function does not return anything but affect the given image by side-effect.
@@ -156,13 +155,14 @@ class DetectedSubFigure(SubFigure):
         panel (DetectedPanel):      Panel object.
         label (DetectedLabel):      Label object.
         caption (str):              Caption text.
-        is_true_positive (bool):    TODO
+        is_true_positive (bool):    TODO.
     """
 
     def __init__(self,
                  panel: DetectedPanel = None,
                  label: DetectedLabel = None,
-                 caption: str = None):
+                 caption: str = None
+                 ) -> None:
         """
         Init for a `DetectedPanel` object.
 
@@ -179,7 +179,9 @@ class DetectedSubFigure(SubFigure):
 
 
     @classmethod
-    def from_normal_sub_figure(cls, subfigure: SubFigure) -> 'DetectedSubFigure':
+    def from_normal_sub_figure(cls,
+                               subfigure: SubFigure
+                               ) -> DetectedSubFigure:
         """
         Build a DetectedSubFigure object from a normal Figure object.
 
@@ -207,7 +209,7 @@ class DetectedSubFigure(SubFigure):
 
 
     @classmethod
-    def from_dict(cls, detected_sub_figure_dict: Dict) -> 'DetectedSubFigure':
+    def from_dict(cls, detected_sub_figure_dict: Dict) -> DetectedSubFigure:
         """
         Instanciate a DetectedSubFigure object from a dictionnary.
 
@@ -224,17 +226,19 @@ class DetectedSubFigure(SubFigure):
 
         label = None
         if 'label' in detected_sub_figure_dict:
-            panel = DetectedLabel.from_dict(detected_sub_figure_dict['label'])
+            label = DetectedLabel.from_dict(detected_sub_figure_dict['label'])
 
 
         detected_sub_figure = DetectedSubFigure(panel=panel,
                                                 label=label,
                                                 caption=detected_sub_figure_dict.get('caption'))
 
-        detected_sub_figure.is_true_positive = detected_sub_figure_dict.get('is_true_positive')
+        if 'is_true_positive' in detected_sub_figure_dict:
+            detected_sub_figure.is_true_positive = detected_sub_figure_dict['is_true_positive']
 
-        detected_sub_figure.caption_is_positive = \
-            detected_sub_figure_dict.get('caption_is_positive')
+        if 'caption_is_positive' in detected_sub_figure_dict:
+            detected_sub_figure.caption_is_positive = \
+                detected_sub_figure_dict['caption_is_positive']
 
         return detected_sub_figure
 

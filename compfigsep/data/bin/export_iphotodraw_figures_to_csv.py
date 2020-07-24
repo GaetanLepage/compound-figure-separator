@@ -27,7 +27,7 @@ keras-retinanet (https://github.com/fizyr/keras-retinanet).
 """
 
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
 from typing import List
 
@@ -37,7 +37,7 @@ from compfigsep.data.figure_generators import IphotodrawXmlFigureGenerator
 from compfigsep.data.export import export_figures_to_csv
 
 
-def parse_args(args: List[str]) -> ArgumentParser:
+def parse_args(args: List[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
@@ -45,7 +45,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
         args (List[str]):   The arguments from the command line call.
 
     Returns:
-        parser (ArgumentParser):    Populated namespace.
+        namespace (Namespace):  Populated namespace.
     """
     parser = ArgumentParser(description="Convert annotations from individual iPhotoDraw"\
                                         " xml annotation files. to a CSV annotations file.")

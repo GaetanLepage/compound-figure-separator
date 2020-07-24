@@ -23,10 +23,11 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Classes Panel and DetectedPanel.
 """
 
-from typing import Tuple, Dict
+from __future__ import annotations
+from typing import cast, Tuple, Dict, Optional
 
-import cv2
-import numpy as np
+import cv2 # type: ignore
+import numpy as np # type: ignore
 
 from ..box import Box
 
@@ -44,7 +45,7 @@ class Panel:
         box (Box):  The bounding box localizing the panel on the image.
     """
 
-    def __init__(self, box: Box = None):
+    def __init__(self, box: Box):
         """
         Args:
             box (Box):  The bounding box localizing the panel on the image.
@@ -52,11 +53,12 @@ class Panel:
         if isinstance(box, np.ndarray):
             box = box.tolist()
 
-        self.box = [round(val) for val in box]
+        self.box = cast(Box,
+                        tuple([round(val) for val in box]))
 
 
     @classmethod
-    def from_dict(cls, panel_dict: Dict) -> 'Panel':
+    def from_dict(cls, panel_dict: Dict) -> Panel:
         """
         Instanciate a Panel object from a dictionnary.
 
@@ -67,7 +69,7 @@ class Panel:
             panel (Panel):  The resulting Panel object.
         """
 
-        return Panel(box=panel_dict.get('box'))
+        return Panel(box=panel_dict['box'])
 
 
     def to_dict(self) -> Dict:
@@ -88,7 +90,8 @@ class Panel:
 
     def draw(self,
              image: np.ndarray,
-             color: Color = DEFAULT_GT_COLOR):
+             color: Color = DEFAULT_GT_COLOR
+             ) -> None:
         """
         Draw the panel bounding box.
         The image is affected by side-effect.
@@ -113,7 +116,7 @@ class Panel:
         return string
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
 
@@ -132,8 +135,9 @@ class DetectedPanel(Panel):
     """
 
     def __init__(self,
-                 box: Box = None,
-                 detection_score: float = None):
+                 box: Box,
+                 detection_score: float = None
+                 ) -> None:
         """
         Args:
             box (Box):                  The bounding box localizing the panel on the image.
@@ -143,12 +147,12 @@ class DetectedPanel(Panel):
 
         self.detection_score = detection_score
 
-        self.is_true_positive_iou = None
-        self.is_true_positive_overlap = None
+        self.is_true_positive_iou: Optional[bool] = None
+        self.is_true_positive_overlap: Optional[bool] = None
 
 
     @classmethod
-    def from_normal_panel(cls, panel: Panel) -> 'DetectedPanel':
+    def from_normal_panel(cls, panel: Panel) -> DetectedPanel:
         """
         Build a DetectedPanel object from a normal Panel object.
 
@@ -169,7 +173,7 @@ class DetectedPanel(Panel):
 
 
     @classmethod
-    def from_dict(cls, panel_dict: Dict) -> 'DetectedPanel':
+    def from_dict(cls, panel_dict: Dict) -> DetectedPanel:
         """
         Instanciate a DetectedPanel object from a dictionnary.
 
@@ -180,8 +184,9 @@ class DetectedPanel(Panel):
             detected_panel (DetectedPanel): The resulting DetectedPanel object.
         """
 
-        detected_panel = DetectedPanel(box=panel_dict.get('box'),
-                                       detection_score=panel_dict.get('detection_score'))
+        if 'box' in panel_dict:
+            detected_panel = DetectedPanel(box=panel_dict['box'],
+                                           detection_score=panel_dict.get('detection_score'))
 
         detected_panel.is_true_positive_overlap = panel_dict.get('is_true_positive_overlap')
 
@@ -218,7 +223,8 @@ class DetectedPanel(Panel):
 
     def draw(self,
              image: np.ndarray,
-             color: Color = DEFAULT_DETECTION_COLOR):
+             color: Color = DEFAULT_DETECTION_COLOR
+             ) -> None:
         """
         Draw the panel bounding box on the image.
         the image is affected by side-effect.
@@ -234,7 +240,7 @@ class DetectedPanel(Panel):
         super().draw(image, color)
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         string = super().__str__()
 
         if self.detection_score is not None:
@@ -249,5 +255,5 @@ class DetectedPanel(Panel):
         return string
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)

@@ -24,7 +24,7 @@ Beam search algorithm for mapping panels and labels.
 """
 
 import math
-from typing import List
+from typing import List, Tuple
 
 from ...utils import box
 from ...utils.figure.panel import Panel
@@ -51,6 +51,9 @@ def _compute_panel_label_distances(panels: List[Panel],
         panel_center = box.get_center(panel.box)
 
         for label in labels:
+            if label.box is None:
+                continue
+
             label_center = box.get_center(label.box)
 
             distance = math.hypot(panel_center[0] - label_center[0],
@@ -88,21 +91,24 @@ def assign_labels_to_panels(panels: List[Panel],
     # Beam search
 
     # a `pair` represents a path (overall_distance, label_indexes)
-    all_item_pairs = []
+    Pair = Tuple[float, List[int]]
+    all_item_pairs: List[List[Pair]] = []
+
     for panel_idx, panel in enumerate(panels):
         item_pairs = []
 
         # Initialisation
         if panel_idx == 0:
             for label_idx in range(len(labels)):
-                dist = distances[panel_idx][label_idx]
-                label_indexes = [label_idx]
+                dist: float = distances[panel_idx][label_idx]
+                label_indexes: List[int] = [label_idx]
                 item_pair = (dist, label_indexes)
                 item_pairs.append(item_pair)
 
-        # Exploring the graph
+        # Exploring the graph.
         else:
-            prev_item_pairs = all_item_pairs[panel_idx - 1]
+            prev_item_pairs: List[Pair] = all_item_pairs[panel_idx - 1]
+
             for prev_item_pair in prev_item_pairs:
 
                 prev_dist, prev_label_indexes = prev_item_pair
@@ -111,6 +117,7 @@ def assign_labels_to_panels(panels: List[Panel],
                     if label_idx in prev_label_indexes:
                         # We allow a label assigned to one panel only
                         continue
+
                     dist = distances[panel_idx][label_idx] + prev_dist
                     label_indexes = list(prev_label_indexes)
                     label_indexes.append(label_idx)
@@ -137,11 +144,11 @@ def assign_labels_to_panels(panels: List[Panel],
     # all_item_pairs[-1][0][1] : the complete path from this pair
     best_path = all_item_pairs[-1][0][1]
 
-    subfigures = []
+    subfigures: List[SubFigure] = []
 
     for panel_index, panel in enumerate(panels):
         # panel.add_label_info(label=labels[best_path[panel_index]])
-        matched_label = labels[best_path[panel_index]]
+        matched_label: Label = labels[best_path[panel_index]]
 
         subfigures.append(SubFigure(panel=panel,
                                     label=matched_label))

@@ -58,7 +58,7 @@ def int64_list_feature(value: List[int]) -> tf.train.Feature:
     return tf.train.Feature(int64_list=tf.train.Int64List(value=value))
 
 
-def bytes_feature(value: str) -> tf.train.Feature:
+def bytes_feature(value: bytes) -> tf.train.Feature:
     """
     Wrapper to create a TensorFlow byte feature.
 
@@ -71,7 +71,7 @@ def bytes_feature(value: str) -> tf.train.Feature:
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
 
-def bytes_list_feature(value: List[str]) -> tf.train.Feature:
+def bytes_list_feature(value: List[bytes]) -> tf.train.Feature:
     """
     Wrapper to create a TensorFlow byte list feature.
 

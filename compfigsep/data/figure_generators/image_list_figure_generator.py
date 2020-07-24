@@ -26,6 +26,8 @@ Figure generator handling a list of images.
 import os
 import logging
 
+from typing import Iterable
+
 from ...utils.figure.figure import Figure
 from .figure_generator import FigureGenerator
 
@@ -59,7 +61,7 @@ class ImageListFigureGenerator(FigureGenerator):
         self.image_list_txt = image_list_txt
 
 
-    def __call__(self) -> Figure:
+    def __call__(self) -> Iterable[Figure]:
 
         with open(self.image_list_txt, 'r') as image_list_file:
 

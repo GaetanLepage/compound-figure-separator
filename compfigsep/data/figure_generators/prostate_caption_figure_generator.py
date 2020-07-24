@@ -26,9 +26,10 @@ This set contains gt annotations for captions
 
 import os
 import logging
+from typing import Iterable
 
 from ...utils.figure.figure import Figure
-from .figure_generator import ImageListFigureGenerator
+from . import ImageListFigureGenerator
 
 
 class ProstateCaptionFigureGenerator(ImageListFigureGenerator):
@@ -53,7 +54,7 @@ class ProstateCaptionFigureGenerator(ImageListFigureGenerator):
                          image_directory_path=image_directory_path)
 
 
-    def __call__(self) -> Figure:
+    def __call__(self) -> Iterable[Figure]:
 
         with open(self.image_list_txt, 'r') as image_list_file:
 

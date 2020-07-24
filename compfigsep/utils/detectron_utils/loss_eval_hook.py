@@ -30,13 +30,13 @@ import logging
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-import numpy as np
+import numpy as np # type: ignore
 
 
-from detectron2.engine.hooks import HookBase
-from detectron2.utils.logger import log_every_n_seconds
-import detectron2.utils.comm as comm
-from detectron2.utils.logger import setup_logger
+from detectron2.engine.hooks import HookBase # type: ignore
+from detectron2.utils.logger import log_every_n_seconds # type: ignore
+import detectron2.utils.comm as comm # type: ignore
+from detectron2.utils.logger import setup_logger # type: ignore
 
 
 class LossEvalHook(HookBase):
@@ -47,7 +47,8 @@ class LossEvalHook(HookBase):
     def __init__(self,
                  eval_period: int,
                  model: nn.Module,
-                 data_loader: DataLoader):
+                 data_loader: DataLoader
+                 ) -> None:
         """
         Init function.
 
@@ -73,11 +74,12 @@ class LossEvalHook(HookBase):
         """
         # Copying inference_on_dataset from evaluator.py
         num_samples = len(self._data_loader)
-        self._logger.info(f"Starting validation on {num_samples} samples")
+        self._logger.info("Starting validation on %d samples",
+                          num_samples)
         num_warmup = min(5, num_samples - 1)
 
         start_time = time.perf_counter()
-        total_compute_time = 0
+        total_compute_time: float = 0
         losses = []
         for idx, inputs in enumerate(self._data_loader):
             if idx == num_warmup:
@@ -90,6 +92,7 @@ class LossEvalHook(HookBase):
             losses.append(loss_batch)
             if torch.cuda.is_available():
                 torch.cuda.synchronize()
+
             total_compute_time += time.perf_counter() - start_compute_time
             iters_after_start = idx + 1 - num_warmup * int(idx >= num_warmup)
 

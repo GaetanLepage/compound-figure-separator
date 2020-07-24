@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Iterable
 
 from sortedcontainers import SortedKeyList
 import numpy as np
@@ -123,13 +123,13 @@ def panel_splitting_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
     return imageclef_accuracy, precision, recall, mAP
 
 
-def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
+def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
     """
     Compute the metrics (ImageCLEF and mAP) from a given set of panel slitting detections.
 
     Args:
-        figure_generator (FigureGenerator): A figure generator yielding Figure objects
-                                                augmented with detected panels.
+        figure_generator (Iterable[Figure]):    A figure generator yielding Figure objects
+                                                    augmented with detected panels.
 
     Returns:
         metrics (Dict[str, float]): A dict containing the computed metrics.
@@ -143,7 +143,7 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
         'sum_imageclef_accuracies': 0
     }
 
-    for figure in figure_generator():
+    for figure in figure_generator:
         panel_splitting_figure_eval(figure, stats)
 
     imageclef_accuracy, precision, recall, mean_average_precision = panel_splitting_metrics(

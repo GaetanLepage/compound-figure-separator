@@ -27,11 +27,11 @@ Script to evaluate panel splitting predictions from a JSON annotation file.
 
 import sys
 import os
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
 from typing import List
 
-import compfigsep
+import compfigsep # type: ignore
 
 sys.path.append('.')
 
@@ -41,7 +41,7 @@ from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
 from compfigsep.panel_splitting.evaluate import evaluate_detections
 
 
-def parse_args(args: List[str]) -> ArgumentParser:
+def parse_args(args: List[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
@@ -49,7 +49,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
         args (List[str]):   The arguments from the command line call.
 
     Returns:
-        parser (ArgumentParser):    Populated namespace.
+        parser (Namespace): Populated namespace.
     """
     parser = ArgumentParser(description="Evaluate panel splitting detections.")
 
@@ -70,11 +70,11 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    args = parse_args(args)
+    parsed_args = parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
     figure_generator = JsonFigureGenerator(
-        json_annotation_file_path=args.json)
+        json_annotation_file_path=parsed_args.json)
 
     # Evaluate the data set.
     evaluate_detections(figure_generator=figure_generator)

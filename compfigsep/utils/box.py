@@ -61,11 +61,10 @@ def union(box_1: Box,
     width_union = max(box_1[2], box_2[2]) - x_union
     height_union = max(box_1[3], box_2[3]) - y_union
 
-    return [
-        x_union,
-        y_union,
-        x_union + width_union,
-        y_union + height_union]
+    return (x_union,
+            y_union,
+            x_union + width_union,
+            y_union + height_union)
 
 
 def intersection(box_1: Box,
@@ -89,13 +88,12 @@ def intersection(box_1: Box,
     height_intersect = min(box_1[3], box_2[3]) - y_intersect
 
     if width_intersect < 0 or height_intersect < 0:
-        return [0, 0, 0, 0]
+        return (0, 0, 0, 0)
 
-    return [
-        x_intersect,
-        y_intersect,
-        x_intersect + width_intersect,
-        y_intersect + height_intersect]
+    return (x_intersect,
+            y_intersect,
+            x_intersect + width_intersect,
+            y_intersect + height_intersect)
 
 
 def area(box: Box) -> float:

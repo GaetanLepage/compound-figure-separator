@@ -25,14 +25,14 @@ Definition of a meta-evaluator for the panel segmentation tasks.
 
 import os
 import logging
-from typing import List, Dict
+from typing import Optional, List, Dict, Callable, Iterable
 from collections import defaultdict, OrderedDict
 from pprint import pprint
 import torch
 
-from detectron2.data import MetadataCatalog
-from detectron2.evaluation.evaluator import DatasetEvaluator
-from detectron2.utils import comm
+from detectron2.data import MetadataCatalog # type: ignore
+from detectron2.evaluation.evaluator import DatasetEvaluator # type: ignore
+from detectron2.utils import comm # type: ignore
 
 import compfigsep
 from ..figure.figure import Figure
@@ -61,9 +61,10 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
     def __init__(self,
                  dataset_name: str,
                  task_name: str,
-                 evaluation_function: callable = None,
+                 evaluation_function: Callable = None,
                  export: bool = True,
-                 export_dir: str = None):
+                 export_dir: str = None
+                 ) -> None:
         """
         Init function.
 
@@ -85,7 +86,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         data_set = MetadataCatalog.get(dataset_name)
         self._cpu_device = torch.device("cpu")
         self._logger = logging.getLogger(__name__)
-        self._predictions = dict()
+        self._predictions: Dict = {}
 
         self._task_name = task_name
         self._evaluation_function = evaluation_function
@@ -102,7 +103,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         self.export_dir = export_dir
 
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Preparation for a new round of evaluation.
         Should be called before starting a round of evaluation.
@@ -112,7 +113,8 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
     def process(self,
                 inputs: List[dict],
-                outputs: List[dict]):
+                outputs: List[dict]
+                ) -> None:
         """
         Process the pair of inputs and outputs.
         If they contain batches, the pairs can be consumed one-by-one using `zip`:
@@ -127,7 +129,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
 
     def _augmented_figure_generator(self,
-                                    predictions: dict) -> Figure:
+                                    predictions: dict) -> Iterable[Figure]:
         """
         Iterate over a Figure generator, process raw predictions and yield back the augmented
         Figure objects.
@@ -143,7 +145,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         raise NotImplementedError("This method is abstract and needs to be implemented.")
 
 
-    def evaluate(self) -> Dict[str, Dict[str, int]]:
+    def evaluate(self) -> Optional[Dict[str, Dict[str, int]]]:
         """
         Evaluate/summarize the performance after processing all input/output pairs.
 
@@ -158,9 +160,9 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         # Gather predictions on the main device.
         all_predictions = comm.gather(self._predictions, dst=0)
         if not comm.is_main_process():
-            return
+            return None
 
-        predictions = defaultdict(dict)
+        predictions: defaultdict = defaultdict(dict)
         for predictions_per_rank in all_predictions:
             for clsid, lines in predictions_per_rank.items():
                 predictions[clsid] = lines
@@ -168,8 +170,8 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
         # Evaluate the metrics on the predictions.
         metrics_dict = self._evaluation_function(
-                figure_generator=self._augmented_figure_generator(predictions))\
-                       if self._evaluation_function is not None else None
+            figure_generator=self._augmented_figure_generator(predictions))\
+                if self._evaluation_function is not None else None
 
         # Export predictions and gt in a single JSON file
         if self.export:

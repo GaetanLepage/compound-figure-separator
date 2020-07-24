@@ -27,7 +27,7 @@ Script to evaluate label recognition predictions from a JSON annotation file.
 
 import sys
 import os
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
 from typing import List
 
@@ -41,7 +41,7 @@ from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
 from compfigsep.label_recognition.evaluate import evaluate_detections
 
 
-def parse_args(args: List[str]) -> ArgumentParser:
+def parse_args(args: List[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
@@ -49,11 +49,12 @@ def parse_args(args: List[str]) -> ArgumentParser:
         args (List[str]):   The arguments from the command line call.
 
     Returns:
-        parser (ArgumentParser):    Populated namespace.
+        namespace (Namespace):  Populated namespace.
     """
     parser = ArgumentParser(description="Evaluate label recognition detections.")
 
-    add_json_arg(folder_default_relative_path='label_recognition/output/')
+    add_json_arg(parser=parser,
+                 folder_default_relative_path='label_recognition/output/')
 
     return parser.parse_args(args)
 
@@ -69,11 +70,11 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    args = parse_args(args)
+    parsed_args = parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
     figure_generator = JsonFigureGenerator(
-        json_path=args.json)
+        json_path=parsed_args.json)
 
     # Evaluate the data set.
     evaluate_detections(figure_generator=figure_generator)

@@ -22,3 +22,9 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 ###########################################
 Module handling the caption splitting task.
 """
+
+from .evaluate import *
+from .labels_extraction import *
+from .subcaptions_extraction import *
+
+__all__ = [k for k in globals().keys() if not k.startswith("_")]

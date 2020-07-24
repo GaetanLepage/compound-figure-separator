@@ -30,10 +30,11 @@ import os
 import logging
 import urllib.request
 from typing import List
-from argparse import ArgumentParser
-import progressbar
+from argparse import ArgumentParser, Namespace
 
 import xml.etree.ElementTree as ET
+
+import progressbar
 
 from compfigsep.data.figure_generators import DATA_DIR
 
@@ -42,7 +43,7 @@ from compfigsep.data.figure_generators import DATA_DIR
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&retmode=xml&id="
 
 
-def parse_args(args: List[str]) -> ArgumentParser:
+def parse_args(args: List[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
@@ -50,7 +51,7 @@ def parse_args(args: List[str]) -> ArgumentParser:
         args (List[str]):   The arguments from the command line call.
 
     Returns:
-        parser (ArgumentParser):   Populated namespace.
+        namespace (Namespace):  Populated namespace.
     """
     parser = ArgumentParser(description="Convert the ImageCLEF dataset to a"\
                                         " TFRecord file.")
