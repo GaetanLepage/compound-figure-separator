@@ -1,4 +1,4 @@
-# CompFigSeg
+# CompFigSep
 
 Implementation of a complete pipeline for compound figures separation.\
 The code for the panel segmentation task is heavily inspired from Zou & al. work ([paper](https://asistdl.onlinelibrary.wiley.com/doi/abs/10.1002/asi.24334) and [implementation](https://github.com/JieZou1/PanelSeg/tree/master/PanelSeg_Keras)).
