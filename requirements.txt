@@ -19,13 +19,13 @@ git+https://github.com/facebookresearch/detectron2.git
 # Image #
 #########
 Pillow
-opencv-python==4.2.0.32
+# opencv-python==4.2.0.32
+opencv-python
 
 ########
 # Text #
 ########
 textdistance
-
 
 ############################
 # Documentation generation #
