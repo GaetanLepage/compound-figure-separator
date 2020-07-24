@@ -19,35 +19,25 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
                 Stefano Marchesin (stefano.marchesin@unipd.it)
 
 
-##################################################################
+###################################################################
 Functions to infer the labels from the caption text.
 
-The original version of this code was written by Stefano Marchesin
-(stefano.marchesin@unipd.it).
+The original version of this code was written by Stefano Marchesin.
 """
 
-from typing import List
+from typing import List, Dict
 import re
 
-from ..utils.figure.labels_structure import LC_ROMAN, UC_ROMAN
+from ..utils.figure.label import (is_char,
+                                  is_roman,
+                                  roman_to_int,
+                                  LC_ROMAN_FROM_INT,
+                                  UC_ROMAN_FROM_INT)
+
 from . import regex_definitions
 
 
-def is_roman(string: str) -> bool:
-    """
-    Check if the given string is a roman number (up to 20).
-    (i, ii,..., xx).
-
-    Args:
-        string (str):   A string that may be a roman number.
-
-    Returns:
-        is_roman (bool):    Whether the given string is a roman number.
-    """
-    return string in UC_ROMAN or string in LC_ROMAN
-
-
-def label_identification(caption: str) -> List['str']:
+def label_identification(caption: str) -> Dict:
     """
     Given a caption text, identify the labels.
 
@@ -55,14 +45,24 @@ def label_identification(caption: str) -> List['str']:
         caption (str):  The caption text from which to extract captions.
 
     Returns:
-        label_list (List[str]): A list of detected labels.
+        output_dict (Dict): A dict containing the detection information (list of labels, ranges).
     """
+    # To avoid returning to many things, we build an output dict.
+    output_dict = {
+        'labels': {
+            'characters': [],
+            'romans': [],
+            'digits': []
+        },
+        'ranges' : {
+            'hyphen': None,
+            'conj': None
+        }
+    }
+
     # Detect alphanumerical labels.
     characters_raw = regex_definitions.RE_CHARACTERS.findall(caption)
-    print("characters_raw:", characters_raw)
-
     characters_cleaned = []
-
     if characters_raw:
         # Get the list of alphanumerical labels.
         characters_list = []
@@ -77,16 +77,17 @@ def label_identification(caption: str) -> List['str']:
 
         # Sort the list of characters.
         characters_cleaned.sort()
-        print("characters_cleaned:", characters_cleaned)
 
-    # detect roman numbers
+        # Store the list of labels in the output dict.
+        output_dict['labels']['characters'] = characters_cleaned
+
+
+    # Detect roman numbers.
     romans_raw = regex_definitions.RE_ROMAN.findall(caption)
     romans_cleaned = []
     if romans_raw:
         # Get the list of roman labels.
         romans_list = [raw[0] for raw in romans_raw]
-
-        print(romans_list)
 
         # Clean the list.
         romans_cleaned = [re.sub(pattern=r'[().:]',
@@ -94,32 +95,17 @@ def label_identification(caption: str) -> List['str']:
                                  string=element)
                           for element in romans_list]
 
-
         # Remove duplicates.
         romans_cleaned = list(set(romans_cleaned))
 
-        # Check if roman numbers are lower or upper case.
-        # Thanks to how regular expressions operate on '|' we just need to check first element
-        is_upper = romans_cleaned[0].isupper()
-        # Convert roman to numerical.
-        for key, value in enumerate(romans_cleaned):
-            # Check if roman numbers are upper or lower case.
-            if is_upper:
-                romans_cleaned[key] = uc_latin_mapper[value]
-            else:
-                romans_cleaned[key] = lc_latin_mapper[value]
-        # Sort the list of numerical numbers and revert it back to its roman
-        # form.
-        romans_cleaned.sort()
-        for key, value in enumerate(romans_cleaned):
-            # Check if roman numbers were upper or lower case.
-            if is_upper:
-                romans_cleaned[key] = uc_latin_mapper[value]
-            else:
-                romans_cleaned[key] = lc_latin_mapper[value]
-        print("romans_cleaned:", romans_cleaned)
+        # Sort the list of roman numbers according to their numerical values.
+        romans_cleaned.sort(key=lambda roman_char: roman_to_int(roman_char=roman_char))
 
-    # detect numerical labels
+        # Store the list of labels in the output dict.
+        output_dict['labels']['romans'] = romans_cleaned
+
+
+    # Detect numerical labels.
     digits_raw = regex_definitions.RE_DIGITS.findall(caption)
     digits_cleaned = []
     if digits_raw:
@@ -129,116 +115,155 @@ def label_identification(caption: str) -> List['str']:
             digits_list.append(raw[0])
         # clean the list
         for element in digits_list:
-            digits_cleaned.append(re.sub(r'[().:]', '', element))
+            digits_cleaned.append(re.sub(pattern=r'[().:]',
+                                         repl='',
+                                         string=element))
         # remove duplicates
         digits_cleaned = list(set(digits_cleaned))
         # sort the list of characters
         digits_cleaned.sort()
-        print("digits_cleaned:", digits_cleaned)
+
+        # Store the list of labels in the output dict.
+        output_dict['labels']['digits'] = digits_cleaned
 
 
     # Get hyphens and conjunctions.
     hyphen_range = regex_definitions.RE_HYPHEN.findall(caption)
     conj_range = regex_definitions.RE_CONJUNCTIONS.findall(caption)
 
-    print("hyphen_range:", hyphen_range)
-    print("conj_range:", conj_range)
-
-    # TODO
-    return None
-
-
-def label_expansion(caption,
-                    detected_labels):
-    """
-    TODO
-    """
     # Extract first element of each tuple and replace the tuple with it.
-    ranges = []
     # Hyphen range.
     hyphen_vector = [hyphen_tuple[0] for hyphen_tuple in hyphen_range]
     # Conjunction range.
     conj_vector = [conj_tuple[0] for conj_tuple in conj_range]
 
-    # Clean the elements and expand the sequences hyphen range.
-    hyphen_cleaned = []
-    for element in hyphen_vector:
-        hyphen_cleaned.append(re.sub(pattern=r'[().:]',
-                                     repl='',
-                                     string=element))
 
-    for element in hyphen_cleaned:
+    # Store the ranges in the output dict.
+    output_dict['ranges']['hyphen'] = hyphen_vector
+    output_dict['ranges']['conj'] = conj_vector
 
-        # Split the string by hyphen
+    return output_dict
+
+
+
+def _expand_hyphen_range(hyphen_expressions: List[str]) -> List[str]:
+    """
+    Expand the label hyphen ranges from the caption.
+    ex: ['A-C', 'E-F'] -> ['A', 'B', 'C', 'E', 'F']
+
+    Args:
+        hyphen_expressions (List[str]): The list of hyphen matches.
+
+    Returns:
+        hyphen_range (List[str]):   The list of expanded elements.
+    """
+    hyphen_range = []
+
+    for element in hyphen_expressions:
+
+        # Split the string by hyphen: 'A-D' -> ['A', 'D']
         element = element.split('-')
 
-        # Check if the range is numerical, roman or alphabetical
+        # Check if the range is numerical, roman or alphabetical.
         ## CAVEAT: set also the roman one
-        if all(d.isdigit() for d in element): # numerical
-            ranges = ranges + list(map(int,
-                                       range(ord(element[0]),
-                                             ord(element[-1]) + 1)))
+        # Case 1/3: numerical.
+        if all(d.isdigit() for d in element):
 
-        # Roman.
+            # Get numerical lower and upper bounds.
+            inf = int(element[0])
+            sup = int(element[-1])
+
+            hyphen_range += list(map(str,
+                                     range(inf, sup + 1)))
+
+        # Case 2/3: roman numbers.
         elif all(is_roman(r) for r in element):
 
-            # Convert roman numbers into numericals, expand and then re-convert.
-            for key, value in enumerate(element):
+            # Check if roman numbers are lower or upper case.
+            # Thanks to how regular expressions operate on '|' we just need to check first
+            # element.
+            is_upper = element[0].isupper()
 
-                # Check if roman numbers are upper or lower case.
-                if is_upper:
-                    element[key] = uc_latin_mapper[value]
-                else:
-                    element[key] = lc_latin_mapper[value]
+            # Get numerical lower and upper bounds.
+            inf = roman_to_int(element[0])
+            sup = roman_to_int(element[-1])
 
             # Expand the range of numerical numbers and revert it back to its roman form.
-            roman_range = list(map(int,
-                                   range(ord(element[0]),
-                                         ord(element[-1]) + 1)))
+            roman_range = list(range(inf, sup + 1))
 
-            for key, value in enumerate(roman_range):
-                # Check if roman numbers were upper or lower case.
-                if is_upper:
-                    roman_range[key] = uc_latin_mapper[value]
-                else:
-                    roman_range[key] = lc_latin_mapper[value]
+            if is_upper:
+                roman_range = [UC_ROMAN_FROM_INT[value] for value in roman_range]
+            else:
+                roman_range = [LC_ROMAN_FROM_INT[value] for value in roman_range]
 
-            # Concatenate the range of roman numbers to the list of ranges
-            ranges += roman_range
+            # Concatenate the range of roman numbers to the list of ranges.
+            hyphen_range += roman_range
 
-        # Alphabetical.
-        else:
-            ranges += list(map(chr,
-                               range(ord(element[0]),
-                                     ord(element[-1]) + 1)
-                               )
-                            )
+        # Case 3/3: alphabetical characters.
+        elif all(is_char(char=r) for r in element):
 
-    # Conjunction range.
-    conj_cleaned = []
+            # Get 'numerical' lower and upper bounds.
+            inf = ord(element[0])
+            sup = ord(element[-1])
+            hyphen_range += list(map(chr,
+                                     range(inf, sup + 1)))
 
+        return hyphen_range
+
+
+
+def label_expansion(label_dict: Dict):
+    """
+    Expand the label ranges from the caption.
+    ex: ['A-C', 'D', 'E and F'] -> ['A', 'B', 'C', 'D', 'E', 'F']
+
+    Args:
+        label_dict (Dict):  The dict containing labels lists and ranges detections.
+
+    Returns:
+        labels (List[str]): The final list of detected labels.
+    """
+    ranges = []
+
+    # ==> Hyphen ranges.
+    # Clean the elements and expand the sequences hyphen range.
+    hyphen_cleaned = [re.sub(pattern=r'[().:]',
+                             repl='',
+                             string=element)
+                      for element in label_dict['ranges']['hyphen']]
+
+    hyphen_range = _expand_hyphen_range(hyphen_expressions=hyphen_cleaned)
+
+
+    # ==> Conjunction ranges.
     # Clean the identified patterns from useless characters.
-    for element in conj_vector:
-        conj_cleaned.append(re.sub(pattern=r'[().:,]',
+    conj_cleaned = [re.sub(pattern=r'[().:,]',
                                    repl=' ',
-                                   string=element.replace('and', ' ')))
+                                   string=element.replace('and', ' '))
+                    for element in label_dict['ranges']['conj']]
+
+    # print('conj_cleaned:', conj_cleaned)
     # Append elements to ranges.
     for element in conj_cleaned:
         ranges += element.split()
+    # print("ranges before removing duplicates:", ranges)
 
     # Remove duplicates.
     ranges = list(set(ranges))
 
+    # print("ranges after removing duplicates:", ranges)
+
+
     ranges.sort()
-    print("ranges:", ranges)
+    # print("expanded ranges:", ranges)
 
 
     # Merge the lists containing the expanded ranges and the single labels.
     # ('|' is the union operation between sets).
     labels = list(set(ranges)\
-                  | set(digits_cleaned)\
-                  | set(romans_cleaned)\
-                  | set(characters_cleaned)
+                  | set(label_dict['labels']['digits'])\
+                  | set(label_dict['labels']['romans'])\
+                  | set(label_dict['labels']['characters'])
                   )
     labels.sort()
     # Split the labels list into three sublists: digits, alphanumeric & roman.
@@ -253,18 +278,17 @@ def label_expansion(caption,
             labels_digits.append(label)
 
         # Store roman.
-        elif is_roman(label):
+        if is_roman(label):
             labels_romans.append(label)
 
         # Store alphanumerical.
-        else:
+        if is_char(char=label):
             labels_alphanum.append(label)
 
-    print("labels_digits:", labels_digits)
-    print("labels_romans:", labels_romans)
-    print("labels_alphanum:", labels_alphanum)
+    return labels_digits, labels_romans, labels_alphanum
 
 
+# TODO check how to use this.
 ## 3rd step: label filtering
 # Decide which list to consider (digits/romans or alphanumeric) depending on
 # the amount of matched characters between image and caption.
