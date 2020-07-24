@@ -23,39 +23,19 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Defines a structure for labels.
 """
 
+from __future__ import annotations
+
 import logging
 import operator
 from enum import Enum
 from typing import List
 
-LC_ROMAN = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x',
-            'xi', 'xii', 'xiii', 'xiv', 'xv', 'xvi', 'xvii', 'xviii', 'xix', 'xx']
-
-# {'i': 1, 'ii': 2,..., 'xx': 20}
-LC_ROMAN_TO_INT = {char: int_value
-                   for char, int_value in zip(LC_ROMAN,
-                                              range(1,
-                                                    len(LC_ROMAN) + 1)
-                                              )
-                   }
-# {1: 'i', 2: 'ii',..., 20: 'xx'}
-LC_ROMAN_FROM_INT = {value: char for char, value in LC_ROMAN_TO_INT.items()}
-
-# ['I', 'II',..., 'XX']
-UC_ROMAN = [char.upper() for char in LC_ROMAN]
-
-# {'I': 1, 'II': 2,..., 'XX': 20}
-UC_ROMAN_TO_INT = {char: int_value
-                   for char, int_value in zip(UC_ROMAN,
-                                              range(1,
-                                                    len(UC_ROMAN) + 1)
-                                              )
-                   }
-
-# {1: 'I', 2: 'II',..., 20: 'XX'}
-UC_ROMAN_FROM_INT = {value: char for char, value in UC_ROMAN_TO_INT.items()}
-
-
+from .utils import (is_lower_char,
+                    is_upper_char,
+                    UC_ROMAN,
+                    LC_ROMAN,
+                    UC_ROMAN_TO_INT,
+                    LC_ROMAN_TO_INT)
 
 
 class LabelStructureEnum(Enum):
@@ -96,8 +76,8 @@ class LabelStructure:
     """
 
     def __init__(self,
-                 labels_type: LabelStructureEnum = None,
-                 num_labels: int = None):
+                 labels_type: LabelStructureEnum,
+                 num_labels: int) -> None:
         """
         Args:
             labels_type (LabelStructureEnum):   The type of labels.
@@ -110,7 +90,7 @@ class LabelStructure:
 
     @classmethod
     def from_labels_list(cls,
-                         labels_list: List[str]) -> 'LabelStructure':
+                         labels_list: List[str]) -> LabelStructure:
         """
         Create a LabelStructure object from a list of labels.
 
@@ -136,12 +116,12 @@ class LabelStructure:
             if len(label) == 1:
 
                 # a, b, c...
-                if ord(label) in range(97, 97 + 26):
+                if is_lower_char(char=label):
                     similarity_list[LabelStructureEnum.LATIN_LC] += 1
                     continue
 
                 # A, B, C...
-                if ord(label) in range(65, 65 + 26):
+                if is_upper_char(char=label):
                     similarity_list[LabelStructureEnum.LATIN_UC] += 1
                     continue
 
@@ -160,12 +140,14 @@ class LabelStructure:
                 similarity_list[LabelStructureEnum.ROMAN_LC] += 1
                 continue
 
+            # I, II, III...
             if label in UC_ROMAN_TO_INT.keys():
                 similarity_list[LabelStructureEnum.ROMAN_UC] += 1
                 continue
 
             # Default case
-            logging.warning(f"Label {label} does not belong to a default type.")
+            logging.warning("Label %s does not belong to a default type.",
+                            label)
             similarity_list[LabelStructureEnum.OTHER] += 1
 
         max_pos = max(similarity_list.items(),
@@ -186,12 +168,12 @@ class LabelStructure:
             return []
 
         if self.labels_type == LabelStructureEnum.NUMERICAL:
-            list = [str(i) for i in range(self.num_labels)]
+            return [str(i) for i in range(self.num_labels)]
 
-        if self.from_labels_list == LabelStructureEnum.LATIN_UC:
+        if self.labels_type == LabelStructureEnum.LATIN_UC:
             return [chr(65 + i) for i in range(self.num_labels)]
 
-        if self.from_labels_list == LabelStructureEnum.LATIN_LC:
+        if self.labels_type == LabelStructureEnum.LATIN_LC:
             return [chr(97 + i) for i in range(self.num_labels)]
 
         if self.labels_type == LabelStructureEnum.ROMAN_UC:
@@ -200,11 +182,13 @@ class LabelStructure:
         if self.labels_type == LabelStructureEnum.ROMAN_LC:
             return LC_ROMAN[:self.num_labels]
 
-        if self.labels_type in (LabelStructureEnum.OTHER, LabelStructureEnum.NONE):
-            return ['_'] * self.num_labels
+        # Default case
+        assert self.labels_type in (LabelStructureEnum.OTHER, LabelStructureEnum.NONE)
+
+        return ['_'] * self.num_labels
 
 
-    def __eq__(self, other: 'LabelStructure') -> bool:
+    def __eq__(self, other: object) -> bool:
 
         if isinstance(other, LabelStructure):
             return self.labels_type == other.labels_type and self.num_labels == other.num_labels
