@@ -42,7 +42,7 @@ MODULE_DIR = os.path.dirname(compfigsep.__file__)
 
 
 
-def parse_args(args: List[str]) -> Namespace:
+def _parse_args(args: List[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
@@ -71,7 +71,7 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    parsed_args = parse_args(args)
+    parsed_args = _parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
     figure_generator = JsonFigureGenerator(

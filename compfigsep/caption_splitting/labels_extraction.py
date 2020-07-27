@@ -25,7 +25,7 @@ Functions to infer the labels from the caption text.
 The original version of this code was written by Stefano Marchesin.
 """
 
-from typing import List, Dict
+from typing import List, Dict, Any
 import re
 
 from ..utils.figure.label import (is_char,
@@ -48,7 +48,7 @@ def label_identification(caption: str) -> Dict:
         output_dict (Dict): A dict containing the detection information (list of labels, ranges).
     """
     # To avoid returning to many things, we build an output dict.
-    output_dict = {
+    output_dict: Dict[str, Any] = {
         'labels': {
             'characters': [],
             'romans': [],
@@ -189,15 +189,16 @@ def _expand_hyphen_range(hyphen_expressions: List[str]) -> List[str]:
             sup = roman_to_int(element[-1])
 
             # Expand the range of numerical numbers and revert it back to its roman form.
-            roman_range = list(range(inf, sup + 1))
+            roman_range_int: List[int] = list(range(inf, sup + 1))
+            roman_range_str: List[str]
 
             if is_upper:
-                roman_range = [UC_ROMAN_FROM_INT[value] for value in roman_range]
+                roman_range_str = [UC_ROMAN_FROM_INT[value] for value in roman_range_int]
             else:
-                roman_range = [LC_ROMAN_FROM_INT[value] for value in roman_range]
+                roman_range_str = [LC_ROMAN_FROM_INT[value] for value in roman_range_int]
 
             # Concatenate the range of roman numbers to the list of ranges.
-            hyphen_range += roman_range
+            hyphen_range += roman_range_str
 
         # Case 3/3: alphabetical characters.
         elif all(is_char(char=r) for r in element):
