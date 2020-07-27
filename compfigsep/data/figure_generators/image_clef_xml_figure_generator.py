@@ -23,10 +23,11 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Figure generator handling the ImageCLEF data set.
 """
 
+from __future__ import annotations
 import os
 import logging
 import xml.etree.ElementTree as ET
-from typing import cast, Iterable, Tuple
+from typing import cast, Iterable, List
 
 from ...utils.figure import Figure, Panel, SubFigure
 from ...utils.box import Box
@@ -51,8 +52,7 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
 
     def __init__(self,
                  xml_annotation_file_path: str,
-                 image_directory_path: str
-                 ) -> None:
+                 image_directory_path: str) -> None:
         """
         Generator of Figure objects from ImageCLEF data set.
 
@@ -63,6 +63,7 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
         Yields:
             figure (Figure): Figure objects with annotations.
         """
+        super().__init__()
 
         # Open and parse the xml annotation file.
         tree = ET.parse(xml_annotation_file_path)
@@ -80,6 +81,11 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
         self.image_directory_path = image_directory_path
 
 
+    def __copy__(self) -> ImageClefXmlFigureGenerator:
+
+        raise NotImplementedError()
+
+
     def __call__(self) -> Iterable[Figure]:
         """
         'Generator' method yielding annotated figures from the ImageCLEF data set.
@@ -93,18 +99,16 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
 
             # Image filename
             filename_item = annotation_item.find('./filename')
-            image_filename = filename_item.text
+
+            if filename_item is None or filename_item.text is None:
+                continue
+
+            image_filename: str = filename_item.text
 
             # Image path
             image_path = os.path.join(
                 self.image_directory_path,
                 image_filename + '.jpg')
-
-            # TODO maybe set up a verbose mode
-            # print('Processing Image {}/{} : {}'.format(
-                # annotation_index + 1,
-                # num_images,
-                # image_path))
 
             # Create Figure object
             figure = Figure(image_path=image_path,
@@ -124,16 +128,18 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
 
                 point_items = object_item.findall('./point')
 
-                str_coordinates = [
+                coordinates = [
                     point_items[0].get('x'),
                     point_items[0].get('y'),
                     point_items[3].get('x'),
                     point_items[3].get('y')
                 ]
 
-                if not all([type(coord) == str
-                            for coord in str_coordinates]):
+                if any([coord is None for coord in coordinates]):
                     continue
+
+                str_coordinates: List[str] = cast(List[str],
+                                                  coordinates)
 
                 # Create Panel object
                 panel = Panel(box=cast(Box,

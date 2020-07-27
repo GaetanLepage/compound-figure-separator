@@ -23,17 +23,19 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import Dict, Tuple, Iterable
+from typing import Dict, Tuple, Any
 
-from sortedcontainers import SortedKeyList
-import numpy as np
+from sortedcontainers import SortedKeyList # type: ignore
+import numpy as np # type: ignore
 
 from ..data.figure_generators import FigureGenerator
+
 from ..utils.figure import Figure
 from ..utils.average_precision import compute_average_precision
 
 
-def panel_splitting_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
+def panel_splitting_figure_eval(figure: Figure,
+                                stat_dict: Dict[str, Any]) -> None:
     """
     Evaluate panel splitting metrics on a single figure.
 
@@ -78,7 +80,7 @@ def panel_splitting_figure_eval(figure: Figure, stat_dict: Dict[str, any]):
     stat_dict['sum_imageclef_accuracies'] += imageclef_accuracy
 
 
-def panel_splitting_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
+def panel_splitting_metrics(stat_dict: Dict[str, Any]) -> Tuple[float, float, float, float]:
     """
     Evaluate the panel splitting metrics.
 
@@ -95,35 +97,37 @@ def panel_splitting_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
         mAP (int):                  Mean average precision value.
     """
     # 1) ImageCLEF accuracy
-    imageclef_accuracy = stat_dict['sum_imageclef_accuracies'] / stat_dict['num_samples']
+    imageclef_accuracy: float = stat_dict['sum_imageclef_accuracies'] / stat_dict['num_samples']
 
     # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
-    true_positives = [np.float(is_positive) for _, is_positive in stat_dict['detections']]
-    overall_correct_count = np.sum(true_positives)
+    true_positives = [np.float(is_positive)
+                      for _, is_positive in stat_dict['detections']]
+
+    overall_correct_count: int = np.sum(true_positives)
 
     # 2) overall recall = TP / TP + FN
-    recall = overall_correct_count / stat_dict['overall_gt_count']
+    recall: float = overall_correct_count / stat_dict['overall_gt_count']
     # 3) overall precision = TP / TP + FP
-    precision = overall_correct_count / stat_dict['overall_detected_count']
+    precision: float = overall_correct_count / stat_dict['overall_detected_count']
 
     # 4) mAP computation
-    cumsum_true_positives = np.cumsum(true_positives)
+    cumsum_true_positives: int = np.cumsum(true_positives)
 
     # cumulated_recalls
-    cumulated_recalls = cumsum_true_positives / stat_dict['overall_gt_count']
+    cumulated_recalls: float = cumsum_true_positives / stat_dict['overall_gt_count']
 
     # = cumsum(TP + FP)
-    cumsum_detections = np.arange(1, stat_dict['overall_detected_count'] + 1)
-    cumulated_precisions = cumsum_true_positives / cumsum_detections
+    cumsum_detections: int = np.arange(1, stat_dict['overall_detected_count'] + 1)
+    cumulated_precisions: float = cumsum_true_positives / cumsum_detections
 
     # mAP = area under the precison/recall curve (only one 'class' here)
-    mAP = compute_average_precision(recall=cumulated_recalls,
-                                    precision=cumulated_precisions)
+    mean_average_precision: float = compute_average_precision(recall=cumulated_recalls,
+                                                              precision=cumulated_precisions)
 
-    return imageclef_accuracy, precision, recall, mAP
+    return imageclef_accuracy, precision, recall, mean_average_precision
 
 
-def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
+def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
     """
     Compute the metrics (ImageCLEF and mAP) from a given set of panel slitting detections.
 
@@ -143,7 +147,7 @@ def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
         'sum_imageclef_accuracies': 0
     }
 
-    for figure in figure_generator:
+    for figure in figure_generator():
         panel_splitting_figure_eval(figure, stats)
 
     imageclef_accuracy, precision, recall, mean_average_precision = panel_splitting_metrics(

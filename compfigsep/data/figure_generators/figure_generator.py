@@ -23,11 +23,13 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Definition of an abstract class to handle figure data loading from various sources.
 """
 
+from __future__ import annotations
 import os
 from abc import ABC, abstractmethod
-from typing import Iterable
+from typing import Iterable, Callable
 
 import compfigsep
+import copy
 
 from ...utils.figure.figure import Figure
 
@@ -46,17 +48,20 @@ class FigureGenerator(ABC):
 
     Attributes:
         data_dir (str):         The path to the directory where the image data sets are stored.
-        current_index (int):    Index of the currently handled figure. This helps knowing the
-                                     "progression" of the data loading process.
     """
 
-    def __init__(self):
-        """
-        Init function for every FigureGenerator.
-        """
+    def __init__(self) -> None:
 
         self.data_dir = DATA_DIR
-        self.current_index = 0
+
+
+    @abstractmethod
+    def __copy__(self) -> FigureGenerator:
+        """
+        TODO
+        """
+        raise NotImplementedError('This method has to be implemented for each subclass.')
+
 
 
     @abstractmethod
@@ -69,3 +74,47 @@ class FigureGenerator(ABC):
             Iterable[Figure]:   figure objects with or without annotations (and or detections).
         """
         raise NotImplementedError('This method has to be implemented for each subclass.')
+
+
+class StackedFigureGenerator(FigureGenerator):
+    """
+    Class for creating a FigureGenerator by applying a function to all the figures from an
+    existing FigureGenerator.
+
+    Attributes:
+        base_figure_generator (FigureGenerator):    A figure generator yielding Figure
+                                                        objects.
+        function (Callable[[Figure], None]):        A function taking a Figure as argument and
+                                                            modifying it.
+    """
+
+    def __init__(self,
+                 base_figure_generator: FigureGenerator,
+                 function: Callable[[Figure], None]) -> None:
+        """
+        Args:
+            base_figure_generator (FigureGenerator):    A figure generator yielding Figure
+                                                            objects.
+            function (Callable[[Figure], None]):        A function taking a Figure as argument and
+                                                            modifying it.
+        """
+        super().__init__()
+
+        self._base_figure_generator = base_figure_generator
+        self._function = function
+
+
+    def __copy__(self) -> StackedFigureGenerator:
+
+        return StackedFigureGenerator(
+            base_figure_generator=copy.copy(self._base_figure_generator),
+            function=self._function)
+
+
+    def __call__(self) -> Iterable[Figure]:
+
+        for figure in self._base_figure_generator():
+
+            self._function(figure)
+
+            yield figure

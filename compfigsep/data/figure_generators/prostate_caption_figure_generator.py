@@ -28,6 +28,8 @@ import os
 import logging
 from typing import Iterable
 
+from progressbar import progressbar # type: ignore
+
 from ...utils.figure.figure import Figure
 from . import ImageListFigureGenerator
 
@@ -44,7 +46,7 @@ class ProstateCaptionFigureGenerator(ImageListFigureGenerator):
 
     def __init__(self,
                  image_list_txt: str,
-                 image_directory_path: str = None):
+                 image_directory_path: str = None) -> None:
         """
         Args:
             image_list_txt (str):       The path to the list of images to be loaded.
@@ -58,7 +60,7 @@ class ProstateCaptionFigureGenerator(ImageListFigureGenerator):
 
         with open(self.image_list_txt, 'r') as image_list_file:
 
-            for image_counter, line in enumerate(image_list_file.readlines()):
+            for image_counter, line in enumerate(progressbar(image_list_file.readlines())):
 
                 # Compute image path.
                 if self.image_directory_path is not None:

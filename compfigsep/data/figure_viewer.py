@@ -27,10 +27,9 @@ along with the annotations.
 from argparse import ArgumentParser
 
 from ..data.figure_generators import FigureGenerator
-from ..utils.figure import Figure
 
 
-def add_viewer_args(parser: ArgumentParser):
+def add_viewer_args(parser: ArgumentParser) -> None:
     """
     Add to the given parser the arguments relative to the preview options :
         * mode ('gt', 'pred' or 'both')
@@ -65,7 +64,7 @@ def view_data_set(figure_generator: FigureGenerator,
                   save_preview: bool = False,
                   preview_folder: str = None,
                   delay: int = 0,
-                  window_name: str = None):
+                  window_name: str = None) -> None:
     """
     Preview all the figures from a data set.
     The image is displayed along with the bounding boxes (panels and, if present, labels).

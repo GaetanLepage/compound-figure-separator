@@ -43,11 +43,8 @@ class IndividualCsvFigureGenerator(FigureGenerator):
     """
 
     def __init__(self,
-                 csv_annotation_directory: str
-                 ) -> None:
+                 csv_annotation_directory: str) -> None:
         """
-        Init for IndividualCsvFigureGenerator.
-
         Args:
             csv_annotation_directory (str):     The path of the directory containing the csv
                                                     annotation files.

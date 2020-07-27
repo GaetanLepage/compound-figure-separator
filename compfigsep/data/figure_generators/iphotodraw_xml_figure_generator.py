@@ -23,15 +23,43 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Figure generator handling the PanelSeg (Zou) data set.
 """
 
+from __future__ import annotations
 import os
 import sys
 import logging
 from typing import Iterable
+from argparse import ArgumentParser
 
-import progressbar
+import progressbar # type: ignore
 
 from ...utils.figure.figure import Figure
 from .figure_generator import FigureGenerator
+
+
+def add_iphotodraw_args(parser: ArgumentParser,
+                        default_eval_list_path: str = None):
+    """
+    Parse the argument for loading a json file.
+
+    Args:
+        parser (ArgumentParser):        An ArgumentParser.
+        default_eval_list_path (str):   Default path to a txt file list.
+    """
+
+    if default_eval_list_path is None or not os.path.isfile(default_eval_list_path):
+
+        default_eval_list_path = "data/zou/eval.txt"
+
+    parser.add_argument('--file_list_txt',
+                        help="The path to the txt file listing the images.",
+                        default=default_eval_list_path,
+                        type=str)
+
+    parser.add_argument('--image_directory_path',
+                        help="The path to the directory where the images are stored.",
+                        default=None,
+                        type=str)
+
 
 
 class IphotodrawXmlFigureGenerator(FigureGenerator):
@@ -49,11 +77,8 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
     def __init__(self,
                  file_list_txt: str = None,
                  image_directory_path: str = None,
-                 caption_annotation_file: str = None
-                 ) -> None:
+                 caption_annotation_file: str = None) -> None:
         """
-        Init for IphotodrawXmlFigureGenerator.
-
         Args:
             file_list_txt (str):            The path of the list of figures which annotations
                                                 have to be loaded.
@@ -97,6 +122,10 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
         if caption_annotation_file is not None:
             with open(caption_annotation_file, 'r') as caption_annotation_file_:
                 self.caption_lines = caption_annotation_file_.readlines()
+
+
+    def __copy__(self) -> IphotodrawXmlFigureGenerator:
+        raise NotImplementedError()
 
 
     def __call__(self) -> Iterable[Figure]:

@@ -42,7 +42,7 @@ class GlobalCsvFigureGenerator(FigureGenerator):
         csv_annotation_file_path (str): The path to the csv annotation file.
     """
 
-    def __init__(self, csv_annotation_file_path: str):
+    def __init__(self, csv_annotation_file_path: str) -> None:
         """
         Init function.
         Call the init function of the abstract parent class.

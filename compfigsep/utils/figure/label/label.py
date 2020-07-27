@@ -48,8 +48,7 @@ class Label:
 
     def __init__(self,
                  text: str = None,
-                 box: Box = None
-                 ) -> None:
+                 box: Box = None) -> None:
         """
         Args:
             text (str): The label text ('A' or '1' or 'ii'...).
@@ -104,7 +103,7 @@ class Label:
 
     def draw(self,
              image: np.ndarray,
-             color: Color = DEFAULT_GT_COLOR):
+             color: Color = DEFAULT_GT_COLOR) -> None:
         """
         Draw the label bounding box and text on the image.
         The image is affected by side-effect.
@@ -159,7 +158,7 @@ class DetectedLabel(Label):
     def __init__(self,
                  text: str = None,
                  box: Box = None,
-                 detection_score: float = None):
+                 detection_score: float = None) -> None:
         """
         Args:
             text (str):                 The label text ('A' or '1' or 'ii'...).
@@ -241,7 +240,7 @@ class DetectedLabel(Label):
 
     def draw(self,
              image: np.ndarray,
-             color: Color = DEFAULT_DETECTION_COLOR):
+             color: Color = DEFAULT_DETECTION_COLOR) -> None:
         """
         Draw the label bounding box and text on the image.
         the image is affected by side-effect.
@@ -253,7 +252,7 @@ class DetectedLabel(Label):
         super().draw(image, color)
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         string = super().__str__()
 
         if self.detection_score is not None:

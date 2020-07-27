@@ -40,7 +40,7 @@ from .utils import (is_lower_char,
 
 class LabelStructureEnum(Enum):
     """
-    TODO
+    Enum representing the category of labels for a figure.
     """
 
     # The image contain no labels
@@ -164,28 +164,32 @@ class LabelStructure:
             core_label_list (List[str]):    The list of labels corresponding to this
                                                 LabelStructure.
         """
+        output_list: List[str] = []
+
         if self.labels_type is None:
-            return []
+            output_list = []
 
-        if self.labels_type == LabelStructureEnum.NUMERICAL:
-            return [str(i) for i in range(self.num_labels)]
+        elif self.labels_type == LabelStructureEnum.NUMERICAL:
+            output_list = [str(i) for i in range(self.num_labels)]
 
-        if self.labels_type == LabelStructureEnum.LATIN_UC:
-            return [chr(65 + i) for i in range(self.num_labels)]
+        elif self.labels_type == LabelStructureEnum.LATIN_UC:
+            output_list = [chr(65 + i) for i in range(self.num_labels)]
 
-        if self.labels_type == LabelStructureEnum.LATIN_LC:
-            return [chr(97 + i) for i in range(self.num_labels)]
+        elif self.labels_type == LabelStructureEnum.LATIN_LC:
+            output_list = [chr(97 + i) for i in range(self.num_labels)]
 
-        if self.labels_type == LabelStructureEnum.ROMAN_UC:
-            return UC_ROMAN[:self.num_labels]
+        elif self.labels_type == LabelStructureEnum.ROMAN_UC:
+            output_list = UC_ROMAN[:self.num_labels]
 
-        if self.labels_type == LabelStructureEnum.ROMAN_LC:
-            return LC_ROMAN[:self.num_labels]
+        elif self.labels_type == LabelStructureEnum.ROMAN_LC:
+            output_list = LC_ROMAN[:self.num_labels]
 
         # Default case
-        assert self.labels_type in (LabelStructureEnum.OTHER, LabelStructureEnum.NONE)
+        else:
+            assert self.labels_type in (LabelStructureEnum.OTHER, LabelStructureEnum.NONE)
+            output_list = ['_'] * self.num_labels
 
-        return ['_'] * self.num_labels
+        return output_list
 
 
     def __eq__(self, other: object) -> bool:

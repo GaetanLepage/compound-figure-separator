@@ -46,12 +46,12 @@ class ModelWriter(HookBase):
             input_example (dict):   An exemple of a model input to infer the input shape.
             log_dir (str):          The path to the folder where to store the output log.
         """
-        self._model = model
-        self._input_example = input_example
-        self._log_dir = log_dir
+        self._model: nn.Module = model
+        self._input_example: dict = input_example
+        self._log_dir: str = log_dir
 
 
-    def before_train(self):
+    def before_train(self) -> None:
         """
         Called at the beginning of the training process.
         Write the model shape to the summary writer.

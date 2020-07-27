@@ -44,7 +44,7 @@ class ImageListFigureGenerator(FigureGenerator):
 
     def __init__(self,
                  image_list_txt: str,
-                 image_directory_path: str = None):
+                 image_directory_path: str = None) -> None:
         """
         Args:
             image_list_txt (str):       The path to the list of images to be loaded.

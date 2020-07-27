@@ -23,6 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Figure generator handling a JSON annotation file.
 """
 
+from __future__ import annotations
 import os
 import logging
 import json
@@ -32,15 +33,11 @@ import datetime
 from typing import Iterable
 from argparse import ArgumentParser
 
-import progressbar
+import progressbar # type: ignore
 
 import compfigsep
 
-from ...utils.figure import (Figure,
-                             SubFigure,
-                             DetectedSubFigure,
-                             Panel,
-                             Label)
+from ...utils.figure import Figure
 
 from .figure_generator import FigureGenerator
 
@@ -95,23 +92,48 @@ def get_most_recent_json(folder_path: str = None) -> str:
                      string=file_name) is None:
             continue
 
-        date_string = re.search(pattern=r"[0-9]{4}-[A-Za-z]+-[0-3][0-9]_"\
-                                         "[0-2][0-9]:[0-5][0-9]:[0-5][0-9]",
-                                string=file_name).group(0)
+        date_match = re.search(pattern=r"[0-9]{4}-[A-Za-z]+-[0-3][0-9]_"\
+                                        "[0-2][0-9]:[0-5][0-9]:[0-5][0-9]",
+                               string=file_name)
+        if date_match is None:
+            continue
 
-        year = int(re.search(pattern=r"[0-9]{4}",
-                             string=date_string).group(0))
+        date_string = date_match.group(0)
 
-        month_string = re.search(pattern=r"[A-Za-z]+",
-                                 string=date_string).group(0)
+        # Year
+        year_match = re.search(pattern=r"[0-9]{4}",
+                               string=date_string)
+        if year_match is None:
+            continue
+
+        year = int(year_match.group(0))
+
+        # Month
+        month_match = re.search(pattern=r"[A-Za-z]+",
+                                string=date_string)
+
+        if month_match is None:
+            continue
+
+        month_string = month_match.group(0)
 
         month_number = strptime(month_string, '%B').tm_mon
 
-        day_number = int(re.search(pattern=r"-[0-3][0-9]_",
-                                   string=date_string).group(0)[1:-1])
+        # Day
+        day_match = re.search(pattern=r"-[0-3][0-9]_",
+                              string=date_string)
+        if day_match is None:
+            continue
 
-        time_string = re.search(pattern=r"[0-2][0-9]:[0-5][0-9]:[0-5][0-9]",
-                                string=date_string).group(0)
+        day_number = int(day_match.group(0)[1:-1])
+
+        # Time
+        time_match = re.search(pattern=r"[0-2][0-9]:[0-5][0-9]:[0-5][0-9]",
+                               string=date_string)
+        if time_match is None:
+            continue
+
+        time_string = time_match.group(0)
 
         hour, minute, second = (int(value) for value in time_string.split(':'))
 
@@ -165,9 +187,6 @@ def add_json_arg(parser: ArgumentParser,
 
     json_default_path = os.path.relpath(json_default_path)
 
-    print(json_default_path)
-
-
     parser.add_argument('--json',
                         help="The path to the json annotation file.",
                         default=json_default_path,
@@ -182,11 +201,8 @@ class JsonFigureGenerator(FigureGenerator):
         json_annotation_file_path (str):    The path to the json annotation file.
     """
 
-    def __init__(self, json_path: str):
+    def __init__(self, json_path: str) -> None:
         """
-        Init function.
-        Call the init function of the abstract parent class.
-
         Args:
             json (str): The path to a json annotation file OR to a folder where to look for the
                             most recent file.
@@ -204,6 +220,11 @@ class JsonFigureGenerator(FigureGenerator):
                 "\n\t {}".format(self.json_annotation_file_path))
 
 
+    def __copy__(self) -> JsonFigureGenerator:
+
+        return JsonFigureGenerator(json_path=self.json_annotation_file_path)
+
+
     def __call__(self) -> Iterable[Figure]:
         """
         Generator of Figure objects from a json annotation file.
@@ -211,7 +232,6 @@ class JsonFigureGenerator(FigureGenerator):
         Returns:
             Iterable[Figure]:   Figure objects with annotations.
         """
-
 
         with open(self.json_annotation_file_path, 'r') as json_annotation_file:
             data_dict = json.load(json_annotation_file)

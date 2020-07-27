@@ -64,6 +64,7 @@ class Figure:
         labels_structure (LabelStructure):              Object defining entirely the labels of the
                                                             figure.
         caption (str):                                  The complete caption.
+        detected_subcaptions (Dict[str, str]):          The dict containing detected subcaptions.
         preview_image (np.ndarray):                     The preview image (image + bounding boxes)
         gt_subfigures (List[SubFigure]):                Ground truth subfigure objects.
         detected_panels (List[DetectedPanel]):          Detected panel objects.
@@ -73,8 +74,7 @@ class Figure:
 
     def __init__(self,
                  image_path: str,
-                 index: int
-                 ) -> None:
+                 index: int) -> None:
         """
         Init for a Figure object.  Neither the image or the annotations are loaded at this stage.
 
@@ -100,7 +100,8 @@ class Figure:
 
         # Caption
         self.caption: Optional[str]
-        self.detected_captions: List[str]
+        # Dict mapping detected sub-captions to labels.
+        self.detected_subcaptions: Dict[str, str]
 
         # Can contain a preview of the image with its bounding boxes.
         self.preview_image: np.ndarray
@@ -163,6 +164,9 @@ class Figure:
             figure.detected_labels = [DetectedLabel.from_dict(label_dict)
                                       for label_dict in figure_dict['detected_labels']]
 
+        if 'detected_subcaptions' in figure_dict:
+            figure.detected_subcaptions = figure_dict['detected_subcaptions']
+
 
         return figure
 
@@ -188,7 +192,7 @@ class Figure:
         self.image = img
 
         # Store the image size
-        self.image_height, self.image_width = self.image.shape[:2]
+        self.image_height, self.image_width = img.shape[:2]
 
 #########################
 # IMPORT GT ANNOTATIONS #
@@ -1061,8 +1065,7 @@ class Figure:
 #################
 
     def export_gt_annotation_to_individual_csv(self,
-                                               csv_export_dir: str = None
-                                               ) -> None:
+                                               csv_export_dir: str = None) -> None:
         """
         Export the ground truth annotation of the figure to an individual csv file.
 
@@ -1142,24 +1145,40 @@ class Figure:
             'image_height': self.image_height
         }
 
-        if self.gt_subfigures is not None:
+        try:
             output_dict['gt_subfigures'] = [subfigure.to_dict()
                                             for subfigure in self.gt_subfigures]
+        except AttributeError:
+            pass
 
-        if self.detected_subfigures is not None:
+        try:
             output_dict['detected_subfigures'] = [subfigure.to_dict()
                                                   for subfigure in self.detected_subfigures]
+        except AttributeError:
+            pass
 
-        if self.caption is not None:
+        try:
             output_dict['caption'] = self.caption
+        except AttributeError:
+            pass
 
-        if self.detected_panels is not None:
+        try:
             output_dict['detected_panels'] = [panel.to_dict()
                                               for panel in self.detected_panels]
+        except AttributeError:
+            pass
 
-        if self.detected_labels is not None:
+        try:
             output_dict['detected_labels'] = [label.to_dict()
                                               for label in self.detected_labels]
+        except AttributeError:
+            pass
+
+        try:
+            output_dict['detected_subcaptions'] = self.detected_subcaptions
+
+        except AttributeError:
+            pass
 
         return output_dict
 
