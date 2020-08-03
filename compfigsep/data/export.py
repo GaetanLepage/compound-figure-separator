@@ -156,27 +156,6 @@ def export_figures_to_json(figure_generator: FigureGenerator,
                   indent=4)
 
 
-# deprecated
-def export_figures_to_tf_record(figure_generator: FigureGenerator,
-                                tf_record_filename: str):
-    """
-    Convert a set of figures to a a TensorFlow records file.
-
-    Args:
-        figure_generator (FigureGenerator): A generator yielding figure objects.
-        tf_record_filename (str):           Path to the output tf record file.
-    """
-    import tensorflow as tf
-
-    with tf.io.TFRecordWriter(tf_record_filename) as writer:
-
-        for figure in figure_generator():
-
-            tf_example = figure.convert_to_tf_example()
-
-            writer.write(tf_example.SerializeToString())
-
-
 def export_figures_to_detectron_dict(figure_generator: FigureGenerator,
                                      task: str = 'panel_splitting') -> List[dict]:
     """

@@ -28,14 +28,11 @@ from __future__ import annotations
 import os
 import csv
 import logging
-import io
-import hashlib
 from typing import cast, List, Dict
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 
 import numpy as np # type: ignore
-import PIL.Image # type: ignore
 from cv2 import cv2 # type: ignore
 
 from .sub_figure import SubFigure, DetectedSubFigure
@@ -130,8 +127,7 @@ class Figure:
     @classmethod
     def from_dict(cls,
                   figure_dict: Dict,
-                  index: int
-                  ) -> Figure:
+                  index: int) -> Figure:
         """
         Create a Figure object from a dictionnary.
 
@@ -1190,89 +1186,3 @@ class Figure:
             pass
 
         return output_dict
-
-
-    def convert_to_tf_example(self) -> 'tf.train.Example':
-        """
-        Convert the figure (only panel info) to a TensorFlow example which is compatible with the
-        TensorFlow Object Detection API.
-        This is deprecated since the project relies on Detectron 2 (PyTorch).
-
-        Returns:
-            example (tf.train.Example): The corresponding tf example.
-        """
-        # TODO remove everything tensorflow related
-        # Import TensorFlow.
-        import tensorflow as tf # type: ignore
-        from .. import dataset_util
-
-        # Load image
-        with tf.io.gfile.GFile(self.image_path, 'rb') as fid:
-            encoded_jpg = fid.read()
-
-        encoded_jpg_io = io.BytesIO(encoded_jpg)
-        image = PIL.Image.open(encoded_jpg_io)
-
-        # Generate unique id
-        key = hashlib.sha256(encoded_jpg).hexdigest()
-
-        # Check that image shape is correct
-        assert image.size[0] == self.image_width, "Inconsistent image width."
-        assert image.size[1] == self.image_height, "Inconsistent image height."
-
-        xmin = []
-        ymin = []
-        xmax = []
-        ymax = []
-        classes = []
-        classes_text = []
-        for subfigure in self.gt_subfigures:
-
-            panel = subfigure.panel
-
-            if panel is None:
-                continue
-
-            # Bounding box
-            xmin.append(float(panel.box[0]) / self.image_width)
-            ymin.append(float(panel.box[1]) / self.image_height)
-            xmax.append(float(panel.box[2]) / self.image_width)
-            ymax.append(float(panel.box[3]) / self.image_height)
-
-            # Class information
-            class_name = 'panel'
-            classes_text.append(class_name.encode('utf8'))
-            classes.append(1)
-
-        feature = {
-            'image/key/sha256':
-                dataset_util.bytes_feature(key.encode('utf8')),
-            'image/encoded':
-                dataset_util.bytes_feature(encoded_jpg),
-            'image/source_id':
-                dataset_util.bytes_feature(self.image_filename.encode('utf8')),
-            'image/filename':
-                dataset_util.bytes_feature(self.image_filename.encode('utf8')),
-            'image/height':
-                dataset_util.int64_feature(self.image_height),
-            'image/width':
-                dataset_util.int64_feature(self.image_width),
-            'image/format':
-                dataset_util.bytes_feature(self.image_format.encode('utf8')),
-            'image/object/bbox/xmin':
-                dataset_util.float_list_feature(xmin),
-            'image/object/bbox/xmax':
-                dataset_util.float_list_feature(xmax),
-            'image/object/bbox/ymin':
-                dataset_util.float_list_feature(ymin),
-            'image/object/bbox/ymax':
-                dataset_util.float_list_feature(ymax),
-            'image/object/class/text':
-                dataset_util.bytes_list_feature(classes_text),
-            'image/object/class/label':
-                dataset_util.int64_list_feature(classes),
-            }
-
-        example = tf.train.Example(features=tf.train.Features(feature=feature))
-
-        return example
