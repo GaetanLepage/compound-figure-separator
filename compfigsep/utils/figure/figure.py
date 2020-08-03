@@ -30,8 +30,9 @@ import csv
 import logging
 import io
 import hashlib
-from typing import cast, Optional, List, Dict
+from typing import cast, List, Dict
 import xml.etree.ElementTree as ET
+from collections import OrderedDict
 
 import numpy as np # type: ignore
 import PIL.Image # type: ignore
@@ -96,12 +97,13 @@ class Figure:
         self.image_height = 0
 
         # Structure of the labels
-        self.labels_structure = None
+        self.labels_structure: LabelStructure
 
         # Caption
-        self.caption: Optional[str]
-        # Dict mapping detected sub-captions to labels.
-        self.detected_subcaptions: Dict[str, str]
+        self.caption: str
+        # Dicts mapping detected sub-captions to labels.
+        self.gt_subcaptions: OrderedDict
+        self.detected_subcaptions: OrderedDict
 
         # Can contain a preview of the image with its bounding boxes.
         self.preview_image: np.ndarray
@@ -464,8 +466,11 @@ class Figure:
                              for labels in label_dict.values())
 
             if num_labeled_panels != num_labels:
-                self._logger.error(f"{annotation_file_path}: has a different number of labeled"\
-                                   f" panels and labels:\n{panel_dict}\n{label_dict}")
+                self._logger.error("%s has a different number of labeled"\
+                                   " panels and labels:\n%s\n%s",
+                                   annotation_file_path,
+                                   str(panel_dict),
+                                   str(label_dict))
                 return subfigures
 
             # Collect all panel label characters.
@@ -575,9 +580,9 @@ class Figure:
 
         labels_line = lines[1]
         labels_list = [label.strip() for label in labels_line.split(',')]
-        labels_structure = LabelStructure.from_labels_list(labels_list)
+        labels_structure: LabelStructure = LabelStructure.from_labels_list(labels_list)
 
-        if self.labels_structure is not None:
+        if hasattr(self, 'labels_structure'):
             assert labels_structure == self.labels_structure,\
                 "LabelStructure do not correspond:"\
                 f"\n{labels_structure} != {self.labels_structure}"
@@ -585,12 +590,16 @@ class Figure:
         else:
             self.labels_structure = labels_structure
 
-        caption_dict = {}
+        caption_dict: Dict[str, str] = {}
         for caption_line in lines[2:]:
             label, text = caption_line.split(':', maxsplit=1)
             label = label.strip()
             text = text.strip()
             caption_dict[label] = text
+
+        # Store the captions gt.
+        self.gt_subcaptions = OrderedDict(dict(sorted(caption_dict.items(),
+                                                      key=lambda item: item[0])))
 
         # Loop over gt_subfigures.
         for gt_subfigure in self.gt_subfigures:
@@ -600,7 +609,7 @@ class Figure:
                 label_object = gt_subfigure.label
 
                 # and if that label has a valid label text,
-                if label_object.text is not None and len(label_object.text) > 1:
+                if label_object.text is not None and len(label_object.text) == 1:
 
                     # Look for a matching caption.
                     for caption_label in caption_dict:

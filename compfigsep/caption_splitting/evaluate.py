@@ -44,36 +44,64 @@ def caption_splitting_figure_eval(figure: Figure,
                                         evaluation stats It will be updated by
                                         this function.
     """
+    # Score of this figure
     figure_score: float = 0
+
+    # Number of ground truth labels. i.e. the normalizer for the figure score.
     num_gt_labels: int = 0
 
-    if not hasattr(figure, 'detected_subcaptions'):
-        return
+    # Get the dictionnary of detected subcaptions (if it exists).
+    detected_subcaptions: Dict[str, str] = figure.detected_subcaptions\
+                                           if hasattr(figure, 'detected_subcaptions')\
+                                           else {}
 
-    for gt_subfigure in figure.gt_subfigures:
+    # Case where this is not a compound figure.
+    if len(figure.gt_subfigures) == 1 and '_' in figure.detected_subcaptions:
+        num_gt_labels = 1
+        figure_score = textdistance.levenshtein.normalized_similarity(
+            figure.gt_subfigures[0],
+            figure.detected_subcaptions['_'])
 
-        if gt_subfigure.caption is None:
-            continue
+    # Case where multiple labels where detected.
+    else:
+        for gt_subfigure in figure.gt_subfigures:
 
-        if gt_subfigure.label is None or gt_subfigure.label.text is None:
-            continue
+            if gt_subfigure.caption is None:
+                continue
 
-        num_gt_labels += 1
+            if gt_subfigure.label is None or gt_subfigure.label.text is None:
+                continue
 
 
-        if gt_subfigure.label.text in figure.detected_subcaptions:
+            # Increase the number of ground truth labels.
+            num_gt_labels += 1
 
-            gt_subcaption: str = gt_subfigure.caption
-            detected_subcaption: str = \
-                figure.detected_subcaptions[gt_subfigure.label.text]
+            if gt_subfigure.label.text in detected_subcaptions:
 
-            figure_score += textdistance.levenshtein.normalized_similarity(
-                gt_subcaption,
-                detected_subcaption)
+                # Get the ground truth subcaption.
+                gt_subcaption: str = gt_subfigure.caption
 
+                # Get the corresponding detected subcaption.
+                detected_subcaption: str = \
+                    detected_subcaptions[gt_subfigure.label.text]
+
+                # Compute the Levenshtein distance between the GT and the detection.
+                figure_score += textdistance.levenshtein.normalized_similarity(
+                    gt_subcaption,
+                    detected_subcaption)
+
+    # If the ground truth figure was not annotated,
     if num_gt_labels > 0:
         stat_dict['num_captions'] += 1
         stat_dict['levenshtein_metric'] += figure_score / num_gt_labels
+
+        # TODO remove the end of this function
+        gt_dict = {sf.label.text: sf.caption
+                   for sf in figure.gt_subfigures
+                   if sf.label is not None}
+        print("# GT #")
+        pprint(gt_dict)
+        print("SCORE = ", figure_score / num_gt_labels)
 
 
 def caption_splitting_metrics(stat_dict: Dict[str, Any]) -> float:

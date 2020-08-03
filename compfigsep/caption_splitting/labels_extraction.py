@@ -25,7 +25,7 @@ Functions to infer the labels from the caption text.
 The original version of this code was written by Stefano Marchesin.
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple, cast
 import re
 
 from ..utils.figure.label import (is_char,
@@ -84,10 +84,10 @@ def label_identification(caption: str) -> Dict:
 
     # Detect roman numbers.
     romans_raw = regex_definitions.RE_ROMAN.findall(caption)
-    romans_cleaned = []
+    romans_cleaned: List[str] = []
     if romans_raw:
         # Get the list of roman labels.
-        romans_list = [raw[0] for raw in romans_raw]
+        romans_list: List[str] = [raw[0] for raw in romans_raw]
 
         # Clean the list.
         romans_cleaned = [re.sub(pattern=r'[().:]',
@@ -100,6 +100,8 @@ def label_identification(caption: str) -> Dict:
 
         # Sort the list of roman numbers according to their numerical values.
         romans_cleaned.sort(key=lambda roman_char: roman_to_int(roman_char=roman_char))
+
+        # print(romans_cleaned)
 
         # Store the list of labels in the output dict.
         output_dict['labels']['romans'] = romans_cleaned
@@ -133,9 +135,9 @@ def label_identification(caption: str) -> Dict:
 
     # Extract first element of each tuple and replace the tuple with it.
     # Hyphen range.
-    hyphen_vector = [hyphen_tuple[0] for hyphen_tuple in hyphen_range]
+    hyphen_vector: List[str] = [hyphen_tuple[0] for hyphen_tuple in hyphen_range]
     # Conjunction range.
-    conj_vector = [conj_tuple[0] for conj_tuple in conj_range]
+    conj_vector: List[str] = [conj_tuple[0] for conj_tuple in conj_range]
 
 
     # Store the ranges in the output dict.
@@ -157,36 +159,37 @@ def _expand_hyphen_range(hyphen_expressions: List[str]) -> List[str]:
     Returns:
         hyphen_range (List[str]):   The list of expanded elements.
     """
-    hyphen_range = []
+    hyphen_range: List[str] = []
 
-    for element in hyphen_expressions:
+    for range_str in hyphen_expressions:
 
         # Split the string by hyphen: 'A-D' -> ['A', 'D']
-        element = element.split('-')
+        range_pair: Tuple[str, str] = cast(Tuple[str, str],
+                                           range_str.split('-'))
 
         # Check if the range is numerical, roman or alphabetical.
         ## CAVEAT: set also the roman one
         # Case 1/3: numerical.
-        if all(d.isdigit() for d in element):
+        if all(d.isdigit() for d in range_pair):
 
             # Get numerical lower and upper bounds.
-            inf = int(element[0])
-            sup = int(element[-1])
+            inf: int = int(range_pair[0])
+            sup: int = int(range_pair[-1])
 
             hyphen_range += list(map(str,
                                      range(inf, sup + 1)))
 
         # Case 2/3: roman numbers.
-        elif all(is_roman(r) for r in element):
+        elif all(is_roman(r) for r in range_pair):
 
             # Check if roman numbers are lower or upper case.
             # Thanks to how regular expressions operate on '|' we just need to check first
             # element.
-            is_upper = element[0].isupper()
+            is_upper = range_pair[0].isupper()
 
             # Get numerical lower and upper bounds.
-            inf = roman_to_int(element[0])
-            sup = roman_to_int(element[-1])
+            inf = roman_to_int(range_pair[0])
+            sup = roman_to_int(range_pair[-1])
 
             # Expand the range of numerical numbers and revert it back to its roman form.
             roman_range_int: List[int] = list(range(inf, sup + 1))
@@ -201,15 +204,15 @@ def _expand_hyphen_range(hyphen_expressions: List[str]) -> List[str]:
             hyphen_range += roman_range_str
 
         # Case 3/3: alphabetical characters.
-        elif all(is_char(char=r) for r in element):
+        elif all(is_char(char=r) for r in range_pair):
 
             # Get 'numerical' lower and upper bounds.
-            inf = ord(element[0])
-            sup = ord(element[-1])
+            inf = ord(range_pair[0])
+            sup = ord(range_pair[-1])
             hyphen_range += list(map(chr,
                                      range(inf, sup + 1)))
 
-        return hyphen_range
+    return hyphen_range
 
 
 
@@ -224,28 +227,28 @@ def label_expansion(label_dict: Dict):
     Returns:
         labels (List[str]): The final list of detected labels.
     """
-    ranges = []
+    ranges: List[str] = []
 
     # ==> Hyphen ranges.
     # Clean the elements and expand the sequences hyphen range.
-    hyphen_cleaned = [re.sub(pattern=r'[().:]',
-                             repl='',
-                             string=element)
-                      for element in label_dict['ranges']['hyphen']]
+    hyphen_cleaned: List[str] = [re.sub(pattern=r'[().:]',
+                                        repl='',
+                                        string=element)
+                                 for element in label_dict['ranges']['hyphen']]
 
-    hyphen_range = _expand_hyphen_range(hyphen_expressions=hyphen_cleaned)
+    ranges = _expand_hyphen_range(hyphen_expressions=hyphen_cleaned)
 
 
     # ==> Conjunction ranges.
     # Clean the identified patterns from useless characters.
-    conj_cleaned = [re.sub(pattern=r'[().:,]',
-                                   repl=' ',
-                                   string=element.replace('and', ' '))
-                    for element in label_dict['ranges']['conj']]
+    conj_range: List[str] = [re.sub(pattern=r'[().:,]',
+                                    repl=' ',
+                                    string=element.replace('and', ' '))
+                             for element in label_dict['ranges']['conj']]
 
     # print('conj_cleaned:', conj_cleaned)
     # Append elements to ranges.
-    for element in conj_cleaned:
+    for element in conj_range:
         ranges += element.split()
     # print("ranges before removing duplicates:", ranges)
 
@@ -254,10 +257,9 @@ def label_expansion(label_dict: Dict):
 
     # print("ranges after removing duplicates:", ranges)
 
-
+    # Sort ranges.
     ranges.sort()
     # print("expanded ranges:", ranges)
-
 
     # Merge the lists containing the expanded ranges and the single labels.
     # ('|' is the union operation between sets).
@@ -266,11 +268,14 @@ def label_expansion(label_dict: Dict):
                   | set(label_dict['labels']['romans'])\
                   | set(label_dict['labels']['characters'])
                   )
+
+    # Sort the labels.
     labels.sort()
+
     # Split the labels list into three sublists: digits, alphanumeric & roman.
-    labels_digits = []
-    labels_romans = []
-    labels_alphanum = []
+    labels_digits: List[str] = []
+    labels_romans: List[str] = []
+    labels_alphanum: List[str] = []
 
     for label in labels:
 
