@@ -27,24 +27,30 @@ Label Recognition detection training script.
 This scripts reads a given config file and runs the training or evaluation.
 """
 
-import os
-from typing import List
+from argparse import Namespace, ArgumentParser
+from typing import List, Dict
 
-import detectron2.utils.comm as comm
-from detectron2.checkpoint import DetectionCheckpointer
-from detectron2.config import CfgNode, get_cfg
-from detectron2.engine import (DefaultTrainer,
-                               default_argument_parser,
-                               default_setup,
-                               launch,
-                               HookBase)
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
 
-from detectron2.evaluation import verify_results
-from detectron2.data.build import build_detection_test_loader
-from detectron2.data.dataset_mapper import DatasetMapper
+import detectron2.utils.comm as comm # type: ignore
+from detectron2.utils.logger import setup_logger # type: ignore
+from detectron2.checkpoint import DetectionCheckpointer # type: ignore
+from detectron2.config import CfgNode, get_cfg # type: ignore
+from detectron2.engine import (DefaultTrainer, # type: ignore
+                               default_argument_parser, # type: ignore
+                               default_setup, # type: ignore
+                               launch, # type: ignore
+                               HookBase) # type: ignore
+from detectron2.evaluation import verify_results # type: ignore
+from detectron2.data.build import build_detection_test_loader # type: ignore
+from detectron2.data.dataset_mapper import DatasetMapper # type: ignore
 
-from compfigsep.label_recognition import register_label_recognition_dataset, LabelRecogEvaluator
-from compfigsep.utils.detectron_utils import LossEvalHook, add_validation_config
+from compfigsep.label_recognition import (register_label_recognition_dataset, # type: ignore
+                                          LabelRecogEvaluator, # type: ignore
+                                          LabelRecogRetinaNet) # type: ignore
+from compfigsep.utils.detectron_utils import LossEvalHook, add_validation_config # type: ignore
 
 
 class Trainer(DefaultTrainer):
@@ -89,23 +95,46 @@ class Trainer(DefaultTrainer):
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            data_set_mapper = DatasetMapper(cfg=self.cfg,
-                                            is_train=True)
+            data_set_mapper: DatasetMapper = DatasetMapper(cfg=self.cfg,
+                                                           is_train=True)
 
-            data_loader = build_detection_test_loader(cfg=self.cfg,
-                                                      dataset_name=self.cfg.DATASETS.VALIDATION,
-                                                      mapper=data_set_mapper)
+            data_loader: DataLoader = build_detection_test_loader(
+                cfg=self.cfg,
+                dataset_name=self.cfg.DATASETS.VALIDATION,
+                mapper=data_set_mapper)
 
-            loss_eval_hook = LossEvalHook(eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
-                                          model=self.model,
-                                          data_loader=data_loader)
+            loss_eval_hook: LossEvalHook = LossEvalHook(
+                eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
+                model=self.model,
+                data_loader=data_loader)
+
             hooks.insert(index=-1,
                          obj=loss_eval_hook)
 
         return hooks
 
 
-def setup(args: List[str]) -> CfgNode:
+
+    @classmethod
+    def build_model(cls, cfg: CfgNode) -> nn.Module:
+        """
+        Instanciate and return the PanelSegRetinaNet model.
+
+        Args:
+            cfg (CfgNode):  The global config.
+
+        Returns:
+            model (nn.Module):  The PanelSegRetinaNet model.
+        """
+        model = LabelRecogRetinaNet(cfg)
+        model.to(torch.device(cfg.MODEL.DEVICE))
+        logger = setup_logger(name=__name__,
+                              distributed_rank=comm.get_rank())
+        logger.info("Model:\n%s", model)
+        return model
+
+
+def setup(parsed_args: Namespace) -> CfgNode:
     """
     Create configs and perform basic setups.
 
@@ -120,10 +149,10 @@ def setup(args: List[str]) -> CfgNode:
     # Add some config options to handle validation
     add_validation_config(cfg)
 
-    cfg.merge_from_file(args.config_file)
-    cfg.merge_from_list(args.opts)
+    cfg.merge_from_file(parsed_args.config_file)
+    cfg.merge_from_list(parsed_args.opts)
     cfg.freeze()
-    default_setup(cfg, args)
+    default_setup(cfg, parsed_args)
 
     return cfg
 
@@ -148,51 +177,53 @@ def register_datasets(cfg: CfgNode):
         register_label_recognition_dataset(dataset_name=cfg.DATASETS.VALIDATION)
 
 
-def main(args: List[str]) -> dict:
+def main(parsed_args: Namespace) -> Dict:
     """
     Launch training/testing for the label recognition task on a single device.
 
     Args:
-        args (List[str]): Arguments from the command line.
+        args (Namespace):   Arguments from the command line.
 
     Returns:
         If training: OrderedDict of results, if evaluation is enabled. Otherwise None.
         If test: a dict of result metrics.
     """
-    cfg = setup(args)
+    cfg: CfgNode = setup(parsed_args)
 
     # Register the needed datasets
     register_datasets(cfg)
 
     # Inference only (testing)
-    if args.eval_only:
+    if parsed_args.eval_only:
 
         # Load the model
-        model = Trainer.build_model(cfg)
+        model: nn.Module = Trainer.build_model(cfg)
 
         # Load the latest weights
         DetectionCheckpointer(model,
                               save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS,
-                                                                      resume=args.resume)
-        res = Trainer.test(cfg, model)
+                                                                      resume=parsed_args.resume)
+        res: Dict = Trainer.test(cfg, model)
         if comm.is_main_process():
-            verify_results(cfg, res)
+            verify_results(cfg=cfg,
+                           results=res)
         return res
 
     # Training
-    trainer = Trainer(cfg)
-    trainer.resume_or_load(resume=args.resume)
+    trainer: Trainer = Trainer(cfg)
+    trainer.resume_or_load(resume=parsed_args.resume)
     return trainer.train()
 
 
 if __name__ == "__main__":
-    parser = default_argument_parser()
+    PARSER: ArgumentParser = default_argument_parser()
 
-    args = parser.parse_args()
-    print("Command Line Args:", args)
+    PARSED_ARGS: Namespace = PARSER.parse_args()
+    print("Command Line Args:", PARSED_ARGS)
+
     launch(main,
-           args.num_gpus,
-           num_machines=args.num_machines,
-           machine_rank=args.machine_rank,
-           dist_url=args.dist_url,
-           args=(args,))
+           PARSED_ARGS.num_gpus,
+           num_machines=PARSED_ARGS.num_machines,
+           machine_rank=PARSED_ARGS.machine_rank,
+           dist_url=PARSED_ARGS.dist_url,
+           args=(PARSED_ARGS,))

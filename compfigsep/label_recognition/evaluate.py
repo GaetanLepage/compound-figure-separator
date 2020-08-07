@@ -23,17 +23,16 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import Tuple, Dict, Iterable
-from sortedcontainers import SortedKeyList
-import numpy as np
+from typing import Tuple, Dict, Iterable, Any
+from sortedcontainers import SortedKeyList # type: ignore
+import numpy as np # type: ignore
 
-from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
 from ..utils.average_precision import compute_average_precision
 
 
 def label_recognition_figure_eval(figure: Figure,
-                                  stat_dict: Dict[str, any]):
+                                  stat_dict: Dict[str, Any]):
     """
     Evaluate label recognition metrics on a single figure.
 

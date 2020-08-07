@@ -27,30 +27,27 @@ Custom variation of RetinaNet to handle label recognition.
 
 import logging
 import math
-from typing import List, Tuple
-import numpy as np
+from typing import List, Dict
+import numpy as np # type: ignore
 import torch
-from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss
+from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss # type: ignore
 from torch import nn
 
-from detectron2.layers import ShapeSpec, batched_nms, cat
-from detectron2.structures import Boxes, ImageList, Instances, pairwise_iou
-from detectron2.utils.events import get_event_storage
-from detectron2.utils.logger import log_first_n
-from detectron2.config import CfgNode
+from detectron2.layers import ShapeSpec, batched_nms, cat # type: ignore
+from detectron2.structures import Boxes, ImageList, Instances, pairwise_iou # type: ignore
+from detectron2.utils.events import get_event_storage # type: ignore
+from detectron2.utils.logger import log_first_n # type: ignore
+from detectron2.config import CfgNode # type: ignore
 
-from detectron2.modeling.anchor_generator import build_anchor_generator
-from detectron2.modeling.backbone.resnet import build_resnet_backbone
-from detectron2.modeling.box_regression import Box2BoxTransform
-from detectron2.modeling.matcher import Matcher
-from detectron2.modeling.postprocessing import detector_postprocess
+from detectron2.modeling.anchor_generator import build_anchor_generator # type: ignore
+from detectron2.modeling.backbone.resnet import build_resnet_backbone # type: ignore
+from detectron2.modeling.box_regression import Box2BoxTransform # type: ignore
+from detectron2.modeling.matcher import Matcher # type: ignore
+from detectron2.modeling.postprocessing import detector_postprocess # type: ignore
 
-from detectron2.modeling.meta_arch.retinanet import (
-    permute_to_N_HWA_K,
-    permute_all_cls_and_box_to_N_HWA_K_and_concat
-)
+from detectron2.modeling.meta_arch.retinanet import permute_to_N_HWA_K # type: ignore
 
-from detectron2.modeling.backbone.fpn import FPN, LastLevelP6P7
+from detectron2.modeling.backbone.fpn import FPN, LastLevelP6P7 # type: ignore
 
 
 __all__ = ["LabelRecogRetinaNet"]
@@ -65,24 +62,24 @@ def build_fpn_backbone(cfg: CfgNode,
       * Output: P2, P3, P4
 
     Args:
-        cfg (CfgNode): a detectron2 CfgNode
-        input_shape (ShapeSpec): TODO
+        cfg (CfgNode):              A detectron2 CfgNode
+        input_shape (ShapeSpec):    The input shape of the backbone.
 
     Returns:
         backbone (Backbone):    backbone module, must be a subclass of :class:`Backbone`.
     """
     # Build the feature extractor (Resnet 50)
-    bottom_up = build_resnet_backbone(cfg, input_shape)
+    bottom_up: nn.Module = build_resnet_backbone(cfg, input_shape)
 
     # Label FPN
-    label_in_features = cfg.MODEL.LABEL_FPN.IN_FEATURES
-    label_out_channels = cfg.MODEL.LABEL_FPN.OUT_CHANNELS
-    label_fpn = FPN(bottom_up=bottom_up,
-                    in_features=label_in_features,
-                    out_channels=label_out_channels,
-                    norm=cfg.MODEL.FPN.NORM,
-                    top_block=None,
-                    fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
+    label_in_features: List[str] = cfg.MODEL.FPN.IN_FEATURES
+    label_out_channels: List[str] = cfg.MODEL.FPN.OUT_CHANNELS
+    label_fpn: nn.Module = FPN(bottom_up=bottom_up,
+                               in_features=label_in_features,
+                               out_channels=label_out_channels,
+                               norm=cfg.MODEL.FPN.NORM,
+                               top_block=None,
+                               fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
 
     return label_fpn
 
@@ -92,34 +89,35 @@ class LabelRecogRetinaNet(nn.Module):
     Implement RetinaNet (https://arxiv.org/abs/1708.02002).
     """
 
-    def __init__(self, cfg):
+    def __init__(self, cfg) -> None:
         super().__init__()
 
-        # fmt: off
-        self.num_classes = cfg.MODEL.RETINANET.NUM_CLASSES
-        self.in_features = cfg.MODEL.RETINANET.IN_FEATURES
+        self.num_classes: int = cfg.MODEL.RETINANET.NUM_CLASSES
+        self.in_features: List[str] = cfg.MODEL.RETINANET.IN_FEATURES
         # Loss parameters:
-        self.focal_loss_alpha = cfg.MODEL.RETINANET.FOCAL_LOSS_ALPHA
-        self.focal_loss_gamma = cfg.MODEL.RETINANET.FOCAL_LOSS_GAMMA
-        self.smooth_l1_loss_beta = cfg.MODEL.RETINANET.SMOOTH_L1_LOSS_BETA
+        self.focal_loss_alpha: float = cfg.MODEL.RETINANET.FOCAL_LOSS_ALPHA
+        self.focal_loss_gamma: float = cfg.MODEL.RETINANET.FOCAL_LOSS_GAMMA
+        self.smooth_l1_loss_beta: float = cfg.MODEL.RETINANET.SMOOTH_L1_LOSS_BETA
         # Inference parameters:
-        self.score_threshold = cfg.MODEL.RETINANET.SCORE_THRESH_TEST
-        self.topk_candidates = cfg.MODEL.RETINANET.TOPK_CANDIDATES_TEST
-        self.nms_threshold = cfg.MODEL.RETINANET.NMS_THRESH_TEST
-        self.max_detections_per_image = cfg.TEST.DETECTIONS_PER_IMAGE
+        self.score_threshold: float = cfg.MODEL.RETINANET.SCORE_THRESH_TEST
+        self.topk_candidates: int = cfg.MODEL.RETINANET.TOPK_CANDIDATES_TEST
+        self.nms_threshold: float = cfg.MODEL.RETINANET.NMS_THRESH_TEST
+        self.max_detections_per_image: int = cfg.TEST.DETECTIONS_PER_IMAGE
         # Vis parameters
-        self.vis_period = cfg.VIS_PERIOD
-        self.input_format = cfg.INPUT.FORMAT
-        # fmt: on
+        self.vis_period: int = cfg.VIS_PERIOD
+        self.input_format: str = cfg.INPUT.FORMAT
 
-        self.fpn = build_fpn_backbone(
+        self.fpn: nn.Module = build_fpn_backbone(
             cfg,
             input_shape=ShapeSpec(channels=len(cfg.MODEL.PIXEL_MEAN)))
 
-        backbone_fpn_output_shape = self.backbone.output_shape()
-        feature_shapes = [backbone_fpn_output_shape[f] for f in self.in_features]
-        self.head = RetinaNetHead(cfg, feature_shapes)
-        self.anchor_generator = build_anchor_generator(cfg, feature_shapes)
+        backbone_fpn_output_shape: Dict[str, ShapeSpec] = self.fpn.output_shape()
+
+        feature_shapes: List[ShapeSpec] = [backbone_fpn_output_shape[f]
+                                           for f in self.in_features]
+        self.head: RetinaNetHead = RetinaNetHead(cfg, feature_shapes)
+
+        self.anchor_generator: nn.Module = build_anchor_generator(cfg, feature_shapes)
 
         # Matching and loss
         self.box2box_transform = Box2BoxTransform(weights=cfg.MODEL.RPN.BBOX_REG_WEIGHTS)

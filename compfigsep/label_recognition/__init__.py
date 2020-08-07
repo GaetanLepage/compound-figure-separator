@@ -32,5 +32,6 @@ Output: A list of sub-figures including :
 
 from .load_datasets import *
 from .evaluator import *
+from .label_recog_retinanet import *
 
 __all__ = [k for k in globals().keys() if not k.startswith("_")]

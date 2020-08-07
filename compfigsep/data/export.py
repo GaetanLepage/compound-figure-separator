@@ -134,16 +134,15 @@ def export_figures_to_json(figure_generator: FigureGenerator,
         json_output_filename = "compfigsep_experiment_{date:%Y-%B-%d_%H:%M:%S}.json".format(
             date=datetime.datetime.now())
 
-    json_output_path = os.path.join(json_output_directory_,
-                                    json_output_filename)
-
+    json_output_path: str = os.path.join(json_output_directory_,
+                                         json_output_filename)
 
     if os.path.isfile(json_output_path):
         logging.warning("JSON output file already exist (%s).\nAborting export.",
                         json_output_path)
         return
 
-    output_dict: Dict[str, Any] = {}
+    output_dict: Dict[str, Dict] = {}
 
     # Loop over the figure from the generator and add their dict representation to the output
     # dictionnary.
@@ -170,7 +169,7 @@ def export_figures_to_detectron_dict(figure_generator: FigureGenerator,
     """
     if task not in ['panel_splitting', 'label_recog', 'panel_seg']:
         raise ValueError("`task` has to be one of ['panel_splitting', 'label_recog',"\
-                        f" 'panel_seg'] but is {task}")
+                         f" 'panel_seg'] but is {task}")
 
     from detectron2.structures import BoxMode # type: ignore
 
@@ -184,7 +183,7 @@ def export_figures_to_detectron_dict(figure_generator: FigureGenerator,
         record['height'] = figure.image_height
         record['width'] = figure.image_width
 
-        objs = []
+        objs: List[Dict[str, Any]] = []
 
         if figure.gt_subfigures is not None:
 
@@ -198,7 +197,7 @@ def export_figures_to_detectron_dict(figure_generator: FigureGenerator,
                     if panel is None:
                         continue
 
-                    obj = {
+                    obj: Dict[str, Any] = {
                         'bbox': panel.box,
                         'bbox_mode': BoxMode.XYXY_ABS,
                         'category_id': 0
@@ -217,7 +216,7 @@ def export_figures_to_detectron_dict(figure_generator: FigureGenerator,
                     obj = {
                         'bbox': label.box,
                         'bbox_mode': BoxMode.XYXY_ABS,
-                        'category_id': LABEL_CLASS_MAPPING[label.text]
+                        'category_id': LABEL_CLASS_MAPPING[map_label(label.text)]
                     }
 
                 # panel segmentation task
@@ -241,7 +240,6 @@ def export_figures_to_detectron_dict(figure_generator: FigureGenerator,
                         # TODO: later, we would like to handle >1 length labels
                         obj['label_bbox'] = label.box
                         obj['label'] = LABEL_CLASS_MAPPING[map_label(label.text)]
-
 
                 objs.append(obj)
 
