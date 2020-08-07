@@ -23,9 +23,12 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluator for the panel segmentation task.
 """
 
-from typing import List
+from typing import List, Dict, Any
 
-from ..utils.figure import Figure, DetectedPanel, DetectedLabel, CLASS_LABEL_MAPPING
+from ..utils.figure import (Figure,
+                            DetectedPanel,
+                            DetectedLabel)
+from ..utils.figure.label import CLASS_LABEL_MAPPING
 from ..utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 from .evaluate import evaluate_detections
 
@@ -39,7 +42,7 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
     def __init__(self,
                  dataset_name: str,
                  export: bool = False,
-                 export_dir: str = None):
+                 export_dir: str = None) -> None:
         """
         Init function.
         Call the init function of the parent class (PanelSegAbstractEvaluator).
@@ -58,7 +61,7 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
 
     def process(self,
                 inputs: List[dict],
-                outputs: List[dict]):
+                outputs: List[dict]) -> None:
         """
         Process pairs of inputs and outputs.
 
@@ -67,17 +70,17 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
             outputs (List[dict]):   The return value of `model(inputs)`.
         """
 
-        for input, output in zip(inputs, outputs):
-            image_id = input['image_id']
+        for input_element, output_element in zip(inputs, outputs):
+            image_id: int = input_element['image_id']
 
             self._predictions[image_id] = {}
 
             # Panels
-            panel_instances = output["panels"].to(self._cpu_device)
+            panel_instances = output_element["panels"].to(self._cpu_device)
             panel_boxes = panel_instances.pred_boxes.tensor.numpy()
             panel_scores = panel_instances.scores.tolist()
 
-            predicted_panels = []
+            predicted_panels: List[Dict[str, Any]] = []
             for box, score in zip(panel_boxes, panel_scores):
                 prediction = {
                     'box': box,
@@ -88,52 +91,45 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
             self._predictions[image_id]['panels'] = predicted_panels
 
             # Labels
-            label_instances = output["labels"].to(self._cpu_device)
+            label_instances = output_element["labels"].to(self._cpu_device)
             label_boxes = label_instances.pred_boxes.tensor.numpy()
             label_scores = label_instances.scores.tolist()
             label_classes = label_instances.pred_classes.tolist()
 
-            predicted_labels = []
+            predicted_labels: List[Dict[str, Any]] = []
 
-            for box, score, cls in zip(label_boxes, label_scores, label_classes):
+            for box, score, l_cls in zip(label_boxes, label_scores, label_classes):
                 prediction = {
                     'box': box,
                     'score': score,
-                    'label': cls
+                    'label': l_cls
                 }
                 predicted_labels.append(prediction)
 
             self._predictions[image_id]['labels'] = predicted_labels
 
 
-    def _augmented_figure_generator(self, predictions: dict) -> Figure:
+    def _predict(self, figure: Figure) -> None:
         """
-        Loop over the Figure generator, fill the Figure objects with predictions and yield back
-        the augmented Figure objects.
+        TODO
 
         Args:
-            predictions (dict): The dict containing the predictions from the model.
-
-        Yields:
-            figure (Figure): Figure objects augmented with predictions.
+            figure (Figure):    TODO.
         """
-        for figure in self._figure_generator():
 
-            try:
-                detected_panels = predictions[figure.index]['panels']
-                detected_labels = predictions[figure.index]['labels']
-            except Exception:
-                continue
+        try:
+            detected_panels = self._predictions[figure.index]['panels']
+            detected_labels = self._predictions[figure.index]['labels']
+        except AttributeError:
+            return
 
 
-            # Convert panels and labels from dict to DetectedPanel objects
-            figure.detected_panels = [DetectedPanel(box=panel['box'],
-                                                    detection_score=panel['score'])
-                                      for panel in detected_panels]
+        # Convert panels and labels from dict to DetectedPanel objects
+        figure.detected_panels = [DetectedPanel(box=panel['box'],
+                                                detection_score=panel['score'])
+                                  for panel in detected_panels]
 
-            figure.detected_labels = [DetectedLabel(text=CLASS_LABEL_MAPPING[label['label']],
-                                                    box=label['box'],
-                                                    detection_score=label['score'])
-                                      for label in detected_labels]
-
-            yield figure
+        figure.detected_labels = [DetectedLabel(text=CLASS_LABEL_MAPPING[label['label']],
+                                                box=label['box'],
+                                                detection_score=label['score'])
+                                  for label in detected_labels]

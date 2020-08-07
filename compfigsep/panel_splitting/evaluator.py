@@ -23,9 +23,10 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluator for the panel splitting task.
 """
 
-from typing import List
+from typing import List, Any, Dict
 
 from ..utils.figure import Figure, DetectedPanel
+from ..data.figure_generators import FigureGenerator, StackedFigureGenerator
 from ..utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 from .evaluate import evaluate_detections
 
@@ -89,36 +90,23 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
             self._predictions[image_id] = predicted_panels
 
 
-    def _augmented_figure_generator(self, predictions: dict) -> Figure:
+    def _predict(self, figure: Figure) -> None:
         """
-        Loop over the Figure generator, fill the Figure objects with predictions and yield back
-        the augmented Figure objects.
-
-        Args:
-            predictions (dict): The dict containing the predictions from the model.
-
-        Yields:
-            figure (Figure):    Figure objects augmented with predictions.
+        TODO
         """
-        for figure in self._figure_generator():
 
-            predicted_panels = predictions[figure.index]
+        predicted_panels: List[Dict[str, Any]] = self._predictions[figure.index]
 
-            predicted_panel_objects = []
+        predicted_panel_objects: List[DetectedPanel] = []
 
-            for prediction in predicted_panels:
+        for prediction in predicted_panels:
 
-                # Instanciate a Panel object.
-                panel = DetectedPanel(box=prediction['box'],
-                                      detection_score=prediction['score'])
+            # Instanciate a Panel object.
+            panel = DetectedPanel(box=prediction['box'],
+                                  detection_score=prediction['score'])
 
-                predicted_panel_objects.append(panel)
+            predicted_panel_objects.append(panel)
 
-                # TODO do some post processing here maybe
+            # TODO do some post processing here maybe
 
-            figure.detected_panels = predicted_panel_objects
-
-            # TODO remove
-            # figure.save_preview(mode='pred')
-
-            yield figure
+        figure.detected_panels = predicted_panel_objects

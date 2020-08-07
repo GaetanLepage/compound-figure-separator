@@ -24,10 +24,18 @@ Functions to deal with coordinates and areas of union, intersection of boxes.
 
 In every 'box' function, boxes should respect the format [x1, y1, x2, y2].
 """
+from typing import NamedTuple
 
 from typing import Tuple
 Box = Tuple[int, int, int, int]
-Point = Tuple[float, float]
+
+class Point(NamedTuple):
+    """
+    NamedTuple representing a point in a 2D image.
+    """
+    x: int
+    y: int
+
 
 def get_center(box: Box) -> Point:
     """
@@ -39,8 +47,10 @@ def get_center(box: Box) -> Point:
     Returns:
         x_center, y_center (Point): The coordinates of the center.
     """
-    return (box[0] + box[2]) / 2.0,\
-           (box[1] + box[3]) / 2.0
+    x_center: float = (box[0] + box[2]) / 2.0
+    y_center: float = (box[1] + box[3]) / 2.0
+
+    return Point(int(x_center), int(y_center))
 
 
 def union(box_1: Box,

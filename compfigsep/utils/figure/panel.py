@@ -24,7 +24,7 @@ Classes Panel and DetectedPanel.
 """
 
 from __future__ import annotations
-from typing import cast, Tuple, Dict, Optional
+from typing import cast, Tuple, Dict, Optional, Any
 
 import cv2 # type: ignore
 import numpy as np # type: ignore
@@ -68,7 +68,6 @@ class Panel:
         Returns:
             panel (Panel):  The resulting Panel object.
         """
-
         return Panel(box=panel_dict['box'])
 
 
@@ -79,8 +78,7 @@ class Panel:
         Returns:
             output_dict (Dict): A Dict representing the panel information.
         """
-
-        output_dict = {}
+        output_dict: Dict[str, Any] = {}
 
         if self.box is not None:
             output_dict['box'] = self.box
@@ -90,8 +88,7 @@ class Panel:
 
     def draw(self,
              image: np.ndarray,
-             color: Color = DEFAULT_GT_COLOR
-             ) -> None:
+             color: Color = DEFAULT_GT_COLOR) -> None:
         """
         Draw the panel bounding box.
         The image is affected by side-effect.
@@ -136,8 +133,7 @@ class DetectedPanel(Panel):
 
     def __init__(self,
                  box: Box,
-                 detection_score: float = None
-                 ) -> None:
+                 detection_score: float = None) -> None:
         """
         Args:
             box (Box):                  The bounding box localizing the panel on the image.

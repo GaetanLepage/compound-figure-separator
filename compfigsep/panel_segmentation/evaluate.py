@@ -23,19 +23,19 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel segmentation task metrics.
 """
 
-from typing import Dict, Iterable
+from typing import Dict, Any
 from pprint import pprint
-from sortedcontainers import SortedKeyList
+from sortedcontainers import SortedKeyList # type: ignore
 
 from ..data.figure_generators import FigureGenerator
 from ..panel_splitting.evaluate import panel_splitting_figure_eval, panel_splitting_metrics
 from ..label_recognition.evaluate import label_recognition_figure_eval, multi_class_metrics
-from ..utils.figure import Figure, beam_search
-from ..utils.figure import DetectedSubFigure, Label
+from ..utils.figure import Figure
+from ..utils.figure import Label
 
 
 def panel_segmentation_figure_eval(figure: Figure,
-                                   stat_dict: Dict[str, any]):
+                                   stat_dict: Dict[str, Any]):
     """
     Evaluate panel segmentation metrics on a single figure.
 
@@ -89,7 +89,7 @@ def panel_segmentation_figure_eval(figure: Figure,
                                                    detected_subfigure.is_true_positive))
 
 
-def evaluate_detections(figure_generator: Iterable[Figure]) -> dict:
+def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     """
     Compute the metrics (precision, recall and mAP) from a given set of panel segmentation
     detections.
@@ -129,7 +129,7 @@ def evaluate_detections(figure_generator: Iterable[Figure]) -> dict:
     }
 
 
-    for figure in figure_generator:
+    for figure in figure_generator():
 
         # TODO : clean this function
 
@@ -153,10 +153,6 @@ def evaluate_detections(figure_generator: Iterable[Figure]) -> dict:
         # if len(detected_labels) > 0:
         # subfigures = beam_search.assign_labels_to_panels(figure.detected_panels,
                                                          # figure.detected_labels)
-
-        # Clear the intermediate detected objects
-        figure.detected_panels = None
-        figure.detected_labels = None
 
         # Convert output from beam search (list of SubFigure objects) to DetectedSubFigure.
         # figure.detected_subfigures = [DetectedSubFigure.from_normal_sub_figure(subfigure)

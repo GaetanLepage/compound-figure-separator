@@ -68,14 +68,14 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    args = parse_args(args)
+    parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
     figure_generator = JsonFigureGenerator(
-        json_path=args.json)
+        json_path=parsed_args.json)
 
     # Evaluate the data set.
-    evaluate_detections(figure_generator=figure_generator())
+    evaluate_detections(figure_generator=figure_generator)
 
 
 if __name__ == '__main__':

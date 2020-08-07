@@ -28,34 +28,33 @@ This scripts reads a given config file and runs the training or evaluation.
 """
 
 import os
+from argparse import Namespace
 from typing import List
 
 import torch
 from torch.utils.data import DataLoader
 from torch import nn
 
-import detectron2.utils.comm as comm
-from detectron2.utils.logger import setup_logger
-from detectron2.checkpoint import DetectionCheckpointer
-from detectron2.config import CfgNode, get_cfg
+import detectron2.utils.comm as comm # type: ignore
+from detectron2.utils.logger import setup_logger # type: ignore
+from detectron2.checkpoint import DetectionCheckpointer # type: ignore
+from detectron2.config import CfgNode, get_cfg # type: ignore
 from detectron2.engine import (DefaultTrainer,
                                default_argument_parser,
                                default_setup,
                                launch,
-                               HookBase)
-from detectron2.evaluation import verify_results
-from detectron2.data.build import build_detection_train_loader, build_detection_test_loader
+                               HookBase) # type: ignore
+from detectron2.evaluation import verify_results # type: ignore
+from detectron2.data.build import (build_detection_train_loader,
+                                   build_detection_test_loader)
 
 from compfigsep.panel_segmentation.dataset_mapper import PanelSegDatasetMapper
-from compfigsep.utils.detectron_utils import (
-    LossEvalHook,
-    ModelWriter
-)
-from compfigsep.panel_segmentation import (
-    register_panel_segmentation_dataset,
-    PanelSegEvaluator,
-    add_panel_seg_config,
-    PanelSegRetinaNet)
+from compfigsep.utils.detectron_utils import LossEvalHook
+
+from compfigsep.panel_segmentation import (register_panel_segmentation_dataset,
+                                           PanelSegEvaluator,
+                                           add_panel_seg_config,
+                                           PanelSegRetinaNet)
 from compfigsep.utils.detectron_utils.config import add_validation_config
 
 
@@ -177,12 +176,12 @@ class Trainer(DefaultTrainer):
         return model
 
 
-def setup(args: List[str]) -> CfgNode:
+def setup(parsed_args: Namespace) -> CfgNode:
     """
     Create configs and perform basic setups.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        parsed_args (Namespace):    Arguments from the command line.
 
     Retuns:
         cfg (CfgNode):  A config node filled with necessary options.
@@ -195,10 +194,10 @@ def setup(args: List[str]) -> CfgNode:
     # Add some config options relative to the panel segmentation task.
     add_panel_seg_config(cfg)
 
-    cfg.merge_from_file(args.config_file)
-    cfg.merge_from_list(args.opts)
+    cfg.merge_from_file(parsed_args.config_file)
+    cfg.merge_from_list(parsed_args.opts)
     cfg.freeze()
-    default_setup(cfg, args)
+    default_setup(cfg, parsed_args)
     return cfg
 
 
@@ -222,12 +221,12 @@ def register_datasets(cfg: CfgNode):
         register_panel_segmentation_dataset(dataset_name=cfg.DATASETS.VALIDATION)
 
 
-def main(args: List[str]) -> dict:
+def main(args: Namespace) -> dict:
     """
     Launch training/testing for the panel splitting task on a single device.
 
     Args:
-        args (List[str]): Arguments from the command line.
+        args (Namespace):   Parsed arguments.
 
     Returns:
         If training: OrderedDict of results, if evaluation is enabled. Otherwise None.
@@ -242,7 +241,7 @@ def main(args: List[str]) -> dict:
     if args.eval_only:
 
         # Load the model
-        model = Trainer.build_model(cfg)
+        model: nn.Module = Trainer.build_model(cfg)
 
         # Load the latest weights
         DetectionCheckpointer(model,
@@ -260,17 +259,17 @@ def main(args: List[str]) -> dict:
 
 
 if __name__ == "__main__":
-    parser = default_argument_parser()
-    parser.add_argument('--export-only',
+    PARSER = default_argument_parser()
+    PARSER.add_argument('--export-only',
                         action='store_true',
                         help="Do not compute metrics, just store the raw predictions of panel"\
                              "segmentation.")
 
-    args = parser.parse_args()
-    print("Command Line Args:", args)
+    parsed_args: Namespace = PARSER.parse_args()
+
     launch(main,
-           args.num_gpus,
-           num_machines=args.num_machines,
-           machine_rank=args.machine_rank,
-           dist_url=args.dist_url,
-           args=(args,))
+           parsed_args.num_gpus,
+           num_machines=parsed_args.num_machines,
+           machine_rank=parsed_args.machine_rank,
+           dist_url=parsed_args.dist_url,
+           args=(parsed_args,))

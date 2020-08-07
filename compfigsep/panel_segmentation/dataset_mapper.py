@@ -29,15 +29,14 @@ from typing import List
 
 import copy
 import logging
-import numpy as np
+import numpy as np # type: ignore
 import torch
-from fvcore.transforms.transform import TransformList
 
-from detectron2.data import detection_utils as utils
+from detectron2.data import detection_utils as utils # type: ignore
 from detectron2.data import transforms as T
 
-from detectron2.structures import BoxMode, Instances, Boxes
-from detectron2.config import CfgNode
+from detectron2.structures import BoxMode, Instances, Boxes # type: ignore
+from detectron2.config import CfgNode # type: ignore
 
 
 __all__ = ["PanelSegDatasetMapper"]
@@ -159,7 +158,9 @@ class PanelSegDatasetMapper:
         # TODO simplify this
         if "annotations" not in dataset_dict:
             image, transforms = T.apply_transform_gens(
-                transform_gens=([self.crop_gen] if self.crop_gen else []) + self.tfm_gens,
+                transform_gens=([self.crop_gen]
+                                if self.crop_gen
+                                else []) + self.tfm_gens,
                 img=image)
 
         else:
@@ -211,12 +212,15 @@ class PanelSegDatasetMapper:
                                                              transforms=transforms,
                                                              image_size=image_shape))
                 else:
-                    logging.error(f"Error with annotation: {obj} has a 'label' field"\
-                        " but no corresponding 'label_bbox' field.")
+                    logging.error("Error with annotation: %s has a 'label' field"\
+                                  " but no corresponding 'label_bbox' field.",
+                                  obj)
 
             elif 'label_bbox' in obj:
                 logging.error("Inconsistent label annotation:"\
-                    f" obj['label']={obj['label']} and obj['label_bbox']={obj['label_bbox']}")
+                              " obj['label']=%s and obj['label_bbox']=%s",
+                              obj['label'],
+                              obj['label_bbox'])
 
 
         panel_instances, label_instances = self._annotations_to_instances(panel_annos=panel_annos,

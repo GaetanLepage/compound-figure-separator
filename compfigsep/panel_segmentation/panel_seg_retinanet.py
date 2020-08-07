@@ -59,7 +59,7 @@ def build_fpn_backbones(cfg: CfgNode,
 
     Args:
         cfg (CfgNode):              A detectron2 CfgNode.
-        input_shape (ShapeSpec):    The input shaoe of the backbone.
+        input_shape (ShapeSpec):    The input shape of the backbone.
 
     Returns:
         backbone (Backbone):    backbone module, must be a subclass of :class:`Backbone`.
@@ -133,25 +133,25 @@ class PanelSegRetinaNet(nn.Module):
         super().__init__()
 
         self.num_label_classes: int = cfg.MODEL.RETINANET.NUM_LABEL_CLASSES
-        self.panel_in_features = cfg.MODEL.RETINANET.PANEL_IN_FEATURES
-        self.label_in_features = cfg.MODEL.RETINANET.LABEL_IN_FEATURES
+        self.panel_in_features: List[str] = cfg.MODEL.RETINANET.PANEL_IN_FEATURES
+        self.label_in_features: List[str] = cfg.MODEL.RETINANET.LABEL_IN_FEATURES
         # Loss parameters:
-        self.focal_loss_alpha = cfg.MODEL.RETINANET.FOCAL_LOSS_ALPHA
-        self.focal_loss_gamma = cfg.MODEL.RETINANET.FOCAL_LOSS_GAMMA
-        self.smooth_l1_loss_beta = cfg.MODEL.RETINANET.SMOOTH_L1_LOSS_BETA
+        self.focal_loss_alpha: float = cfg.MODEL.RETINANET.FOCAL_LOSS_ALPHA
+        self.focal_loss_gamma: float = cfg.MODEL.RETINANET.FOCAL_LOSS_GAMMA
+        self.smooth_l1_loss_beta: float = cfg.MODEL.RETINANET.SMOOTH_L1_LOSS_BETA
         # Inference parameters:
-        self.score_threshold = cfg.MODEL.RETINANET.SCORE_THRESH_TEST
-        self.topk_candidates = cfg.MODEL.RETINANET.TOPK_CANDIDATES_TEST
-        self.nms_threshold = cfg.MODEL.RETINANET.NMS_THRESH_TEST
-        self.max_detections_per_image = cfg.TEST.DETECTIONS_PER_IMAGE
+        self.score_threshold: float = cfg.MODEL.RETINANET.SCORE_THRESH_TEST
+        self.topk_candidates: int = cfg.MODEL.RETINANET.TOPK_CANDIDATES_TEST
+        self.nms_threshold: float = cfg.MODEL.RETINANET.NMS_THRESH_TEST
+        self.max_detections_per_image: int = cfg.TEST.DETECTIONS_PER_IMAGE
 
         self.panel_fpn, self.label_fpn = build_fpn_backbones(
             cfg,
             input_shape=ShapeSpec(channels=len(cfg.MODEL.PIXEL_MEAN)))
 
         # Panel
-        panel_backbone_fpn_output_shape = self.panel_fpn.output_shape()
-        panel_feature_shapes = [panel_backbone_fpn_output_shape[f]
+        panel_backbone_fpn_output_shape: Dict[str, ShapeSpec] = self.panel_fpn.output_shape()
+        panel_feature_shapes: List[ShapeSpec] = [panel_backbone_fpn_output_shape[f]
                                 for f in self.panel_in_features]
 
         self.panel_anchor_generator = DefaultAnchorGenerator(
@@ -167,9 +167,9 @@ class PanelSegRetinaNet(nn.Module):
 
 
         # Label
-        label_backbone_fpn_output_shape = self.label_fpn.output_shape()
-        label_feature_shapes = [label_backbone_fpn_output_shape[f]
-                                for f in self.label_in_features]
+        label_backbone_fpn_output_shape: Dict[str, ShapeSpec] = self.label_fpn.output_shape()
+        label_feature_shapes: List[ShapeSpec] = [label_backbone_fpn_output_shape[f]
+                                                 for f in self.label_in_features]
 
         self.label_anchor_generator = DefaultAnchorGenerator(
             sizes=cfg.MODEL.LABEL_ANCHOR_GENERATOR.SIZES,
@@ -177,10 +177,11 @@ class PanelSegRetinaNet(nn.Module):
             strides=[x.stride for x in label_feature_shapes],
             offset=cfg.MODEL.ANCHOR_GENERATOR.OFFSET)
 
-        self.label_head = RetinaNetHead(cfg,
-                                        input_shape=label_feature_shapes,
-                                        num_classes=cfg.MODEL.RETINANET.NUM_LABEL_CLASSES,
-                                        num_anchors=self.label_anchor_generator.num_cell_anchors)
+        self.label_head: RetinaNetHead = RetinaNetHead(
+            cfg,
+            input_shape=label_feature_shapes,
+            num_classes=cfg.MODEL.RETINANET.NUM_LABEL_CLASSES,
+            num_anchors=self.label_anchor_generator.num_cell_anchors)
 
         # Matching and loss
         # TODO maybe have to duplicate those as well

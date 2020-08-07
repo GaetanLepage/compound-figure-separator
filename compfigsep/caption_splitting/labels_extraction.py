@@ -101,6 +101,7 @@ def label_identification(caption: str) -> Dict:
         # Sort the list of roman numbers according to their numerical values.
         romans_cleaned.sort(key=lambda roman_char: roman_to_int(roman_char=roman_char))
 
+        # TODO remove
         # print(romans_cleaned)
 
         # Store the list of labels in the output dict.
@@ -109,7 +110,7 @@ def label_identification(caption: str) -> Dict:
 
     # Detect numerical labels.
     digits_raw = regex_definitions.RE_DIGITS.findall(caption)
-    digits_cleaned = []
+    digits_cleaned: List[str] = []
     if digits_raw:
         # get the list of numerical labels
         digits_list = []
@@ -216,7 +217,7 @@ def _expand_hyphen_range(hyphen_expressions: List[str]) -> List[str]:
 
 
 
-def label_expansion(label_dict: Dict):
+def label_expansion(label_dict: Dict) -> List[str]:
     """
     Expand the label ranges from the caption.
     ex: ['A-C', 'D', 'E and F'] -> ['A', 'B', 'C', 'D', 'E', 'F']
@@ -255,6 +256,7 @@ def label_expansion(label_dict: Dict):
     # Remove duplicates.
     ranges = list(set(ranges))
 
+    # TODO remove
     # print("ranges after removing duplicates:", ranges)
 
     # Sort ranges.
@@ -272,26 +274,7 @@ def label_expansion(label_dict: Dict):
     # Sort the labels.
     labels.sort()
 
-    # Split the labels list into three sublists: digits, alphanumeric & roman.
-    labels_digits: List[str] = []
-    labels_romans: List[str] = []
-    labels_alphanum: List[str] = []
-
-    for label in labels:
-
-        # Store digit.
-        if label.isdigit():
-            labels_digits.append(label)
-
-        # Store roman.
-        if is_roman(label):
-            labels_romans.append(label)
-
-        # Store alphanumerical.
-        if is_char(char=label):
-            labels_alphanum.append(label)
-
-    return labels_digits, labels_romans, labels_alphanum
+    return labels
 
 
 # TODO check how to use this.

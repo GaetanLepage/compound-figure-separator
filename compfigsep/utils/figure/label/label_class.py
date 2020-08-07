@@ -122,18 +122,17 @@ def case_same_label(char: str) -> bool:
         bool which tells whether `char` belongs to a "dual class".
     """
     # If the given character belongs to a "dual class", return True.
-    if char in (
-            'c', 'C',
-            'k', 'K',
-            'o', 'O',
-            'p', 'P',
-            's', 'S',
-            'u', 'U',
-            'v', 'V',
-            'w', 'W',
-            'x', 'X',
-            'y', 'Y',
-            'z', 'Z'):
+    if char in ('c', 'C',
+                'k', 'K',
+                'o', 'O',
+                'p', 'P',
+                's', 'S',
+                'u', 'U',
+                'v', 'V',
+                'w', 'W',
+                'x', 'X',
+                'y', 'Y',
+                'z', 'Z'):
         return True
 
     # Else, return False.

@@ -23,6 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Figure generator handling a list of images.
 """
 
+from __future__ import annotations
 import os
 import logging
 
@@ -59,6 +60,14 @@ class ImageListFigureGenerator(FigureGenerator):
         self.image_directory_path = image_directory_path
 
         self.image_list_txt = image_list_txt
+
+
+    def __copy__(self) -> ImageListFigureGenerator:
+        """
+        TODO
+        """
+        return ImageListFigureGenerator(image_list_txt=self.image_list_txt,
+                                        image_directory_path=self.image_directory_path)
 
 
     def __call__(self) -> Iterable[Figure]:

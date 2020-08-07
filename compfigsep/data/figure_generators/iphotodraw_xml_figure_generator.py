@@ -27,7 +27,7 @@ from __future__ import annotations
 import os
 import sys
 import logging
-from typing import Iterable
+from typing import Iterable, List
 from argparse import ArgumentParser
 
 import progressbar # type: ignore
@@ -77,6 +77,7 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
     def __init__(self,
                  file_list_txt: str = None,
                  image_directory_path: str = None,
+                 image_paths_list: List[str] = None,
                  caption_annotation_file: str = None) -> None:
         """
         Args:
@@ -88,14 +89,12 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
         # Call base class method.
         super().__init__()
 
-        # Check argument consistency
-        if file_list_txt is not None and image_directory_path is not None:
-            logging.error("Both `file_list_txt` and `input_directory` options cannot be"\
-                          " simultaneously True.")
-            sys.exit(1)
+        # If a list of image paths was provided.
+        if image_paths_list is not None:
+            self.image_paths = image_paths_list
 
         # If a list of image files was provided, read it and store the image files.
-        if file_list_txt is not None:
+        elif file_list_txt is not None:
 
             # Read list of image files
             with open(file_list_txt, 'r') as eval_list_file:
@@ -110,13 +109,12 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
 
             self.image_paths = [f for f in os.listdir(image_directory_path)
                                 if f.endswith('.jpg') and os.path.isfile(
-                                    os.path.join(image_directory_path, f))
-                                ]
+                                    os.path.join(image_directory_path, f))]
 
         else:
-            logging.error("Either one of `file_list_txt` and `input_directory` options"\
-                          " has to be set.")
+            logging.error("Either one of the options has to be set.")
             sys.exit(1)
+
 
         # Caption annotations
         if caption_annotation_file is not None:
@@ -125,7 +123,8 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
 
 
     def __copy__(self) -> IphotodrawXmlFigureGenerator:
-        raise NotImplementedError()
+
+        return IphotodrawXmlFigureGenerator(image_paths_list=self.image_paths)
 
 
     def __call__(self) -> Iterable[Figure]:

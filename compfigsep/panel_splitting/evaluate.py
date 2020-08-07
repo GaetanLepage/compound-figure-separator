@@ -54,8 +54,8 @@ def panel_splitting_figure_eval(figure: Figure,
     stat_dict['overall_detected_count'] += len(figure.detected_panels)
 
     # TODO remove
-    print("Number of GT panels :", len(figure.gt_subfigures))
-    print("Number of detected panels :", len(figure.detected_panels))
+    # print("Number of GT panels :", len(figure.gt_subfigures))
+    # print("Number of detected panels :", len(figure.detected_panels))
 
     num_correct_imageclef = 0
     num_correct_iou_thresh = 0
@@ -70,8 +70,8 @@ def panel_splitting_figure_eval(figure: Figure,
                                      detected_panel.is_true_positive_iou))
 
     # TODO remove
-    print("Number of imageCLEF correct panels :", num_correct_imageclef)
-    print("Number of IoU correct panels :", num_correct_iou_thresh)
+    # print("Number of imageCLEF correct panels :", num_correct_imageclef)
+    # print("Number of IoU correct panels :", num_correct_iou_thresh)
 
     # ImageCLEF accuracy (based on overlap 0.66 threshold)
     k = max(len(figure.gt_subfigures), len(figure.detected_panels))

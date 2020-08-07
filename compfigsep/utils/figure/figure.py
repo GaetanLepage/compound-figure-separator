@@ -28,7 +28,7 @@ from __future__ import annotations
 import os
 import csv
 import logging
-from typing import cast, List, Dict
+from typing import cast, List, Dict, Set
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 
@@ -152,7 +152,8 @@ class Figure:
                                           for detected_subfigure_dict
                                           in figure_dict['detected_subfigures']]
 
-        figure.caption = figure_dict.get('caption')
+        if 'caption' in figure_dict:
+            figure.caption = figure_dict['caption']
 
         if 'detected_panels' in figure_dict:
             figure.detected_panels = [DetectedPanel.from_dict(panel_dict)
@@ -334,16 +335,18 @@ class Figure:
 
             for panel_item in panel_items:
                 text_item = panel_item.find('./BlockText/Text')
-                label_text = text_item.text
+                label_text: str = text_item.text
                 label_text = label_text.strip()
-                words = label_text.split(' ')
+                words: str = label_text.split(' ')
 
                 # Panels can only have 1 or 2 words:
                 # *) The first one is "panel"
                 # *) The second one is the label text
                 if len(words) > 2:
                     # The panel annotation is not valid. Skip it.
-                    self._logger.error(f"{annotation_file_path}: {label_text} is not correct")
+                    self._logger.error("%s: %s is not correct",
+                                       annotation_file_path,
+                                       label_text)
                     continue
 
                 # If the label text contains two words,
@@ -360,13 +363,14 @@ class Figure:
 
                 if x_max <= x_min or y_max <= y_min:
                     # TODO check what to do in this case
-                    self._logger.error(f"{annotation_file_path}: panel {label_text} rect is not"\
-                                        " correct!")
+                    self._logger.error("%s: panel %s rect is not correct!",
+                                       annotation_file_path,
+                                       label_text)
                     continue
 
                 # Create Panel object
-                panel_rect = (x_min, y_min, x_max, y_max)
-                panel = Panel(box=panel_rect)
+                panel_rect: box.Box = (x_min, y_min, x_max, y_max)
+                panel: Panel = Panel(box=panel_rect)
 
                 if label_text in panel_dict:
                     panel_dict[label_text].append(panel)
@@ -388,23 +392,26 @@ class Figure:
 
             for label_item in label_items:
                 text_item = label_item.find('./BlockText/Text')
-                label_text = text_item.text
+                label_text: str = text_item.text
                 label_text = label_text.strip()
-                words = label_text.split(' ')
+                words: str = label_text.split(' ')
 
                 # Labels can only have 2 words:
                 # *) The first one is "label"
                 # *) The second one is the label text
                 if len(words) != 2:
-                    self._logger.error(f"{annotation_file_path}: {label_text} is not correct")
+                    self._logger.error("%s: %s is not correct",
+                                       annotation_file_path,
+                                       label_text)
                     continue
                 label_text = words[1]
 
                 x_min, y_min, x_max, y_max = extract_bbox_from_iphotodraw_node(item=label_item)
 
                 if x_max <= x_min or y_max <= y_min:
-                    self._logger.error(f"{annotation_file_path}: label {label_text} rect is not"\
-                                        " correct!")
+                    self._logger.error("%s: label %s rect is not correct!",
+                                       annotation_file_path,
+                                       label_text)
                     continue
 
                 label_rect = (x_min, y_min, x_max, y_max)
@@ -449,17 +456,19 @@ class Figure:
             # Case where the figure has no labels.
             if len(label_dict) == 0:
                 if len(panel_dict) != 0:
-                    self._logger.error(f"{annotation_file_path}: Some panels have label"\
-                                       f" annotations ({panel_dict}) but there are no labels.")
+                    self._logger.error("%s: Some panels have label annotations (%s) but there"\
+                                       " are no labels.",
+                                       annotation_file_path,
+                                       panel_dict)
 
                 return subfigures
 
             # Case where the figure contains labels.
             # => Check that there are as many labeled panels as there are labels.
-            num_labeled_panels = sum(len(panels)
-                                     for panels in panel_dict.values())
-            num_labels = sum(len(labels)
-                             for labels in label_dict.values())
+            num_labeled_panels: int = sum(len(panels)
+                                          for panels in panel_dict.values())
+            num_labels: int = sum(len(labels)
+                                  for labels in label_dict.values())
 
             if num_labeled_panels != num_labels:
                 self._logger.error("%s has a different number of labeled"\
@@ -470,7 +479,7 @@ class Figure:
                 return subfigures
 
             # Collect all panel label characters.
-            label_texts = set(panel_dict.keys())
+            label_texts: Set = set(panel_dict.keys())
 
             # Assign labels to panels.
             for label_text in label_texts:
@@ -478,17 +487,20 @@ class Figure:
                 # (should be 1).
                 if len(panel_dict[label_text]) != len(label_dict[label_text]):
 
-                    self._logger.error(f"{annotation_file_path}: For label {label_text}, there"\
-                                        " is not the same number of panels"\
-                                       f" ({panel_dict[label_text]}) and labels"\
-                                       f" ({label_dict[label_dict]}) have same matching labels!")
+                    self._logger.error("%s: For label %s, there is not the same number of panels"\
+                                       " (%s) and labels (%s) have same matching labels!",
+                                       annotation_file_path,
+                                       label_text,
+                                       panel_dict[label_text],
+                                       label_dict[label_text])
                     continue
 
                 # Multiple panel/label pairs for the same label text.
                 if len(panel_dict[label_text]) > 1:
-                    self._logger.info(f"{annotation_file_path}: Multiple panels/labels with"\
-                                      f" same label {label_text}. Matching them with beam"\
-                                       " search.")
+                    self._logger.info("%s: Multiple panels/labels with same label %s."\
+                                      " Matching them with beam search.",
+                                      annotation_file_path,
+                                      label_text)
 
                     subfigures.extend(beam_search.assign_labels_to_panels(
                         panels=panel_dict[label_text],
@@ -516,19 +528,19 @@ class Figure:
 
 
         # Create element tree object.
-        tree = ET.parse(annotation_file_path)
+        tree: ET.ElementTree = ET.parse(annotation_file_path)
 
         # Get root element.
-        root = tree.getroot()
+        root: ET.Element = tree.getroot()
 
-        shape_items = root.findall('./Layers/Layer/Shapes/Shape')
+        shape_items: List[ET.Element] = root.findall('./Layers/Layer/Shapes/Shape')
 
         # Read All Items (Panels and Labels)
-        panel_items = []
-        label_items = []
+        panel_items: List[Panel] = []
+        label_items: List[Label] = []
         for shape_item in shape_items:
-            text_item = shape_item.find('./BlockText/Text')
-            text = text_item.text.lower()
+            text_item: ET.Element = shape_item.find('./BlockText/Text')
+            text: str = text_item.text.lower()
             if text.startswith('panel'):
                 panel_items.append(shape_item)
             elif text.startswith('label'):
@@ -624,7 +636,7 @@ class Figure:
 
     def match_detected_and_gt_panels_splitting_task(self,
                                                     iou_threshold: float = 0.5,
-                                                    overlap_threshold: float = 0.66):
+                                                    overlap_threshold: float = 0.66) -> None:
         """
         Match the detected panels with a ground truth one.
         The `self.detected_panels` attribute is modified by side effect.
@@ -654,8 +666,8 @@ class Figure:
             max_iou: float = -1
             max_overlap: float = -1
 
-            best_matching_gt_panel_iou_index = -1
-            best_matching_gt_panel_overlap_index = -1
+            best_matching_gt_panel_iou_index: int = -1
+            best_matching_gt_panel_overlap_index: int = -1
 
             for gt_panel_index, gt_subfigure in enumerate(self.gt_subfigures):
 
@@ -664,15 +676,15 @@ class Figure:
                 if gt_panel is None:
                     continue
 
-                intersection_area = box.intersection_area(gt_panel.box,
-                                                          detected_panel.box)
+                intersection_area: float = box.intersection_area(gt_panel.box,
+                                                                 detected_panel.box)
                 if intersection_area == 0:
                     continue
 
-                detected_panel_area = box.area(detected_panel.box)
+                detected_panel_area: float = box.area(detected_panel.box)
 
                 # --> Using ImageCLEF metric (overlap)
-                overlap = intersection_area / detected_panel_area
+                overlap: float = intersection_area / detected_panel_area
 
                 # Potential match
                 if overlap > max_overlap:
@@ -711,8 +723,7 @@ class Figure:
 
 
     def match_detected_and_gt_labels(self,
-                                     iou_threshold: float = 0.5
-                                     ) -> None:
+                                     iou_threshold: float = 0.5) -> None:
         """
         Match the detected labels with a ground truth one.
         The comparison criterion is the IoU which is maximized.
@@ -734,11 +745,12 @@ class Figure:
 
             for gt_label_index, gt_subfigure in enumerate(self.gt_subfigures):
 
-                gt_label = gt_subfigure.label
+                if gt_subfigure.label is not None:
+                    gt_label: Label = gt_subfigure.label
 
                 # TODO laverage the 'single-character label' restriction.
-                if gt_label is None\
-                    or gt_label.box is None\
+                if gt_label.box is None\
+                    or gt_label.text is None\
                     or len(gt_label.text) != 1:
 
                     continue
@@ -746,6 +758,8 @@ class Figure:
                 # If the label classes do not match, no need to compute the IoU.
                 if gt_label.text != detected_label.text:
                     continue
+
+                assert detected_label.box is not None
 
                 # Compute IoU between detection and ground truth.
                 iou = box.iou(gt_label.box, detected_label.box)
@@ -909,8 +923,9 @@ class Figure:
         ]
 
         # Automatically set mode to 'gt' if there is no detected elements.
-        if mode == 'both' and self.detected_subfigures is None and self.detected_panels is None\
-            and self.detected_labels is None:
+        if mode == 'both' and not hasattr(self, 'detected_subfigures') \
+                          and not hasattr(self, 'detected_panels') \
+                          and not hasattr(self, 'detected_labels'):
 
             mode = 'gt'
 
@@ -923,18 +938,18 @@ class Figure:
 
             # If this figure contains detected subfigures, they are considered to be
             # the relevant detections to display.
-            if self.detected_subfigures is not None:
+            if hasattr(self, 'detected_subfigure'):
 
                 for detected_subfigure in self.detected_subfigures:
                     detected_subfigure.draw_elements(image=preview_img)
 
             # Else, we display the available detected elements.
             else:
-                if self.detected_panels is not None:
+                if hasattr(self, 'detected_panels'):
                     for panel in self.detected_panels:
                         panel.draw(image=preview_img)
 
-                if self.detected_labels is not None:
+                if hasattr(self, 'detected_labels'):
                     for label in self.detected_labels:
                         label.draw(image=preview_img)
 

@@ -65,11 +65,13 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
         """
         super().__init__()
 
+        self.xml_annotation_file_path: str = xml_annotation_file_path
+
         # Open and parse the xml annotation file.
-        tree = ET.parse(xml_annotation_file_path)
+        tree: ET.ElementTree = ET.parse(xml_annotation_file_path)
 
         # Get root element.
-        root = tree.getroot()
+        root: ET.Element = tree.getroot()
 
         # Get the annotation data from the parsed xml.
         self.annotation_items = root.findall('./annotation')
@@ -83,7 +85,8 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
 
     def __copy__(self) -> ImageClefXmlFigureGenerator:
 
-        raise NotImplementedError()
+        return ImageClefXmlFigureGenerator(xml_annotation_file_path=self.xml_annotation_file_path,
+                                           image_directory_path=self.image_directory_path)
 
 
     def __call__(self) -> Iterable[Figure]:

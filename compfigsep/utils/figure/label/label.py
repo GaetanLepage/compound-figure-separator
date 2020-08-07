@@ -24,7 +24,7 @@ Classes Label and DetectedLabel.
 """
 
 from __future__ import annotations
-from typing import cast, Tuple, Dict
+from typing import cast, Tuple, Dict, Optional
 
 import cv2 # type: ignore
 import numpy as np # type: ignore
@@ -168,8 +168,8 @@ class DetectedLabel(Label):
         super().__init__(text=text,
                          box=box)
 
-        self.detection_score = detection_score
-        self.is_true_positive = None
+        self.detection_score: Optional[float] = detection_score
+        self.is_true_positive: bool = False
 
 
     @classmethod
@@ -210,7 +210,8 @@ class DetectedLabel(Label):
                                        box=label_dict.get('box'),
                                        detection_score=label_dict.get('detection_score'))
 
-        detected_label.is_true_positive = label_dict.get('is_true_positive')
+        if 'is_true_positive' in label_dict:
+            detected_label.is_true_positive = label_dict['is_true_positive']
 
         return detected_label
 
@@ -224,7 +225,7 @@ class DetectedLabel(Label):
         """
 
         # Call the method form Panel class.
-        output_dict = super().to_dict()
+        output_dict: Dict = super().to_dict()
 
         if self.box is not None:
             output_dict['box'] = self.box

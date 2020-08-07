@@ -28,6 +28,7 @@ This scripts reads a given config file and runs the training or evaluation.
 """
 
 import os
+from argparse import ArgumentParser, Namespace
 from typing import List
 
 import detectron2.utils.comm as comm
@@ -103,12 +104,12 @@ class Trainer(DefaultTrainer):
 
 
 
-def setup(args: List[str]) -> CfgNode:
+def setup(parsed_args: Namespace) -> CfgNode:
     """
     Create configs and perform basic setups.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        args (Namespace):   Arguments from the command line.
 
     Retuns:
         cfg (CfgNode):  A config node filled with necessary options.
@@ -118,10 +119,10 @@ def setup(args: List[str]) -> CfgNode:
     # Add some config options to handle validation
     add_validation_config(cfg)
 
-    cfg.merge_from_file(args.config_file)
-    cfg.merge_from_list(args.opts)
+    cfg.merge_from_file(parsed_args.config_file)
+    cfg.merge_from_list(parsed_args.opts)
     cfg.freeze()
-    default_setup(cfg, args)
+    default_setup(cfg, parsed_args)
     return cfg
 
 
@@ -145,24 +146,24 @@ def register_datasets(cfg: CfgNode):
         register_panel_splitting_dataset(dataset_name=cfg.DATASETS.VALIDATION)
 
 
-def main(args: List[str]) -> dict:
+def main(parsed_args: Namespace) -> dict:
     """
     Launch training/testing for the panel splitting task on a single device.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        parsed_args (Namespace):    Arguments from the command line.
 
     Returns:
         If training:    OrderedDict of results, if evaluation is enabled. Otherwise None.
         If test:    A dict of result metrics.
     """
-    cfg = setup(args)
+    cfg = setup(parsed_args)
 
     # Register the needed datasets
     register_datasets(cfg)
 
     # Inference only (testing)
-    if args.eval_only:
+    if parsed_args.eval_only:
 
         # Load the model
         model = Trainer.build_model(cfg)
@@ -170,7 +171,7 @@ def main(args: List[str]) -> dict:
         # Load the latest weights
         DetectionCheckpointer(model,
                               save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS,
-                                                                      resume=args.resume)
+                                                                      resume=parsed_args.resume)
         res = Trainer.test(cfg, model)
         if comm.is_main_process():
             verify_results(cfg, res)
@@ -178,18 +179,18 @@ def main(args: List[str]) -> dict:
 
     # Training
     trainer = Trainer(cfg)
-    trainer.resume_or_load(resume=args.resume)
+    trainer.resume_or_load(resume=parsed_args.resume)
     return trainer.train()
 
 
 if __name__ == "__main__":
-    parser = default_argument_parser()
+    parser: ArgumentParser = default_argument_parser()
 
-    args = parser.parse_args()
-    print("Command Line Args:", args)
+    parsed_args: Namespace = parser.parse_args()
+
     launch(main,
-           args.num_gpus,
-           num_machines=args.num_machines,
-           machine_rank=args.machine_rank,
-           dist_url=args.dist_url,
-           args=(args,))
+           parsed_args.num_gpus,
+           num_machines=parsed_args.num_machines,
+           machine_rank=parsed_args.machine_rank,
+           dist_url=parsed_args.dist_url,
+           args=(parsed_args,))

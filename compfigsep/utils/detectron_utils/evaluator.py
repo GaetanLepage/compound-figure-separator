@@ -25,20 +25,23 @@ Definition of a meta-evaluator for the panel segmentation tasks.
 
 import os
 import logging
-from typing import Optional, List, Dict, Callable, Iterable
+from typing import Optional, List, Dict, Callable
 from collections import defaultdict, OrderedDict
 from pprint import pprint
-import torch
+from copy import copy
 
+import torch
 from detectron2.data import MetadataCatalog # type: ignore
 from detectron2.evaluation.evaluator import DatasetEvaluator # type: ignore
 from detectron2.utils import comm # type: ignore
 
 import compfigsep
-from ..figure.figure import Figure
+from ..figure import Figure
+from ...data.figure_generators import FigureGenerator, StackedFigureGenerator
 from ...data.export import export_figures_to_json
 
 MODULE_DIR = os.path.dirname(compfigsep.__file__)
+
 
 class PanelSegAbstractEvaluator(DatasetEvaluator):
     """
@@ -63,8 +66,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
                  task_name: str,
                  evaluation_function: Callable = None,
                  export: bool = True,
-                 export_dir: str = None
-                 ) -> None:
+                 export_dir: str = None) -> None:
         """
         Init function.
 
@@ -113,8 +115,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
     def process(self,
                 inputs: List[dict],
-                outputs: List[dict]
-                ) -> None:
+                outputs: List[dict]) -> None:
         """
         Process the pair of inputs and outputs.
         If they contain batches, the pairs can be consumed one-by-one using `zip`:
@@ -128,8 +129,18 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         raise NotImplementedError("This method should be implmented in each subclass.")
 
 
-    def _augmented_figure_generator(self,
-                                    predictions: dict) -> Iterable[Figure]:
+    def _predict(self, figure: Figure) -> None:
+        """
+        TODO
+
+        Args:
+            figure (Figure):    TODO.
+        """
+        raise NotImplementedError("This method should be implmented in each subclass.")
+
+
+
+    def _augmented_figure_generator(self) -> FigureGenerator:
         """
         Iterate over a Figure generator, process raw predictions and yield back the augmented
         Figure objects.
@@ -137,12 +148,14 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         This method is abstract and has to be implemented.
 
         Args:
-            predictions (dict): The dict containing the predictions from the model.
+            predictions (Dict): The dict containing the predictions from the model.
 
         Yields:
-            figure (Figure): Figure objects augmented with predictions.
+            figure_generator (FigureGenerator): FigureGenerator yielding Figure objects augmented
+                                                    with predictions.
         """
-        raise NotImplementedError("This method is abstract and needs to be implemented.")
+        return StackedFigureGenerator(base_figure_generator=self._figure_generator,
+                                      function=self._predict)
 
 
     def evaluate(self) -> Optional[Dict[str, Dict[str, int]]]:
@@ -168,14 +181,16 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
                 predictions[clsid] = lines
         del all_predictions
 
+        self._predictions = predictions
+
         # Evaluate the metrics on the predictions.
         metrics_dict = self._evaluation_function(
-            figure_generator=self._augmented_figure_generator(predictions))\
+            figure_generator=copy(self._augmented_figure_generator()))\
                 if self._evaluation_function is not None else None
 
         # Export predictions and gt in a single JSON file
         if self.export:
-            export_figures_to_json(figure_generator=self._augmented_figure_generator(predictions),
+            export_figures_to_json(figure_generator=self._augmented_figure_generator(),
                                    json_output_directory=self.export_dir)
 
         # Print the results

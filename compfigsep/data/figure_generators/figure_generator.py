@@ -27,9 +27,9 @@ from __future__ import annotations
 import os
 from abc import ABC, abstractmethod
 from typing import Iterable, Callable
+import copy
 
 import compfigsep
-import copy
 
 from ...utils.figure.figure import Figure
 
@@ -62,6 +62,13 @@ class FigureGenerator(ABC):
         """
         raise NotImplementedError('This method has to be implemented for each subclass.')
 
+
+    def run(self) -> None:
+        """
+        TODO
+        """
+        for _ in self():
+            continue
 
 
     @abstractmethod
