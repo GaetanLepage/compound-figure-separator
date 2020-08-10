@@ -324,28 +324,33 @@ class LabelRecogRetinaNet(nn.Module):
                                                                  List[Tensor]]:
         """
         Args:
-            anchors (list[Boxes]): A list of #feature level Boxes.
-                The Boxes contains anchors of this image on the specific feature level.
-            targets (list[Instances]): a list of N `Instances`s. The i-th
-                `Instances` contains the ground-truth per-instance annotations
-                for the i-th input image.  Specify `targets` during training only.
+            anchors (List[Boxes]):      A list of #feature level Boxes.
+                                            The Boxes contains anchors of this image on the
+                                            specific feature level.
+            targets (list[Instances]):  A list of N `Instances`s.
+                                            The i-th `Instances` contains the ground-truth
+                                            per-instance annotations for the i-th input image.
+                                            Specify `targets` during training only.
 
         Returns:
-            gt_classes (Tensor):
-                An integer tensor of shape (N, R) storing ground-truth
-                labels for each anchor.
-                R is the total number of anchors, i.e. the sum of Hi x Wi x A for all levels.
-                Anchors with an IoU with some target higher than the foreground threshold
-                are assigned their corresponding label in the [0, K-1] range.
-                Anchors whose IoU are below the background threshold are assigned
-                the label "K". Anchors whose IoU are between the foreground and background
-                thresholds are assigned a label "-1", i.e. ignore.
-            gt_anchors_deltas (Tensor):
-                Shape (N, R, 4).
-                The last dimension represents ground-truth box2box transform
-                targets (dx, dy, dw, dh) that map each anchor to its matched ground-truth box.
-                The values in the tensor are meaningful only when the corresponding
-                anchor is labeled as foreground.
+            gt_classes (Tensor):        An integer tensor of shape (N, R) storing ground-truth
+                                            labels for each anchor.
+                                            R is the total number of anchors, i.e. the sum of
+                                            Hi x Wi x A for all levels.
+                                            Anchors with an IoU with some target higher than the
+                                            foreground threshold are assigned their corresponding
+                                            label in the [0, K-1] range. Anchors whose IoU are
+                                            below the background threshold are assigned the label
+                                            "K".
+                                            Anchors whose IoU are between the foreground and
+                                            background thresholds are assigned a label "-1", i.e.
+                                            ignore.
+            gt_anchors_deltas (Tensor): Shape (N, R, 4).
+                                            The last dimension represents ground-truth box2box
+                                            transform targets (dx, dy, dw, dh) that map each
+                                            anchor to its matched ground-truth box.
+                                            The values in the tensor are meaningful only when the
+                                            corresponding anchor is labeled as foreground.
         """
         anchors_boxes: Boxes = Boxes.cat(anchors)
 
@@ -387,14 +392,15 @@ class LabelRecogRetinaNet(nn.Module):
                   pred_anchor_deltas: List[Tensor],
                   image_sizes: List[torch.Size]) -> List[Instances]:
         """
-        Arguments:
-            box_cls, box_delta: Same as the output of :meth:`RetinaNetHead.forward`
-            anchors (list[Boxes]): A list of #feature level Boxes.
-                The Boxes contain anchors of this image on the specific feature level.
-            image_sizes (List[torch.Size]): the input image sizes
+        Args:
+            box_cls, box_delta:             Same as the output of :meth:`RetinaNetHead.forward`
+            anchors (list[Boxes]):          A list of #feature level Boxes.
+                                                The Boxes contain anchors of this image on the
+                                                specific feature level.
+            image_sizes (List[torch.Size]): The input image sizes
 
         Returns:
-            results (List[Instances]): a list of #images elements.
+            results (List[Instances]):  A list of #images elements.
         """
         results: List[Instances] = []
 
@@ -414,19 +420,19 @@ class LabelRecogRetinaNet(nn.Module):
                                 anchors: List[Boxes],
                                 box_cls: List[Tensor],
                                 box_delta: List[Tensor],
-                                image_size: Tuple[int, int]):
+                                image_size: Tuple[int, int]) -> Instances:
         """
         Single-image inference. Return bounding-box detection results by thresholding
         on scores and applying non-maximum suppression (NMS).
 
-        Arguments:
-            box_cls (list[Tensor]): list of #feature levels. Each entry contains
-                tensor of size (H x W x A, K)
-            box_delta (list[Tensor]): Same shape as 'box_cls' except that K becomes 4.
-            anchors (list[Boxes]): list of #feature levels. Each entry contains
-                a Boxes object, which contains all the anchors for that
-                image in that feature level.
-            image_size (tuple(H, W)): a tuple of the image height and width.
+        Args:
+            box_cls (list[Tensor]):     List of #feature levels. Each entry contains tensor of
+                                            size (H x W x A, K).
+            box_delta (list[Tensor]):   Same shape as 'box_cls' except that K becomes 4.
+            anchors (list[Boxes]):      List of #feature levels. Each entry contains a Boxes
+                                            object, which contains all the anchors for that image
+                                            in that feature level.
+            image_size (tuple(H, W)):   A tuple of the image height and width.
 
         Returns:
             Same as `inference`, but for only one image.
@@ -490,9 +496,16 @@ class LabelRecogRetinaNet(nn.Module):
         return result
 
 
-    def preprocess_image(self, batched_inputs):
+    def preprocess_image(self,
+                         batched_inputs: List[Dict[str, Any]]) -> ImageList:
         """
         Normalize, pad and batch the input images.
+
+        Args:
+            batched_inputs (List[Dict[str ,Any]]):  TODO.
+
+        Returns:
+            images (ImageList): TODO.
         """
         images = [x["image"].to(self.device) for x in batched_inputs]
         images = [(x - self.pixel_mean) / self.pixel_std for x in images]

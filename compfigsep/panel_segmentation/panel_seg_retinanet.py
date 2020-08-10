@@ -24,7 +24,7 @@ Custom model derived from RetinaNet to achieve panel segmentation.
 """
 
 import math
-from typing import cast, List, Tuple, Dict, Any
+from typing import cast, List, Tuple, Dict, Any, Union
 import torch
 from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss # type: ignore
 from torch import nn, Tensor
@@ -62,32 +62,33 @@ def build_fpn_backbones(cfg: CfgNode,
         input_shape (ShapeSpec):    The input shape of the backbone.
 
     Returns:
-        backbone (Backbone):    backbone module, must be a subclass of :class:`Backbone`.
+        backbone (Backbone):    Backbone module, must be a subclass of :class:`Backbone`.
     """
     # Build the feature extractor (Resnet 50)
-    bottom_up = build_resnet_backbone(cfg, input_shape)
+    bottom_up: nn.Module = build_resnet_backbone(cfg, input_shape)
 
     # Panel FPN
-    panel_in_features = cfg.MODEL.PANEL_FPN.IN_FEATURES
-    panel_out_channels = cfg.MODEL.PANEL_FPN.OUT_CHANNELS
-    in_channels_p6p7 = bottom_up.output_shape()["res5"].channels
-    panel_fpn = FPN(bottom_up=bottom_up,
-                    in_features=panel_in_features,
-                    out_channels=panel_out_channels,
-                    norm=cfg.MODEL.FPN.NORM,
-                    top_block=LastLevelP6P7(in_channels_p6p7, panel_out_channels),
-                    fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
+    panel_in_features: List[str] = cfg.MODEL.PANEL_FPN.IN_FEATURES
+    panel_out_channels: List[str] = cfg.MODEL.PANEL_FPN.OUT_CHANNELS
+    in_channels_p6p7 = bottom_up.output_shape()['res5'].channels
+    panel_fpn: nn.Module = FPN(bottom_up=bottom_up,
+                               in_features=panel_in_features,
+                               out_channels=panel_out_channels,
+                               norm=cfg.MODEL.FPN.NORM,
+                               top_block=LastLevelP6P7(in_channels_p6p7,
+                                                       panel_out_channels),
+                               fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
 
 
     # Label FPN
-    label_in_features = cfg.MODEL.LABEL_FPN.IN_FEATURES
-    label_out_channels = cfg.MODEL.LABEL_FPN.OUT_CHANNELS
-    label_fpn = FPN(bottom_up=bottom_up,
-                    in_features=label_in_features,
-                    out_channels=label_out_channels,
-                    norm=cfg.MODEL.FPN.NORM,
-                    top_block=None,
-                    fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
+    label_in_features: List[str] = cfg.MODEL.LABEL_FPN.IN_FEATURES
+    label_out_channels: List[str] = cfg.MODEL.LABEL_FPN.OUT_CHANNELS
+    label_fpn: nn.Module = FPN(bottom_up=bottom_up,
+                               in_features=label_in_features,
+                               out_channels=label_out_channels,
+                               norm=cfg.MODEL.FPN.NORM,
+                               top_block=None,
+                               fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
 
     return panel_fpn, label_fpn
 
@@ -154,16 +155,17 @@ class PanelSegRetinaNet(nn.Module):
         panel_feature_shapes: List[ShapeSpec] = [panel_backbone_fpn_output_shape[f]
                                                  for f in self.panel_in_features]
 
-        self.panel_anchor_generator = DefaultAnchorGenerator(
+        self.panel_anchor_generator: DefaultAnchorGenerator = DefaultAnchorGenerator(
             sizes=cfg.MODEL.PANEL_ANCHOR_GENERATOR.SIZES,
             aspect_ratios=cfg.MODEL.PANEL_ANCHOR_GENERATOR.ASPECT_RATIOS,
             strides=[x.stride for x in panel_feature_shapes],
             offset=cfg.MODEL.ANCHOR_GENERATOR.OFFSET)
 
-        self.panel_head = RetinaNetHead(cfg,
-                                        input_shape=panel_feature_shapes,
-                                        num_classes=1,
-                                        num_anchors=self.panel_anchor_generator.num_cell_anchors)
+        self.panel_head: RetinaNetHead = RetinaNetHead(
+            cfg,
+            input_shape=panel_feature_shapes,
+            num_classes=1,
+            num_anchors=self.panel_anchor_generator.num_cell_anchors)
 
 
         # Label
@@ -171,7 +173,7 @@ class PanelSegRetinaNet(nn.Module):
         label_feature_shapes: List[ShapeSpec] = [label_backbone_fpn_output_shape[f]
                                                  for f in self.label_in_features]
 
-        self.label_anchor_generator = DefaultAnchorGenerator(
+        self.label_anchor_generator: DefaultAnchorGenerator = DefaultAnchorGenerator(
             sizes=cfg.MODEL.LABEL_ANCHOR_GENERATOR.SIZES,
             aspect_ratios=cfg.MODEL.LABEL_ANCHOR_GENERATOR.ASPECT_RATIOS,
             strides=[x.stride for x in label_feature_shapes],
@@ -216,7 +218,8 @@ class PanelSegRetinaNet(nn.Module):
         return self.pixel_mean.device
 
 
-    def forward(self, batched_inputs: List[dict]) -> Dict[str, Any]:
+    def forward(self, batched_inputs: List[dict]) -> Union[Dict[str, Any],
+                                                           List[Dict[str, Instances]]]:
         """
         Args:
             batched_inputs (List[dict]):
@@ -245,11 +248,10 @@ class PanelSegRetinaNet(nn.Module):
         panel_anchors: List[Boxes] = self.panel_anchor_generator(panel_features)
         panel_pred_logits, panel_pred_anchor_deltas = self.panel_head(panel_features)
         # Transpose the Hi*Wi*A dimension to the middle:
-        panel_pred_logits = [permute_to_N_HWA_K(x,
-                                                K=1)
+        panel_pred_logits = [permute_to_N_HWA_K(x, K=1)
                              for x in panel_pred_logits]
-        panel_pred_anchor_deltas = [permute_to_N_HWA_K(x,
-                                                       K=4)
+
+        panel_pred_anchor_deltas = [permute_to_N_HWA_K(x, K=4)
                                     for x in panel_pred_anchor_deltas]
 
         # detected labels
@@ -259,9 +261,10 @@ class PanelSegRetinaNet(nn.Module):
         label_anchors: List[Boxes] = self.label_anchor_generator(label_features)
         label_pred_logits, label_pred_anchor_deltas = self.label_head(label_features)
         # Transpose the Hi*Wi*A dimension to the middle:
-        label_pred_logits = [permute_to_N_HWA_K(x,
-        label_pred_anchor_deltas = [permute_to_N_HWA_K(x,
-                                                       K=4)
+        label_pred_logits = [permute_to_N_HWA_K(x, K=self.num_label_classes)
+                             for x in label_pred_logits]
+
+        label_pred_anchor_deltas = [permute_to_N_HWA_K(x, K=4)
                                     for x in label_pred_anchor_deltas]
 
         # Training
@@ -270,6 +273,7 @@ class PanelSegRetinaNet(nn.Module):
             # Panels
             panel_gt_instances = [x['panel_instances'].to(self.device)
                                   for x in batched_inputs]
+
             panel_gt_classes, panel_gt_boxes = self.get_ground_truth(
                 anchors=panel_anchors,
                 gt_instances=panel_gt_instances,
@@ -321,7 +325,7 @@ class PanelSegRetinaNet(nn.Module):
             label_pred_anchor_deltas=label_pred_anchor_deltas,
             image_sizes=images.image_sizes)
 
-        processed_results = []
+        processed_results: List[Dict[str, Instances]] = []
 
         for inference_results, input_per_image, image_size in zip(
                 batched_inference_results,
@@ -347,7 +351,9 @@ class PanelSegRetinaNet(nn.Module):
             panel_output_boxes.clip(panel_results.image_size)
 
             # 2) Labels
-            label_results = Instances((height, width), **label_results.get_fields())
+            label_results = Instances((height,
+                                       width),
+                                      **label_results.get_fields())
 
             # Clip and scale boxes
             label_output_boxes = label_results.pred_boxes
