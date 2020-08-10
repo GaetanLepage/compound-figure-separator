@@ -23,16 +23,19 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import Tuple, Dict, Iterable, Any
+from typing import Tuple, Dict, List, Iterable, Any
+from pprint import pprint
+
 from sortedcontainers import SortedKeyList # type: ignore
 import numpy as np # type: ignore
 
 from ..utils.figure import Figure
+from ..utils.figure.label import Label
 from ..utils.average_precision import compute_average_precision
 
 
 def label_recognition_figure_eval(figure: Figure,
-                                  stat_dict: Dict[str, Any]):
+                                  stat_dict: Dict[str, Any]) -> None:
     """
     Evaluate label recognition metrics on a single figure.
 
@@ -41,21 +44,23 @@ def label_recognition_figure_eval(figure: Figure,
         stat_dict (Dict[str, any]): A dict containing label recognition evaluation stats
                                         It will be updated by this function.
     """
-    # TODO make sure panels have been set correctly
     # Perform matching on this figure
     # This tests whether a detected label is true positive or false positive
     figure.match_detected_and_gt_labels()
 
     # TODO remove
-    num_gt_labels = 0
+    num_gt_labels: int = 0
 
     # Keep track of the number of gt labels for each class
     for gt_subfigure in figure.gt_subfigures:
 
-        gt_label = gt_subfigure.label
+        if gt_subfigure.label is None:
+            continue
+
+        gt_label: Label = gt_subfigure.label
 
         # Drop useless panels for this task
-        if gt_label is None or gt_label.box is None or len(gt_label.text) != 1:
+        if gt_label.box is None or gt_label.text is None or len(gt_label.text) != 1:
             continue
 
         # TODO remove
@@ -95,7 +100,7 @@ def label_recognition_figure_eval(figure: Figure,
     stat_dict['overall_correct_count'] += num_correct
 
 
-def multi_class_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
+def multi_class_metrics(stat_dict: Dict[str, Any]) -> Tuple[float, float, float]:
     """
     Compute the metrics for a multi class detection task.
     Used for both label recognition and panel segmentation tasks
@@ -105,50 +110,53 @@ def multi_class_metrics(stat_dict: Dict[str, any]) -> Tuple[int, int, int]:
                                         detections.
 
     Returns:
-        precision (int):    Precision value (TP / TP + FN).
-        recall (int):       Recall value (TP / TP + FN).
-        mAP (int):          Mean average precision value.
+        precision (float):  Precision value (TP / TP + FN).
+        recall (float):     Recall value (TP / TP + FN).
+        mAP (float):        Mean average precision value.
     """
 
     # 1) overall recall = TP / TP + FN
-    recall = stat_dict['overall_correct_count'] / stat_dict['overall_gt_count']
+    recall: float = stat_dict['overall_correct_count'] / stat_dict['overall_gt_count']
     # 2) overall precision = TP / TP + FP
-    precision = stat_dict['overall_correct_count'] / stat_dict['overall_detected_count']
+    precision: float = stat_dict['overall_correct_count'] / stat_dict['overall_detected_count']
 
     # 3) mean average precision (mAP)
     # Computation of mAP is done class wise
-    mAP = 0
+    mean_average_precision: float = 0
     for cls in stat_dict['detections_by_class']:
 
         # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
-        class_true_positives = [np.float(is_positive)
-                                for _, is_positive in stat_dict['detections_by_class'][cls]]
+        class_true_positives: List[np.float] = [np.float(is_positive)
+                                                for _, is_positive
+                                                in stat_dict['detections_by_class'][cls]]
 
-        class_detected_count = len(stat_dict['detections_by_class'][cls])
+        class_detected_count: int = len(stat_dict['detections_by_class'][cls])
         class_gt_count = stat_dict['gt_count_by_class'][cls] \
             if cls in stat_dict['gt_count_by_class'] else 0
 
-        class_cumsum_true_positives = np.cumsum(class_true_positives)
+        class_cumsum_true_positives: np.array = np.cumsum(class_true_positives)
 
         # cumulated_recalls
         if class_gt_count == 0:
-            class_cumulated_recalls = np.zeros(shape=(class_detected_count,))
+            class_cumulated_recalls: np.array = np.zeros(shape=(class_detected_count,))
         else:
             class_cumulated_recalls = class_cumsum_true_positives / class_gt_count
 
         # = cumsum(TP + FP)
-        class_cumsum_detections = np.arange(1, class_detected_count + 1)
-        class_cumulated_precisions = class_cumsum_true_positives / class_cumsum_detections
+        class_cumsum_detections: np.array = np.arange(1, class_detected_count + 1)
+        class_cumulated_precisions: np.array = \
+            class_cumsum_true_positives / class_cumsum_detections
 
         # Add the AP score to the overall mAP total
-        mAP += compute_average_precision(recall=class_cumulated_recalls,
-                                         precision=class_cumulated_precisions)
+        mean_average_precision += compute_average_precision(
+            recall=class_cumulated_recalls,
+            precision=class_cumulated_precisions)
 
 
     # normalize mAP by the number of classes
-    mAP /= len(stat_dict['detections_by_class'])
+    mean_average_precision /= len(stat_dict['detections_by_class'])
 
-    return precision, recall, mAP
+    return precision, recall, mean_average_precision
 
 
 def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
@@ -181,14 +189,12 @@ def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
 
     precision, recall, mean_average_precision = multi_class_metrics(stats['label_recognition'])
 
-    print(f"Precision: {precision:.3f}\n"\
-          f"Recall: {recall:.3f}\n"\
-          f"mAP (IoU threshold = 0.5): {mean_average_precision:.3f}")
-
     metrics = {
         'precision': precision,
         'recall': recall,
         'mAP': mean_average_precision
     }
+
+    pprint(metrics)
 
     return metrics

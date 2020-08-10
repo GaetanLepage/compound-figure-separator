@@ -61,8 +61,8 @@ def label_identification(caption: str) -> Dict:
     }
 
     # Detect alphanumerical labels.
-    characters_raw = regex_definitions.RE_CHARACTERS.findall(caption)
-    characters_cleaned = []
+    characters_raw: List[str] = regex_definitions.RE_CHARACTERS.findall(caption)
+    characters_cleaned: List[str] = []
     if characters_raw:
         # Get the list of alphanumerical labels.
         characters_list = []
@@ -83,7 +83,7 @@ def label_identification(caption: str) -> Dict:
 
 
     # Detect roman numbers.
-    romans_raw = regex_definitions.RE_ROMAN.findall(caption)
+    romans_raw: List[str] = regex_definitions.RE_ROMAN.findall(caption)
     romans_cleaned: List[str] = []
     if romans_raw:
         # Get the list of roman labels.
@@ -109,14 +109,15 @@ def label_identification(caption: str) -> Dict:
 
 
     # Detect numerical labels.
-    digits_raw = regex_definitions.RE_DIGITS.findall(caption)
+    digits_raw: List[str] = regex_definitions.RE_DIGITS.findall(caption)
     digits_cleaned: List[str] = []
     if digits_raw:
-        # get the list of numerical labels
+        # Get the list of numerical labels.
         digits_list = []
         for raw in digits_raw:
             digits_list.append(raw[0])
-        # clean the list
+
+        # Clean the list.
         for element in digits_list:
             digits_cleaned.append(re.sub(pattern=r'[().:]',
                                          repl='',
