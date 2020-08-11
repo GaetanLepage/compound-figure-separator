@@ -29,7 +29,7 @@ import math
 from typing import List, Dict, Tuple, Any
 import numpy as np # type: ignore
 import torch
-from torch import nn, Tensor
+from torch import nn, Tensor, LongTensor
 from torch.nn import functional as F
 from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss # type: ignore
 
@@ -119,68 +119,31 @@ class LabelRecogRetinaNet(nn.Module):
         self.anchor_generator: nn.Module = build_anchor_generator(cfg, feature_shapes)
 
         # Matching and loss
-        self.box2box_transform = Box2BoxTransform(weights=cfg.MODEL.RPN.BBOX_REG_WEIGHTS)
-        self.anchor_matcher = Matcher(cfg.MODEL.RETINANET.IOU_THRESHOLDS,
-                                      cfg.MODEL.RETINANET.IOU_LABELS,
-                                      allow_low_quality_matches=True)
+        self.box2box_transform: Box2BoxTransform = Box2BoxTransform(
+            weights=cfg.MODEL.RPN.BBOX_REG_WEIGHTS)
+
+        self.anchor_matcher: Matcher = Matcher(
+            thresholds=cfg.MODEL.RETINANET.IOU_THRESHOLDS,
+            labels=cfg.MODEL.RETINANET.IOU_LABELS,
+            allow_low_quality_matches=True)
 
         self.register_buffer("pixel_mean",
                              torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
         self.register_buffer("pixel_std",
                              torch.Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1))
 
-        """
-        In Detectron1, loss is normalized by number of foreground samples in the batch.
-        When batch size is 1 per GPU, #foreground has a large variance and
-        using it lead to lower performance. Here we maintain an EMA of #foreground to
-        stabilize the normalizer.
-        """
-        self.loss_normalizer: float = 100  # initialize with any reasonable #fg that's not too small
-        self.loss_normalizer_momentum = 0.9
+        # In Detectron1, loss is normalized by number of foreground samples in the batch.
+        # When batch size is 1 per GPU, #foreground has a large variance and
+        # using it lead to lower performance. Here we maintain an EMA of #foreground to
+        # stabilize the normalizer.
+
+        # Initialize with any reasonable #fg that's not too small
+        self.loss_normalizer: float = 100
+        self.loss_normalizer_momentum: float = 0.9
 
     @property
-    def device(self):
+    def device(self) -> torch.device:
         return self.pixel_mean.device
-
-
-    def visualize_training(self, batched_inputs, results):
-        """
-        A function used to visualize ground truth images and final network predictions.
-        It shows ground truth bounding boxes on the original image and up to 20
-        predicted object bounding boxes on the original image.
-
-        Args:
-            batched_inputs (list): a list that contains input to the model.
-            results (List[Instances]): a list of #images elements.
-        """
-        from detectron2.utils.visualizer import Visualizer
-
-        assert len(batched_inputs) == len(results), "Cannot visualize inputs and results of"\
-                                                    " different sizes"
-        storage = get_event_storage()
-        max_boxes = 20
-
-        image_index = 0  # only visualize a single image
-        img = batched_inputs[image_index]["image"].cpu().numpy()
-        assert img.shape[0] == 3, "Images should have 3 channels."
-        if self.input_format == "BGR":
-            img = img[::-1, :, :]
-        img = img.transpose(1, 2, 0)
-        v_gt = Visualizer(img, None)
-        v_gt = v_gt.overlay_instances(boxes=batched_inputs[image_index]["instances"].gt_boxes)
-        anno_img = v_gt.get_image()
-        processed_results = detector_postprocess(results[image_index],
-                                                 img.shape[0],
-                                                 img.shape[1])
-        predicted_boxes = processed_results.pred_boxes.tensor.detach().cpu().numpy()
-
-        v_pred = Visualizer(img, None)
-        v_pred = v_pred.overlay_instances(boxes=predicted_boxes[0:max_boxes])
-        prop_img = v_pred.get_image()
-        vis_img = np.vstack((anno_img, prop_img))
-        vis_img = vis_img.transpose(2, 0, 1)
-        vis_name = f"Top: GT bounding boxes; Bottom: {max_boxes} Highest Scoring Results"
-        storage.put_image(vis_name, vis_img)
 
 
     def forward(self, batched_inputs: List[dict]) -> Dict[str, Any]:
@@ -199,8 +162,8 @@ class LabelRecogRetinaNet(nn.Module):
                   See :meth:`postprocess` for details.
 
         Returns:
-            dict[str: Tensor]:  mapping from a named loss to a tensor storing the loss. Used during
-                                    training only.
+            dict[str: Tensor]:  Mapping from a named loss to a tensor storing the loss.
+                                    Used during training only.
         """
         images: ImageList = self.preprocess_image(batched_inputs)
 
@@ -234,7 +197,8 @@ class LabelRecogRetinaNet(nn.Module):
                                  pred_logits=pred_logits,
                                  pred_anchor_deltas=pred_anchor_deltas,
                                  image_sizes=images.image_sizes)
-        processed_results = []
+
+        processed_results: List[Dict[str, Any]] = []
         for results_per_image, input_per_image, image_size in zip(results,
                                                                   batched_inputs,
                                                                   images.image_sizes):
@@ -267,15 +231,6 @@ class LabelRecogRetinaNet(nn.Module):
                 storing the loss. Used during training only. The dict keys are:
                 "loss_cls" and "loss_box_reg"
         """
-        # pred_class_logits, pred_anchor_deltas = permute_all_cls_and_box_to_N_HWA_K_and_concat(
-            # pred_class_logits,
-            # pred_anchor_deltas,
-            # self.num_classes)
-        # # Shapes: (N x R, K) and (N x R, 4), respectively.
-
-        # gt_classes = gt_classes.flatten()
-        # gt_anchors_deltas = gt_anchors_deltas.view(-1, 4)
-
         num_images: int = len(gt_classes)
 
         # shape(gt_classes) = (N, R)
@@ -298,8 +253,8 @@ class LabelRecogRetinaNet(nn.Module):
 
         # classification and regression loss
         # no loss for the last (background) class --> [:, :-1]
-        gt_classes_target = F.one_hot(gt_classes_tensor[valid_mask],
-                                      num_classes=self.num_classes + 1)[:, :-1]
+        gt_classes_target: LongTensor = F.one_hot(gt_classes_tensor[valid_mask],
+                                                  num_classes=self.num_classes + 1)[:, :-1]
 
         # logits loss
         loss_cls = sigmoid_focal_loss_jit(inputs=cat(pred_logits, dim=1)[valid_mask],
@@ -507,8 +462,12 @@ class LabelRecogRetinaNet(nn.Module):
         Returns:
             images (ImageList): TODO.
         """
-        images = [x["image"].to(self.device) for x in batched_inputs]
-        images = [(x - self.pixel_mean) / self.pixel_std for x in images]
+        images = [x["image"].to(self.device)
+                  for x in batched_inputs]
+
+        images = [(x - self.pixel_mean) / self.pixel_std
+                  for x in images]
+
         images = ImageList.from_tensors(images, self.fpn.size_divisibility)
         return images
 
@@ -520,18 +479,21 @@ class RetinaNetHead(nn.Module):
     It has two subnets for the two tasks, with a common structure but separate parameters.
     """
 
-    def __init__(self, cfg, input_shape: List[ShapeSpec]):
+    def __init__(self,
+                 cfg: CfgNode,
+                 input_shape: List[ShapeSpec]) -> None:
         super().__init__()
         in_channels = input_shape[0].channels
         num_classes: int = cfg.MODEL.RETINANET.NUM_CLASSES
         num_convs: int = cfg.MODEL.RETINANET.NUM_CONVS
         prior_prob: float = cfg.MODEL.RETINANET.PRIOR_PROB
-        num_anchors = build_anchor_generator(cfg, input_shape).num_cell_anchors
+        num_anchors: List[int] = build_anchor_generator(cfg,
+                                                        input_shape).num_cell_anchors
 
         assert len(set(num_anchors)) == 1,\
             "Using different number of anchors between levels is not currently supported!"
 
-        num_anchors = num_anchors[0]
+        num_anchors_int: int = num_anchors[0]
 
         cls_subnet: List[nn.Module] = []
         bbox_subnet: List[nn.Module] = []
@@ -552,14 +514,14 @@ class RetinaNetHead(nn.Module):
         self.cls_subnet = nn.Sequential(*cls_subnet)
         self.bbox_subnet = nn.Sequential(*bbox_subnet)
         self.cls_score = nn.Conv2d(in_channels,
-                                   num_anchors
+                                   num_anchors_int
                                    * num_classes,
                                    kernel_size=3,
                                    stride=1,
                                    padding=1)
 
         self.bbox_pred = nn.Conv2d(in_channels,
-                                   num_anchors * 4,
+                                   num_anchors_int * 4,
                                    kernel_size=3,
                                    stride=1,
                                    padding=1)
@@ -572,12 +534,16 @@ class RetinaNetHead(nn.Module):
 
             for layer in modules.modules():
                 if isinstance(layer, nn.Conv2d):
-                    torch.nn.init.normal_(layer.weight, mean=0, std=0.01)
-                    torch.nn.init.constant_(layer.bias, 0)
+                    torch.nn.init.normal_(tensor=layer.weight,
+                                          mean=0,
+                                          std=0.01)
+                    torch.nn.init.constant_(tensor=layer.bias,
+                                            val=0)
 
         # Use prior in model initialization to improve stability
         bias_value: float = -math.log((1 - prior_prob) / prior_prob)
-        torch.nn.init.constant_(self.cls_score.bias, bias_value)
+        torch.nn.init.constant_(self.cls_score.bias,
+                                bias_value)
 
 
     def forward(self, features: List[Tensor]) -> Tuple[List[Tensor], List[Tensor]]:
