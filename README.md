@@ -11,10 +11,11 @@ In the context of medical scientific publications, compound figures account for 
 To exploit the information from those compound figures, they need to be segmented in several sub figures as independent as possible.
 
 The _compound figure separation_ task is composed of several subtasks:
-*   Panel segmentation
-    *   Panel splitting
-    *   Label recognition
-*   Caption splitting
+
+* Panel segmentation
+  * Panel splitting
+  * Label recognition
+* Caption splitting
 
 ## How to use
 
@@ -37,6 +38,7 @@ pip install -r requirements.txt
 
 
 It is possible to follow training using _TensorBoard_
+
 ```bash
 tensorboard --logdir=compfigsep/<TASK_NAME>/output/ [--bind_all]
 ```
@@ -47,10 +49,11 @@ tensorboard --logdir=compfigsep/<TASK_NAME>/output/ [--bind_all]
 
 ### Modules
 
-*   `data`
+* `data`
 
 The `data` module contains function dealing with the various data sources. Among other things, one can preview, load and export the different data sets.
-*   `utils`
+
+* `utils`
 
 In `utils`, several functions are here to handle miscellaneous tasks.
 

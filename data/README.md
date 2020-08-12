@@ -3,7 +3,7 @@
 Two data sets are used to test this pipeline :
 
 
-## ![image](https://www.imageclef.org/files/tech_logo.png =100x) ImageCLEF 2016
+## ![](https://www.imageclef.org/files/tech_logo.png =100x) ImageCLEF 2016
 
 The [_ImageCLEF 2016_ medical challenge](https://www.imageclef.org/2016/medical) includes different subtasks. One of them is _figure separation_. It consists in _panel splitting_. Hence, the data set provided for this challenge only contains annotations for panels. Neither labels nor captions are part of this data set.
 
