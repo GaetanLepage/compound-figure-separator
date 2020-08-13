@@ -745,8 +745,10 @@ class Figure:
 
             for gt_label_index, gt_subfigure in enumerate(self.gt_subfigures):
 
-                if gt_subfigure.label is not None:
-                    gt_label: Label = gt_subfigure.label
+                if gt_subfigure.label is None:
+                    continue
+
+                gt_label: Label = gt_subfigure.label
 
                 # TODO laverage the 'single-character label' restriction.
                 if gt_label.box is None\
