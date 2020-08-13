@@ -46,8 +46,6 @@ def label_filtering(text_labels: List[str],
     # vote for the most likely label structure.
     labels: List[str] = text_labels + image_labels
 
-    print(labels)
-
     label_structure: LabelStructure = LabelStructure.from_labels_list(labels_list=labels)
 
     return label_structure

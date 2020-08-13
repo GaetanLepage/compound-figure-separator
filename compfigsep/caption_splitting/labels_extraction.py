@@ -60,87 +60,65 @@ def label_identification(caption: str) -> Dict:
         }
     }
 
-    # Detect alphanumerical labels.
-    characters_raw: List[str] = regex_definitions.RE_CHARACTERS.findall(caption)
-    characters_cleaned: List[str] = []
-    if characters_raw:
-        # Get the list of alphanumerical labels.
-        characters_list = []
-        for raw in characters_raw:
-            characters_list.append(raw[0])
-        # Clean the list.
-        for element in characters_list:
-            characters_cleaned.append(re.sub(r'[().:]', '', element))
+    # Detect alphabetical labels.
+    characters: List[str] = [re.sub(pattern=r'[().:]',
+                                    repl='',
+                                    string=raw[0])
+                             for raw
+                             in regex_definitions.RE_CHARACTERS.findall(caption)]
 
-        # Remove duplicates.
-        characters_cleaned = list(set(characters_cleaned))
+    # Remove duplicates.
+    characters = list(set(characters))
 
-        # Sort the list of characters.
-        characters_cleaned.sort()
+    # Sort the list of characters.
+    characters.sort()
 
-        # Store the list of labels in the output dict.
-        output_dict['labels']['characters'] = characters_cleaned
+    # Store the list of labels in the output dict.
+    output_dict['labels']['characters'] = characters
 
 
     # Detect roman numbers.
-    romans_raw: List[str] = regex_definitions.RE_ROMAN.findall(caption)
-    romans_cleaned: List[str] = []
-    if romans_raw:
-        # Get the list of roman labels.
-        romans_list: List[str] = [raw[0] for raw in romans_raw]
+    romans: List[str] = [re.sub(pattern=r'[().:]',
+                                repl='',
+                                string=raw[0])
+                         for raw in
+                         regex_definitions.RE_ROMAN.findall(caption)]
+    # Remove duplicates.
+    romans = list(set(romans))
 
-        # Clean the list.
-        romans_cleaned = [re.sub(pattern=r'[().:]',
-                                 repl='',
-                                 string=element)
-                          for element in romans_list]
+    # Sort the list of roman numbers according to their numerical values.
+    romans.sort(key=lambda roman_char: roman_to_int(roman_char=roman_char))
 
-        # Remove duplicates.
-        romans_cleaned = list(set(romans_cleaned))
-
-        # Sort the list of roman numbers according to their numerical values.
-        romans_cleaned.sort(key=lambda roman_char: roman_to_int(roman_char=roman_char))
-
-        # TODO remove
-        # print(romans_cleaned)
-
-        # Store the list of labels in the output dict.
-        output_dict['labels']['romans'] = romans_cleaned
+    # Store the list of labels in the output dict.
+    output_dict['labels']['romans'] = romans
 
 
     # Detect numerical labels.
-    digits_raw: List[str] = regex_definitions.RE_DIGITS.findall(caption)
-    digits_cleaned: List[str] = []
-    if digits_raw:
-        # Get the list of numerical labels.
-        digits_list = []
-        for raw in digits_raw:
-            digits_list.append(raw[0])
+    digits: List[str] = [re.sub(pattern=r'[().:]',
+                                repl='',
+                                string=raw[0])
+                         for raw
+                         in regex_definitions.RE_DIGITS.findall(caption)]
 
-        # Clean the list.
-        for element in digits_list:
-            digits_cleaned.append(re.sub(pattern=r'[().:]',
-                                         repl='',
-                                         string=element))
-        # remove duplicates
-        digits_cleaned = list(set(digits_cleaned))
-        # sort the list of characters
-        digits_cleaned.sort()
+    # Remove duplicates.
+    digits = list(set(digits))
 
-        # Store the list of labels in the output dict.
-        output_dict['labels']['digits'] = digits_cleaned
+    # Sort the list of characters.
+    digits.sort()
 
+    # Store the list of labels in the output dict.
+    output_dict['labels']['digits'] = digits
 
     # Get hyphens and conjunctions.
-    hyphen_range = regex_definitions.RE_HYPHEN.findall(caption)
-    conj_range = regex_definitions.RE_CONJUNCTIONS.findall(caption)
-
     # Extract first element of each tuple and replace the tuple with it.
     # Hyphen range.
-    hyphen_vector: List[str] = [hyphen_tuple[0] for hyphen_tuple in hyphen_range]
+    hyphen_vector: List[str] = [hyphen_tuple[0]
+                                for hyphen_tuple
+                                in regex_definitions.RE_HYPHEN.findall(caption)]
     # Conjunction range.
-    conj_vector: List[str] = [conj_tuple[0] for conj_tuple in conj_range]
-
+    conj_vector: List[str] = [conj_tuple[0]
+                              for conj_tuple
+                              in regex_definitions.RE_CONJUNCTIONS.findall(caption)]
 
     # Store the ranges in the output dict.
     output_dict['ranges']['hyphen'] = hyphen_vector

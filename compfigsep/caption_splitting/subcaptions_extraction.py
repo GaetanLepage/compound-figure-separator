@@ -93,7 +93,7 @@ def _sentence_preface(sentences_list: List[str],
 
     Args:
         sentences_list (List[str]): TODO.
-        target_regex (re.Pattern):  TODO.
+        target_regex (re.Pattern):  Regular expression to detect labels.
 
     Returns:
         preface (str):  The preface sentence(s).
@@ -145,11 +145,11 @@ def _label_positions(subcaption: str,
     TODO
 
     Args:
-        subcaption (str):           TODO.
-        target_regex (re.Pattern):  TODO.
+        subcaption (str):           Sub-caption sentence.
+        target_regex (re.Pattern):  Regular expression to detect labels.
 
     Returns:
-        positions (List[Position]): TODO.
+        positions (List[Position]): List of the positions of detected labels.
     """
     # Loop through all the regex (i.e. char, hyphen and conj) and put them into
     # positions.
@@ -210,6 +210,7 @@ def _label_positions(subcaption: str,
         positions.append(Position(start_index=match.start(),
                                   end_index=match.end(),
                                   string_list=char_cleaned))
+
     # TODO unclear how positions are sorted
     # see https://stackoverflow.com/a/5824559/11196710
     positions.sort()
@@ -304,13 +305,13 @@ def _post_labels(subcaptions: Dict[str, str],
         positions (List[Position]):     List of positions detected in `subcapt`.
     """
     # Deal with first position.
-    end = positions[0].start_index
+    end: int = positions[0].start_index
 
     # Avoid wrong cases like (A-D) ______ (B)____(C). Where (A-D) is clearly in an
     # incorrect position.
     if end != 0:
         # Loop through the list of labels attached to each position.
-        label_list = positions[0].string_list
+        label_list: List[str] = positions[0].string_list
         for label in label_list:
             # Inserted try catch for avoiding error when the script misleads (i,v) for
             # roman numbers.
@@ -423,7 +424,7 @@ def _process_caption_subsentence(caption_subsentence: str,
         sub_labels (List[str]):             TODO.
         subcaptions (Dict[str, str]):       TODO.
         fuzzy_captions (Dict[str, str]):    TODO.
-        target_regex (re.Pattern):          TODO.
+        target_regex (re.Pattern):          Regular expression to detect labels.
     """
 
     # For each subsentence extract all the image pointers and their positions.
@@ -550,7 +551,7 @@ def _process_caption_subsentence_pos(caption_subsentence,
             # Check if the last label extracted is at the end of the
             # subsentence and it is not contained in sub_positions_POS.
             if sub_positions[-1].end_index == subsentence_len\
-                    and sub_positions[-1].end_index != sub_positions_pos[-1].end_index:
+                and sub_positions[-1].end_index != sub_positions_pos[-1].end_index:
                 # Consider labels as 'post description' labels.
 
                 # Check for words that are associated to labels like in, from
@@ -632,7 +633,7 @@ def _process_caption_sentence(caption_sentence: str,
     TODO
 
     Args:
-        caption_sentence (str):             TODO.
+        caption_sentence (str):             The caption sentence to be processed.
         subcaptions (Dict[str, str]):       The dictionary for outputing subcaptions.
         fuzzy_captions (Dict[str, str]):    TODO.
         image_pointers (List[str]):         TODO.
@@ -680,15 +681,12 @@ def _process_caption_sentence(caption_sentence: str,
     image_pointers = list(set(image_pointers))
 
     # Classify labels in pre, post and in description.
-    # print("image_pointers :", image_pointers)
 
     # Define the list of tuples representing POS labels.
     # Loop through all the POS regex (i.e. target, hyphen and conj) and put them into
     # positions_POS.
     positions_pos: List[Position] = _pos_positions(subcaption=caption_sentence,
                                                    target_regex_pos=target_regex_pos)
-    # TODO remove
-    # print("positions_POS :", positions_pos)
 
     # Define the list of image pointers that each subsentence contains.
     sub_image_pointers: List[str] = []
@@ -780,8 +778,6 @@ def _process_caption_sentence(caption_sentence: str,
         if positions[-1].end_index == len(caption_sentence):
             # Consider labels as 'post description' labels.
 
-            # print("last extracted label is at the end of the sentence --> post description labels.")
-
             # Assign to the subcaptions the related sentences.
             _post_labels(subcaptions=subcaptions,
                          subcapt=caption_sentence,
@@ -790,8 +786,6 @@ def _process_caption_sentence(caption_sentence: str,
         # Check if the first label extracted is at the beginning of the sentence.
         elif positions[0].start_index == 0:
             # Consider labels as 'pre description' labels.
-
-            # print("first extracted label is at the beginning of the sentence --> pre description labels.")
 
             # Assign to the subcaptions the related sentences.
             _pre_labels(subcaptions=subcaptions,
@@ -870,7 +864,6 @@ def extract_subcaptions(caption: str,
 
     # Turn the label structure into a list of labels.
     filtered_labels: List[str] = label_structure.get_core_label_list()
-    print("filtered_labels = ", filtered_labels)
 
     # Initialize the dictionaries containing the subcaptions.
     subcaptions: Dict[str, str] = {label: '' for label in filtered_labels}
@@ -897,29 +890,16 @@ def extract_subcaptions(caption: str,
     # subpanel caption.
     if preface != '':
 
-        # TODO remove
-        # print("Preface:", preface)
-
         # Associate preface to each subcaption.
         for label in subcaptions:
             subcaptions[label] += preface
 
-        # from pprint import pprint
-        # pprint(subcaptions)
-
     # Define the list of image pointers that each sentence contains.
     image_pointers: List[str] = []
-
-    # TODO remove
-    # print(f"Preface end index: {preface_end_index}")
 
     # Loop through all the sentences of the caption after preface:
     for caption_sentence in caption_sentences_list[preface_end_index:]:
         # For each substring extract all the image pointers (labels) and their positions.
-
-        # TODO remove. No actual need for index.
-        # print("\nsentence_index :", sentence_index)
-        # print("caption_sentence :", caption_sentence)
 
         image_pointers = _process_caption_sentence(caption_sentence=caption_sentence,
                                                    subcaptions=subcaptions,
@@ -928,10 +908,5 @@ def extract_subcaptions(caption: str,
                                                    filtered_labels=filtered_labels,
                                                    target_regex=target_regex,
                                                    target_regex_pos=target_regex_pos)
-
-    # Assign each element in fuzzycaptions to subcaptions, labelling it as 'fuzzy'.
-    # TODO check what to do.
-    # for label, value in fuzzy_captions.items():
-        # subcaptions[label] += ' FUZZY: ' + value
 
     return subcaptions
