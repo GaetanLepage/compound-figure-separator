@@ -48,14 +48,10 @@ from compfigsep.caption_splitting import (label_identification,
 
 from compfigsep.data.export import export_figures_to_json
 
-# TODO remove (it was just for testing)
-from pprint import pprint
-
 import compfigsep
 sys.path.append('.')
 
 MODULE_DIR = os.path.dirname(compfigsep.__file__)
-
 
 
 def _parse_args(args: List[str]) -> Namespace:
@@ -108,26 +104,14 @@ def main(args: List[str] = None):
         if caption is None:
             return
 
-        print("Caption:", caption)
-
         label_dict = label_identification(caption=caption)
-
-        pprint(label_dict)
 
         labels_list: List[str] = label_expansion(label_dict)
 
         label_structure: LabelStructure = label_filtering.label_filtering(text_labels=labels_list)
 
-        # TODO: just for testing: remove
-        # filtered_labels = labels_alphanum
-        # target_regex = RE_CHARACTERS
-        # target_regex_pos = RE_CHARACTERS_POS
-
         sub_captions_dict = extract_subcaptions(caption=caption,
                                                 label_structure=label_structure)
-
-        print("# DETECTION #")
-        pprint(sub_captions_dict)
 
         figure.detected_subcaptions = OrderedDict(sub_captions_dict)
 
@@ -152,8 +136,8 @@ def main(args: List[str] = None):
     logging.info("Exporting detected captions")
 
     # Export detections to JSON.
-    # export_figures_to_json(figure_generator=copy.copy(prediction_figure_generator),
-                           # json_output_directory="compfigsep/caption_splitting/output/")
+    export_figures_to_json(figure_generator=copy.copy(prediction_figure_generator),
+                           json_output_directory="compfigsep/caption_splitting/output/")
 
     logging.info("Evaluate detections")
 

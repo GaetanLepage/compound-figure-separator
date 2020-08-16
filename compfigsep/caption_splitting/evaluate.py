@@ -75,7 +75,6 @@ def caption_splitting_figure_eval(figure: Figure,
             if gt_subfigure.label is None or gt_subfigure.label.text is None:
                 continue
 
-
             # Increase the number of ground truth labels.
             num_gt_labels += 1
 
@@ -97,14 +96,6 @@ def caption_splitting_figure_eval(figure: Figure,
     if num_gt_labels > 0:
         stat_dict['num_captions'] += 1
         stat_dict['levenshtein_metric'] += figure_score / num_gt_labels
-
-        # TODO remove the end of this function
-        gt_dict = {sf.label.text: sf.caption
-                   for sf in figure.gt_subfigures
-                   if sf.label is not None}
-        print("# GT #")
-        pprint(gt_dict)
-        print("SCORE = ", figure_score / num_gt_labels)
 
 
 def caption_splitting_metrics(stat_dict: Dict[str, Any]) -> float:

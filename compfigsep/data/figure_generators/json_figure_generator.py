@@ -238,12 +238,7 @@ class JsonFigureGenerator(FigureGenerator):
         with open(self.json_annotation_file_path, 'r') as json_annotation_file:
             data_dict = json.load(json_annotation_file)
 
-        from pprint import pprint
-
         for index, figure_dict in enumerate(progressbar.progressbar(data_dict.values())):
-
-            print("-- JSON figure generator --")
-            pprint(figure_dict)
 
             yield Figure.from_dict(figure_dict=figure_dict,
                                    index=index)

@@ -108,14 +108,8 @@ class StackedFigureGenerator(FigureGenerator):
 
     def __call__(self) -> Iterable[Figure]:
 
-        from pprint import pprint
-
         for figure in self._base_figure_generator():
 
-            print("-- Stacked figure generator --")
-
             self._function(figure)
-
-            pprint(figure.to_dict())
 
             yield figure

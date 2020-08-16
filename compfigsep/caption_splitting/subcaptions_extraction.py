@@ -128,12 +128,8 @@ def _sentence_preface(sentences_list: List[str],
     # TODO : should remove or not ?
     # If the script cannot find a preface, the first sentence is the preface.
     if preface == '':
-        # print("cannot find preface: taking first sentence by default")
         preface = sentences_list[0]
         index = 1
-
-
-    # print("preface_end_index = ", index)
 
     return preface, index
 
@@ -365,7 +361,6 @@ def _pre_labels(subcaptions: Dict[str, str],
         label_list: List[str] = position.string_list
 
         for label in label_list:
-            # print(f"Adding to label {label} caption : {subcapt[init:end]}")
             subcaptions[label] += subcapt[init:end] + '. '
 
 
@@ -382,7 +377,6 @@ def _pre_labels(subcaptions: Dict[str, str],
         label_list = last_position.string_list
         for label in label_list:
             if label in subcaptions:
-                # print(f"Adding to label {label} caption : {subcapt[init:]}")
                 subcaptions[label] += subcapt[init:] + '. '
 
 
@@ -436,7 +430,6 @@ def _process_caption_subsentence(caption_subsentence: str,
     # into sub_positions.
     sub_positions = _label_positions(subcaption=caption_subsentence,
                                      target_regex=target_regex)
-    # print("sub_positions:", sub_positions)
 
     # Remove overlapping elements (e.g. (A-D) and D)).
     sub_positions = _remove_overlaps(positions=sub_positions)
@@ -650,15 +643,12 @@ def _process_caption_sentence(caption_sentence: str,
     # Loop through all the regex (i.e. target, hyphen and conj) and put them into positions.
     positions: List[Position] = _label_positions(subcaption=caption_sentence,
                                                  target_regex=target_regex)
-    # print("positions :", positions)
 
     # remove overlapping elements (e.g. (A-D) and D))
     positions = _remove_overlaps(positions=positions)
-    # print("positions (without overlaps) :", positions)
 
     positions = _clean_positions(positions=positions,
                                  selected_labels=filtered_labels)
-    # print("positions (cleaned) :", positions)
 
     # Check if positions list is empty or not.
     if len(positions) == 0:
@@ -666,7 +656,6 @@ def _process_caption_sentence(caption_sentence: str,
         # In this case, assign the sentence without labels to the subcaptions that have been
         # expanded in the previous iteration.
         for label in image_pointers:
-            # print(f"Adding to label {label} caption : {caption_sentence}")
             subcaptions[label] += caption_sentence
 
         # Go to next sentence.

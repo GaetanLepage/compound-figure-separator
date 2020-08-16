@@ -226,21 +226,15 @@ def label_expansion(label_dict: Dict) -> List[str]:
                                     string=element.replace('and', ' '))
                              for element in label_dict['ranges']['conj']]
 
-    # print('conj_cleaned:', conj_cleaned)
     # Append elements to ranges.
     for element in conj_range:
         ranges += element.split()
-    # print("ranges before removing duplicates:", ranges)
 
     # Remove duplicates.
     ranges = list(set(ranges))
 
-    # TODO remove
-    # print("ranges after removing duplicates:", ranges)
-
     # Sort ranges.
     ranges.sort()
-    # print("expanded ranges:", ranges)
 
     # Merge the lists containing the expanded ranges and the single labels.
     # ('|' is the union operation between sets).
@@ -254,17 +248,3 @@ def label_expansion(label_dict: Dict) -> List[str]:
     labels.sort()
 
     return labels
-
-
-# TODO check how to use this.
-## 3rd step: label filtering
-# Decide which list to consider (digits/romans or alphanumeric) depending on
-# the amount of matched characters between image and caption.
-
-### CAVEAT: This part will be done once we have the result list of characters from images ###
-
-# CAVEAT: this list is the one that will be used once we know which are the correct labels.
-# labels_final = []
-
-# if (selected_labels==['none']):
-    # selected_labels = labels_alphanum
