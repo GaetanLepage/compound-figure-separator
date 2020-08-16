@@ -111,16 +111,18 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
 
     def _predict(self, figure: Figure) -> None:
         """
-        TODO
+        Write the predictions (stored in the `_predictions` attribute) in the appropriate
+        attributes of the given figure object.
+        The latter is modified by side effet.
 
         Args:
-            figure (Figure):    TODO.
+            figure (Figure):    A Figure object to augment with prediction data.
         """
 
         try:
             detected_panels = self._predictions[figure.index]['panels']
             detected_labels = self._predictions[figure.index]['labels']
-        except AttributeError:
+        except KeyError:
             return
 
 

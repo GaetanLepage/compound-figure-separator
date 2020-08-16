@@ -55,6 +55,9 @@ def caption_splitting_figure_eval(figure: Figure,
                                            if hasattr(figure, 'detected_subcaptions')\
                                            else {}
 
+    if not hasattr(figure, 'gt_subfigures'):
+        return
+
     # Case where this is not a compound figure.
     if len(figure.gt_subfigures) == 1 and '_' in figure.detected_subcaptions:
         num_gt_labels = 1
@@ -143,7 +146,7 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
     lavenstein_metric: float = caption_splitting_metrics(stat_dict=stat_dict)
 
     metrics: Dict[str, float] = {
-        'lavenstein_metric': lavenstein_metric
+        'levenstein_metric': lavenstein_metric
     }
 
     pprint(metrics)

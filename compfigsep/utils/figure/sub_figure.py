@@ -161,8 +161,7 @@ class DetectedSubFigure(SubFigure):
     def __init__(self,
                  panel: DetectedPanel = None,
                  label: DetectedLabel = None,
-                 caption: str = None
-                 ) -> None:
+                 caption: str = None) -> None:
         """
         Init for a `DetectedPanel` object.
 

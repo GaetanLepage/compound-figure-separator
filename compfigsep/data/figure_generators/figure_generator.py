@@ -51,24 +51,12 @@ class FigureGenerator(ABC):
     """
 
     def __init__(self) -> None:
-
         self.data_dir = DATA_DIR
 
 
     @abstractmethod
     def __copy__(self) -> FigureGenerator:
-        """
-        TODO
-        """
         raise NotImplementedError('This method has to be implemented for each subclass.')
-
-
-    def run(self) -> None:
-        """
-        TODO
-        """
-        for _ in self():
-            continue
 
 
     @abstractmethod
@@ -120,8 +108,14 @@ class StackedFigureGenerator(FigureGenerator):
 
     def __call__(self) -> Iterable[Figure]:
 
+        from pprint import pprint
+
         for figure in self._base_figure_generator():
 
+            print("-- Stacked figure generator --")
+
             self._function(figure)
+
+            pprint(figure.to_dict())
 
             yield figure

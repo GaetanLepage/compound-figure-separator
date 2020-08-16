@@ -88,10 +88,10 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    parsed_args = _parse_args(args)
+    parsed_args: Namespace = _parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
-    figure_generator = JsonFigureGenerator(
+    figure_generator: JsonFigureGenerator = JsonFigureGenerator(
         json_path=parsed_args.json)
 
     def predict_caption(figure: Figure) -> None:
@@ -102,8 +102,6 @@ def main(args: List[str] = None):
         Args:
             figure (Figure):    A figure object.
         """
-
-        print("#############")
 
         caption = figure.caption
 
@@ -147,20 +145,20 @@ def main(args: List[str] = None):
         # if caption.startswith("nTE-2-PyP protects prostatic and penile"):
             # sys.exit()
 
-    prediction_figure_generator = StackedFigureGenerator(
+    prediction_figure_generator: StackedFigureGenerator = StackedFigureGenerator(
         base_figure_generator=figure_generator,
         function=predict_caption)
 
     logging.info("Exporting detected captions")
 
     # Export detections to JSON.
-    export_figures_to_json(figure_generator=copy.copy(prediction_figure_generator),
-                           json_output_directory="compfigsep/caption_splitting/output/")
+    # export_figures_to_json(figure_generator=copy.copy(prediction_figure_generator),
+                           # json_output_directory="compfigsep/caption_splitting/output/")
 
     logging.info("Evaluate detections")
 
     # Evaluate the data set.
-    # evaluate_detections(figure_generator=prediction_figure_generator)
+    evaluate_detections(figure_generator=prediction_figure_generator)
 
 
 if __name__ == '__main__':

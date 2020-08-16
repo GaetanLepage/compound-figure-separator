@@ -238,8 +238,8 @@ class Figure:
 
                     label_text: str = label_class.map_label(row[10])
 
-                    label = Label(text=label_text,
-                                  box=label_coordinates)
+                    label: Label = Label(text=label_text,
+                                         box=label_coordinates)
 
                 # Panel splitting only
                 elif len(row) != 6:
@@ -258,10 +258,10 @@ class Figure:
                     f"\n\timage in csv row : {image_path}"
 
                 # Instanciate Panel object
-                panel = Panel(box=panel_coordinates)
+                panel: Panel = Panel(box=panel_coordinates)
 
-                subfigure = SubFigure(panel=panel,
-                                      label=label)
+                subfigure: SubFigure = SubFigure(panel=panel,
+                                                 label=label)
 
                 subfigures.append(subfigure)
 
@@ -274,8 +274,7 @@ class Figure:
 
 
     def load_annotation_from_iphotodraw(self,
-                                        annotation_file_path: str
-                                        ) -> None:
+                                        annotation_file_path: str) -> None:
         """
         Load iPhotoDraw annotation.
         Deal with PanelSeg data set.
@@ -1169,7 +1168,7 @@ class Figure:
 
         try:
             output_dict['gt_subfigures'] = [subfigure.to_dict()
-                                            for subfigure in self.gt_subfigures]
+                                        for subfigure in self.gt_subfigures]
         except AttributeError:
             pass
 

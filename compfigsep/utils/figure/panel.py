@@ -53,8 +53,8 @@ class Panel:
         if isinstance(box, np.ndarray):
             box = box.tolist()
 
-        self.box = cast(Box,
-                        tuple([round(val) for val in box]))
+        self.box: Box = cast(Box,
+                             tuple([round(val) for val in box]))
 
 
     @classmethod
@@ -107,7 +107,7 @@ class Panel:
 
 
     def __str__(self) -> str:
-        string = f"{type(self).__name__}:"
+        string: str = f"{type(self).__name__}:"
         string += f" box: {self.box}"
 
         return string
@@ -180,9 +180,11 @@ class DetectedPanel(Panel):
             detected_panel (DetectedPanel): The resulting DetectedPanel object.
         """
 
-        if 'box' in panel_dict:
-            detected_panel = DetectedPanel(box=panel_dict['box'],
-                                           detection_score=panel_dict.get('detection_score'))
+        if 'box' not in panel_dict:
+            raise KeyError("The panel_dict should have a 'box' attribute")
+
+        detected_panel = DetectedPanel(box=panel_dict['box'],
+                                       detection_score=panel_dict.get('detection_score'))
 
         detected_panel.is_true_positive_overlap = panel_dict.get('is_true_positive_overlap')
 

@@ -33,8 +33,8 @@ from ...box import Box
 
 Color = Tuple[int, int, int]
 
-DEFAULT_GT_COLOR = (0, 255, 0)
-DEFAULT_DETECTION_COLOR = (0, 0, 200)
+DEFAULT_GT_COLOR: Color = (0, 255, 0)
+DEFAULT_DETECTION_COLOR: Color = (0, 0, 200)
 
 
 class Label:
@@ -54,16 +54,14 @@ class Label:
             text (str): The label text ('A' or '1' or 'ii'...).
             box (Box):  The bounding box localizing the label on the image.
         """
-        self.text = text
+        self.text: Optional[str] = text
 
         if isinstance(box, np.ndarray):
             box = box.tolist()
 
-        self.box = box
-
         if box is not None:
-            self.box = cast(Box,
-                            tuple([round(val) for val in box]))
+            self.box: Box = cast(Box,
+                                 tuple([round(val) for val in box]))
 
 
     @classmethod
@@ -95,7 +93,7 @@ class Label:
         if self.text is not None:
             output_dict['text'] = self.text
 
-        if self.box is not None:
+        if hasattr(self, 'box'):
             output_dict['box'] = self.box
 
         return output_dict
@@ -132,8 +130,9 @@ class Label:
 
 
     def __str__(self) -> str:
-        string = f"{type(self).__name__}:"
-        string += f" box: {self.box}"
+        string: str = f"{type(self).__name__}:"
+        if hasattr(self, 'box'):
+            string += f" box: {self.box}"
         string += f", text: {self.text}"
 
         return string
