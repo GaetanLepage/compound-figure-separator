@@ -35,7 +35,7 @@ from collections import OrderedDict
 import numpy as np # type: ignore
 from cv2 import cv2 # type: ignore
 
-from .sub_figure import SubFigure, DetectedSubFigure
+from .sub_figure import SubFigure, DetectedSubFigure, Color
 from .panel import Panel, DetectedPanel
 from .label import (Label,
                     DetectedLabel,
@@ -117,9 +117,6 @@ class Figure:
         # Detected subfigures
         self.detected_subfigures: List[DetectedSubFigure]
 
-        # Matched figures
-        self.matched_subfigures = None # TODO
-
         # Logger
         self._logger = logging.getLogger(__name__)
 
@@ -192,6 +189,7 @@ class Figure:
 
         # Store the image size
         self.image_height, self.image_width = img.shape[:2]
+
 
 #########################
 # IMPORT GT ANNOTATIONS #
@@ -910,11 +908,11 @@ class Figure:
 
         assert self.image is not None
 
-        preview_img = self.image.copy()
+        preview_img: np.ndarray = self.image.copy()
 
 
         # Prepare set of colors for drawing elements:
-        shape_colors = [
+        shape_colors: List[Color] = [
             (255, 0, 0),
             (0, 255, 0),
             (0, 0, 255),
