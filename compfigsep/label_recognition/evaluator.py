@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluator for the label recognition task.
 """
 
-from typing import List
+from typing import List, Dict, Any
 
 from ..utils.figure import Figure, DetectedLabel
 from ..utils.figure.label import CLASS_LABEL_MAPPING
@@ -97,19 +97,18 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
             figure (Figure):    A Figure object to augment with prediction data.
         """
 
-        detected_labels = self._predictions[figure.index]
+        detected_labels_dicts: List[Dict[str, Any]] = self._predictions[figure.index]
 
-        detected_label_objects = []
+        detected_labels: List[DetectedLabel] = []
 
-        for detected_label in detected_labels:
+        for detected_label_dict in detected_labels_dicts:
 
             # Instanciate a DetectedLabel object.
-            detected_label = DetectedLabel(text=CLASS_LABEL_MAPPING[detected_label['cls']],
-                                           box=detected_label['box'],
-                                           detection_score=detected_label['score'])
+            detected_label: DetectedLabel = DetectedLabel(
+                text=CLASS_LABEL_MAPPING[detected_label_dict['cls']],
+                box=detected_label_dict['box'],
+                detection_score=detected_label_dict['score'])
 
-            detected_label_objects.append(detected_label)
+            detected_labels.append(detected_label)
 
-            # TODO do some post processing here maybe
-
-        figure.detected_labels = detected_label_objects
+        figure.detected_labels = detected_labels

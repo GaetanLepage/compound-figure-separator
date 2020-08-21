@@ -23,12 +23,13 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import Tuple, Dict, List, Iterable, Any
+from typing import Tuple, Dict, List, Any
 from pprint import pprint
 
 from sortedcontainers import SortedKeyList # type: ignore
 import numpy as np # type: ignore
 
+from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
 from ..utils.figure.label import Label
 from ..utils.average_precision import compute_average_precision
@@ -131,7 +132,7 @@ def multi_class_metrics(stat_dict: Dict[str, Any]) -> Tuple[float, float, float]
                                                 in stat_dict['detections_by_class'][cls]]
 
         class_detected_count: int = len(stat_dict['detections_by_class'][cls])
-        class_gt_count = stat_dict['gt_count_by_class'][cls] \
+        class_gt_count: int = stat_dict['gt_count_by_class'][cls] \
             if cls in stat_dict['gt_count_by_class'] else 0
 
         class_cumsum_true_positives: np.array = np.cumsum(class_true_positives)
@@ -159,14 +160,14 @@ def multi_class_metrics(stat_dict: Dict[str, Any]) -> Tuple[float, float, float]
     return precision, recall, mean_average_precision
 
 
-def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
+def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
     """
     Compute the metrics (precision, recall and mAP) from a given set of label recognition
     detections.
 
     Args:
-        figure_generator (Iterable[Figure]):    A figure generator yielding Figure objects
-                                                    augmented with detected labels.
+        figure_generator (FigureGenerator): A figure generator yielding Figure objects augmented
+                                                with detected labels.
 
     Returns:
         metrics (Dict[str, float]): A dict containing the computed metrics.
@@ -182,12 +183,12 @@ def evaluate_detections(figure_generator: Iterable[Figure]) -> Dict[str, float]:
         'gt_count_by_class': {}
     }
 
-    for figure in figure_generator:
+    for figure in figure_generator():
 
         label_recognition_figure_eval(figure, stats)
 
 
-    precision, recall, mean_average_precision = multi_class_metrics(stats['label_recognition'])
+    precision, recall, mean_average_precision = multi_class_metrics(stat_dict=stats)
 
     metrics = {
         'precision': precision,

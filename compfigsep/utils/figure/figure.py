@@ -197,7 +197,7 @@ class Figure:
 
     def load_annotation_from_csv(self,
                                  annotations_folder: str,
-                                 is_ground_truth: bool = True):
+                                 is_ground_truth: bool = True) -> None:
         """
         Load figure annotations from the given (individual) csv file.
 
@@ -426,8 +426,7 @@ class Figure:
 
 
         def match_panels_with_labels(panel_dict: Dict[str, List[Panel]],
-                                     label_dict: Dict[str, List[Label]],
-                                     ) -> List[SubFigure]:
+                                     label_dict: Dict[str, List[Label]]) -> List[SubFigure]:
             """
             Match both lists to get a unique list of subfigures.
 
@@ -781,8 +780,7 @@ class Figure:
 
 
     def match_detected_and_gt_panels_segmentation_task(self,
-                                                       iou_threshold: float = 0.5
-                                                       ) -> None:
+                                                       iou_threshold: float = 0.5) -> None:
         """
         Match the detected subfigures with a ground truth one.
         The comparison criterion is the IoU between panels which is maximized.
@@ -1015,8 +1013,7 @@ class Figure:
     def show_preview(self,
                      mode: str = 'gt',
                      delay: int = 0,
-                     window_name: str = None
-                     ) -> None:
+                     window_name: str = None) -> None:
         """
         Display a preview of the image along with the panels and labels drawn on top.
 
@@ -1042,8 +1039,7 @@ class Figure:
 
     def save_preview(self,
                      mode: str = 'gt',
-                     folder: str = None
-                     ) -> None:
+                     folder: str = None) -> None:
         """
         Save the annotation preview at folder.
 
@@ -1164,39 +1160,26 @@ class Figure:
             'image_height': self.image_height
         }
 
-        try:
+        if hasattr(self, 'gt_subfigures'):
             output_dict['gt_subfigures'] = [subfigure.to_dict()
-                                        for subfigure in self.gt_subfigures]
-        except AttributeError:
-            pass
+                                            for subfigure in self.gt_subfigures]
 
-        try:
+        if hasattr(self, 'detected_subfigures'):
             output_dict['detected_subfigures'] = [subfigure.to_dict()
                                                   for subfigure in self.detected_subfigures]
-        except AttributeError:
-            pass
 
-        try:
+        if hasattr(self, 'caption'):
             output_dict['caption'] = self.caption
-        except AttributeError:
-            pass
 
-        try:
+        if hasattr(self, 'detected_panels'):
             output_dict['detected_panels'] = [panel.to_dict()
                                               for panel in self.detected_panels]
-        except AttributeError:
-            pass
 
-        try:
+        if hasattr(self, 'detected_labels'):
             output_dict['detected_labels'] = [label.to_dict()
                                               for label in self.detected_labels]
-        except AttributeError:
-            pass
 
-        try:
+        if hasattr(self, 'detected_subcaptions'):
             output_dict['detected_subcaptions'] = self.detected_subcaptions
-
-        except AttributeError:
-            pass
 
         return output_dict
