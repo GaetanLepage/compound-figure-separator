@@ -51,14 +51,14 @@ def panel_segmentation_figure_eval(figure: Figure,
         if gt_subfigure.label is None:
             gt_subfigure.label = Label(box=None,
                                        text='')
-        gt_label = gt_subfigure.label
+        gt_label: Label = gt_subfigure.label
 
         if len(gt_label.text) != 1:
             # TODO: this choice might not be smart
             # "" stands for "no label"
             gt_label.text = ''
 
-        cls = gt_label.text
+        cls: str = gt_label.text
 
         stat_dict['overall_gt_count'] += 1
 
@@ -164,7 +164,7 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         #figure.show_preview(mode='both', window_name='panel_segmentation')
 
 
-    metrics = {}
+    metrics: Dict[str, Dict[str, float]] = {}
 
     # Panel splitting
     psp_imageclef_acc, psp_precision, psp_recall, psp_map = panel_splitting_metrics(
@@ -195,6 +195,5 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     metrics['panel_segmentation'] = {}
 
     pprint(metrics)
-
 
     return metrics['panel_segmentation']

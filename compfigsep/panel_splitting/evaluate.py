@@ -53,12 +53,8 @@ def panel_splitting_figure_eval(figure: Figure,
     stat_dict['overall_gt_count'] += len(figure.gt_subfigures)
     stat_dict['overall_detected_count'] += len(figure.detected_panels)
 
-    # TODO remove
-    # print("Number of GT panels :", len(figure.gt_subfigures))
-    # print("Number of detected panels :", len(figure.detected_panels))
-
-    num_correct_imageclef = 0
-    num_correct_iou_thresh = 0
+    num_correct_imageclef: int = 0
+    num_correct_iou_thresh: int = 0
 
     for detected_panel in figure.detected_panels:
         num_correct_imageclef += int(detected_panel.is_true_positive_overlap)
@@ -69,13 +65,9 @@ def panel_splitting_figure_eval(figure: Figure,
         stat_dict['detections'].add((detected_panel.detection_score,
                                      detected_panel.is_true_positive_iou))
 
-    # TODO remove
-    # print("Number of imageCLEF correct panels :", num_correct_imageclef)
-    # print("Number of IoU correct panels :", num_correct_iou_thresh)
-
     # ImageCLEF accuracy (based on overlap 0.66 threshold)
-    k = max(len(figure.gt_subfigures), len(figure.detected_panels))
-    imageclef_accuracy = num_correct_imageclef / k
+    k: int = max(len(figure.gt_subfigures), len(figure.detected_panels))
+    imageclef_accuracy: float = num_correct_imageclef / k
 
     stat_dict['sum_imageclef_accuracies'] += imageclef_accuracy
 

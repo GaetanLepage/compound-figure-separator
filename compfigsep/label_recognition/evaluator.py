@@ -40,7 +40,7 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
     def __init__(self,
                  dataset_name: str,
                  export: bool = False,
-                 export_dir : str = None):
+                 export_dir: str = None):
         """
         Init function.
         Call the init function of the parent function (PanelSegAbstractEvaluator).
