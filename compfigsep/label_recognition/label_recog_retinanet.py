@@ -27,10 +27,9 @@ Custom variation of RetinaNet to handle label recognition.
 
 import math
 from typing import List, Dict, Tuple, Any
-import numpy as np # type: ignore
 import torch
 from torch import nn, Tensor, LongTensor
-from torch.nn import functional as F
+# from torch.nn import functional as F
 from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss # type: ignore
 
 from detectron2.layers import ShapeSpec, batched_nms, cat # type: ignore
@@ -50,6 +49,7 @@ from detectron2.modeling.backbone.fpn import FPN # type: ignore
 
 
 __all__ = ["LabelRecogRetinaNet"]
+
 
 
 def build_fpn_backbone(cfg: CfgNode,
@@ -143,6 +143,10 @@ class LabelRecogRetinaNet(nn.Module):
 
     @property
     def device(self) -> torch.device:
+        """
+        Returns:
+        TODO
+        """
         return self.pixel_mean.device
 
 
@@ -457,10 +461,10 @@ class LabelRecogRetinaNet(nn.Module):
         Normalize, pad and batch the input images.
 
         Args:
-            batched_inputs (List[Dict[str ,Any]]):  TODO.
+            batched_inputs (List[Dict[str ,Any]]):  List of batched inputs.
 
         Returns:
-            images (ImageList): TODO.
+            images (ImageList): An ImageList structure containing the preprocessed image data.
         """
         images = [x["image"].to(self.device)
                   for x in batched_inputs]

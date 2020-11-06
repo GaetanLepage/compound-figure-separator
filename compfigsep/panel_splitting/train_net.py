@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 #############################
@@ -27,11 +27,10 @@ Panel Splitting detection training script.
 This scripts reads a given config file and runs the training or evaluation.
 """
 
-import os
 from argparse import ArgumentParser, Namespace
 from typing import List
 
-import detectron2.utils.comm as comm
+import detectron2.utils.comm as comm # type: ignore
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import CfgNode, get_cfg
 from detectron2.engine import (DefaultTrainer,

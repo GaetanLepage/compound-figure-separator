@@ -51,7 +51,7 @@ def caption_splitting_figure_eval(figure: Figure,
     num_gt_labels: int = 0
 
     # Get the dictionnary of detected subcaptions (if it exists).
-    detected_subcaptions: Dict[str, str] = figure.detected_subcaptions\
+    detected_subcaptions: Dict[str, str] = figure.detected_subcaptions \
                                            if hasattr(figure, 'detected_subcaptions')\
                                            else {}
 

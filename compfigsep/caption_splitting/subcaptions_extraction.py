@@ -30,7 +30,7 @@ import re
 from typing import List, Dict, Tuple, NamedTuple, Optional
 import itertools
 
-import nltk # type: ignore
+import nltk  # type: ignore
 
 from .regex_definitions import (RE_DIGITS,
                                 RE_DIGITS_POS,

@@ -38,7 +38,7 @@ _ANY_NON_ZERO_DIGIT = r"[1-9]"
 _ANY_LABEL = _ANY_CHAR + r'|' + _ANY_ROMAN + r'|' + _ANY_NON_ZERO_DIGIT
 
 # Build the regular expressions that match classes.
-RE_CHARACTERS = re.compile(r"((\b|\.|\()(" + _ANY_CHAR + r")(?![^).:0-9])[0-9]?(\)|\.|:|\b)?)")
+RE_CHARACTERS = re.compile(r"((\b|\.|\()(" + _ANY_CHAR + r")(?![^).:0-9])[0-9]?(\)|\.|:|\b")
 RE_ROMAN = re.compile(r"((\b|\.|\()(" + _ANY_ROMAN + r")+(?![^).:])(\)|\.|:|\b)?)")
 RE_DIGITS = re.compile(r"((\b|\.|\()(" \
     + _ANY_NON_ZERO_DIGIT + r")(?![^).:0-9])[0-9]?(\)|\.|:|\b)?)")

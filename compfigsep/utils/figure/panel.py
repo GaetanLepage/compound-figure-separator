@@ -221,15 +221,14 @@ class DetectedPanel(Panel):
 
     def draw(self,
              image: np.ndarray,
-             color: Color = DEFAULT_DETECTION_COLOR
-             ) -> None:
+             color: Color = DEFAULT_DETECTION_COLOR) -> None:
         """
         Draw the panel bounding box on the image.
         the image is affected by side-effect.
 
-        args:
-            image (np.ndarray): image to override with annotations.
-            color (color):      color to draw the element with.
+        Args:
+            image (np.ndarray): Image to override with annotations.
+            color (color):      Color to draw the element with.
         """
         # Set default color if needed.
         if color is None:
