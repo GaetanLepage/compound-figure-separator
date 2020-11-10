@@ -26,8 +26,8 @@ Classes Panel and DetectedPanel.
 from __future__ import annotations
 from typing import cast, Tuple, Dict, Optional, Any
 
-import cv2 # type: ignore
-import numpy as np # type: ignore
+import cv2
+import numpy as np
 
 from ..box import Box
 

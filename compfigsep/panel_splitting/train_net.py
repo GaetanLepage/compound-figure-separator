@@ -31,16 +31,16 @@ from argparse import ArgumentParser, Namespace
 from typing import List
 
 import detectron2.utils.comm as comm # type: ignore
-from detectron2.checkpoint import DetectionCheckpointer
-from detectron2.config import CfgNode, get_cfg
+from detectron2.checkpoint import DetectionCheckpointer # type: ignore
+from detectron2.config import CfgNode, get_cfg # type: ignore
 from detectron2.engine import (DefaultTrainer,
                                default_argument_parser,
                                default_setup,
                                launch,
-                               HookBase)
-from detectron2.evaluation import verify_results
-from detectron2.data.build import build_detection_test_loader
-from detectron2.data.dataset_mapper import DatasetMapper
+                               HookBase) # type: ignore
+from detectron2.evaluation import verify_results # type: ignore
+from detectron2.data.build import build_detection_test_loader # type: ignore
+from detectron2.data.dataset_mapper import DatasetMapper # type: ignore
 
 from compfigsep.panel_splitting import register_panel_splitting_dataset, PanelSplitEvaluator
 from compfigsep.utils.detectron_utils import LossEvalHook, add_validation_config
