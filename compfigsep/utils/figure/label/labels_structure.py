@@ -124,7 +124,7 @@ class LabelStructure:
             label_structure (LabelStructure):   An instance of the corresponding LabelStructure
                                                     object.
         """
-        labels_list = list(set(labels_list))
+        labels_list: List[str] = list(set(labels_list))
         # TODO maybe put in histogram...
         # Case where there are no named labels.
         if labels_list == ['_'] * len(labels_list):
@@ -253,7 +253,7 @@ class LabelStructure:
         return False
 
     def __str__(self) -> str:
-        string = str(self.labels_type)
+        string: str = str(self.labels_type)
         string += f" | number of labels : {self.num_labels}"
 
         return string

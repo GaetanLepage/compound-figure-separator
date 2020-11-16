@@ -219,7 +219,7 @@ class Figure:
                 "\n\tShould be {}".format(annotation_csv))
 
         # Create empty list of subfigures
-        subfigures = []
+        subfigures: List[SubFigure] = []
 
         # Open the csv file containing annotations
         with open(annotation_csv, 'r') as annotation_csv_file:

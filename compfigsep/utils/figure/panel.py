@@ -183,8 +183,9 @@ class DetectedPanel(Panel):
         if 'box' not in panel_dict:
             raise KeyError("The panel_dict should have a 'box' attribute")
 
-        detected_panel = DetectedPanel(box=panel_dict['box'],
-                                       detection_score=panel_dict.get('detection_score'))
+        detected_panel: DetectedPanel = DetectedPanel(
+            box=panel_dict['box'],
+            detection_score=panel_dict.get('detection_score'))
 
         detected_panel.is_true_positive_overlap = panel_dict.get('is_true_positive_overlap')
 
@@ -202,7 +203,7 @@ class DetectedPanel(Panel):
         """
 
         # Call the method form Panel class.
-        output_dict = super().to_dict()
+        output_dict: Dict = super().to_dict()
 
         if self.box is not None:
             output_dict['box'] = self.box

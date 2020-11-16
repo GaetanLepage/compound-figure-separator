@@ -24,7 +24,7 @@ Classes Label and DetectedLabel.
 """
 
 from __future__ import annotations
-from typing import cast, Tuple, Dict, Optional
+from typing import cast, Tuple, Dict, Optional, Any
 
 import cv2 # type: ignore
 import numpy as np # type: ignore
@@ -88,7 +88,7 @@ class Label:
             output_dict (Dict): A Dict representing the label information.
         """
 
-        output_dict: Dict = {}
+        output_dict: Dict[str, Any] = {}
 
         if self.text is not None:
             output_dict['text'] = self.text
@@ -194,7 +194,7 @@ class DetectedLabel(Label):
 
 
     @classmethod
-    def from_dict(cls, label_dict: Dict) -> DetectedLabel:
+    def from_dict(cls, label_dict: Dict[str, Any]) -> DetectedLabel:
         """
         Instanciate a DetectedLabel object from a dictionnary.
 
@@ -205,9 +205,10 @@ class DetectedLabel(Label):
             detected_label (DetectedLabel): The resulting DetectedLabel object.
         """
 
-        detected_label = DetectedLabel(text=label_dict.get('text'),
-                                       box=label_dict.get('box'),
-                                       detection_score=label_dict.get('detection_score'))
+        detected_label: DetectedLabel = DetectedLabel(
+            text=label_dict.get('text'),
+            box=label_dict.get('box'),
+            detection_score=label_dict.get('detection_score'))
 
         if 'is_true_positive' in label_dict:
             detected_label.is_true_positive = label_dict['is_true_positive']
@@ -215,7 +216,7 @@ class DetectedLabel(Label):
         return detected_label
 
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         """
         Export to a dict.
 

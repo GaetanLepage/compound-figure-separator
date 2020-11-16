@@ -45,19 +45,20 @@ def _compute_panel_label_distances(panels: List[Panel],
         distances (List[List[float]]):  The matrix containing the distances.
     """
     # calculate distance from panels to labels
-    distances = []
+    distances : List[List[float]] = []
     for panel in panels:
-        dists = []
-        panel_center = box.get_center(panel.box)
+        dists: List[float] = []
+
+        panel_center: box.Point = box.get_center(panel.box)
 
         for label in labels:
             if label.box is None:
                 continue
 
-            label_center = box.get_center(label.box)
+            label_center: box.Point = box.get_center(label.box)
 
-            distance = math.hypot(panel_center[0] - label_center[0],
-                                  panel_center[1] - label_center[1])
+            distance: float = math.hypot(panel_center[0] - label_center[0],
+                                         panel_center[1] - label_center[1])
             dists.append(distance)
 
         distances.append(dists)
