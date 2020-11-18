@@ -9,7 +9,7 @@
 GitHub:         https://github.com/GaetanLepage/compound-figure-separator
 
 Author:         Gaétan Lepage
-Email:          gaetan.lepage@grenoble-inp.org
+Email:          gaetan.lepage@grenoble-inp.fr
 Date:           Spring 2020
 
 Master's project @HES-SO (Sierre, SW)
