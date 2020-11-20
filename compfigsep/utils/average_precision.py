@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Function to compute the average precision.
 """
 
-import numpy as np # type: ignore
+import numpy as np
 
 def compute_average_precision(recall: np.ndarray,
                               precision: np.ndarray) -> float:

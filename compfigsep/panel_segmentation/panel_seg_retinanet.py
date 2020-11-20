@@ -26,22 +26,22 @@ Custom model derived from RetinaNet to achieve panel segmentation.
 import math
 from typing import cast, List, Tuple, Dict, Any, Union
 import torch
-from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss # type: ignore
+from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss
 from torch import nn, Tensor, LongTensor
 from torch.nn import functional as F
 
-from detectron2.layers import ShapeSpec, batched_nms, cat # type: ignore
-from detectron2.structures import Boxes, ImageList, Instances, pairwise_iou # type: ignore
-from detectron2.utils.events import get_event_storage # type: ignore
-from detectron2.config import CfgNode # type: ignore
+from detectron2.layers import ShapeSpec, batched_nms, cat
+from detectron2.structures import Boxes, ImageList, Instances, pairwise_iou
+from detectron2.utils.events import get_event_storage
+from detectron2.config import CfgNode
 
-from detectron2.modeling.anchor_generator import DefaultAnchorGenerator # type: ignore
-from detectron2.modeling.backbone.resnet import build_resnet_backbone # type: ignore
-from detectron2.modeling.box_regression import Box2BoxTransform # type: ignore
-from detectron2.modeling.matcher import Matcher # type: ignore
+from detectron2.modeling.anchor_generator import DefaultAnchorGenerator
+from detectron2.modeling.backbone.resnet import build_resnet_backbone
+from detectron2.modeling.box_regression import Box2BoxTransform
+from detectron2.modeling.matcher import Matcher
 
-from detectron2.modeling.backbone.fpn import FPN, LastLevelP6P7 # type: ignore
-from detectron2.modeling.meta_arch.retinanet import permute_to_N_HWA_K # type: ignore
+from detectron2.modeling.backbone.fpn import FPN, LastLevelP6P7
+from detectron2.modeling.meta_arch.retinanet import permute_to_N_HWA_K
 
 __all__ = ["PanelSegRetinaNet"]
 

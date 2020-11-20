@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Additional configuration options for PanelSegRetinaNet.
 """
 
-from detectron2.config import CfgNode # type: ignore
+from detectron2.config import CfgNode
 
 def add_panel_seg_config(cfg: CfgNode):
     """

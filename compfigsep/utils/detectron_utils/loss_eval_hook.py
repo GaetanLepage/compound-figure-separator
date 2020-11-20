@@ -31,13 +31,13 @@ from typing import List
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-import numpy as np # type: ignore
+import numpy as np
 
 
-from detectron2.engine.hooks import HookBase # type: ignore
-from detectron2.utils.logger import log_every_n_seconds # type: ignore
-import detectron2.utils.comm as comm # type: ignore
-from detectron2.utils.logger import setup_logger # type: ignore
+from detectron2.engine.hooks import HookBase
+from detectron2.utils.logger import log_every_n_seconds
+import detectron2.utils.comm as comm
+from detectron2.utils.logger import setup_logger
 
 
 class LossEvalHook(HookBase):

@@ -24,7 +24,6 @@ Post-processing tools to filter label detections.
 """
 
 from ..data.figure_generators import FigureGenerator
-from ..utils.figure import Figure
 
 
 def filter_labels(figure_generator: FigureGenerator):

@@ -29,7 +29,7 @@ import operator
 from enum import Enum
 from typing import List, Dict, Callable
 
-import numpy as np # type: ignore
+import numpy as np
 
 from .utils import (is_lower_char,
                     is_upper_char,

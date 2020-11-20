@@ -171,7 +171,7 @@ def export_figures_to_detectron_dict(figure_generator: FigureGenerator,
         raise ValueError("`task` has to be one of ['panel_splitting', 'label_recog',"\
                          f" 'panel_seg'] but is {task}")
 
-    from detectron2.structures import BoxMode # type: ignore
+    from detectron2.structures import BoxMode
 
     dataset_dicts: List[dict] = []
 

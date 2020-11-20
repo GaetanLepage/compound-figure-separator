@@ -52,7 +52,7 @@ def _parse_args(args: List[str]) -> Namespace:
     Returns:
         parser (Namespace): Populated namespace.
     """
-    parser = ArgumentParser(description="Evaluate caption splitting.")
+    parser: ArgumentParser = ArgumentParser(description="Evaluate caption splitting.")
 
     add_json_arg(parser=parser,
                  folder_default_relative_path='caption_splitting/output/')
@@ -71,7 +71,7 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    parsed_args = _parse_args(args)
+    parsed_args: Namespace = _parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
     figure_generator = JsonFigureGenerator(

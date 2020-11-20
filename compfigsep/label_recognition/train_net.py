@@ -34,23 +34,23 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
-import detectron2.utils.comm as comm # type: ignore
-from detectron2.utils.logger import setup_logger # type: ignore
-from detectron2.checkpoint import DetectionCheckpointer # type: ignore
-from detectron2.config import CfgNode, get_cfg # type: ignore
-from detectron2.engine import (DefaultTrainer, # type: ignore
-                               default_argument_parser, # type: ignore
-                               default_setup, # type: ignore
-                               launch, # type: ignore
-                               HookBase) # type: ignore
-from detectron2.evaluation import verify_results # type: ignore
-from detectron2.data.build import build_detection_test_loader # type: ignore
-from detectron2.data.dataset_mapper import DatasetMapper # type: ignore
+import detectron2.utils.comm as comm
+from detectron2.utils.logger import setup_logger
+from detectron2.checkpoint import DetectionCheckpointer
+from detectron2.config import CfgNode, get_cfg
+from detectron2.engine import (DefaultTrainer,
+                               default_argument_parser,
+                               default_setup,
+                               launch,
+                               HookBase)
+from detectron2.evaluation import verify_results
+from detectron2.data.build import build_detection_test_loader
+from detectron2.data.dataset_mapper import DatasetMapper
 
-from compfigsep.label_recognition import (register_label_recognition_dataset, # type: ignore
-                                          LabelRecogEvaluator, # type: ignore
-                                          LabelRecogRetinaNet) # type: ignore
-from compfigsep.utils.detectron_utils import LossEvalHook, add_validation_config # type: ignore
+from compfigsep.label_recognition import (register_label_recognition_dataset,
+                                          LabelRecogEvaluator,
+                                          LabelRecogRetinaNet)
+from compfigsep.utils.detectron_utils import LossEvalHook, add_validation_config
 
 
 class Trainer(DefaultTrainer):

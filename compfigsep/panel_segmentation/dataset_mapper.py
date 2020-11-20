@@ -29,14 +29,14 @@ from typing import List
 
 import copy
 import logging
-import numpy as np # type: ignore
+import numpy as np
 import torch
 
-from detectron2.data import detection_utils as utils # type: ignore
+from detectron2.data import detection_utils as utils
 from detectron2.data import transforms as T
 
-from detectron2.structures import BoxMode, Instances, Boxes # type: ignore
-from detectron2.config import CfgNode # type: ignore
+from detectron2.structures import BoxMode, Instances, Boxes
+from detectron2.config import CfgNode
 
 
 __all__ = ["PanelSegDatasetMapper"]
@@ -60,7 +60,7 @@ class PanelSegDatasetMapper:
 
     def __init__(self,
                  cfg: CfgNode,
-                 is_train: bool = True):
+                 is_train: bool = True) -> None:
         """
         Init method for class PanelSegDatasetMapper.
 
@@ -102,39 +102,39 @@ class PanelSegDatasetMapper:
         # Panels
 
         # Create an `Instances` object for panels
-        panel_instances = Instances(image_size)
+        panel_instances: Instances = Instances(image_size)
         # TODO remove
         # print("panel_instances:", panel_instances.get_fields())
 
-        panel_boxes = [BoxMode.convert(box=obj['bbox'],
-                                       from_mode=obj['bbox_mode'],
-                                       to_mode=BoxMode.XYXY_ABS)
-                       for obj in panel_annos]
-        panel_boxes = panel_instances.gt_boxes = Boxes(panel_boxes)
+        panel_boxes_list: List = [BoxMode.convert(box=obj['bbox'],
+                                                  from_mode=obj['bbox_mode'],
+                                                  to_mode=BoxMode.XYXY_ABS)
+                                  for obj in panel_annos]
+        panel_boxes = panel_instances.gt_boxes = Boxes(panel_boxes_list)
         panel_boxes.clip(image_size)
 
         # Only one class (panel)
-        panel_classes = [0 for obj in panel_annos]
-        panel_classes = torch.tensor(panel_classes, dtype=torch.int64)
-        panel_instances.gt_classes = panel_classes
+        panel_classes: List[int] = [0 for obj in panel_annos]
+        panel_classes_tensor: torch.Tensor = torch.tensor(panel_classes, dtype=torch.int64)
+        panel_instances.gt_classes = panel_classes_tensor
 
 
         # Labels (also handle case where there are no labels)
-        label_boxes = [BoxMode.convert(box=obj['bbox'],
-                                       from_mode=obj['bbox_mode'],
-                                       to_mode=BoxMode.XYXY_ABS)
-                       for obj in label_annos]
+        label_boxes_list: List = [BoxMode.convert(box=obj['bbox'],
+                                                  from_mode=obj['bbox_mode'],
+                                                  to_mode=BoxMode.XYXY_ABS)
+                                  for obj in label_annos]
 
         # Create an `Instances` object for labels
-        label_instances = Instances(image_size)
+        label_instances: Instances = Instances(image_size)
         # if len(label_boxes) > 0:
 
-        label_boxes = label_instances.gt_boxes = Boxes(label_boxes)
+        label_boxes = label_instances.gt_boxes = Boxes(label_boxes_list)
         label_boxes.clip(image_size)
 
-        label_classes = [obj['label'] for obj in label_annos]
-        label_classes = torch.tensor(label_classes, dtype=torch.int64)
-        label_instances.gt_classes = label_classes
+        label_classes: List[int] = [obj['label'] for obj in label_annos]
+        label_classes_tensor: torch.Tensor = torch.tensor(label_classes, dtype=torch.int64)
+        label_instances.gt_classes = label_classes_tensor
 
         assert len(label_boxes) == len(label_classes),\
             f"There are {len(label_boxes)} boxes but {len(label_classes)} labels."
@@ -152,7 +152,7 @@ class PanelSegDatasetMapper:
         """
         dataset_dict = copy.deepcopy(dataset_dict)  # it will be modified by code below
         # USER: Write your own image loading if it's not from a file
-        image = utils.read_image(dataset_dict["file_name"], format=self.img_format)
+        image: np.ndarray = utils.read_image(dataset_dict["file_name"], format=self.img_format)
         utils.check_image_size(dataset_dict, image)
 
         # TODO simplify this

@@ -25,7 +25,7 @@ Module to evaluate the panel segmentation task metrics.
 
 from typing import Dict, Any
 from pprint import pprint
-from sortedcontainers import SortedKeyList # type: ignore
+from sortedcontainers import SortedKeyList
 
 from ..data.figure_generators import FigureGenerator
 from ..panel_splitting.evaluate import panel_splitting_figure_eval, panel_splitting_metrics

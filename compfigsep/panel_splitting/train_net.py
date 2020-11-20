@@ -30,17 +30,20 @@ This scripts reads a given config file and runs the training or evaluation.
 from argparse import ArgumentParser, Namespace
 from typing import List
 
-import detectron2.utils.comm as comm # type: ignore
-from detectron2.checkpoint import DetectionCheckpointer # type: ignore
-from detectron2.config import CfgNode, get_cfg # type: ignore
+from torch.utils.data import DataLoader
+from torch import nn
+
+import detectron2.utils.comm as comm
+from detectron2.checkpoint import DetectionCheckpointer
+from detectron2.config import CfgNode, get_cfg
 from detectron2.engine import (DefaultTrainer,
                                default_argument_parser,
                                default_setup,
                                launch,
-                               HookBase) # type: ignore
-from detectron2.evaluation import verify_results # type: ignore
-from detectron2.data.build import build_detection_test_loader # type: ignore
-from detectron2.data.dataset_mapper import DatasetMapper # type: ignore
+                               HookBase)
+from detectron2.evaluation import verify_results
+from detectron2.data.build import build_detection_test_loader
+from detectron2.data.dataset_mapper import DatasetMapper
 
 from compfigsep.panel_splitting import register_panel_splitting_dataset, PanelSplitEvaluator
 from compfigsep.utils.detectron_utils import LossEvalHook, add_validation_config
@@ -87,9 +90,9 @@ class Trainer(DefaultTrainer):
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            data_set_mapper = DatasetMapper(cfg=self.cfg,
-                                            is_train=True)
-            data_loader = build_detection_test_loader(cfg=self.cfg,
+            data_set_mapper: DatasetMapper = DatasetMapper(cfg=self.cfg,
+                                                           is_train=True)
+            data_loader: DataLoader = build_detection_test_loader(cfg=self.cfg,
                                                       dataset_name=self.cfg.DATASETS.VALIDATION,
                                                       mapper=data_set_mapper)
 
@@ -113,7 +116,7 @@ def setup(parsed_args: Namespace) -> CfgNode:
     Retuns:
         cfg (CfgNode):  A config node filled with necessary options.
     """
-    cfg = get_cfg()
+    cfg: CfgNode = get_cfg()
 
     # Add some config options to handle validation
     add_validation_config(cfg)
@@ -156,7 +159,7 @@ def main(parsed_args: Namespace) -> dict:
         If training:    OrderedDict of results, if evaluation is enabled. Otherwise None.
         If test:    A dict of result metrics.
     """
-    cfg = setup(parsed_args)
+    cfg: CfgNode = setup(parsed_args)
 
     # Register the needed datasets
     register_datasets(cfg)
@@ -165,19 +168,19 @@ def main(parsed_args: Namespace) -> dict:
     if parsed_args.eval_only:
 
         # Load the model
-        model = Trainer.build_model(cfg)
+        model: nn.Module = Trainer.build_model(cfg)
 
         # Load the latest weights
         DetectionCheckpointer(model,
                               save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS,
                                                                       resume=parsed_args.resume)
-        res = Trainer.test(cfg, model)
+        res: dict = Trainer.test(cfg, model)
         if comm.is_main_process():
             verify_results(cfg, res)
         return res
 
     # Training
-    trainer = Trainer(cfg)
+    trainer: Trainer = Trainer(cfg)
     trainer.resume_or_load(resume=parsed_args.resume)
     return trainer.train()
 

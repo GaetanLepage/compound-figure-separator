@@ -26,7 +26,7 @@ Custom hook to write the model graph (architecture) in TensorBoard storage.
 from torch import nn
 from torch.utils.tensorboard import SummaryWriter
 
-from detectron2.engine.hooks import HookBase # type: ignore
+from detectron2.engine.hooks import HookBase
 
 
 class ModelWriter(HookBase):

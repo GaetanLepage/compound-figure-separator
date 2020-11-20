@@ -120,6 +120,13 @@ def _message_update_rule(label_from: DetectedLabel,
                          label_to: DetectedLabel) -> float:
     """
     TODO
+
+    Args:
+        label_from (DetectedLabel): TODO
+        label_to (DetectedLabel):   TODO
+
+    Returns:
+        prob_message (float):   TODO
     """
 
     prob_message: float
@@ -131,6 +138,12 @@ def _build_neighbors(label_list: List[DetectedLabel]) -> Dict[DetectedLabel,
                                                               Set[DetectedLabel]]:
     """
     TODO
+
+    Args:
+        label_list (List[DetectedLabel]):   List of detected labels.
+
+    Returns:
+        neighbors_sets (Dict[DetectedLabel, Set[DetectedLabel]]):   TODO
     """
 
     neighbors_sets: Dict[DetectedLabel, Set[DetectedLabel]] = {
@@ -166,6 +179,16 @@ def _build_neighbors(label_list: List[DetectedLabel]) -> Dict[DetectedLabel,
 
 def _belief(label: DetectedLabel,
             neighbors: Set[DetectedLabel]) -> float:
+    """
+    TODO
+
+    Args:
+        label (DetectedLabel):          TODO
+        neighbors (Set[DetectedLabel]): TODO
+
+    Returns:
+        TODO (float):   TODO
+    """
 
     return _unary_compatibility(label) * max(_message_update_rule(label_from=label_from,
                                                                   label_to=label)

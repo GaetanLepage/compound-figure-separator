@@ -33,7 +33,7 @@ import datetime
 from typing import Iterable
 from argparse import ArgumentParser
 
-import progressbar # type: ignore
+import progressbar
 
 import compfigsep
 

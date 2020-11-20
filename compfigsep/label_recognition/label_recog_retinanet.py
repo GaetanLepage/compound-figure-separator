@@ -30,22 +30,22 @@ from typing import List, Dict, Tuple, Any
 import torch
 from torch import nn, Tensor, LongTensor
 # from torch.nn import functional as F
-from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss # type: ignore
+from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss
 
-from detectron2.layers import ShapeSpec, batched_nms, cat # type: ignore
-from detectron2.structures import Boxes, ImageList, Instances, pairwise_iou # type: ignore
-from detectron2.utils.events import get_event_storage # type: ignore
-from detectron2.config import CfgNode # type: ignore
+from detectron2.layers import ShapeSpec, batched_nms, cat
+from detectron2.structures import Boxes, ImageList, Instances, pairwise_iou
+from detectron2.utils.events import get_event_storage
+from detectron2.config import CfgNode
 
-from detectron2.modeling.anchor_generator import build_anchor_generator # type: ignore
-from detectron2.modeling.backbone.resnet import build_resnet_backbone # type: ignore
-from detectron2.modeling.box_regression import Box2BoxTransform # type: ignore
-from detectron2.modeling.matcher import Matcher # type: ignore
-from detectron2.modeling.postprocessing import detector_postprocess # type: ignore
+from detectron2.modeling.anchor_generator import build_anchor_generator
+from detectron2.modeling.backbone.resnet import build_resnet_backbone
+from detectron2.modeling.box_regression import Box2BoxTransform
+from detectron2.modeling.matcher import Matcher
+from detectron2.modeling.postprocessing import detector_postprocess
 
-from detectron2.modeling.meta_arch.retinanet import permute_to_N_HWA_K # type: ignore
+from detectron2.modeling.meta_arch.retinanet import permute_to_N_HWA_K
 
-from detectron2.modeling.backbone.fpn import FPN # type: ignore
+from detectron2.modeling.backbone.fpn import FPN
 
 
 __all__ = ["LabelRecogRetinaNet"]

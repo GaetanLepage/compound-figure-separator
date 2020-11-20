@@ -27,16 +27,14 @@ boxes.
 """
 
 import sys
-import os
 from argparse import ArgumentParser, Namespace
 
 from typing import List
 
-sys.path.append('.')
-
 from compfigsep.data.figure_generators import JsonFigureGenerator
 from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
 
+sys.path.append('.')
 
 def parse_args(args: List[str]) -> Namespace:
     """
@@ -48,7 +46,8 @@ def parse_args(args: List[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser = ArgumentParser(description="Preview all the figures from an ImageCLEF data set.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Preview all the figures from an ImageCLEF data set.")
 
     # TODO check default path
     parser.add_argument('--json',
@@ -72,18 +71,18 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    args = parse_args(args)
+    parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling ImageCLEF xml annotation files.
-    figure_generator = JsonFigureGenerator(
-        json_path=args.json)
+    figure_generator: JsonFigureGenerator = JsonFigureGenerator(
+        json_path=parsed_args.json)
 
     # Preview the data set.
     view_data_set(figure_generator=figure_generator,
-                  mode=args.mode,
-                  save_preview=args.save_preview,
-                  preview_folder=args.json.replace('.json', '_preview/'),
-                  delay=args.delay,
+                  mode=parsed_args.mode,
+                  save_preview=parsed_args.save_preview,
+                  preview_folder=parsed_args.json.replace('.json', '_preview/'),
+                  delay=parsed_args.delay,
                   window_name="JSON data preview")
 
 

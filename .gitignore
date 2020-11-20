@@ -4,6 +4,8 @@
 # Data set archives
 *.zip
 
+.vim/
+
 
 *.iml
 # models/

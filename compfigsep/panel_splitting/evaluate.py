@@ -25,8 +25,8 @@ Module to evaluate the panel splitting task metrics.
 
 from typing import Dict, Tuple, Any
 
-from sortedcontainers import SortedKeyList # type: ignore
-import numpy as np # type: ignore
+from sortedcontainers import SortedKeyList
+import numpy as np
 
 from ..data.figure_generators import FigureGenerator
 
@@ -92,8 +92,8 @@ def panel_splitting_metrics(stat_dict: Dict[str, Any]) -> Tuple[float, float, fl
     imageclef_accuracy: float = stat_dict['sum_imageclef_accuracies'] / stat_dict['num_samples']
 
     # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
-    true_positives = [np.float(is_positive)
-                      for _, is_positive in stat_dict['detections']]
+    true_positives: np.array = [np.float(is_positive)
+                                for _, is_positive in stat_dict['detections']]
 
     overall_correct_count: int = np.sum(true_positives)
 
@@ -130,7 +130,7 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
     Returns:
         metrics (Dict[str, float]): A dict containing the computed metrics.
     """
-    stats = {
+    stats: Dict[str, Any] = {
         'num_samples': 0,
         'overall_gt_count': 0,
         'overall_detected_count': 0,
@@ -150,7 +150,7 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
           f"Recall: {recall:.3f}\n"\
           f"mAP (IoU threshold = 0.5): {mean_average_precision:.3f}")
 
-    metrics = {
+    metrics: Dict[str, float] = {
         'image_clef_accuracy': imageclef_accuracy,
         'precision': precision,
         'recall': recall,

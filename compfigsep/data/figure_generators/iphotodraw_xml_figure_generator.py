@@ -30,7 +30,7 @@ import logging
 from typing import Iterable, List
 from argparse import ArgumentParser
 
-import progressbar # type: ignore
+import progressbar
 
 from ...utils.figure.figure import Figure
 from .figure_generator import FigureGenerator

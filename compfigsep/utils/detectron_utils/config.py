@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Additional config options to handle the evaluation of a validation set during training.
 """
 
-from detectron2.config import CfgNode # type: ignore
+from detectron2.config import CfgNode
 
 def add_validation_config(cfg: CfgNode) -> None:
     """

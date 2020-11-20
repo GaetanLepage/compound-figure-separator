@@ -26,7 +26,7 @@ Evaluation tool for caption splitting.
 from typing import Dict, Any
 from pprint import pprint
 
-import textdistance # type: ignore
+import textdistance
 
 from ..utils.figure import Figure
 from ..data.figure_generators import FigureGenerator

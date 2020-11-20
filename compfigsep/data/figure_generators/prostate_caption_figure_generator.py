@@ -28,7 +28,7 @@ import os
 import logging
 from typing import Iterable
 
-from progressbar import progressbar # type: ignore
+from progressbar import progressbar
 
 from ...utils.figure.figure import Figure
 from . import ImageListFigureGenerator

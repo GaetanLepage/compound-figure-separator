@@ -31,14 +31,14 @@ from argparse import ArgumentParser, Namespace
 
 from typing import List
 
-import compfigsep # type: ignore
-
-sys.path.append('.')
-
-MODULE_DIR = os.path.dirname(compfigsep.__file__)
+import compfigsep
 
 from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
 from compfigsep.panel_splitting.evaluate import evaluate_detections
+
+sys.path.append('.')
+
+MODULE_DIR: str = os.path.dirname(compfigsep.__file__)
 
 
 def parse_args(args: List[str]) -> Namespace:
@@ -51,7 +51,7 @@ def parse_args(args: List[str]) -> Namespace:
     Returns:
         parser (Namespace): Populated namespace.
     """
-    parser = ArgumentParser(description="Evaluate panel splitting detections.")
+    parser: ArgumentParser = ArgumentParser(description="Evaluate panel splitting detections.")
 
     add_json_arg(parser=parser,
                  folder_default_relative_path='panel_splitting/output_imageclef/')
@@ -70,10 +70,10 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    parsed_args = parse_args(args)
+    parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
-    figure_generator = JsonFigureGenerator(json_path=parsed_args.json)
+    figure_generator: JsonFigureGenerator = JsonFigureGenerator(json_path=parsed_args.json)
 
     # Evaluate the data set.
     evaluate_detections(figure_generator=figure_generator)

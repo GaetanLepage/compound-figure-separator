@@ -26,6 +26,7 @@ opencv-python
 # Text #
 ########
 textdistance
+nltk
 
 ############################
 # Documentation generation #

@@ -27,24 +27,25 @@ Panel Segmentation detection training script.
 This scripts reads a given config file and runs the training or evaluation.
 """
 
-import os
 from argparse import Namespace
 from typing import List
+
+from logging import Logger
 
 import torch
 from torch.utils.data import DataLoader
 from torch import nn
 
-import detectron2.utils.comm as comm # type: ignore
-from detectron2.utils.logger import setup_logger # type: ignore
-from detectron2.checkpoint import DetectionCheckpointer # type: ignore
-from detectron2.config import CfgNode, get_cfg # type: ignore
+import detectron2.utils.comm as comm
+from detectron2.utils.logger import setup_logger
+from detectron2.checkpoint import DetectionCheckpointer
+from detectron2.config import CfgNode, get_cfg
 from detectron2.engine import (DefaultTrainer,
                                default_argument_parser,
                                default_setup,
                                launch,
-                               HookBase) # type: ignore
-from detectron2.evaluation import verify_results # type: ignore
+                               HookBase)
+from detectron2.evaluation import verify_results
 from detectron2.data.build import (build_detection_train_loader,
                                    build_detection_test_loader)
 
@@ -116,7 +117,7 @@ class Trainer(DefaultTrainer):
         Returns:
             a DataLoader yielding formatted test examples.
         """
-        mapper = PanelSegDatasetMapper(cfg, is_train=False)
+        mapper: PanelSegDatasetMapper = PanelSegDatasetMapper(cfg, is_train=False)
         return build_detection_test_loader(cfg,
                                            dataset_name=dataset_name,
                                            mapper=mapper)
@@ -132,7 +133,7 @@ class Trainer(DefaultTrainer):
         Returns:
             list[HookBase]: The list of hooks to call during training.
         """
-        hooks = super().build_hooks()
+        hooks: List[HookBase] = super().build_hooks()
 
         # TODO remove as it can't work
         # input_example = next(iter(self.data_loader))
@@ -142,17 +143,19 @@ class Trainer(DefaultTrainer):
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            data_set_mapper = PanelSegDatasetMapper(cfg=self.cfg,
-                                                    is_train=True)
-            data_loader = build_detection_test_loader(cfg=self.cfg,
-                                                      dataset_name=self.cfg.DATASETS.VALIDATION,
-                                                      mapper=data_set_mapper)
+            data_set_mapper: PanelSegDatasetMapper = PanelSegDatasetMapper(cfg=self.cfg,
+                                                                           is_train=True)
+            data_loader: DataLoader = build_detection_test_loader(
+                cfg=self.cfg,
+                dataset_name=self.cfg.DATASETS.VALIDATION,
+                mapper=data_set_mapper)
 
-            loss_eval_hook = LossEvalHook(eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
-                                          model=self.model,
-                                          data_loader=data_loader)
-            hooks.insert(index=-1,
-                         obj=loss_eval_hook)
+            loss_eval_hook: LossEvalHook = LossEvalHook(
+                eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
+                model=self.model,
+                data_loader=data_loader)
+
+            hooks.insert(-1, loss_eval_hook)
 
         return hooks
 
@@ -168,11 +171,13 @@ class Trainer(DefaultTrainer):
         Returns:
             model (nn.Module):  The PanelSegRetinaNet model.
         """
-        model = PanelSegRetinaNet(cfg)
+        model: PanelSegRetinaNet = PanelSegRetinaNet(cfg)
         model.to(torch.device(cfg.MODEL.DEVICE))
-        logger = setup_logger(name=__name__,
-                              distributed_rank=comm.get_rank())
+
+        logger: Logger = setup_logger(name=__name__,
+                                      distributed_rank=comm.get_rank())
         logger.info("Model:\n%s", model)
+
         return model
 
 

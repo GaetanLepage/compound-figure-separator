@@ -26,8 +26,8 @@ Module to evaluate the panel splitting task metrics.
 from typing import Tuple, Dict, List, Any
 from pprint import pprint
 
-from sortedcontainers import SortedKeyList # type: ignore
-import numpy as np # type: ignore
+from sortedcontainers import SortedKeyList
+import numpy as np
 
 from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
@@ -66,7 +66,7 @@ def label_recognition_figure_eval(figure: Figure,
 
         # TODO remove
         num_gt_labels += 1
-        cls = gt_label.text
+        cls: str = gt_label.text
 
         stat_dict['overall_gt_count'] += 1
 
@@ -82,9 +82,12 @@ def label_recognition_figure_eval(figure: Figure,
     print("Number of GT labels :", num_gt_labels)
     print("Number of detected labels :", len(figure.detected_labels))
 
-    num_correct = 0
+    num_correct: int = 0
     for detected_label in figure.detected_labels:
         num_correct += int(detected_label.is_true_positive)
+
+        if detected_label.text is None:
+            continue
 
         cls = detected_label.text
 

@@ -25,9 +25,9 @@ Also handles the detection information.
 """
 
 from __future__ import annotations
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Optional
 
-import numpy as np # type: ignore
+import numpy as np
 
 from . import Panel, DetectedPanel, Label, DetectedLabel
 
@@ -60,9 +60,9 @@ class SubFigure:
             caption (str):  Caption text.
         """
 
-        self.panel = panel
-        self.label = label
-        self.caption = caption
+        self.panel: Optional[Panel] = panel
+        self.label: Optional[Label] = label
+        self.caption: Optional[str] = caption
 
 
     @classmethod
@@ -167,10 +167,9 @@ class DetectedSubFigure(SubFigure):
 
         Args:
         """
-        # Call the SubFigure init.
-        super().__init__(panel=panel,
-                         label=label,
-                         caption=caption)
+        self.panel: Optional[DetectedPanel] = panel
+        self.label: Optional[DetectedLabel] = label
+        self.caption: Optional[str] = caption
 
         self.is_true_positive = False
 
@@ -179,8 +178,7 @@ class DetectedSubFigure(SubFigure):
 
     @classmethod
     def from_normal_sub_figure(cls,
-                               subfigure: SubFigure
-                               ) -> DetectedSubFigure:
+                               subfigure: SubFigure) -> DetectedSubFigure:
         """
         Build a DetectedSubFigure object from a normal Figure object.
 

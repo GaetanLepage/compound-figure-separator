@@ -25,7 +25,7 @@ Functions to merge image label and text label information to filter detections.
 
 from typing import List
 
-from ..utils.figure.label import (LabelStructure)
+from ..utils.figure.label import LabelStructure
 
 
 def label_filtering(text_labels: List[str],

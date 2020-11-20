@@ -31,9 +31,9 @@ from pprint import pprint
 from copy import copy
 
 import torch
-from detectron2.data import MetadataCatalog # type: ignore
-from detectron2.evaluation.evaluator import DatasetEvaluator # type: ignore
-from detectron2.utils import comm # type: ignore
+from detectron2.data import MetadataCatalog
+from detectron2.evaluation.evaluator import DatasetEvaluator
+from detectron2.utils import comm
 
 import compfigsep
 from ..figure import Figure

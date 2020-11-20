@@ -28,12 +28,12 @@ from __future__ import annotations
 import os
 import csv
 import logging
-from typing import cast, List, Dict, Set
+from typing import cast, List, Dict, Set, Optional, Any
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 
-import numpy as np # type: ignore
-from cv2 import cv2 # type: ignore
+import numpy as np
+from cv2 import cv2
 
 from .sub_figure import SubFigure, DetectedSubFigure, Color
 from .panel import Panel, DetectedPanel
@@ -293,20 +293,22 @@ class Figure:
             Returns:
                 x_min, y_min, x_max, y_max (box.Box):   The coordinates of the bounding box.
             """
-            extent_item = item.find('./Data/Extent')
+            extent_item: Optional[ET.Element] = item.find('./Data/Extent')
+            if not extent_item:
+                raise ValueError("xml file is not valid")
 
             # Get data from the xml item.
-            height_string = extent_item.get('Height')
-            width_string = extent_item.get('Width')
+            height_string: str = extent_item.attrib['Height']
+            width_string: str = extent_item.attrib['Width']
 
-            x_string = extent_item.get('X')
-            y_string = extent_item.get('Y')
+            x_string: str = extent_item.attrib['X']
+            y_string: str = extent_item.attrib['Y']
 
             # Compute coordinates of the bounding box.
-            x_min = round(float(x_string))
-            y_min = round(float(y_string))
-            x_max = x_min + round(float(width_string))
-            y_max = y_min + round(float(height_string))
+            x_min: int = round(float(x_string))
+            y_min: int = round(float(y_string))
+            x_max: int = x_min + round(float(width_string))
+            y_max: int = y_min + round(float(height_string))
 
             # Clip values with respect to the image shape.
             if x_min < 0:
@@ -331,10 +333,12 @@ class Figure:
             panel_dict: Dict[str, List[Panel]] = {}
 
             for panel_item in panel_items:
-                text_item = panel_item.find('./BlockText/Text')
-                label_text: str = text_item.text
-                label_text = label_text.strip()
-                words: str = label_text.split(' ')
+                text_item: Optional[ET.Element] = panel_item.find('./BlockText/Text')
+                if text_item is None or text_item.text is None:
+                    continue
+
+                label_text: str = text_item.text.strip()
+                words: List[str] = label_text.split(' ')
 
                 # Panels can only have 1 or 2 words:
                 # *) The first one is "panel"
@@ -388,10 +392,12 @@ class Figure:
             label_dict: Dict[str, List[Label]] = {}
 
             for label_item in label_items:
-                text_item = label_item.find('./BlockText/Text')
-                label_text: str = text_item.text
-                label_text = label_text.strip()
-                words: str = label_text.split(' ')
+                text_item: Optional[ET.Element] = label_item.find('./BlockText/Text')
+                if text_item is None or text_item.text is None:
+                    continue
+
+                label_text: str = text_item.text.strip()
+                words: List[str] = label_text.split(' ')
 
                 # Labels can only have 2 words:
                 # *) The first one is "label"
@@ -532,10 +538,15 @@ class Figure:
         shape_items: List[ET.Element] = root.findall('./Layers/Layer/Shapes/Shape')
 
         # Read All Items (Panels and Labels)
-        panel_items: List[Panel] = []
-        label_items: List[Label] = []
+        panel_items: List[ET.Element] = []
+        label_items: List[ET.Element] = []
+
         for shape_item in shape_items:
-            text_item: ET.Element = shape_item.find('./BlockText/Text')
+
+            text_item: Optional[ET.Element] = shape_item.find('./BlockText/Text')
+            if text_item is None or text_item.text is None:
+                continue
+
             text: str = text_item.text.lower()
             if text.startswith('panel'):
                 panel_items.append(shape_item)
@@ -655,8 +666,8 @@ class Figure:
                                             true with respect to the overlap value.
         """
         # Keep track of the associations.
-        picked_gt_panels_overlap = [False] * len(self.gt_subfigures)
-        picked_gt_panels_iou = [False] * len(self.gt_subfigures)
+        picked_gt_panels_overlap: List[bool] = [False] * len(self.gt_subfigures)
+        picked_gt_panels_iou: List[bool] = [False] * len(self.gt_subfigures)
 
         for detected_panel in self.detected_panels:
             max_iou: float = -1
@@ -667,7 +678,7 @@ class Figure:
 
             for gt_panel_index, gt_subfigure in enumerate(self.gt_subfigures):
 
-                gt_panel = gt_subfigure.panel
+                gt_panel: Optional[Panel] = gt_subfigure.panel
 
                 if gt_panel is None:
                     continue
@@ -677,7 +688,7 @@ class Figure:
                 if intersection_area == 0:
                     continue
 
-                detected_panel_area: float = box.area(detected_panel.box)
+                detected_panel_area: int = box.area(detected_panel.box)
 
                 # --> Using ImageCLEF metric (overlap)
                 overlap: float = intersection_area / detected_panel_area
@@ -688,7 +699,7 @@ class Figure:
                     best_matching_gt_panel_overlap_index = gt_panel_index
 
                 # --> Using IoU (common for object detection)
-                iou = box.iou(gt_panel.box, detected_panel.box)
+                iou: float = box.iou(gt_panel.box, detected_panel.box)
 
                 # Potential match
                 if iou > max_iou:
@@ -732,7 +743,7 @@ class Figure:
                                         true.
         """
         # Keep track of the associations.
-        picked_gt_labels_indices = [False] * len(self.gt_subfigures)
+        picked_gt_labels_indices: List[bool] = [False] * len(self.gt_subfigures)
 
         # Loop over detected labels.
         for detected_label in self.detected_labels:
@@ -746,7 +757,6 @@ class Figure:
 
                 gt_label: Label = gt_subfigure.label
 
-                # TODO laverage the 'single-character label' restriction.
                 if gt_label.box is None\
                     or gt_label.text is None\
                     or len(gt_label.text) != 1:
@@ -760,7 +770,7 @@ class Figure:
                 assert detected_label.box is not None
 
                 # Compute IoU between detection and ground truth.
-                iou = box.iou(gt_label.box, detected_label.box)
+                iou: float = box.iou(gt_label.box, detected_label.box)
 
                 # Potential match
                 if iou > max_iou:
@@ -793,23 +803,39 @@ class Figure:
                                         true.
         """
         # Keep track of the associations.
-        picked_gt_subfigures_indices = [False] * len(self.gt_subfigures)
+        picked_gt_subfigures_indices: List[bool] = [False] * len(self.gt_subfigures)
 
         # Loop over detected subfigures.
         for detected_subfigure in self.detected_subfigures:
-            max_iou = -1
-            best_matching_gt_subfigure_index = -1
+            max_iou: float = -1
+            best_matching_gt_subfigure_index: int = -1
 
-            detected_panel = detected_subfigure.panel
-            detected_label = detected_subfigure.label
+            detected_panel: Optional[DetectedPanel] = detected_subfigure.panel
+
+            # If the detected panel is not valid, skip this subfigure
+            if detected_panel is None:
+                continue
+
+            detected_label: Optional[DetectedLabel] = detected_subfigure.label
+
+            # If the detected label is not valid, skip this subfigure
+            if detected_label is None:
+                continue
 
             for gt_subfigure_index, gt_subfigure in enumerate(self.gt_subfigures):
 
                 gt_panel = gt_subfigure.panel
                 gt_label = gt_subfigure.label
 
-                # TODO laverage the 'single-character label' restriction.
-                if gt_label.box is None or len(gt_label.text) != 1:
+                # If the GT panel is not valid (missing information), skip this subfigure
+                if gt_panel is None or gt_panel.box is None:
+                    continue
+
+                # If the GT label is not valid (missing information), skip this subfigure
+                if gt_label is None \
+                        or gt_label.box is None \
+                        or gt_label.text is None \
+                        or len(gt_label.text) != 1:
                     continue
 
                 # If the label classes do not match, no need to compute the IoU.
@@ -817,7 +843,7 @@ class Figure:
                     continue
 
                 # Compute IoU between detection and ground truth.
-                iou = box.iou(gt_panel.box, detected_panel.box)
+                iou: float = box.iou(gt_panel.box, detected_panel.box)
 
                 # Potential match
                 if iou > max_iou:
@@ -851,7 +877,7 @@ class Figure:
 
         # Loop over detected labels.
         for detected_caption in self.detected_captions:
-            max_iou = -1
+            max_iou: int = -1
             best_matching_gt_caption_index = -1
 
             for gt_caption_index, gt_subfigure in enumerate(self.gt_subfigures):
@@ -1027,7 +1053,7 @@ class Figure:
             window_name (str):  Name of the image display window.
         """
 
-        image_preview = self.get_preview(mode)
+        image_preview: np.ndarray = self.get_preview(mode)
 
         if window_name is None:
             window_name = self.image_filename
@@ -1051,7 +1077,7 @@ class Figure:
             folder (str):   The folder where to store the image preview.
         """
         # Get the preview image.
-        preview_img = self.get_preview(mode)
+        preview_img: np.ndarray = self.get_preview(mode)
 
         # Default output directory.
         if folder is None:
@@ -1064,10 +1090,9 @@ class Figure:
             os.makedirs(folder)
 
         # Remove extension from original figure image file name
-        file_name = os.path.splitext(
-            self.image_filename)[0]
+        file_name: str = os.path.splitext(self.image_filename)[0]
 
-        export_path = os.path.join(folder, file_name + "_preview.jpg")
+        export_path: str = os.path.join(folder, file_name + "_preview.jpg")
         export_path = os.path.abspath(export_path)
 
         # Write the preview image file to destination
@@ -1098,11 +1123,11 @@ class Figure:
                           csv_export_dir)
 
         # Remove extension from original figure image file name.
-        csv_export_file_name = os.path.splitext(self.image_filename)[0] + '.csv'
+        csv_export_file_name: str = os.path.splitext(self.image_filename)[0] + '.csv'
 
         # Compute csv annotation file path.
-        csv_file_path = os.path.join(csv_export_dir,
-                                     csv_export_file_name)
+        csv_file_path: str = os.path.join(csv_export_dir,
+                                          csv_export_file_name)
 
         # Check if file already exists.
         if os.path.isfile(csv_file_path):
@@ -1122,22 +1147,19 @@ class Figure:
                     continue
 
                 # Panel information
-                csv_row = [self.image_path,
-                           subfigure.panel.box[0],
-                           subfigure.panel.box[1],
-                           subfigure.panel.box[2],
-                           subfigure.panel.box[3],
-                           'panel']
+                csv_row: List = [self.image_path,
+                                 subfigure.panel.box[0],
+                                 subfigure.panel.box[1],
+                                 subfigure.panel.box[2],
+                                 subfigure.panel.box[3],
+                                 'panel']
 
                 # Label information
                 if subfigure.label is not None \
                     and subfigure.label.box is not None:
 
                     # Label bounding box
-                    csv_row.append(subfigure.label.box[0])
-                    csv_row.append(subfigure.label.box[1])
-                    csv_row.append(subfigure.label.box[2])
-                    csv_row.append(subfigure.label.box[3])
+                    csv_row.extend(subfigure.label.box)
 
                     # Label text
                     csv_row.append(subfigure.label.text)
@@ -1154,7 +1176,7 @@ class Figure:
             output_dict (Dict): A Dict representing the figure information.
         """
 
-        output_dict = {
+        output_dict: Dict[str, Any] = {
             'image_path': self.image_path,
             'image_width': self.image_width,
             'image_height': self.image_height

@@ -29,7 +29,7 @@ import sys
 import os
 import logging
 import urllib.request
-from typing import List
+from typing import List, Optional
 from argparse import ArgumentParser, Namespace
 
 import xml.etree.ElementTree as ET
@@ -53,8 +53,8 @@ def parse_args(args: List[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser = ArgumentParser(description="Convert the ImageCLEF dataset to a"\
-                                        " TFRecord file.")
+    parser: ArgumentParser = ArgumentParser(description="Convert the ImageCLEF dataset to a"\
+                                                        " TFRecord file.")
 
     parser.add_argument('--file_list_txt',
                         help="The path to the txt file listing the images.",
@@ -69,7 +69,7 @@ def parse_args(args: List[str]) -> Namespace:
 
 
 def get_captions(file_list_txt: str,
-                 override: bool = False):
+                 override: bool = False) -> None:
     """
     Download caption data from PubMedCentral data base.
 
@@ -86,11 +86,11 @@ def get_captions(file_list_txt: str,
             image_paths = [os.path.join(DATA_DIR, path)
                            for path in list_file.read().splitlines()]
 
-    pmc_id = ''
+    pmc_id: str = ''
     for image_path in progressbar.progressbar(image_paths):
 
         # Get image filename from path (and remove the extension).
-        image_filename = os.path.splitext(os.path.basename(image_path))[0]
+        image_filename: str = os.path.splitext(os.path.basename(image_path))[0]
 
         # This script only manages images from PubMedCentral.
         if image_filename.startswith('PMC'):
@@ -103,16 +103,16 @@ def get_captions(file_list_txt: str,
             new_pmc_id, target_file_name = image_filename.split('_',
                                                                 maxsplit=1)
 
-
             # Path to the txt file that will contain the caption text.
-            caption_annotation_file_path = image_path.replace('.jpg',
+            caption_annotation_file_path: str = image_path.replace('.jpg',
                                                               '_caption.txt')
 
             if os.path.isfile(caption_annotation_file_path) and not override:
-                logging.warning(f"Caption file {caption_annotation_file_path}"\
-                                f" for image {image_path} already exists."\
+                logging.warning("Caption file %s for image %s already exists."\
                                 "\n==> As `override` has been set to False,"\
-                                " this image is skipped.")
+                                " this image is skipped.",
+                                caption_annotation_file_path,
+                                image_path)
                 continue
 
 
@@ -120,32 +120,34 @@ def get_captions(file_list_txt: str,
             # re-download the xml data.
             if new_pmc_id != pmc_id:
                 pmc_id = new_pmc_id
-                xml_url = BASE_URL + pmc_id
-                xml_data = urllib.request.urlopen(xml_url).read()
-                xml_root = ET.fromstring(xml_data)
+                xml_url: str = BASE_URL + pmc_id
+                xml_data: str = urllib.request.urlopen(xml_url).read()
+                xml_root: ET.Element = ET.fromstring(xml_data)
 
             for figure_element in xml_root.iter('fig'):
-                graphic_element = figure_element.find('graphic')
+                graphic_element: Optional[ET.Element] = figure_element.find('graphic')
+
                 # If image name is not available.
                 if graphic_element is None:
                     continue
-                file_base_name = next(v for k, v in graphic_element.attrib.items()
-                                      if k.endswith('href'))
+                file_base_name: str = next(v for k, v in graphic_element.attrib.items()
+                                           if k.endswith('href'))
 
                 # No need to go further if this figure_element corresponds to
                 # another figure.
                 if file_base_name != target_file_name:
-                    found_matching_figure_element = False
+                    found_matching_figure_element: bool = False
                     continue
 
                 found_matching_figure_element = True
 
-                caption_element = figure_element.find('caption')
+                caption_element: Optional[ET.Element] = figure_element.find('caption')
+
                 if caption_element is not None:
 
                     # Gather all the text (possibly nested) from the
                     # caption_element.
-                    caption_text = ''.join(caption_element.itertext()).lstrip()
+                    caption_text: str = ''.join(caption_element.itertext()).lstrip()
 
                     # Remove multiple spaces and '\t' from the caption.
                     caption_text = ' '.join(caption_text.split())
@@ -159,14 +161,14 @@ def get_captions(file_list_txt: str,
                 break
 
             if not found_matching_figure_element:
-                logging.warning(f"No match for image file name {target_file_name}."\
-                                f"\nPMC id = {pmc_id}")
+                logging.warning("No match for image file name %s.\nPMC id = %d",
+                                target_file_name, pmc_id)
 
         else:
-            logging.warning(f"Not a PMC article: {image_filename}")
+            logging.warning("Not a PMC article: %s", image_filename)
 
 
-def main(args: List[str] = None):
+def main(args: List[str] = None) -> None:
     """
     Download caption data from PubMedCentral data base.
 
@@ -177,11 +179,11 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    args = parse_args(args)
+    parsed_args: Namespace = parse_args(args)
 
     # Get the captions
-    get_captions(file_list_txt=args.file_list_txt,
-                 override=args.override)
+    get_captions(file_list_txt=parsed_args.file_list_txt,
+                 override=parsed_args.override)
 
 if __name__ == '__main__':
     main()
