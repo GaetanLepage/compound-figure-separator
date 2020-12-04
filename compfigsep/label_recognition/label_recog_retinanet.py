@@ -29,7 +29,7 @@ import math
 from typing import List, Dict, Tuple, Any
 import torch
 from torch import nn, Tensor, LongTensor
-# from torch.nn import functional as F
+from torch.nn import functional as F
 from fvcore.nn import sigmoid_focal_loss_jit, smooth_l1_loss
 
 from detectron2.layers import ShapeSpec, batched_nms, cat
@@ -106,7 +106,7 @@ class LabelRecogRetinaNet(nn.Module):
         self.vis_period: int = cfg.VIS_PERIOD
         self.input_format: str = cfg.INPUT.FORMAT
 
-        self.fpn: nn.Module = build_fpn_backbone(
+        self.fpn: FPN = build_fpn_backbone(
             cfg,
             input_shape=ShapeSpec(channels=len(cfg.MODEL.PIXEL_MEAN)))
 
@@ -150,7 +150,8 @@ class LabelRecogRetinaNet(nn.Module):
         return self.pixel_mean.device
 
 
-    def forward(self, batched_inputs: List[dict]) -> Dict[str, Any]:
+    def forward(self, batched_inputs: List[dict]) -> Union[Dict[str, Any],
+                                                           List[Dict[str, Instances]]]:
         """
         Args:
             batched_inputs: a list, batched outputs of :class:`DatasetMapper` .
@@ -466,13 +467,14 @@ class LabelRecogRetinaNet(nn.Module):
         Returns:
             images (ImageList): An ImageList structure containing the preprocessed image data.
         """
-        images = [x["image"].to(self.device)
-                  for x in batched_inputs]
+        images: List[Tensor] = [x["image"].to(self.device)
+                                for x in batched_inputs]
 
         images = [(x - self.pixel_mean) / self.pixel_std
                   for x in images]
 
-        images = ImageList.from_tensors(images, self.fpn.size_divisibility)
+        images: ImageList = ImageList.from_tensors(images, self.fpn.size_divisibility)
+
         return images
 
 

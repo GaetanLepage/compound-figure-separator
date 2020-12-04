@@ -294,7 +294,8 @@ class Figure:
                 x_min, y_min, x_max, y_max (box.Box):   The coordinates of the bounding box.
             """
             extent_item: Optional[ET.Element] = item.find('./Data/Extent')
-            if not extent_item:
+
+            if extent_item is None:
                 raise ValueError("xml file is not valid")
 
             # Get data from the xml item.
@@ -333,6 +334,7 @@ class Figure:
             panel_dict: Dict[str, List[Panel]] = {}
 
             for panel_item in panel_items:
+
                 text_item: Optional[ET.Element] = panel_item.find('./BlockText/Text')
                 if text_item is None or text_item.text is None:
                     continue
@@ -420,8 +422,8 @@ class Figure:
                 label_rect = (x_min, y_min, x_max, y_max)
 
                 # Instanciate Label object.
-                label = Label(text=label_text,
-                              box=label_rect)
+                label: Label = Label(text=label_text,
+                                     box=label_rect)
 
                 if label_text in label_dict:
                     label_dict[label_text].append(label)
@@ -481,7 +483,7 @@ class Figure:
                 return subfigures
 
             # Collect all panel label characters.
-            label_texts: Set = set(panel_dict.keys())
+            label_texts: Set[str] = set(panel_dict.keys())
 
             # Assign labels to panels.
             for label_text in label_texts:
@@ -573,7 +575,7 @@ class Figure:
         """
         Load caption text and the ground truth for sub captions (if available).
         """
-        caption_annotation_file_path = self.image_path.replace('.jpg', '_caption.txt')
+        caption_annotation_file_path: str = self.image_path.replace('.jpg', '_caption.txt')
 
         if not os.path.isfile(caption_annotation_file_path):
             logging.info("Caption file missing:\nNo such file as %s.",
@@ -581,7 +583,7 @@ class Figure:
             return
 
         with open(caption_annotation_file_path, 'r') as caption_annotation_file:
-            lines = caption_annotation_file.readlines()
+            lines: List[str] = caption_annotation_file.readlines()
 
         if len(lines) == 0:
             logging.warning("Caption annotation file %s seems to be empty.",
@@ -593,8 +595,8 @@ class Figure:
         if len(lines) <= 1:
             return
 
-        labels_line = lines[1]
-        labels_list = [label.strip() for label in labels_line.split(',')]
+        labels_line: str = lines[1]
+        labels_list: List[str] = [label.strip() for label in labels_line.split(',')]
         labels_structure: LabelStructure = LabelStructure.from_labels_list(labels_list)
 
         if hasattr(self, 'labels_structure'):
@@ -621,7 +623,7 @@ class Figure:
 
             # If it has a label,
             if gt_subfigure.label is not None:
-                label_object = gt_subfigure.label
+                label_object: Label = gt_subfigure.label
 
                 # and if that label has a valid label text,
                 if label_object.text is not None and len(label_object.text) == 1:

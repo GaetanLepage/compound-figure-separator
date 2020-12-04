@@ -36,7 +36,7 @@ from detectron2.utils.events import get_event_storage
 from detectron2.config import CfgNode
 
 from detectron2.modeling.anchor_generator import DefaultAnchorGenerator
-from detectron2.modeling.backbone.resnet import build_resnet_backbone
+from detectron2.modeling.backbone.resnet import build_resnet_backbone, ResNet
 from detectron2.modeling.box_regression import Box2BoxTransform
 from detectron2.modeling.matcher import Matcher
 
@@ -47,7 +47,7 @@ __all__ = ["PanelSegRetinaNet"]
 
 
 def build_fpn_backbones(cfg: CfgNode,
-                        input_shape: ShapeSpec) -> Tuple[nn.Module, nn.Module]:
+                        input_shape: ShapeSpec) -> Tuple[FPN, FPN]:
     """
     Build the Resnet 50 backbone and the two FPN networks:
     * Panel FPN:
@@ -65,30 +65,30 @@ def build_fpn_backbones(cfg: CfgNode,
         backbone (Backbone):    Backbone module, must be a subclass of :class:`Backbone`.
     """
     # Build the feature extractor (Resnet 50)
-    bottom_up: nn.Module = build_resnet_backbone(cfg, input_shape)
+    bottom_up: ResNet = build_resnet_backbone(cfg, input_shape)
 
     # Panel FPN
     panel_in_features: List[str] = cfg.MODEL.PANEL_FPN.IN_FEATURES
     panel_out_channels: List[str] = cfg.MODEL.PANEL_FPN.OUT_CHANNELS
     in_channels_p6p7: int = bottom_up.output_shape()['res5'].channels
-    panel_fpn: nn.Module = FPN(bottom_up=bottom_up,
-                               in_features=panel_in_features,
-                               out_channels=panel_out_channels,
-                               norm=cfg.MODEL.FPN.NORM,
-                               top_block=LastLevelP6P7(in_channels_p6p7,
-                                                       panel_out_channels),
-                               fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
+    panel_fpn: FPN = FPN(bottom_up=bottom_up,
+                         in_features=panel_in_features,
+                         out_channels=panel_out_channels,
+                         norm=cfg.MODEL.FPN.NORM,
+                         top_block=LastLevelP6P7(in_channels_p6p7,
+                                                 panel_out_channels),
+                         fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
 
 
     # Label FPN
     label_in_features: List[str] = cfg.MODEL.LABEL_FPN.IN_FEATURES
     label_out_channels: List[str] = cfg.MODEL.LABEL_FPN.OUT_CHANNELS
-    label_fpn: nn.Module = FPN(bottom_up=bottom_up,
-                               in_features=label_in_features,
-                               out_channels=label_out_channels,
-                               norm=cfg.MODEL.FPN.NORM,
-                               top_block=None,
-                               fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
+    label_fpn: FPN = FPN(bottom_up=bottom_up,
+                         in_features=label_in_features,
+                         out_channels=label_out_channels,
+                         norm=cfg.MODEL.FPN.NORM,
+                         top_block=None,
+                         fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
 
     return panel_fpn, label_fpn
 
@@ -609,7 +609,7 @@ class PanelSegRetinaNet(nn.Module):
             box_cls_i = box_cls_i.flatten().sigmoid_()
 
             # Keep top k top scoring indices only.
-            num_topk = min(self.topk_candidates, box_reg_i.size(0))
+            num_topk: int = min(self.topk_candidates, box_reg_i.size(0))
             # torch.sort is actually faster than .topk (at least on GPUs)
             predicted_prob, topk_idxs = box_cls_i.sort(descending=True)
             predicted_prob = predicted_prob[:num_topk]
@@ -626,8 +626,8 @@ class PanelSegRetinaNet(nn.Module):
             box_reg_i = box_reg_i[anchor_idxs]
             anchors_i = anchors_i[anchor_idxs]
             # predict boxes
-            predicted_boxes = self.box2box_transform.apply_deltas(deltas=box_reg_i,
-                                                                  boxes=anchors_i.tensor)
+            predicted_boxes: Tensor = self.box2box_transform.apply_deltas(deltas=box_reg_i,
+                                                                          boxes=anchors_i.tensor)
 
             boxes_all.append(predicted_boxes)
             scores_all.append(predicted_prob)
@@ -711,8 +711,8 @@ class PanelSegRetinaNet(nn.Module):
         images_list = [(x - self.pixel_mean) / self.pixel_std
                        for x in images_list]
 
-        images = ImageList.from_tensors(images_list,
-                                        self.panel_fpn.size_divisibility)
+        images: ImageList = ImageList.from_tensors(images_list,
+                                                   self.panel_fpn.size_divisibility)
 
         return images
 

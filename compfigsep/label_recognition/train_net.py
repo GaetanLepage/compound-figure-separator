@@ -95,8 +95,8 @@ class Trainer(DefaultTrainer):
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            data_set_mapper: DatasetMapper = DatasetMapper(cfg=self.cfg,
-                                                           is_train=True)
+            data_set_mapper: DatasetMapper = DatasetMapper.from_config(cfg=self.cfg,
+                                                                       is_train=True)
 
             data_loader: DataLoader = build_detection_test_loader(
                 cfg=self.cfg,

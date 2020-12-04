@@ -86,21 +86,23 @@ class Trainer(DefaultTrainer):
         Returns:
             List[HookBase]: The augmented list of hooks.
         """
-        hooks = super().build_hooks()
+        hooks: List[HookBase] = super().build_hooks()
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            data_set_mapper: DatasetMapper = DatasetMapper(cfg=self.cfg,
-                                                           is_train=True)
+            data_set_mapper: DatasetMapper = DatasetMapper.from_config(cfg=self.cfg,
+                                                                       is_train=True)
+
             data_loader: DataLoader = build_detection_test_loader(cfg=self.cfg,
                                                       dataset_name=self.cfg.DATASETS.VALIDATION,
                                                       mapper=data_set_mapper)
 
-            loss_eval_hook = LossEvalHook(eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
-                                          model=self.model,
-                                          data_loader=data_loader)
-            hooks.insert(index=-1,
-                         obj=loss_eval_hook)
+            loss_eval_hook: LossEvalHook = LossEvalHook(
+                eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
+                model=self.model,
+                data_loader=data_loader)
+
+            hooks.insert(-1, loss_eval_hook)
 
         return hooks
 
