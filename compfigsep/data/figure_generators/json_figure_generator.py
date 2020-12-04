@@ -213,7 +213,8 @@ class JsonFigureGenerator(FigureGenerator):
         elif os.path.isdir(json_path):
             self.json_annotation_file_path = get_most_recent_json(folder_path=json_path)
 
-        print(self.json_annotation_file_path)
+        else:
+            raise ValueError(f"{json_path} is not a valid JSON path.")
 
         super().__init__()
 

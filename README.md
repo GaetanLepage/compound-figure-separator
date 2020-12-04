@@ -32,8 +32,14 @@ python3 -m venv venv
 # make sure pip is up to date
 pip install --upgrade pip
 
+# Install pytorch first
+pip install torch
+
 # install the required packages
 pip install -r requirements.txt
+
+# Download the requirements for nltk
+python -c "import nltk; nltk.download('punkt')"
 ```
 
 

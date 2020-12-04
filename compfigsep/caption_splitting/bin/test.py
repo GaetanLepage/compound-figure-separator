@@ -68,7 +68,7 @@ def _parse_args(args: List[str]) -> Namespace:
 
     add_json_arg(parser=parser,
                  json_default_relative_path=\
-                    '../data/pubmed_prostate/prostate_data_only_annotated_captions.json')
+                    '../data/pubmed_caption_splitting/prostate_data_only_annotated_captions.json')
 
     return parser.parse_args(args)
 

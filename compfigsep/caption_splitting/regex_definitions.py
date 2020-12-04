@@ -41,7 +41,7 @@ _ANY_LABEL: str = _ANY_CHAR + r'|' + _ANY_ROMAN + r'|' + _ANY_NON_ZERO_DIGIT
 
 # Build the regular expressions that match classes.
 RE_CHARACTERS: Pattern[str] = re.compile(r"((\b|\.|\()(" + _ANY_CHAR \
-                                       + r")(?![^).:0-9])[0-9]?(\)|\.|:|\b")
+                                       + r")(?![^).:0-9])[0-9]?(\)|\.|:|\b)?)")
 
 RE_ROMAN: Pattern[str] = re.compile(r"((\b|\.|\()(" + _ANY_ROMAN \
                                   + r")+(?![^).:])(\)|\.|:|\b)?)")
