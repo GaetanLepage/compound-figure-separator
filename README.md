@@ -26,19 +26,19 @@ In order to be sure to fulfill the **software requirements**, it is best to work
 # Create the virtual environment.
 python3 -m venv venv
 
-# activate it
+# Activate it.
 . venv/bin/activate
 
-# make sure pip is up to date
+# Make sure pip is up to date.
 pip install --upgrade pip
 
-# Install pytorch first
+# Install pytorch first.
 pip install torch
 
-# install the required packages
+# Install the required packages.
 pip install -r requirements.txt
 
-# Download the requirements for nltk
+# Download the requirements for nltk.
 python -c "import nltk; nltk.download('punkt')"
 ```
 
