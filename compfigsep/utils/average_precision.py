@@ -43,8 +43,8 @@ def compute_average_precision(recall: np.ndarray,
                                           f" length.\n\tlen(recall) = {len(recall)}"\
                                           f"\n\tlen(precision) = {len(precision)}"\
 
-    mrec = np.concatenate(([0.], recall, [1.]))
-    mpre = np.concatenate(([0.], precision, [0.]))
+    mrec: np.ndarray = np.concatenate(([0.], recall, [1.]))
+    mpre: np.ndarray = np.concatenate(([0.], precision, [0.]))
 
     # Compute the precision envelope
     # Make the precision monotonically decreasing (goes from the end to the beginning)
@@ -54,9 +54,9 @@ def compute_average_precision(recall: np.ndarray,
 
     # To calculate area under PR curve, look for points
     # where X axis (recall) changes value.
-    i = np.where(mrec[1:] != mrec[:-1])[0]
+    index: int = np.where(mrec[1:] != mrec[:-1])[0]
 
     # Sum (delta recall) * prec.
-    average_precision = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
+    average_precision = np.sum((mrec[index + 1] - mrec[index]) * mpre[index + 1])
 
     return average_precision

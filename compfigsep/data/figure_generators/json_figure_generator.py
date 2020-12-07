@@ -235,6 +235,7 @@ class JsonFigureGenerator(FigureGenerator):
         Returns:
             Iterable[Figure]:   Figure objects with annotations.
         """
+        print(f"Json file: {self.json_annotation_file_path}")
 
         with open(self.json_annotation_file_path, 'r') as json_annotation_file:
             data_dict = json.load(json_annotation_file)

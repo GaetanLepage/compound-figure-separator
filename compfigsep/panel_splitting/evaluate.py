@@ -23,7 +23,8 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import Dict, Tuple, Any
+from typing import Dict, Tuple, Any, List
+from collections import namedtuple
 
 from sortedcontainers import SortedKeyList
 import numpy as np
@@ -34,45 +35,60 @@ from ..utils.figure import Figure
 from ..utils.average_precision import compute_average_precision
 
 
-def panel_splitting_figure_eval(figure: Figure,
-                                stat_dict: Dict[str, Any]) -> None:
+PanelSplittingFigureResult = namedtuple("PanelSplittingFigureResult",
+                                        [
+                                            'gt_count',
+                                            'detected_count',
+                                            'imageclef_accuracy',
+                                            'detections'
+                                        ])
+
+
+def panel_splitting_figure_eval(figure: Figure) -> PanelSplittingFigureResult:
     """
     Evaluate panel splitting metrics on a single figure.
 
     Args:
         figure (Figure):            The figure on which to evaluate the panel splitting task.
-        stat_dict (Dict[str, any]): A dict containing panel splitting evaluation stats
-                                        It will be updated by this function.
-    """
-    stat_dict['num_samples'] += 1
 
+    Returns:
+        result (PanelSplittingFigureResult):    TODO
+    """
     # Perform matching on this figure
     # This tests whether a detected panel is true positive or false positive
     figure.match_detected_and_gt_panels_splitting_task()
 
-    stat_dict['overall_gt_count'] += len(figure.gt_subfigures)
-    stat_dict['overall_detected_count'] += len(figure.detected_panels)
-
     num_correct_imageclef: int = 0
     num_correct_iou_thresh: int = 0
 
+    detections: List[Tuple[float, bool]] = []
+
     for detected_panel in figure.detected_panels:
+        if detected_panel.is_true_positive_overlap is None \
+                or detected_panel.is_true_positive_iou is None:
+            raise ValueError("It seems like the evaluation process was not done" \
+                             " (is_true_positive_* attributes not set)")
+
         num_correct_imageclef += int(detected_panel.is_true_positive_overlap)
 
         num_correct_iou_thresh += int(detected_panel.is_true_positive_iou)
 
-        # Add this detection in the sorted list
-        stat_dict['detections'].add((detected_panel.detection_score,
-                                     detected_panel.is_true_positive_iou))
+        # Add this detection in the list
+        detections.append((detected_panel.detection_score,
+                           detected_panel.is_true_positive_iou))
 
     # ImageCLEF accuracy (based on overlap 0.66 threshold)
     k: int = max(len(figure.gt_subfigures), len(figure.detected_panels))
     imageclef_accuracy: float = num_correct_imageclef / k
 
-    stat_dict['sum_imageclef_accuracies'] += imageclef_accuracy
+    return PanelSplittingFigureResult(gt_count=len(figure.gt_subfigures),
+                                      detected_count=len(figure.detected_panels),
+                                      imageclef_accuracy=imageclef_accuracy,
+                                      detections=detections)
 
 
-def panel_splitting_metrics(stat_dict: Dict[str, Any]) -> Tuple[float, float, float, float]:
+def panel_splitting_metrics(results: List[PanelSplittingFigureResult]
+                            ) -> Tuple[float, float, float, float]:
     """
     Evaluate the panel splitting metrics.
 
@@ -88,29 +104,47 @@ def panel_splitting_metrics(stat_dict: Dict[str, Any]) -> Tuple[float, float, fl
         recall (int):               Recall value (TP / TP + FP).
         mAP (int):                  Mean average precision value.
     """
+    # 0) Initialize statistics variables.
+    overall_gt_count: int = 0
+    overall_detected_count: int = 0
+    sum_imageclef_accuracies: float = 0.0
+    detections: List[Tuple[float, bool]] = []
+
+    # Loop through the results to compute statistics.
+    for figure_result in results:
+        overall_gt_count += figure_result.gt_count
+        overall_detected_count += figure_result.detected_count
+
+        sum_imageclef_accuracies += figure_result.imageclef_accuracy
+
+        detections.extend(figure_result.detections)
+
+    # Sort detections by decreasing detection scores
+    detections.sort(key=lambda u: -u[0])
+
     # 1) ImageCLEF accuracy
-    imageclef_accuracy: float = stat_dict['sum_imageclef_accuracies'] / stat_dict['num_samples']
+    imageclef_accuracy: float = sum_imageclef_accuracies / len(results)
 
     # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
-    true_positives: np.array = [np.float(is_positive)
-                                for _, is_positive in stat_dict['detections']]
+    true_positives: List[float] = [float(is_positive)
+                                   for _, is_positive in detections]
 
     overall_correct_count: int = np.sum(true_positives)
 
     # 2) overall recall = TP / TP + FN
-    recall: float = overall_correct_count / stat_dict['overall_gt_count']
+    recall: float = overall_correct_count / overall_gt_count
     # 3) overall precision = TP / TP + FP
-    precision: float = overall_correct_count / stat_dict['overall_detected_count']
+    precision: float = overall_correct_count / overall_detected_count
 
     # 4) mAP computation
-    cumsum_true_positives: int = np.cumsum(true_positives)
+    cumsum_true_positives: np.ndarray = np.cumsum(true_positives)
 
     # cumulated_recalls
-    cumulated_recalls: float = cumsum_true_positives / stat_dict['overall_gt_count']
+    cumulated_recalls: np.ndarray = cumsum_true_positives / overall_gt_count
 
-    # = cumsum(TP + FP)
-    cumsum_detections: int = np.arange(1, stat_dict['overall_detected_count'] + 1)
-    cumulated_precisions: float = cumsum_true_positives / cumsum_detections
+    # cumulated_precisions
+    cumsum_detections: np.ndarray = np.arange(1, overall_detected_count + 1)
+    cumulated_precisions: np.ndarray = cumsum_true_positives / cumsum_detections
 
     # mAP = area under the precison/recall curve (only one 'class' here)
     mean_average_precision: float = compute_average_precision(recall=cumulated_recalls,
@@ -130,20 +164,14 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
     Returns:
         metrics (Dict[str, float]): A dict containing the computed metrics.
     """
-    stats: Dict[str, Any] = {
-        'num_samples': 0,
-        'overall_gt_count': 0,
-        'overall_detected_count': 0,
-        'detections': SortedKeyList(key=lambda u: -u[0]),
-        'overall_correct_count': 0,
-        'sum_imageclef_accuracies': 0
-    }
+    # List containing the evaluation statistics for each figure.
+    results: List[PanelSplittingFigureResult] = []
 
     for figure in figure_generator():
-        panel_splitting_figure_eval(figure, stats)
+        results.append(panel_splitting_figure_eval(figure))
 
     imageclef_accuracy, precision, recall, mean_average_precision = panel_splitting_metrics(
-        stat_dict=stats)
+        results=results)
 
     print(f"ImageCLEF Accuracy (overlap threshold = 0.66): {imageclef_accuracy:.3f}\n"\
           f"Precision: {precision:.3f}\n"\

@@ -26,7 +26,6 @@ Evaluator for the panel splitting task.
 from typing import List, Any, Dict
 
 from ..utils.figure import Figure, DetectedPanel
-from ..data.figure_generators import FigureGenerator, StackedFigureGenerator
 from ..utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 from .evaluate import evaluate_detections
 
