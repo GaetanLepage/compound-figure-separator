@@ -23,8 +23,10 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluation tool for caption splitting.
 """
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from pprint import pprint
+
+from joblib import Parallel, delayed
 
 import textdistance
 
@@ -32,17 +34,18 @@ from ..utils.figure import Figure
 from ..data.figure_generators import FigureGenerator
 
 
-def caption_splitting_figure_eval(figure: Figure,
-                                  stat_dict: Dict[str, Any]) -> None:
+def caption_splitting_figure_eval(figure: Figure) -> Optional[float]:
     """
     Evaluate caption splitting metrics on a single figure.
 
     Args:
-        figure (Figure):            The figure on which to evaluate the caption
-                                        splitting task.
-        stat_dict (Dict[str, any]): A dict containing caption splitting
-                                        evaluation stats It will be updated by
-                                        this function.
+        figure (Figure):    The figure on which to evaluate the caption
+                                splitting task.
+
+    Return:
+        score (Optional[float]):    If the figure is properly annotated, the Levenshtein metric
+                                        for this figure is returned.
+                                        Else, None is returned.
     """
     # Score of this figure
     figure_score: float = 0
@@ -55,8 +58,9 @@ def caption_splitting_figure_eval(figure: Figure,
                                            if hasattr(figure, 'detected_subcaptions')\
                                            else {}
 
+    # If the figure was not annotated, return None.
     if not hasattr(figure, 'gt_subfigures'):
-        return
+        return None
 
     # Case where this is not a compound figure.
     if len(figure.gt_subfigures) == 1 and '_' in figure.detected_subcaptions:
@@ -92,10 +96,11 @@ def caption_splitting_figure_eval(figure: Figure,
                     gt_subcaption,
                     detected_subcaption)
 
-    # If the ground truth figure was not annotated,
     if num_gt_labels > 0:
-        stat_dict['num_captions'] += 1
-        stat_dict['levenshtein_metric'] += figure_score / num_gt_labels
+        return figure_score / num_gt_labels
+
+    # If the ground truth figure was not annotated (no GT labels), return None.
+    return None
 
 
 def caption_splitting_metrics(stat_dict: Dict[str, Any]) -> float:
@@ -125,14 +130,19 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
         metrics (Dict[str, any]): A dict containing the computed metrics.
     """
 
+    # Parallel computing to speed up the evaluation
+    with Parallel(n_jobs=-1) as parallel:
+        results = parallel(
+            [delayed(caption_splitting_figure_eval)(figure)
+             for figure in figure_generator()])
+
+    # Filter out the figures for which no score was computed (missing annotations for e.g.).
+    valid_results = [res for res in results if res is not None]
+
     stat_dict: Dict[str, Any] = {
-        'num_captions': 0,
-        'levenshtein_metric': 0
+        'num_captions': len(valid_results),
+        'levenshtein_metric': sum(valid_results)
     }
-
-    for figure in figure_generator():
-
-        caption_splitting_figure_eval(figure, stat_dict)
 
     lavenstein_metric: float = caption_splitting_metrics(stat_dict=stat_dict)
 

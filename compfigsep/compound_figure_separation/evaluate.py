@@ -19,29 +19,25 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
                 Stefano Marchesin (stefano.marchesin@unipd.it)
 
 
-#######################################################
-Module to evaluate the panel segmentation task metrics.
+###############################################
+Evaluation tool for compound figure separation.
+
+TODO
 """
 
 from typing import Dict, Any
-from pprint import pprint
-from sortedcontainers import SortedKeyList
-
-from ..data.figure_generators import FigureGenerator
-from ..panel_splitting.evaluate import panel_splitting_figure_eval, panel_splitting_metrics
-from ..label_recognition.evaluate import label_recognition_figure_eval, multi_class_metrics
 from ..utils.figure import Figure
 from ..utils.figure import Label
 
-
-def panel_segmentation_figure_eval(figure: Figure,
-                                   stat_dict: Dict[str, Any]):
+def compound_figure_separation_figure_eval(figure: Figure,
+                                           stat_dict: Dict[str, Any]):
     """
-    Evaluate panel segmentation metrics on a single figure.
+    Evaluate compound figure separation metrics on a single figure.
 
     Args:
-        figure (Figure):            The figure on which to evaluate the panel segmentation task.
-        stat_dict (Dict[str, any]): A dict containing panel segmentation evaluation stats
+        figure (Figure):            The figure on which to evaluate the compound figure separation
+                                        task.
+        stat_dict (Dict[str, any]): A dict containing compound figure evaluation evaluation stats
                                         It will be updated by this function.
     """
     # Keep track of the number of gt panels for each class
@@ -125,7 +121,11 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
             # detections_by_class is like: {class -> [(score, is_tp)]}
             'detections_by_class': {},
             # gt_count_by_class {class -> number_of_gt}
-            'gt_count_by_class': {}}
+            'gt_count_by_class': {}},
+        'caption_splitting': {
+            'num_captions': 0,
+            'levenshtein metric': 0
+        }
     }
 
 
@@ -185,14 +185,12 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     }
 
     # Panel segmentation
-    # pseg_precision, pseg_recall, pseg_map = multi_class_metrics(stats['panel_segmentation'])
-    # metrics['panel_segmentation'] = {
-        # 'precision': pseg_precision,
-        # 'recall': pseg_recall,
-        # 'mAP': pseg_map
-    # }
-    # TODO remove
-    metrics['panel_segmentation'] = {}
+    pseg_precision, pseg_recall, pseg_map = multi_class_metrics(stats['panel_segmentation'])
+    metrics['panel_segmentation'] = {
+        'precision': pseg_precision,
+        'recall': pseg_recall,
+        'mAP': pseg_map
+    }
 
     pprint(metrics)
 

@@ -38,7 +38,7 @@ from detectron2.utils.events import get_event_storage
 from detectron2.config import CfgNode
 
 from detectron2.modeling.anchor_generator import build_anchor_generator
-from detectron2.modeling.backbone.resnet import build_resnet_backbone
+from detectron2.modeling.backbone.resnet import build_resnet_backbone, ResNet
 from detectron2.modeling.box_regression import Box2BoxTransform
 from detectron2.modeling.matcher import Matcher
 from detectron2.modeling.postprocessing import detector_postprocess
@@ -53,7 +53,7 @@ __all__ = ["LabelRecogRetinaNet"]
 
 
 def build_fpn_backbone(cfg: CfgNode,
-                       input_shape: ShapeSpec) -> nn.Module:
+                       input_shape: ShapeSpec) -> FPN:
     """
     Build the Resnet 50 backbone and the FPN:
     Label FPN:
@@ -68,17 +68,17 @@ def build_fpn_backbone(cfg: CfgNode,
         backbone (nn.Module):   Backbone module, must be a subclass of :class:`Backbone`.
     """
     # Build the feature extractor (Resnet 50)
-    bottom_up: nn.Module = build_resnet_backbone(cfg, input_shape)
+    bottom_up: ResNet = build_resnet_backbone(cfg, input_shape)
 
     # Label FPN
     label_in_features: List[str] = cfg.MODEL.FPN.IN_FEATURES
     label_out_channels: List[str] = cfg.MODEL.FPN.OUT_CHANNELS
-    label_fpn: nn.Module = FPN(bottom_up=bottom_up,
-                               in_features=label_in_features,
-                               out_channels=label_out_channels,
-                               norm=cfg.MODEL.FPN.NORM,
-                               top_block=None,
-                               fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
+    label_fpn: FPN = FPN(bottom_up=bottom_up,
+                         in_features=label_in_features,
+                         out_channels=label_out_channels,
+                         norm=cfg.MODEL.FPN.NORM,
+                         top_block=None,
+                         fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
 
     return label_fpn
 
@@ -189,19 +189,19 @@ class LabelRecogRetinaNet(nn.Module):
             gt_instances: Instances = [x['instances'].to(self.device) for x in batched_inputs]
             gt_classes, gt_boxes = self.get_ground_truth(anchors=anchors,
                                                          gt_instances=gt_instances)
-            losses = self.losses(anchors=anchors,
-                                 pred_logits=pred_logits,
-                                 gt_classes=gt_classes,
-                                 pred_anchor_deltas=pred_anchor_deltas,
-                                 gt_boxes=gt_boxes)
+            losses: Dict[str, float] = self.losses(anchors=anchors,
+                                                   pred_logits=pred_logits,
+                                                   gt_classes=gt_classes,
+                                                   pred_anchor_deltas=pred_anchor_deltas,
+                                                   gt_boxes=gt_boxes)
 
             return losses
 
         # Otherwise, do inference.
-        results = self.inference(anchors=anchors,
-                                 pred_logits=pred_logits,
-                                 pred_anchor_deltas=pred_anchor_deltas,
-                                 image_sizes=images.image_sizes)
+        results: List[Instances] = self.inference(anchors=anchors,
+                                                  pred_logits=pred_logits,
+                                                  pred_anchor_deltas=pred_anchor_deltas,
+                                                  image_sizes=images.image_sizes)
 
         processed_results: List[Dict[str, Any]] = []
         for results_per_image, input_per_image, image_size in zip(results,

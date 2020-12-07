@@ -116,8 +116,8 @@ class PanelSegRetinaNet(nn.Module):
                                                     (inference).
         max_detections_per_image (int):         Maximum number of detections to return per image
                                                     during inference.
-        panel_fpn (nn.Module):                  Panel Feature Pyramid Network (FPN).
-        label_fpn (nn.Module):                  Label Feature Pyramid Network (FPN).
+        panel_fpn (FPN):                        Panel Feature Pyramid Network (FPN).
+        label_fpn (FPN):                        Label Feature Pyramid Network (FPN).
         panel_anchor_generator (DefaultAnchorGenerator):
                                                 Compute anchors for panel detection.
         panel_head (RetinaNetHead):             RetinaNetHead handling panels prediction.
