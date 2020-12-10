@@ -165,10 +165,8 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
         metrics (Dict[str, float]): A dict containing the computed metrics.
     """
     # List containing the evaluation statistics for each figure.
-    results: List[PanelSplittingFigureResult] = []
-
-    for figure in figure_generator():
-        results.append(panel_splitting_figure_eval(figure))
+    results: List[PanelSplittingFigureResult] = [panel_splitting_figure_eval(figure)
+                                                 for figure in figure_generator()]
 
     imageclef_accuracy, precision, recall, mean_average_precision = panel_splitting_metrics(
         results=results)

@@ -26,7 +26,7 @@ Custom variation of RetinaNet to handle label recognition.
 """
 
 import math
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple, Any, Union
 import torch
 from torch import nn, Tensor, LongTensor
 from torch.nn import functional as F
