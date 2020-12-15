@@ -879,51 +879,52 @@ class Figure:
 
         # Loop over detected labels.
         for detected_caption in self.detected_captions:
-            max_iou: int = -1
-            best_matching_gt_caption_index = -1
-
-            for gt_caption_index, gt_subfigure in enumerate(self.gt_subfigures):
-
-                gt_caption = gt_subfigure.caption
-
-                if gt_caption is None or gt_caption == "":
-                    continue
-
-                # Compute IoU between detection and ground truth.
-                iou = text.iou(gt_caption, detected_caption)
-
-                # Potential match
-                if iou > max_iou:
-                    max_iou = iou
-                    best_matching_gt_label_index = gt_label_index
-
-            # Check that gt and detected labels are overlapping enough.
-            # ==> True positive
-            if max_iou > iou_threshold\
-                    and not picked_gt_labels_indices[best_matching_gt_label_index]:
-                picked_gt_labels_indices[best_matching_gt_label_index] = True
-                detected_label.is_true_positive = True
-
-            # ==> False positive
-            else:
-                detected_label.is_true_positive = False
+            pass
+#            max_iou: int = -1
+#            best_matching_gt_caption_index = -1
+#
+#            for gt_caption_index, gt_subfigure in enumerate(self.gt_subfigures):
+#
+#                gt_caption = gt_subfigure.caption
+#
+#                if gt_caption is None or gt_caption == "":
+#                    continue
+#
+#                # Compute IoU between detection and ground truth.
+#                iou = text.iou(gt_caption, detected_caption)
+#
+#                # Potential match
+#                if iou > max_iou:
+#                    max_iou = iou
+#                    best_matching_gt_label_index = gt_label_index
+#
+#            # Check that gt and detected labels are overlapping enough.
+#            # ==> True positive
+#            if max_iou > iou_threshold\
+#                    and not picked_gt_labels_indices[best_matching_gt_label_index]:
+#                picked_gt_labels_indices[best_matching_gt_label_index] = True
+#                detected_label.is_true_positive = True
+#
+#            # ==> False positive
+#            else:
+#                detected_label.is_true_positive = False
 
 
 ##################
 # PREVIEW FIGURE #
 ##################
 
-    def get_preview(self, mode='both') -> np.ndarray:
+    def get_preview(self, mode: str = 'both') -> np.ndarray:
         """
         Generate an image preview for the figure.
         It consists in drawing the panels (and labels, if applicable) bounding boxes
         on top of the image.
 
         Args:
-            mode: Select which information to display:
-                    * 'gt': only the ground truth
-                    * 'pred': only the predictions
-                    * 'both': both predicted and ground truth annotations.
+            mode (str): Select which information to display:
+                            * 'gt': only the ground truth
+                            * 'pred': only the predictions
+                            * 'both': both predicted and ground truth annotations.
 
         Returns:
             preview_img (np.ndarray): the preview image
@@ -986,7 +987,7 @@ class Figure:
             for subfigure_index, subfigure in enumerate(self.gt_subfigures):
 
                 # Select color.
-                color = shape_colors[subfigure_index % len(shape_colors)]
+                color: Color = shape_colors[subfigure_index % len(shape_colors)]
 
                 # Draw subfigure.
                 subfigure.draw_elements(image=preview_img,

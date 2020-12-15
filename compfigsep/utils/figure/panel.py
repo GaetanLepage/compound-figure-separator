@@ -33,8 +33,8 @@ from ..box import Box
 
 Color = Tuple[int, int, int]
 
-DEFAULT_GT_COLOR = (0, 255, 0)
-DEFAULT_DETECTION_COLOR = (0, 0, 200)
+DEFAULT_GT_COLOR: Color = (0, 255, 0)
+DEFAULT_DETECTION_COLOR: Color = (0, 0, 200)
 
 
 class Panel:

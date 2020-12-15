@@ -86,8 +86,8 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
     detected_count: int = len(figure.detected_labels)
 
     # TODO remove
-    print("Number of GT labels :", num_gt_labels)
-    print("Number of detected labels :", len(figure.detected_labels))
+    # print("Number of GT labels :", num_gt_labels)
+    # print("Number of detected labels :", len(figure.detected_labels))
 
     num_correct: int = 0
     detections_by_class: Dict[str, List[Tuple[float, bool]]] = {}

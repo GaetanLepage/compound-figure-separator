@@ -14,6 +14,7 @@ git+https://github.com/facebookresearch/detectron2.git
 # Detectron2 requirements:
     torchvision
     pycocotools
+fvcore
 
 #########
 # Image #
