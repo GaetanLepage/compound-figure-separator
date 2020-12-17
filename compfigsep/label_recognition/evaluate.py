@@ -34,6 +34,7 @@ from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
 from ..utils.figure.label import Label
 from ..utils.average_precision import compute_average_precision
+from ..panel_splitting.evaluate import Detection
 
 MultiClassFigureResult = namedtuple("MultiClassFigureResult",
                                         [
@@ -90,7 +91,7 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
     # print("Number of detected labels :", len(figure.detected_labels))
 
     num_correct: int = 0
-    detections_by_class: Dict[str, List[Tuple[float, bool]]] = {}
+    detections_by_class: Dict[str, List[Detection]] = {}
     for detected_label in figure.detected_labels:
         detected_count +=1
         num_correct += int(detected_label.is_true_positive)
@@ -105,9 +106,11 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
             detections_by_class[cls] = []
 
         # Add this detection in the sorted list
-        detections_by_class[cls].append((detected_label.detection_score,
-                                         detected_label.is_true_positive))
+        detections_by_class[cls].append(
+            Detection(score=detected_label.detection_score,
+                      is_true_positive=detected_label.is_true_positive))
 
+    # TODO remove
     print("Number of correct detections :", num_correct)
 
     return MultiClassFigureResult(gt_count=gt_count,
@@ -135,7 +138,7 @@ def multi_class_metrics(results: List[MultiClassFigureResult]) -> Tuple[float, f
     overall_correct_count: int = 0
 
     # detections_by_class is like: {class -> [(score, is_tp)]}
-    detections_by_class: Dict[str, SortedKeyList[Tuple[float, bool]]] = {}
+    detections_by_class: Dict[str, SortedKeyList[Detection]] = {}
     # gt_count_by_class {class -> number_of_gt}
     gt_count_by_class: Dict[str, int] = {}
 
@@ -153,7 +156,8 @@ def multi_class_metrics(results: List[MultiClassFigureResult]) -> Tuple[float, f
             # Initialize the dict entry for this class if necessary
             # it is sorting the predictions in the decreasing order of their score
             if cls not in detections_by_class:
-                detections_by_class[cls] = SortedKeyList(key=lambda u: -u[0])
+                detections_by_class[cls] = SortedKeyList(key=lambda detection: -detection.score)
+
 
             for detection in detection_list:
                 detections_by_class[cls].add(detection)
@@ -169,25 +173,25 @@ def multi_class_metrics(results: List[MultiClassFigureResult]) -> Tuple[float, f
     for cls in detections_by_class:
 
         # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
-        class_true_positives: List[float] = [float(is_positive)
-                                             for _, is_positive
-                                             in detections_by_class[cls]]
+        class_true_positives: List[int] = [int(detection.is_true_positive)
+                                           for detection
+                                           in detections_by_class[cls]]
 
         class_detected_count: int = len(detections_by_class[cls])
         class_gt_count: int = gt_count_by_class[cls] \
             if cls in gt_count_by_class else 0
 
-        class_cumsum_true_positives: np.array = np.cumsum(class_true_positives)
+        class_cumsum_true_positives: np.ndarray = np.cumsum(class_true_positives)
 
         # cumulated_recalls
         if class_gt_count == 0:
-            class_cumulated_recalls: np.array = np.zeros(shape=(class_detected_count,))
+            class_cumulated_recalls: np.ndarray = np.zeros(shape=(class_detected_count,))
         else:
             class_cumulated_recalls = class_cumsum_true_positives / class_gt_count
 
         # = cumsum(TP + FP)
-        class_cumsum_detections: np.array = np.arange(1, class_detected_count + 1)
-        class_cumulated_precisions: np.array = \
+        class_cumsum_detections: np.ndarray = np.arange(1, class_detected_count + 1)
+        class_cumulated_precisions: np.ndarray = \
             class_cumsum_true_positives / class_cumsum_detections
 
         # Add the AP score to the overall mAP total

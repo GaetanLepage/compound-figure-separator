@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluation tool for caption splitting.
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from pprint import pprint
 
 from joblib import Parallel, delayed
@@ -33,8 +33,9 @@ import textdistance
 from ..utils.figure import Figure
 from ..data.figure_generators import FigureGenerator
 
+CaptionSplittingFigureResult = Optional[float]
 
-def caption_splitting_figure_eval(figure: Figure) -> Optional[float]:
+def caption_splitting_figure_eval(figure: Figure) -> CaptionSplittingFigureResult:
     """
     Evaluate caption splitting metrics on a single figure.
 
@@ -43,9 +44,10 @@ def caption_splitting_figure_eval(figure: Figure) -> Optional[float]:
                                 splitting task.
 
     Return:
-        score (Optional[float]):    If the figure is properly annotated, the Levenshtein metric
-                                        for this figure is returned.
-                                        Else, None is returned.
+        score (CaptionSplittingFigureResult):   If the figure is properly annotated, the
+                                                    Levenshtein metric for this figure is
+                                                    returned.
+                                                Else, None is returned.
     """
     # Score of this figure
     figure_score: float = 0
@@ -103,19 +105,25 @@ def caption_splitting_figure_eval(figure: Figure) -> Optional[float]:
     return None
 
 
-def caption_splitting_metrics(stat_dict: Dict[str, Any]) -> float:
+def caption_splitting_metrics(results: List[CaptionSplittingFigureResult]) -> float:
     """
     Compute the metrics for the caption splitting task.
 
     Args:
-        stat_dict (Dict[str, any]): A dict containing the stats gathered while looping over
-                                        detections.
+        results (List[CaptionSplittingFigureResult]):   TODO.
 
     Returns:
         levenshtein_metric (float):  The averaged levenshtein metric.
     """
+    # Filter out the figures for which no score was computed (missing annotations for e.g.).
+    valid_results: List[float] = [res
+                                  for res in results
+                                  if res is not None]
 
-    return stat_dict['levenshtein_metric'] / stat_dict['num_captions']
+    num_captions: int = len(valid_results)
+    levenshtein_metric: float = sum(valid_results)
+
+    return levenshtein_metric / num_captions
 
 
 def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
@@ -132,19 +140,12 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
 
     # Parallel computing to speed up the evaluation
     with Parallel(n_jobs=-1) as parallel:
-        results = parallel(
+
+        results: List[CaptionSplittingFigureResult] = parallel(
             [delayed(caption_splitting_figure_eval)(figure)
              for figure in figure_generator()])
 
-    # Filter out the figures for which no score was computed (missing annotations for e.g.).
-    valid_results = [res for res in results if res is not None]
-
-    stat_dict: Dict[str, Any] = {
-        'num_captions': len(valid_results),
-        'levenshtein_metric': sum(valid_results)
-    }
-
-    lavenstein_metric: float = caption_splitting_metrics(stat_dict=stat_dict)
+    lavenstein_metric: float = caption_splitting_metrics(results=results)
 
     metrics: Dict[str, float] = {
         'levenstein_metric': lavenstein_metric

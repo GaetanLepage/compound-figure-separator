@@ -23,27 +23,33 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel segmentation task metrics.
 """
 
-from typing import Dict, Any
+from typing import Dict, List
+import logging
 from pprint import pprint
-from sortedcontainers import SortedKeyList
 
 from ..data.figure_generators import FigureGenerator
 from ..panel_splitting.evaluate import panel_splitting_figure_eval, panel_splitting_metrics
-from ..label_recognition.evaluate import label_recognition_figure_eval, multi_class_metrics
+from ..panel_splitting.evaluate import Detection, PanelSplittingFigureResult
+from ..label_recognition.evaluate import (MultiClassFigureResult,
+                                          label_recognition_figure_eval,
+                                          multi_class_metrics)
 from ..utils.figure import Figure
 from ..utils.figure import Label
 
 
-def panel_segmentation_figure_eval(figure: Figure,
-                                   stat_dict: Dict[str, Any]):
+def panel_segmentation_figure_eval(figure: Figure) -> MultiClassFigureResult:
     """
     Evaluate panel segmentation metrics on a single figure.
 
     Args:
         figure (Figure):            The figure on which to evaluate the panel segmentation task.
-        stat_dict (Dict[str, any]): A dict containing panel segmentation evaluation stats
-                                        It will be updated by this function.
+
+    Returns:
+        result (MultiClassFigureResult):    TODO.
     """
+    gt_count: int = 0
+    gt_count_by_class: Dict[str, int] = {}
+
     # Keep track of the number of gt panels for each class
     for gt_subfigure in figure.gt_subfigures:
 
@@ -60,33 +66,55 @@ def panel_segmentation_figure_eval(figure: Figure,
 
         cls: str = gt_label.text
 
-        stat_dict['overall_gt_count'] += 1
+        gt_count += 1
 
-        if cls not in stat_dict['gt_count_by_class']:
-            stat_dict['gt_count_by_class'][cls] = 1
+        if cls not in gt_count_by_class:
+            gt_count_by_class[cls] = 1
         else:
-            stat_dict['gt_count_by_class'][cls] += 1
+            gt_count_by_class[cls] += 1
 
+    detected_count: int = len(figure.detected_subfigures)
 
-    stat_dict['overall_detected_count'] += len(figure.detected_subfigures)
+    num_correct: int = 0
+    detections_by_class: Dict[str, List[Detection]] = {}
 
     for detected_subfigure in figure.detected_subfigures:
 
-        stat_dict['overall_correct_count'] += int(detected_subfigure.is_true_positive)
+        if detected_subfigure.panel is None or detected_subfigure.label is None:
+            logging.warning("Detected subfigure does not have both panel and label attributes.")
+            continue
+
+        if detected_subfigure.is_true_positive is None:
+            logging.warning("The `is_true_positive` attribute is None for this detected"\
+                            " subfigure.")
+            continue
+
+        num_correct += int(detected_subfigure.is_true_positive)
+
+        if detected_subfigure.label.text is None:
+            logging.warning("The label of this subfigure doesn't have any text.")
+            continue
 
         cls = detected_subfigure.label.text
 
         # Initialize the dict entry for this class if necessary.
         # It is sorting the predictions in the decreasing order of their score.
-        if cls not in stat_dict['detections_by_class']:
-            stat_dict['detections_by_class'][cls] = SortedKeyList(key=lambda u: -u[0])
+        if cls not in detections_by_class:
+            detections_by_class[cls] = []
 
         # The subfigure detection score is set to be the same as the panel detection sore.
         detected_subfigure.detection_score = detected_subfigure.panel.detection_score
 
         # Add this detection in the sorted list.
-        stat_dict['detections_by_class'][cls].add((detected_subfigure.detection_score,
-                                                   detected_subfigure.is_true_positive))
+        detections_by_class[cls].append(
+            Detection(score=detected_subfigure.detection_score,
+                      is_true_positive=detected_subfigure.is_true_positive))
+
+    return MultiClassFigureResult(gt_count=gt_count,
+                                  gt_count_by_class=gt_count_by_class,
+                                  detected_count=detected_count,
+                                  detections_by_class=detections_by_class,
+                                  correct_count=num_correct)
 
 
 def evaluate_detections(figure_generator: FigureGenerator) -> dict:
@@ -102,52 +130,26 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         metrics (dict): A dict containing the computed metrics.
     """
 
-    stats = {
-        'panel_splitting': {
-            'num_samples': 0,
-            'overall_gt_count': 0,
-            'overall_detected_count': 0,
-            'detections': SortedKeyList(key=lambda u: -u[0]),
-            'overall_correct_count': 0,
-            'sum_imageclef_accuracies': 0},
-        'label_recognition': {
-            'overall_gt_count': 0,
-            'overall_detected_count': 0,
-            'overall_correct_count': 0,
-            # detections_by_class is like: {class -> [(score, is_tp)]}
-            'detections_by_class': {},
-            # gt_count_by_class {class -> number_of_gt}
-            'gt_count_by_class': {}},
-        'panel_segmentation': {
-            'overall_gt_count': 0,
-            'overall_detected_count': 0,
-            'overall_correct_count': 0,
-            # detections_by_class is like: {class -> [(score, is_tp)]}
-            'detections_by_class': {},
-            # gt_count_by_class {class -> number_of_gt}
-            'gt_count_by_class': {}}
-    }
-
+    panel_splitting_results: List[PanelSplittingFigureResult] = []
+    label_recognition_results: List[MultiClassFigureResult] = []
+    panel_segmentation_results: List[MultiClassFigureResult] = []
 
     for figure in figure_generator():
 
-        # TODO : clean this function
-
-        # print("##############################")
-
         # 1) Panel splitting
+        panel_splitting_results.append(panel_splitting_figure_eval(figure))
         print("\nPanel splitting figure stats")
-        panel_splitting_figure_eval(figure, stats['panel_splitting'])
         # pprint(stats['panel_splitting'])
         # figure.show_preview(mode='both', window_name='panel_splitting')
 
         # 2) Label recognition
+        label_recognition_results.append(label_recognition_figure_eval(figure))
         print("\nLabel recognition figure stats")
-        label_recognition_figure_eval(figure, stats['label_recognition'])
         # pprint(stats['label_recognition'])
         # figure.show_preview(mode='both', window_name='label_recognition')
 
         # 3) Panel segmentation
+        panel_segmentation_results.append(panel_segmentation_figure_eval(figure))
         # Assign detected labels to detected panels using the beam search algorithm
         # TODO manage the case where no labels have been detected
         # if len(detected_labels) > 0:
@@ -168,7 +170,7 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
 
     # Panel splitting
     psp_imageclef_acc, psp_precision, psp_recall, psp_map = panel_splitting_metrics(
-        stat_dict=stats['panel_splitting'])
+        results=panel_splitting_results)
     metrics['panel_splitting'] = {
         'imageclef_accuracy': psp_imageclef_acc,
         'precision': psp_precision,
@@ -177,7 +179,7 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     }
 
     # Label recognition
-    lrec_precision, lrec_recall, lrec_map = multi_class_metrics(stats['label_recognition'])
+    lrec_precision, lrec_recall, lrec_map = multi_class_metrics(results=label_recognition_results)
     metrics['label_recognition'] = {
         'precision': lrec_precision,
         'recall': lrec_recall,
@@ -185,7 +187,7 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     }
 
     # Panel segmentation
-    # pseg_precision, pseg_recall, pseg_map = multi_class_metrics(stats['panel_segmentation'])
+    # pseg_precision, pseg_recall, pseg_map = multi_class_metrics(results=panel_segmentation_results)
     # metrics['panel_segmentation'] = {
         # 'precision': pseg_precision,
         # 'recall': pseg_recall,

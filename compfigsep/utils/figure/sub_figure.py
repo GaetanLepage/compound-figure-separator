@@ -152,10 +152,11 @@ class DetectedSubFigure(SubFigure):
     Add association attributes (to link detections to ground truth elements).
 
     Attributes:
-        panel (DetectedPanel):      Panel object.
-        label (DetectedLabel):      Label object.
-        caption (str):              Caption text.
-        is_true_positive (bool):    TODO.
+        panel (Optional[DetectedPanel]):    Panel object.
+        label (Optional[DetectedLabel]):    Label object.
+        caption (Optional[str]):            Caption text.
+        is_true_positive (Optional[bool]):  TODO.
+        detection_score (Optional[float]):  TODO. (in practice, same as panel detection score)
     """
 
     def __init__(self,
@@ -171,9 +172,10 @@ class DetectedSubFigure(SubFigure):
         self.label: Optional[DetectedLabel] = label
         self.caption: Optional[str] = caption
 
-        self.is_true_positive = False
+        self.detection_score: Optional[float] = None
+        self.is_true_positive: Optional[bool] = None
 
-        self.caption_is_positive = False
+        self.caption_is_positive: Optional[bool] = None
 
 
     @classmethod

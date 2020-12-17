@@ -123,12 +123,14 @@ class DetectedPanel(Panel):
     Class representing a detected panel.
 
     Attributes:
-        box (Box):                          The bounding box localizing the panel on the image.
-        detection_score (float):            Detection score (confidence).
-        is_true_positive_iou (bool):        Whether this is a correct panel detection (panel
-                                                splitting and panel segmentation tasks).
-        is_true_positive_overlap (bool):    Whether this is a correct panel detection (ImageCLEF
-                                                panel splitting criteria).
+        box (Box):                                  The bounding box localizing the panel on the
+                                                        image.
+        detection_score (Optional[float]):          Detection score (confidence).
+        is_true_positive_iou (Optional[bool]):      Whether this is a correct panel detection
+                                                        (panel splitting and panel segmentation
+                                                        tasks).
+        is_true_positive_overlap (Optional[bool]):  Whether this is a correct panel detection
+                                                        (ImageCLEF panel splitting criteria).
     """
 
     def __init__(self,
@@ -141,7 +143,7 @@ class DetectedPanel(Panel):
         """
         super().__init__(box=box)
 
-        self.detection_score = detection_score
+        self.detection_score: Optional[float] = detection_score
 
         self.is_true_positive_iou: Optional[bool] = None
         self.is_true_positive_overlap: Optional[bool] = None

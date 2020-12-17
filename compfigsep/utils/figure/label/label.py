@@ -148,10 +148,10 @@ class DetectedLabel(Label):
     Class representing a detected label.
 
     Attributes:
-        text (str):                 The label text ('A' or '1' or 'ii'...).
-        box (Box):                  The bounding box localizing the label on the image.
-        detection_score (float):    Detection score (confidence).
-        is_true_positive (bool):    Whether this is a correct label detection.
+        text (str):                         The label text ('A' or '1' or 'ii'...).
+        box (Box):                          The bounding box localizing the label on the image.
+        detection_score (Optional[float]):  Detection score (confidence).
+        is_true_positive (Optional[bool]):  Whether this is a correct label detection.
     """
 
     def __init__(self,
@@ -168,7 +168,7 @@ class DetectedLabel(Label):
                          box=box)
 
         self.detection_score: Optional[float] = detection_score
-        self.is_true_positive: bool = False
+        self.is_true_positive: Optional[bool] = False
 
 
     @classmethod

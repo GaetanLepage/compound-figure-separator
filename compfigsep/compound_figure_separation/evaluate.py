@@ -25,9 +25,29 @@ Evaluation tool for compound figure separation.
 TODO
 """
 
-from typing import Dict, Any
+from typing import Dict, Any, List
+from pprint import pprint
+
+from sortedcontainers import SortedKeyList # type: ignore
+
+from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
 from ..utils.figure import Label
+
+from ..panel_splitting.evaluate import(PanelSplittingFigureResult,
+                                       panel_splitting_figure_eval,
+                                       panel_splitting_metrics)
+
+from ..label_recognition.evaluate import(MultiClassFigureResult,
+                                         label_recognition_figure_eval,
+                                         multi_class_metrics)
+
+from ..panel_segmentation.evaluate import panel_segmentation_figure_eval
+
+from ..caption_splitting.evaluate import (CaptionSplittingFigureResult,
+                                          caption_splitting_figure_eval,
+                                          caption_splitting_metrics)
+
 
 def compound_figure_separation_figure_eval(figure: Figure,
                                            stat_dict: Dict[str, Any]):
@@ -39,7 +59,7 @@ def compound_figure_separation_figure_eval(figure: Figure,
                                         task.
         stat_dict (Dict[str, any]): A dict containing compound figure evaluation evaluation stats
                                         It will be updated by this function.
-    """
+"""
     # Keep track of the number of gt panels for each class
     for gt_subfigure in figure.gt_subfigures:
 
@@ -49,9 +69,9 @@ def compound_figure_separation_figure_eval(figure: Figure,
                                        text='')
         gt_label: Label = gt_subfigure.label
 
-        if len(gt_label.text) != 1:
+        if gt_label.text is None or len(gt_label.text) != 1:
             # TODO: this choice might not be smart
-            # "" stands for "no label"
+            # '' stands for "no label"
             gt_label.text = ''
 
         cls: str = gt_label.text
@@ -98,53 +118,51 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         metrics (dict): A dict containing the computed metrics.
     """
 
-    stats = {
-        'panel_splitting': {
-            'num_samples': 0,
-            'overall_gt_count': 0,
-            'overall_detected_count': 0,
-            'detections': SortedKeyList(key=lambda u: -u[0]),
-            'overall_correct_count': 0,
-            'sum_imageclef_accuracies': 0},
-        'label_recognition': {
-            'overall_gt_count': 0,
-            'overall_detected_count': 0,
-            'overall_correct_count': 0,
-            # detections_by_class is like: {class -> [(score, is_tp)]}
-            'detections_by_class': {},
-            # gt_count_by_class {class -> number_of_gt}
-            'gt_count_by_class': {}},
-        'panel_segmentation': {
-            'overall_gt_count': 0,
-            'overall_detected_count': 0,
-            'overall_correct_count': 0,
-            # detections_by_class is like: {class -> [(score, is_tp)]}
-            'detections_by_class': {},
-            # gt_count_by_class {class -> number_of_gt}
-            'gt_count_by_class': {}},
-        'caption_splitting': {
-            'num_captions': 0,
-            'levenshtein metric': 0
-        }
-    }
+     # stats = {
+     #     'panel_splitting': {
+     #         'num_samples': 0,
+     #         'overall_gt_count': 0,
+     #         'overall_detected_count': 0,
+     #         'detections': SortedKeyList(key=lambda u: -u[0]),
+     #         'overall_correct_count': 0,
+     #         'sum_imageclef_accuracies': 0},
+     #     'label_recognition': {
+     #         'overall_gt_count': 0,
+     #         'overall_detected_count': 0,
+     #         'overall_correct_count': 0,
+     #         # detections_by_class is like: {class -> [(score, is_tp)]}
+     #         'detections_by_class': {},
+     #         # gt_count_by_class {class -> number_of_gt}
+     #         'gt_count_by_class': {}},
+     #     'panel_segmentation': {
+     #         'overall_gt_count': 0,
+     #         'overall_detected_count': 0,
+     #         'overall_correct_count': 0,
+     #         # detections_by_class is like: {class -> [(score, is_tp)]}
+     #         'detections_by_class': {},
+     #         # gt_count_by_class {class -> number_of_gt}
+     #         'gt_count_by_class': {}},
+     #     'caption_splitting': {
+     #         'num_captions': 0,
+     #         'levenshtein metric': 0
+     #     }
+     # }
 
+    panel_splitting_results: List[PanelSplittingFigureResult] = []
+    label_recognition_results: List[MultiClassFigureResult] = []
+    panel_segmentation_results: List[MultiClassFigureResult] = []
+    caption_splitting_results: List[CaptionSplittingFigureResult] = []
 
     for figure in figure_generator():
 
-        # TODO : clean this function
-
-        # print("##############################")
-
         # 1) Panel splitting
-        print("\nPanel splitting figure stats")
-        panel_splitting_figure_eval(figure, stats['panel_splitting'])
-        # pprint(stats['panel_splitting'])
+        panel_splitting_results.append(panel_splitting_figure_eval(figure))
+        # print("\nPanel splitting figure stats")
         # figure.show_preview(mode='both', window_name='panel_splitting')
 
         # 2) Label recognition
-        print("\nLabel recognition figure stats")
-        label_recognition_figure_eval(figure, stats['label_recognition'])
-        # pprint(stats['label_recognition'])
+        label_recognition_results.append(label_recognition_figure_eval(figure))
+        # print("\nLabel recognition figure stats")
         # figure.show_preview(mode='both', window_name='label_recognition')
 
         # 3) Panel segmentation
@@ -159,16 +177,18 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
                                       # for subfigure in subfigures]
 
         # print("\nPanel segmentation figure stats")
-        # panel_segmentation_figure_eval(figure, stats['panel_segmentation'])
-        #pprint(stats['panel_segmentation'])
+        panel_segmentation_results.append(panel_segmentation_figure_eval(figure))
         #figure.show_preview(mode='both', window_name='panel_segmentation')
+
+        # 4) Caption segmentation
+        caption_splitting_results.append(caption_splitting_figure_eval(figure))
 
 
     metrics: Dict[str, Dict[str, float]] = {}
 
     # Panel splitting
     psp_imageclef_acc, psp_precision, psp_recall, psp_map = panel_splitting_metrics(
-        stat_dict=stats['panel_splitting'])
+        results=panel_splitting_results)
     metrics['panel_splitting'] = {
         'imageclef_accuracy': psp_imageclef_acc,
         'precision': psp_precision,
@@ -177,7 +197,8 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     }
 
     # Label recognition
-    lrec_precision, lrec_recall, lrec_map = multi_class_metrics(stats['label_recognition'])
+    lrec_precision, lrec_recall, lrec_map = multi_class_metrics(
+        results=label_recognition_results)
     metrics['label_recognition'] = {
         'precision': lrec_precision,
         'recall': lrec_recall,
@@ -185,11 +206,19 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     }
 
     # Panel segmentation
-    pseg_precision, pseg_recall, pseg_map = multi_class_metrics(stats['panel_segmentation'])
+    pseg_precision, pseg_recall, pseg_map = multi_class_metrics(
+        results=panel_segmentation_results)
     metrics['panel_segmentation'] = {
         'precision': pseg_precision,
         'recall': pseg_recall,
         'mAP': pseg_map
+    }
+
+    # Caption splitting
+    lavenstein_metric: float = caption_splitting_metrics(caption_splitting_results)
+
+    metrics['caption_splitting'] = {
+        'lavenstein_metric': lavenstein_metric
     }
 
     pprint(metrics)
