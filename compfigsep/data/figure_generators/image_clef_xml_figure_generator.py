@@ -114,8 +114,8 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
                 image_filename + '.jpg')
 
             # Create Figure object
-            figure = Figure(image_path=image_path,
-                            index=annotation_index)
+            figure: Figure = Figure(image_path=image_path,
+                                    index=annotation_index)
 
             # Load image file
             try:
@@ -131,12 +131,10 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
 
                 point_items = object_item.findall('./point')
 
-                coordinates = [
-                    point_items[0].get('x'),
-                    point_items[0].get('y'),
-                    point_items[3].get('x'),
-                    point_items[3].get('y')
-                ]
+                coordinates = [point_items[0].get('x'),
+                               point_items[0].get('y'),
+                               point_items[3].get('x'),
+                               point_items[3].get('y')]
 
                 if any([coord is None for coord in coordinates]):
                     continue
@@ -145,8 +143,9 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
                                                   coordinates)
 
                 # Create Panel object
-                panel = Panel(box=cast(Box,
-                                       (int(coord) for coord in str_coordinates)))
+                panel: Panel = Panel(box=cast(Box,
+                                              (int(coord)
+                                               for coord in str_coordinates)))
 
                 # Add this panel to the list of panels
                 subfigures.append(SubFigure(panel=panel))

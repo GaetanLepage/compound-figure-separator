@@ -73,10 +73,10 @@ class GlobalCsvFigureGenerator(FigureGenerator):
             csv_reader = csv.reader(csv_annotation_file, delimiter=',')
 
             subfigures: List[SubFigure] = []
-            image_path = ''
-            figure = None
+            image_path: str = ''
+            figure: Optional[Figure] = None
 
-            image_counter = 0
+            image_counter: int = 0
 
             for row in csv_reader:
 
@@ -131,7 +131,7 @@ class GlobalCsvFigureGenerator(FigureGenerator):
                 assert panel_class == 'panel'
 
                 # Instanciate Panel object
-                panel = Panel(box=panel_coordinates)
+                panel: Panel = Panel(box=panel_coordinates)
 
                 subfigures.append(SubFigure(panel=panel,
                                             label=label))

@@ -35,6 +35,7 @@ from ..label_recognition.evaluate import (MultiClassFigureResult,
                                           multi_class_metrics)
 from ..utils.figure import Figure
 from ..utils.figure import Label
+from ..utils.figure import beam_search
 
 
 def panel_segmentation_figure_eval(figure: Figure) -> MultiClassFigureResult:
@@ -152,9 +153,9 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         panel_segmentation_results.append(panel_segmentation_figure_eval(figure))
         # Assign detected labels to detected panels using the beam search algorithm
         # TODO manage the case where no labels have been detected
-        # if len(detected_labels) > 0:
-        # subfigures = beam_search.assign_labels_to_panels(figure.detected_panels,
-                                                         # figure.detected_labels)
+        if len(figure.detected_labels) > 0:
+            subfigures = beam_search.assign_labels_to_panels(figure.detected_panels,
+                                                             figure.detected_labels)
 
         # Convert output from beam search (list of SubFigure objects) to DetectedSubFigure.
         # figure.detected_subfigures = [DetectedSubFigure.from_normal_sub_figure(subfigure)

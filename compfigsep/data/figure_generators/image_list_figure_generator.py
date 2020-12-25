@@ -27,7 +27,7 @@ from __future__ import annotations
 import os
 import logging
 
-from typing import Iterable
+from typing import Iterable, Optional
 
 from ...utils.figure.figure import Figure
 from .figure_generator import FigureGenerator
@@ -57,15 +57,12 @@ class ImageListFigureGenerator(FigureGenerator):
             raise FileNotFoundError("The evaluation list file does not exist :"\
                                     "\n\t {}".format(image_list_txt))
 
-        self.image_directory_path = image_directory_path
+        self.image_directory_path: Optional[str] = image_directory_path
 
-        self.image_list_txt = image_list_txt
+        self.image_list_txt: str = image_list_txt
 
 
     def __copy__(self) -> ImageListFigureGenerator:
-        """
-        TODO
-        """
         return ImageListFigureGenerator(image_list_txt=self.image_list_txt,
                                         image_directory_path=self.image_directory_path)
 
@@ -78,7 +75,7 @@ class ImageListFigureGenerator(FigureGenerator):
 
                 # Compute image path.
                 if self.image_directory_path is not None:
-                    image_file_path = os.path.join(self.image_directory_path, line[:-1])
+                    image_file_path: str = os.path.join(self.image_directory_path, line[:-1])
                 elif os.path.isfile(line):
                     image_file_path = line
                 else:
@@ -88,8 +85,8 @@ class ImageListFigureGenerator(FigureGenerator):
                     logging.warning("File not found : %s", image_file_path)
                     continue
 
-                figure = Figure(image_path=image_file_path,
-                                index=image_counter)
+                figure: Figure = Figure(image_path=image_file_path,
+                                        index=image_counter)
 
                 figure.load_image()
 

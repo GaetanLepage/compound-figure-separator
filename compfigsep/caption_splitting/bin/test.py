@@ -32,7 +32,7 @@ import logging
 from argparse import ArgumentParser, Namespace
 from collections import OrderedDict
 
-from typing import List
+from typing import List, Dict
 from compfigsep.utils.figure import Figure, LabelStructure
 
 
@@ -64,7 +64,8 @@ def _parse_args(args: List[str]) -> Namespace:
     Returns:
         parser (Namespace): Populated namespace.
     """
-    parser = ArgumentParser(description="Evaluate caption splitting on the prostate data set.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Evaluate caption splitting on the prostate data set.")
 
     add_json_arg(parser=parser,
                  json_default_relative_path=\
@@ -73,7 +74,7 @@ def _parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None):
+def main(args: List[str] = None) -> None:
     """
     Launch detection and evaluation of the label recognition task on a JSON data set.
 
@@ -99,19 +100,19 @@ def main(args: List[str] = None):
             figure (Figure):    A figure object.
         """
 
-        caption = figure.caption
+        caption: str = figure.caption
 
         if caption is None:
             return
 
-        label_dict = label_identification(caption=caption)
+        label_dict: Dict = label_identification(caption=caption)
 
         labels_list: List[str] = label_expansion(label_dict)
 
         label_structure: LabelStructure = label_filtering.label_filtering(text_labels=labels_list)
 
-        sub_captions_dict = extract_subcaptions(caption=caption,
-                                                label_structure=label_structure)
+        sub_captions_dict: Dict[str, str] = extract_subcaptions(caption=caption,
+                                                                label_structure=label_structure)
 
         figure.detected_subcaptions = OrderedDict(sub_captions_dict)
 

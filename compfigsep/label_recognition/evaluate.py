@@ -92,6 +92,7 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
 
     num_correct: int = 0
     detections_by_class: Dict[str, List[Detection]] = {}
+
     for detected_label in figure.detected_labels:
         detected_count +=1
         num_correct += int(detected_label.is_true_positive)

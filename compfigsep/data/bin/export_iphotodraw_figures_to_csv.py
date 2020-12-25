@@ -31,10 +31,10 @@ from argparse import ArgumentParser, Namespace
 
 from typing import List
 
-sys.path.append(".")
-
 from compfigsep.data.figure_generators import IphotodrawXmlFigureGenerator
 from compfigsep.data.export import export_figures_to_csv
+
+sys.path.append(".")
 
 
 def parse_args(args: List[str]) -> Namespace:
@@ -47,8 +47,9 @@ def parse_args(args: List[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser = ArgumentParser(description="Convert annotations from individual iPhotoDraw"\
-                                        " xml annotation files. to a CSV annotations file.")
+    parser: ArgumentParser = ArgumentParser(description="Convert annotations from individual"\
+                                                        " iPhotoDraw xml annotation files. to a"\
+                                                        " CSV annotations file.")
 
     parser.add_argument('--file_list_txt',
                         help="The path to the txt file listing the images.",
@@ -78,7 +79,7 @@ def parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None):
+def main(args: List[str] = None) -> None:
     """
     Load figures from iPhotoDraw xml annotation files and export them to csv.
 
@@ -89,18 +90,19 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    args = parse_args(args)
+    parsed_args = parse_args(args)
 
     # Create the figure generator handling xml annotation files.
-    figure_generator = IphotodrawXmlFigureGenerator(
-        file_list_txt=args.file_list_txt,
-        image_directory_path=args.image_directory_path)
+    figure_generator: IphotodrawXmlFigureGenerator = IphotodrawXmlFigureGenerator(
+        file_list_txt=parsed_args.file_list_txt,
+        image_directory_path=parsed_args.image_directory_path)
 
     # Export figures to csv.
-    export_figures_to_csv(figure_generator=figure_generator,
-                          output_csv_file=args.output_csv,
-                          individual_export=args.individual_csv,
-                          individual_export_csv_directory=args.individual_export_csv_directory)
+    export_figures_to_csv(
+        figure_generator=figure_generator,
+        output_csv_file=parsed_args.output_csv,
+        individual_export=parsed_args.individual_csv,
+        individual_export_csv_directory=parsed_args.individual_export_csv_directory)
 
 
 if __name__ == '__main__':

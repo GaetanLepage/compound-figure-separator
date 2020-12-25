@@ -60,7 +60,7 @@ def _parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None):
+def main(args: List[str] = None) -> None:
     """
     Launch evaluation of the caption_splitting task on a JSON data set.
 

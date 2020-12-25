@@ -46,8 +46,8 @@ def parse_args(args: List[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser = ArgumentParser(description="Convert annotations from an ImageCLEF xml"\
-                                        " annotation file to a CSV annotations file.")
+    parser: ArgumentParser = ArgumentParser(description="Convert annotations from an ImageCLEF"\
+                                            " xml annotation file to a CSV annotations file.")
 
     parser.add_argument('--annotation_xml',
                         help="The path to the xml annotation file.",
@@ -77,7 +77,7 @@ def parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None):
+def main(args: List[str] = None) -> None:
     """
     Load figures from ImageCLEF xml annotation files and export them to csv.
 

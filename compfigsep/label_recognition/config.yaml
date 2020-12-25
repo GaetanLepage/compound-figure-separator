@@ -1,27 +1,28 @@
 _BASE_: "../utils/detectron_utils/Base-RetinaNet.yaml"
-OUTPUT_DIR: "compfigsep/label_recognition/output"
-MODEL:
-  RESNETS:
-    OUT_FEATURES: ['res2', 'res3', 'res4']
-  FPN:
-    IN_FEATURES: ['res2', 'res3', 'res4']
-    OUT_CHANNELS: 64
-  ANCHOR_GENERATOR:
-    SIZES: !!python/object/apply:eval ["[[x, x * 2**(1.0/3), x * 2**(2.0/3) ] for x in [16, 32, 64]]"]
-    ASPECT_RATIOS: !!python/object/apply:eval ["[[0.5, 1.0, 2.0]]"]
-  RETINANET:
-    NUM_CLASSES: 50
-    NMS_THRESH_TEST: 0.1
-    IN_FEATURES: ['p2', 'p3', 'p4']
+OUTPUT_DIR: "compfigsep/label_recognition/output_backup"
+#OUTPUT_DIR: "compfigsep/label_recognition/output"
+#MODEL:
+  #RESNETS:
+    #OUT_FEATURES: ['res2', 'res3', 'res4']
+  #FPN:
+    #IN_FEATURES: ['res2', 'res3', 'res4']
+    #OUT_CHANNELS: 64
+  #ANCHOR_GENERATOR:
+    #SIZES: !!python/object/apply:eval ["[[x, x * 2**(1.0/3), x * 2**(2.0/3) ] for x in [16, 32, 64]]"]
+    #ASPECT_RATIOS: !!python/object/apply:eval ["[[0.5, 1.0, 2.0]]"]
+  #RETINANET:
+    #NUM_CLASSES: 50
+    #NMS_THRESH_TEST: 0.1
+    #IN_FEATURES: ['p2', 'p3', 'p4']
 DATASETS:
   TRAIN: ('zou_label_recog_train',)
   #VALIDATION: 'image_clef_val'
   TEST: ('zou_label_recog_test',)
-SOLVER:
-  IMS_PER_BATCH: 2
-  BASE_LR: 0.001
-#VALIDATION:
-  #VALIDATION_PERIOD: 5000
-TEST:
-  EVAL_PERIOD: 0
-  DETECTIONS_PER_IMAGE: 16
+#SOLVER:
+  #IMS_PER_BATCH: 2
+  #BASE_LR: 0.001
+##VALIDATION:
+  ##VALIDATION_PERIOD: 5000
+#TEST:
+  #EVAL_PERIOD: 0
+  #DETECTIONS_PER_IMAGE: 16

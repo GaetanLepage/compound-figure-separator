@@ -32,10 +32,10 @@ from argparse import ArgumentParser, Namespace
 
 from typing import List
 
-sys.path.append('.')
-
 from compfigsep.data.figure_generators import ImageClefXmlFigureGenerator
 from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
+
+sys.path.append('.')
 
 
 def parse_args(args: List[str]) -> Namespace:
@@ -48,7 +48,8 @@ def parse_args(args: List[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser = ArgumentParser(description="Preview all the figures from an ImageCLEF data set.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Preview all the figures from an ImageCLEF data set.")
 
     parser.add_argument('--annotation_xml',
                         help="The path to the xml annotation file.",
@@ -65,7 +66,7 @@ def parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None):
+def main(args: List[str] = None) -> None:
     """
     Launch previsualization of ImageCLEF data set.
 
@@ -76,19 +77,19 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    args = parse_args(args)
+    parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling ImageCLEF xml annotation files.
-    figure_generator = ImageClefXmlFigureGenerator(
-        xml_annotation_file_path=args.annotation_xml,
-        image_directory_path=args.image_directory_path)
+    figure_generator: ImageClefXmlFigureGenerator = ImageClefXmlFigureGenerator(
+        xml_annotation_file_path=parsed_args.annotation_xml,
+        image_directory_path=parsed_args.image_directory_path)
 
     # Preview the data set.
     view_data_set(figure_generator=figure_generator,
-                  mode=args.mode,
-                  save_preview=args.save_preview,
-                  preview_folder=os.path.join(args.image_directory_path, "preview"),
-                  delay=args.delay,
+                  mode=parsed_args.mode,
+                  save_preview=parsed_args.save_preview,
+                  preview_folder=os.path.join(parsed_args.image_directory_path, "preview"),
+                  delay=parsed_args.delay,
                   window_name="ImageCLEF data preview")
 
 

@@ -60,7 +60,7 @@ def parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None):
+def main(args: List[str] = None) -> None:
     """
     Launch previsualization of a JSON data set.
 
@@ -74,8 +74,7 @@ def main(args: List[str] = None):
     parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling ImageCLEF xml annotation files.
-    figure_generator: JsonFigureGenerator = JsonFigureGenerator(
-        json_path=parsed_args.json)
+    figure_generator: JsonFigureGenerator = JsonFigureGenerator(json_path=parsed_args.json)
 
     # Preview the data set.
     view_data_set(figure_generator=figure_generator,

@@ -71,7 +71,7 @@ def parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None):
+def main(args: List[str] = None) -> None:
     """
     Export the ImageCLEF dataset to a TFRecord file.
 
@@ -82,16 +82,17 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    args = parse_args(args)
+
+    parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling xml annotation files
-    figure_generator = ImageClefXmlFigureGenerator(
-        xml_annotation_file_path=args.annotation_xml,
-        image_directory_path=args.image_directory_path)
+    figure_generator: ImageClefXmlFigureGenerator = ImageClefXmlFigureGenerator(
+        xml_annotation_file_path=parsed_args.annotation_xml,
+        image_directory_path=parsed_args.image_directory_path)
 
     # Export figures to csv
     export_figures_to_tf_record(figure_generator=figure_generator,
-                                tf_record_filename=args.output_tfrecord)
+                                tf_record_filename=parsed_args.output_tfrecord)
 
 
 if __name__ == '__main__':

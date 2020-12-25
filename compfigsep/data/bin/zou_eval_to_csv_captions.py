@@ -47,8 +47,9 @@ def parse_args(args: List[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser = ArgumentParser(description="Convert annotations from individual iPhotoDraw"\
-                                        " xml annotation files. to a CSV annotations file.")
+    parser: ArgumentParser = ArgumentParser(description="Convert annotations from individual"\
+                                                        " iPhotoDraw xml annotation files. to a"\
+                                                        " CSV annotations file.")
 
     add_iphotodraw_args(parser=parser)
 
@@ -72,7 +73,7 @@ def main(args: List[str] = None) -> None:
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    parsed_args = parse_args(args)
+    parsed_args: Namespace = parse_args(args)
 
 
     if os.path.isfile(parsed_args.csv_output_filename):
@@ -80,7 +81,7 @@ def main(args: List[str] = None) -> None:
         return
 
     # Create the figure generator handling xml annotation files.
-    figure_generator = IphotodrawXmlFigureGenerator(
+    figure_generator: IphotodrawXmlFigureGenerator = IphotodrawXmlFigureGenerator(
         file_list_txt=parsed_args.file_list_txt,
         image_directory_path=parsed_args.image_directory_path)
 
@@ -97,15 +98,12 @@ def main(args: List[str] = None) -> None:
 
             if hasattr(figure, 'gt_subcaptions'):
                 labels_list = list(figure.gt_subcaptions.keys())
-                print(labels_list)
             else:
                 labels_list = []
 
-            csv_row = [
-                figure.image_filename,
-                figure.caption if hasattr(figure, 'caption') else '',
-                ', '.join(labels_list)
-            ]
+            csv_row = [figure.image_filename,
+                       figure.caption if hasattr(figure, 'caption') else '',
+                       ', '.join(labels_list)]
 
             if hasattr(figure, 'gt_subcaptions'):
                 csv_row.extend(figure.gt_subcaptions.values())
@@ -114,8 +112,6 @@ def main(args: List[str] = None) -> None:
                 csv_row.extend('' for _ in range(20))
 
             csv_writer.writerow(csv_row)
-
-
 
 
 if __name__ == '__main__':

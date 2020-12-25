@@ -52,7 +52,8 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
         super().__init__(dataset_name=dataset_name,
                          task_name='label_recog',
                          evaluation_function=evaluate_detections,
-                         export=export)
+                         export=export,
+                         export_dir=export_dir)
 
 
     def process(self,

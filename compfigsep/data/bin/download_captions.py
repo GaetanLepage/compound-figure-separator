@@ -53,8 +53,8 @@ def parse_args(args: List[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser: ArgumentParser = ArgumentParser(description="Convert the ImageCLEF dataset to a"\
-                                                        " TFRecord file.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Convert the ImageCLEF dataset to a TFRecord file.")
 
     parser.add_argument('--file_list_txt',
                         help="The path to the txt file listing the images.",
@@ -179,6 +179,7 @@ def main(args: List[str] = None) -> None:
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
+
     parsed_args: Namespace = parse_args(args)
 
     # Get the captions

@@ -47,7 +47,8 @@ def parse_args(args: List[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser = ArgumentParser(description="Preview all the figures from an iPhotoDraw data set.")
+    parser: ArgumentParser = ArgumentParser(description="Preview all the figures from an"\
+                                                        " iPhotoDraw data set.")
 
     parser.add_argument('--file_list_txt',
                         help="The path to the txt file listing the images.",
@@ -75,18 +76,18 @@ def main(args: List[str] = None):
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
-    args = parse_args(args)
+    parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling iPhotoDraw annotation files.
     figure_generator = IphotodrawXmlFigureGenerator(
-        file_list_txt=args.file_list_txt,
-        image_directory_path=args.image_directory_path)
+        file_list_txt=parsed_args.file_list_txt,
+        image_directory_path=parsed_args.image_directory_path)
 
-    if args.save_preview:
-        if args.file_list_txt is not None:
-            preview_folder = os.path.dirname(args.file_list_txt)
+    if parsed_args.save_preview:
+        if parsed_args.file_list_txt is not None:
+            preview_folder = os.path.dirname(parsed_args.file_list_txt)
         else:
-            preview_folder = args.image_directory_path
+            preview_folder = parsed_args.image_directory_path
         preview_folder = os.path.join(preview_folder, 'preview')
     else:
         preview_folder = ""
@@ -94,10 +95,10 @@ def main(args: List[str] = None):
 
     # Preview the data set.
     view_data_set(figure_generator=figure_generator,
-                  mode=args.mode,
-                  save_preview=args.save_preview,
+                  mode=parsed_args.mode,
+                  save_preview=parsed_args.save_preview,
                   preview_folder=preview_folder,
-                  delay=args.delay,
+                  delay=parsed_args.delay,
                   window_name="PanelSeg data preview")
 
 
