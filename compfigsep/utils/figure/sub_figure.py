@@ -168,6 +168,8 @@ class DetectedSubFigure(SubFigure):
 
         Args:
         """
+        super().__init__()
+
         self.panel: Optional[DetectedPanel] = panel
         self.label: Optional[DetectedLabel] = label
         self.caption: Optional[str] = caption
