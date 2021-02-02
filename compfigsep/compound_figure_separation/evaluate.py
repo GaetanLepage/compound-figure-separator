@@ -118,36 +118,6 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         metrics (dict): A dict containing the computed metrics.
     """
 
-     # stats = {
-     #     'panel_splitting': {
-     #         'num_samples': 0,
-     #         'overall_gt_count': 0,
-     #         'overall_detected_count': 0,
-     #         'detections': SortedKeyList(key=lambda u: -u[0]),
-     #         'overall_correct_count': 0,
-     #         'sum_imageclef_accuracies': 0},
-     #     'label_recognition': {
-     #         'overall_gt_count': 0,
-     #         'overall_detected_count': 0,
-     #         'overall_correct_count': 0,
-     #         # detections_by_class is like: {class -> [(score, is_tp)]}
-     #         'detections_by_class': {},
-     #         # gt_count_by_class {class -> number_of_gt}
-     #         'gt_count_by_class': {}},
-     #     'panel_segmentation': {
-     #         'overall_gt_count': 0,
-     #         'overall_detected_count': 0,
-     #         'overall_correct_count': 0,
-     #         # detections_by_class is like: {class -> [(score, is_tp)]}
-     #         'detections_by_class': {},
-     #         # gt_count_by_class {class -> number_of_gt}
-     #         'gt_count_by_class': {}},
-     #     'caption_splitting': {
-     #         'num_captions': 0,
-     #         'levenshtein metric': 0
-     #     }
-     # }
-
     panel_splitting_results: List[PanelSplittingFigureResult] = []
     label_recognition_results: List[MultiClassFigureResult] = []
     panel_segmentation_results: List[MultiClassFigureResult] = []
