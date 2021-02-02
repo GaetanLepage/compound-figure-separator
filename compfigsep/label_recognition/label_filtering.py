@@ -42,6 +42,12 @@ DELTA = 1
 def _unary_compatibility(label: DetectedLabel) -> float:
     """
     TODO
+
+    Args:
+        label (DetectedLabel):  TODO
+
+    Returns:
+
     """
     assert label.detection_score is not None
 
