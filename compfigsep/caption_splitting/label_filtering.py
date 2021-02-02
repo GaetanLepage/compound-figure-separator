@@ -23,13 +23,13 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Functions to merge image label and text label information to filter detections.
 """
 
-from typing import List
+from typing import List, Optional
 
 from ..utils.figure.label import LabelStructure
 
 
 def label_filtering(text_labels: List[str],
-                    image_labels: List[str] = []) -> LabelStructure:
+                    image_labels: Optional[List[str]] = None) -> LabelStructure:
     """
     Cross the image-based and text-based label detections.
 
@@ -44,7 +44,9 @@ def label_filtering(text_labels: List[str],
     # Merge the two lists of labels.
     # Note: The duplicates are not removed on purpose. The idea is that each detection
     # vote for the most likely label structure.
-    labels: List[str] = text_labels + image_labels
+    labels: List[str] = text_labels
+    if image_labels is not None:
+        labels += image_labels
 
     label_structure: LabelStructure = LabelStructure.from_labels_list(labels_list=labels)
 
