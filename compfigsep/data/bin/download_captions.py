@@ -105,7 +105,7 @@ def get_captions(file_list_txt: str,
 
             # Path to the txt file that will contain the caption text.
             caption_annotation_file_path: str = image_path.replace('.jpg',
-                                                              '_caption.txt')
+                                                                   '_caption.txt')
 
             if os.path.isfile(caption_annotation_file_path) and not override:
                 logging.warning("Caption file %s for image %s already exists."\

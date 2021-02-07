@@ -85,6 +85,7 @@ def view_data_set(figure_generator: FigureGenerator,
     """
 
     for figure in figure_generator():
+
         figure.show_preview(mode=mode,
                             delay=delay,
                             window_name=window_name)

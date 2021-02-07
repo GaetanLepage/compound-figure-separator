@@ -1063,7 +1063,6 @@ class Figure:
 
         cv2.imshow(window_name, image_preview)
         cv2.waitKey(delay)
-        cv2.destroyAllWindows()
 
 
     def save_preview(self,
@@ -1171,12 +1170,12 @@ class Figure:
                 csv_writer.writerow(csv_row)
 
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         """
         Export to a dict.
 
         Returns:
-            output_dict (Dict): A Dict representing the figure information.
+            output_dict (Dict[str, Any]): A Dict representing the figure information.
         """
 
         output_dict: Dict[str, Any] = {
