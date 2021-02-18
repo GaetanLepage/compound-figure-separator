@@ -81,7 +81,8 @@ def main(args: List[str] = None):
     # Create the figure generator handling iPhotoDraw annotation files.
     figure_generator = IphotodrawXmlFigureGenerator(
         file_list_txt=parsed_args.file_list_txt,
-        image_directory_path=parsed_args.image_directory_path)
+        image_directory_path=parsed_args.image_directory_path,
+        default_random_order=parsed_args.random_order)
 
     if parsed_args.save_preview:
         if parsed_args.file_list_txt is not None:

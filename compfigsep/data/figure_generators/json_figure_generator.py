@@ -28,9 +28,10 @@ import os
 import logging
 import json
 import re
+import random
 from time import strptime
 import datetime
-from typing import Iterable
+from typing import Iterable, Optional, List, Tuple, Any
 from argparse import ArgumentParser
 
 import progressbar
@@ -199,13 +200,15 @@ class JsonFigureGenerator(FigureGenerator):
 
     Attributes:
         json_annotation_file_path (str):    The path to the json annotation file.
+        default_random_order (bool):        Wether to yield figures in a random order.
     """
 
-    def __init__(self, json_path: str) -> None:
+    def __init__(self, json_path: str, default_random_order: bool = False) -> None:
         """
         Args:
-            json (str): The path to a json annotation file OR to a folder where to look for the
-                            most recent file.
+            json (str):                     The path to a json annotation file OR to a folder where
+                                                to look for the most recent file.
+            default_random_order (bool):    Wether to yield figures in a random order.
         """
         if os.path.isfile(json_path) and json_path.endswith('.json'):
             self.json_annotation_file_path = json_path
@@ -216,7 +219,7 @@ class JsonFigureGenerator(FigureGenerator):
         else:
             raise ValueError(f"{json_path} is not a valid JSON path.")
 
-        super().__init__()
+        super().__init__(default_random_order=default_random_order)
 
         if not os.path.isfile(self.json_annotation_file_path):
             raise FileNotFoundError("The annotation json file does not exist :"\
@@ -225,22 +228,31 @@ class JsonFigureGenerator(FigureGenerator):
 
     def __copy__(self) -> JsonFigureGenerator:
 
-        return JsonFigureGenerator(json_path=self.json_annotation_file_path)
+        return JsonFigureGenerator(json_path=self.json_annotation_file_path,
+                                   default_random_order=self.default_random_order)
 
 
-    def __call__(self) -> Iterable[Figure]:
+    def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """
         Generator of Figure objects from a json annotation file.
 
         Returns:
             Iterable[Figure]:   Figure objects with annotations.
         """
+        if random_order is None:
+            random_order = self.default_random_order
+
         print(f"Json file: {self.json_annotation_file_path}")
 
         with open(self.json_annotation_file_path, 'r') as json_annotation_file:
             data_dict = json.load(json_annotation_file)
 
-        for index, figure_dict in enumerate(progressbar.progressbar(data_dict.values())):
+        dict_values: List[Tuple[str, Any]] = [pair for pair in data_dict.values()]
+
+        if random_order:
+            random.shuffle(dict_values)
+
+        for index, figure_dict in enumerate(progressbar.progressbar(dict_values)):
 
             yield Figure.from_dict(figure_dict=figure_dict,
                                    index=index)

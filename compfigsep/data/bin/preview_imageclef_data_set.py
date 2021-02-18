@@ -32,7 +32,7 @@ from argparse import ArgumentParser, Namespace
 
 from typing import List
 
-from compfigsep.data.figure_generators import ImageClefXmlFigureGenerator
+from compfigsep.data.figure_generators import add_image_clef_args, ImageClefXmlFigureGenerator
 from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
 
 sys.path.append('.')
@@ -51,17 +51,9 @@ def parse_args(args: List[str]) -> Namespace:
     parser: ArgumentParser = ArgumentParser(
         description="Preview all the figures from an ImageCLEF data set.")
 
-    parser.add_argument('--annotation_xml',
-                        help="The path to the xml annotation file.",
-                        default="data/ImageCLEF/test/FigureSeparationTest2016GT.xml",
-                        type=str)
+    add_image_clef_args(parser=parser)
 
-    parser.add_argument('--image_directory_path',
-                        help="The path to the directory where the images are stored.",
-                        default="data/ImageCLEF/test/FigureSeparationTest2016/",
-                        type=str)
-
-    add_viewer_args(parser)
+    add_viewer_args(parser=parser)
 
     return parser.parse_args(args)
 
@@ -82,7 +74,8 @@ def main(args: List[str] = None) -> None:
     # Create the figure generator handling ImageCLEF xml annotation files.
     figure_generator: ImageClefXmlFigureGenerator = ImageClefXmlFigureGenerator(
         xml_annotation_file_path=parsed_args.annotation_xml,
-        image_directory_path=parsed_args.image_directory_path)
+        image_directory_path=parsed_args.image_directory_path,
+        default_random_order=parsed_args.random_order)
 
     # Preview the data set.
     view_data_set(figure_generator=figure_generator,

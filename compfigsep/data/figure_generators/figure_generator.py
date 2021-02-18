@@ -26,8 +26,9 @@ Definition of an abstract class to handle figure data loading from various sourc
 from __future__ import annotations
 import os
 from abc import ABC, abstractmethod
-from typing import Iterable, Callable
+from typing import Iterable, Callable, Optional
 import copy
+from argparse import ArgumentParser
 
 import compfigsep
 
@@ -41,17 +42,33 @@ DATA_DIR = os.path.join(PROJECT_DIR,
 DATA_DIR = os.path.realpath(DATA_DIR)
 
 
+def add_common_figure_generator_args(parser: ArgumentParser) -> None:
+    """
+    Parse the argument for loading a json file.
+
+    Args:
+        parser (ArgumentParser):        An ArgumentParser.
+        default_eval_list_path (str):   Default path to a txt file list.
+    """
+    parser.add_argument('--random_order',
+                        help="Wether to yield figures in a random order.",
+                        action='store_true')
+
+
 class FigureGenerator(ABC):
     """
     Abstract class representing a figure generator.
     A FigureGenerator is a callable yielding Figure objects.
 
     Attributes:
-        data_dir (str):         The path to the directory where the image data sets are stored.
+        data_dir (str):                 The path to the directory where the image data sets are
+                                            stored.
+        default_random_order (bool):    Wether to yield figures in a random order.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, default_random_order: bool = False) -> None:
         self.data_dir = DATA_DIR
+        self.default_random_order = default_random_order
 
 
     @abstractmethod
@@ -60,10 +77,14 @@ class FigureGenerator(ABC):
 
 
     @abstractmethod
-    def __call__(self) -> Iterable[Figure]:
+    def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """
         Abstract method that has to be implemented.
         It has to be an iterable (generator function) that yields Figure objects.
+
+        Args:
+            random_order (Optional[bool]):  Wether to yield figures in a random order.
+                                                Defaults to the value given in the constructor.
 
         Returns:
             Iterable[Figure]:   figure objects with or without annotations (and or detections).
@@ -81,19 +102,22 @@ class StackedFigureGenerator(FigureGenerator):
                                                         objects.
         function (Callable[[Figure], None]):        A function taking a Figure as argument and
                                                             modifying it.
+        default_random_order (bool):    Wether to yield figures in a random order.
     """
 
     def __init__(self,
                  base_figure_generator: FigureGenerator,
-                 function: Callable[[Figure], None]) -> None:
+                 function: Callable[[Figure], None],
+                 default_random_order: bool = False) -> None:
         """
         Args:
             base_figure_generator (FigureGenerator):    A figure generator yielding Figure
                                                             objects.
             function (Callable[[Figure], None]):        A function taking a Figure as argument and
                                                             modifying it.
+            default_random_order (bool):    Wether to yield figures in a random order.
         """
-        super().__init__()
+        super().__init__(default_random_order=default_random_order)
 
         self._base_figure_generator = base_figure_generator
         self._function = function
@@ -103,12 +127,14 @@ class StackedFigureGenerator(FigureGenerator):
 
         return StackedFigureGenerator(
             base_figure_generator=copy.copy(self._base_figure_generator),
-            function=self._function)
+            function=self._function,
+            default_random_order=self.default_random_order)
 
 
-    def __call__(self) -> Iterable[Figure]:
+    def __call__(self,
+                 random_order: bool = None) -> Iterable[Figure]:
 
-        for figure in self._base_figure_generator():
+        for figure in self._base_figure_generator(random_order=random_order):
 
             self._function(figure)
 

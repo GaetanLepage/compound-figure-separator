@@ -31,7 +31,7 @@ from argparse import ArgumentParser, Namespace
 
 from typing import List
 
-from compfigsep.data.figure_generators import ImageClefXmlFigureGenerator
+from compfigsep.data.figure_generators import add_image_clef_args, ImageClefXmlFigureGenerator
 from compfigsep.data.export import export_figures_to_csv
 
 sys.path.append(".")
@@ -49,15 +49,8 @@ def parse_args(args: List[str]) -> Namespace:
     parser: ArgumentParser = ArgumentParser(description="Convert annotations from an ImageCLEF"\
                                             " xml annotation file to a CSV annotations file.")
 
-    parser.add_argument('--annotation_xml',
-                        help="The path to the xml annotation file.",
-                        default="data/imageCLEF/test/FigureSeparationTest2016GT.xml",
-                        type=str)
 
-    parser.add_argument('--image_directory_path',
-                        help="The path to the directory where the images are stored.",
-                        default="data/imageCLEF/test/FigureSeparationTest2016/",
-                        type=str)
+    add_image_clef_args(parser=parser)
 
     parser.add_argument('--output_csv',
                         help="The path of the csv file to which annotations have to be exported.",

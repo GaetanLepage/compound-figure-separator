@@ -34,7 +34,7 @@ from typing import List
 
 sys.path.append(".")
 
-from compfigsep.data.figure_generators import ImageClefXmlFigureGenerator
+from compfigsep.data.figure_generators import add_image_clef_args, ImageClefXmlFigureGenerator
 from compfigsep.data.export import export_figures_to_tf_record
 
 
@@ -51,15 +51,7 @@ def parse_args(args: List[str]) -> Namespace:
     parser = ArgumentParser(description="Convert the ImageCLEF dataset to a"\
                                         " TFRecord file.")
 
-    parser.add_argument('--annotation_xml',
-                        help="The path to the xml annotation file.",
-                        default="data/ImageCLEF/training/FigureSeparationTraining2016GT.xml",
-                        type=str)
-
-    parser.add_argument('--image_directory_path',
-                        help="The path to the directory where the images are stored.",
-                        default="data/ImageCLEF/training/FigureSeparationTraining2016/",
-                        type=str)
+    add_image_clef_args(parser=parser)
 
     parser.add_argument('--output_tfrecord',
                         help="The path of the tfrecord file to which annotations"\

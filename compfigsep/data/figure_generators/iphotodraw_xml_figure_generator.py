@@ -27,7 +27,8 @@ from __future__ import annotations
 import os
 import sys
 import logging
-from typing import Iterable, List
+import random
+from typing import Iterable, List, Optional
 from argparse import ArgumentParser
 
 import progressbar
@@ -37,7 +38,7 @@ from .figure_generator import FigureGenerator
 
 
 def add_iphotodraw_args(parser: ArgumentParser,
-                        default_eval_list_path: str = None):
+                        default_eval_list_path: str = None) -> None:
     """
     Parse the argument for loading a json file.
 
@@ -69,25 +70,28 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
     where the image files are stored.
 
     Attributes:
-        data_dir (str):             The path to the directory where the image data sets are
-                                        stored.
-        image_paths (List[str]):    List of the image paths.
+        data_dir (str):                 The path to the directory where the image data sets are
+                                            stored.
+        image_paths (List[str]):        List of the image paths.
+        default_random_order (bool):    Wether to yield figures in a random order.
     """
 
     def __init__(self,
                  file_list_txt: str = None,
                  image_directory_path: str = None,
                  image_paths_list: List[str] = None,
-                 caption_annotation_file: str = None) -> None:
+                 caption_annotation_file: str = None,
+                 default_random_order: bool = False) -> None:
         """
         Args:
             file_list_txt (str):            The path of the list of figures which annotations
                                                 have to be loaded.
             image_directory_path (str):     The path of the directory where the images are stored
             caption_annotation_file (str):  The path to the caption annotation file.
+            default_random_order (bool):    Wether to yield figures in a random order.
         """
         # Call base class method.
-        super().__init__()
+        super().__init__(default_random_order=default_random_order)
 
         # If a list of image paths was provided.
         if image_paths_list is not None:
@@ -124,19 +128,31 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
 
     def __copy__(self) -> IphotodrawXmlFigureGenerator:
 
-        return IphotodrawXmlFigureGenerator(image_paths_list=self.image_paths)
+        return IphotodrawXmlFigureGenerator(image_paths_list=self.image_paths,
+                                            default_random_order=self.default_random_order)
 
 
-    def __call__(self) -> Iterable[Figure]:
+    def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """
         'Generator' method yielding annotated figures from the PanelSeg data set.
+
+        Args:
+            random_order (Optional[bool]):  Wether to yield figures in a random order.
+                                                Defaults to the value given in the constructor.
 
         Returns:
             Iterable[Figure]:   Figure objects with annotations.
         """
+        if random_order is None:
+            random_order = self.default_random_order
+
+        image_paths = self.image_paths.copy()
+
+        if random_order:
+            random.shuffle(image_paths)
 
         # Looping over the list of image paths.
-        for image_index, image_path in enumerate(progressbar.progressbar(self.image_paths)):
+        for image_index, image_path in enumerate(progressbar.progressbar(image_paths)):
 
             # Create figure object.
             figure = Figure(image_path=image_path,

@@ -49,10 +49,9 @@ def parse_args(args: List[str]) -> Namespace:
     parser: ArgumentParser = ArgumentParser(
         description="Preview all the figures from an ImageCLEF data set.")
 
-    # TODO check default path
     parser.add_argument('--json',
                         help="The path to the json annotation file.",
-                        default="experiments/panel_segmentation/test.json",
+                        default="compfigsep/compound_figure_separation",
                         type=str)
 
     add_viewer_args(parser)
@@ -74,7 +73,9 @@ def main(args: List[str] = None) -> None:
     parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling ImageCLEF xml annotation files.
-    figure_generator: JsonFigureGenerator = JsonFigureGenerator(json_path=parsed_args.json)
+    figure_generator: JsonFigureGenerator = JsonFigureGenerator(
+        json_path=parsed_args.json,
+        default_random_order=parsed_args.random_order)
 
     # Preview the data set.
     view_data_set(figure_generator=figure_generator,

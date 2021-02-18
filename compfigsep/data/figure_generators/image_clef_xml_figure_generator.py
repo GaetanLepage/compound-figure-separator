@@ -26,12 +26,33 @@ Figure generator handling the ImageCLEF data set.
 from __future__ import annotations
 import os
 import logging
+import random
 import xml.etree.ElementTree as ET
-from typing import cast, Iterable, List
+from typing import cast, Iterable, List, Optional
+from argparse import ArgumentParser
 
 from ...utils.figure import Figure, Panel, SubFigure
 from ...utils.box import Box
 from .figure_generator import FigureGenerator
+
+
+def add_image_clef_args(parser: ArgumentParser) -> None:
+    """
+    Parse the argument for loading an ImageCLEF annotation file.
+
+    Args:
+        parser (ArgumentParser):        An ArgumentParser.
+    """
+
+    parser.add_argument('--annotation_xml',
+                help="The path to the xml annotation file.",
+                default="data/ImageCLEF/training/FigureSeparationTraining2016GT.xml",
+                type=str)
+
+    parser.add_argument('--image_directory_path',
+                        help="The path to the directory where the images are stored.",
+                        default="data/ImageCLEF/training/FigureSeparationTraining2016/",
+                        type=str)
 
 
 class ImageClefXmlFigureGenerator(FigureGenerator):
@@ -48,22 +69,25 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
         num_images (int):                       The number of images in the data set.
         image_directory_path (str):             Path to the directory where image files are
                                                     stored.
+        default_random_order (bool):    Wether to yield figures in a random order.
     """
 
     def __init__(self,
                  xml_annotation_file_path: str,
-                 image_directory_path: str) -> None:
+                 image_directory_path: str,
+                 default_random_order: bool = False) -> None:
         """
         Generator of Figure objects from ImageCLEF data set.
 
         Args:
             xml_annotation_file_path (str): The path of the xml annotation file.
             image_directory_path (str):     The path of the directory where the images are stored.
+            default_random_order (bool):    Wether to yield figures in a random order.
 
         Yields:
             figure (Figure): Figure objects with annotations.
         """
-        super().__init__()
+        super().__init__(default_random_order=default_random_order)
 
         self.xml_annotation_file_path: str = xml_annotation_file_path
 
@@ -86,19 +110,27 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
     def __copy__(self) -> ImageClefXmlFigureGenerator:
 
         return ImageClefXmlFigureGenerator(xml_annotation_file_path=self.xml_annotation_file_path,
-                                           image_directory_path=self.image_directory_path)
+                                           image_directory_path=self.image_directory_path,
+                                           default_random_order=self.default_random_order)
 
 
-    def __call__(self) -> Iterable[Figure]:
+    def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """
         'Generator' method yielding annotated figures from the ImageCLEF data set.
 
         Returns:
             Iterable[Figure]:   Figure objects with annotations.
         """
+        if random_order is None:
+            random_order = self.default_random_order
+
+        annotation_items_copy = self.annotation_items.copy()
+
+        if random_order:
+            random.shuffle(annotation_items_copy)
 
         # Loop over the annotation items.
-        for annotation_index, annotation_item in enumerate(self.annotation_items):
+        for annotation_index, annotation_item in enumerate(annotation_items_copy):
 
             # Image filename
             filename_item = annotation_item.find('./filename')

@@ -74,7 +74,8 @@ def main(args: List[str] = None) -> None:
 
     # Create the figure generator handling a csv annotation file.
     figure_generator = GlobalCsvFigureGenerator(
-        csv_annotation_file_path=parsed_args.annotation_csv)
+        csv_annotation_file_path=parsed_args.annotation_csv,
+        default_random_order=parsed_args.random_order)
 
     # Preview the data set.
     view_data_set(figure_generator=figure_generator,

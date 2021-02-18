@@ -26,7 +26,7 @@ along with the annotations.
 
 from argparse import ArgumentParser
 
-from ..data.figure_generators import FigureGenerator
+from ..data.figure_generators import add_common_figure_generator_args, FigureGenerator
 
 
 def add_viewer_args(parser: ArgumentParser) -> None:
@@ -39,6 +39,8 @@ def add_viewer_args(parser: ArgumentParser) -> None:
     Args:
         parser (ArgumentParser):    An ArgumentParser.
     """
+
+    add_common_figure_generator_args(parser=parser)
 
     parser.add_argument('--mode',
                         help="mode: Select which information to display:"\
@@ -56,6 +58,7 @@ def add_viewer_args(parser: ArgumentParser) -> None:
     parser.add_argument('--save_preview',
                         help="Save the image previews in image files.",
                         action='store_true')
+
 
 
 def view_data_set(figure_generator: FigureGenerator,
