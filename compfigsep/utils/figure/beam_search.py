@@ -42,12 +42,13 @@ def _compute_panel_label_distances(panels: List[Panel],
         labels (List[Label]):   The list of labels.
 
     Returns:
-        distances (List[List[float]]):  The matrix containing the distances.
+        distance_matrix (List[List[float]]):    The matrix containing the distances.
     """
     # calculate distance from panels to labels
-    distances : List[List[float]] = []
+    # distance_matrix[i, j] = dist(Panel_i, Label_j)
+    distance_matrix : List[List[float]] = []
     for panel in panels:
-        dists: List[float] = []
+        dist_from_current_panel_to_labels: List[float] = []
 
         panel_center: box.Point = box.get_center(panel.box)
 
@@ -59,11 +60,11 @@ def _compute_panel_label_distances(panels: List[Panel],
 
             distance: float = math.hypot(panel_center[0] - label_center[0],
                                          panel_center[1] - label_center[1])
-            dists.append(distance)
+            dist_from_current_panel_to_labels.append(distance)
 
-        distances.append(dists)
+        distance_matrix.append(dist_from_current_panel_to_labels)
 
-    return distances
+    return distance_matrix
 
 
 def assign_labels_to_panels(panels: List[Panel],
@@ -95,7 +96,7 @@ def assign_labels_to_panels(panels: List[Panel],
     Pair = Tuple[float, List[int]]
     all_item_pairs: List[List[Pair]] = []
 
-    for panel_idx, panel in enumerate(panels):
+    for panel_idx in range(len(panels)):
         item_pairs = []
 
         # Initialisation

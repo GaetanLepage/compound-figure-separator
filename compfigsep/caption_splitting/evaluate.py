@@ -23,8 +23,9 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluation tool for caption splitting.
 """
 
-from typing import Dict, Any, Optional, List
+from typing import Dict, Optional, List
 from pprint import pprint
+from collections import namedtuple
 
 from joblib import Parallel, delayed
 
@@ -33,9 +34,13 @@ import textdistance
 from ..utils.figure import Figure
 from ..data.figure_generators import FigureGenerator
 
-CaptionSplittingFigureResult = Optional[float]
+CaptionSplittingFigureResult = namedtuple("CaptionSplittingFigureResult",
+                                          [
+                                              'normalized_levenshtein_similarity'
+                                          ])
 
-def caption_splitting_figure_eval(figure: Figure) -> CaptionSplittingFigureResult:
+
+def caption_splitting_figure_eval(figure: Figure) -> Optional[CaptionSplittingFigureResult]:
     """
     Evaluate caption splitting metrics on a single figure.
 
@@ -49,11 +54,11 @@ def caption_splitting_figure_eval(figure: Figure) -> CaptionSplittingFigureResul
                                                     returned.
                                                 Else, None is returned.
     """
-    # Score of this figure
-    figure_score: float = 0
-
     # Number of ground truth labels. i.e. the normalizer for the figure score.
     num_gt_labels: int = 0
+
+    # Initialize the metrics values
+    normalized_levenshtein_similarity: float = 0
 
     # Get the dictionnary of detected subcaptions (if it exists).
     detected_subcaptions: Dict[str, str] = figure.detected_subcaptions \
@@ -67,7 +72,7 @@ def caption_splitting_figure_eval(figure: Figure) -> CaptionSplittingFigureResul
     # Case where this is not a compound figure.
     if len(figure.gt_subfigures) == 1 and '_' in figure.detected_subcaptions:
         num_gt_labels = 1
-        figure_score = textdistance.levenshtein.normalized_similarity(
+        normalized_levenshtein_similarity = textdistance.levenshtein.normalized_similarity(
             figure.gt_subfigures[0],
             figure.detected_subcaptions['_'])
 
@@ -94,12 +99,16 @@ def caption_splitting_figure_eval(figure: Figure) -> CaptionSplittingFigureResul
                     detected_subcaptions[gt_subfigure.label.text]
 
                 # Compute the Levenshtein distance between the GT and the detection.
-                figure_score += textdistance.levenshtein.normalized_similarity(
+                normalized_levenshtein_similarity += textdistance.levenshtein.normalized_similarity(
                     gt_subcaption,
                     detected_subcaption)
 
     if num_gt_labels > 0:
-        return figure_score / num_gt_labels
+        # Normalize the socre over the number of GT subcaptions.
+        normalized_levenshtein_similarity /= num_gt_labels
+
+        return CaptionSplittingFigureResult(
+            normalized_levenshtein_similarity=normalized_levenshtein_similarity)
 
     # If the ground truth figure was not annotated (no GT labels), return None.
     return None
@@ -115,15 +124,22 @@ def caption_splitting_metrics(results: List[CaptionSplittingFigureResult]) -> fl
     Returns:
         levenshtein_metric (float):  The averaged levenshtein metric.
     """
-    # Filter out the figures for which no score was computed (missing annotations for e.g.).
-    valid_results: List[float] = [res
-                                  for res in results
-                                  if res is not None]
+    num_captions: int = 0
 
-    num_captions: int = len(valid_results)
-    levenshtein_metric: float = sum(valid_results)
+    normalized_levenshtein_similarity: float = 0
 
-    return levenshtein_metric / num_captions
+    for result in results:
+        # Filter out the figures for which no score was computed (missing annotations for e.g.).
+        if result is None:
+            continue
+
+        num_captions += 1
+        normalized_levenshtein_similarity += result.normalized_levenshtein_similarity
+
+    # Normalize the score by the number of captions
+    normalized_levenshtein_similarity /= num_captions
+
+    return normalized_levenshtein_similarity
 
 
 def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:

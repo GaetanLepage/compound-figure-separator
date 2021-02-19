@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import Dict, Tuple, Any, List
+from typing import Dict, Tuple, List
 from collections import namedtuple
 
 import numpy as np
@@ -97,8 +97,7 @@ def panel_splitting_metrics(results: List[PanelSplittingFigureResult]
     Evaluate the panel splitting metrics.
 
     Args:
-        stat_dict (Dict[str, any]): A dict containing the stats gathered while looping over
-                                        detections.
+        results (List[PanelSplittingFigureResult]): TODO.
 
     Returns:
         imageclef_accuracy (int):   The ImageCLEF accuracy as presented in this paper:

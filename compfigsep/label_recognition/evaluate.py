@@ -112,7 +112,7 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
                       is_true_positive=detected_label.is_true_positive))
 
     # TODO remove
-    print("Number of correct detections :", num_correct)
+    # print("Number of correct detections :", num_correct)
 
     return MultiClassFigureResult(gt_count=gt_count,
                                   gt_count_by_class=gt_count_by_class,

@@ -639,6 +639,28 @@ class Figure:
                             break
 
 
+#########################
+# IMPORT GT ANNOTATIONS #
+#########################
+
+
+    def match_detected_visual_panels_and_labels(self) -> None:
+        """
+        TODO
+        Panel segmentation
+        """
+
+        # If detected subfigures were already computed (list exists and is not empty), then no need
+        # to do anything.
+        if self.detected_subfigures:
+            return
+
+        self.detected_subfigures = beam_search.assign_labels_to_panels(
+            panels=self.detected_panels,
+            labels=self.detected_labels)
+
+
+
 ##############
 # EVALUATION #
 ##############
@@ -1063,6 +1085,7 @@ class Figure:
 
         cv2.imshow(window_name, image_preview)
         cv2.waitKey(delay)
+        # cv2.destroyAllWindows()
 
 
     def save_preview(self,

@@ -30,13 +30,12 @@ from argparse import ArgumentParser, Namespace
 
 from typing import List
 
-
-sys.path.append('.')
-
-
 from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
 
 from compfigsep.panel_segmentation.evaluate import evaluate_detections
+
+
+sys.path.append('.')
 
 
 def parse_args(args: List[str]) -> Namespace:

@@ -74,6 +74,46 @@ def _parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
+def predict_caption(figure: Figure) -> None:
+    """
+    Apply the full caption splitting pipeline to the given figure.
+    The subcaptions detections are stored in the `detected_subcaptions` attribute.
+
+    Args:
+        figure (Figure):    A figure object.
+    """
+
+    caption: str = figure.caption
+
+    if caption is None:
+        return
+
+    label_dict: Dict = label_identification(caption=caption)
+
+    labels_list: List[str] = label_expansion(label_dict)
+
+    label_structure: LabelStructure = label_filtering.label_filtering(text_labels=labels_list)
+
+    sub_captions_dict: Dict[str, str] = extract_subcaptions(caption=caption,
+                                                            label_structure=label_structure)
+
+    figure.detected_subcaptions = OrderedDict(sub_captions_dict)
+
+    # TODO label 'B' is not detected in this example.
+
+    # if "Microanatomy of P. verrucosa. A) 3D-reconstruction of the central nervous system" in caption:
+    # if "nTE-2-PyP protects prostatic and penile" in caption:
+    # if "" in caption:
+    # if "" in caption:
+    # Case where no label is detected
+    # if "Immunohistochemical staining for PTEN, SFPQ and HDAC1 in PCa and BENIGN tissues" in caption:
+    # if "Transition from PIN to invasive carcinoma is seen in ARR2PBCreER" in caption:
+    # if "Histopathological diagnose was acinar type adenocarcinoma" in caption:
+    # if "PPAR-gamma protein expression in benign prostate tissues by immunohistochemistry" in caption:
+    # if caption.startswith("nTE-2-PyP protects prostatic and penile"):
+        # sys.exit()
+
+
 def main(args: List[str] = None) -> None:
     """
     Launch detection and evaluation of the label recognition task on a JSON data set.
@@ -90,45 +130,6 @@ def main(args: List[str] = None) -> None:
     # Create the figure generator handling JSON annotation files.
     figure_generator: JsonFigureGenerator = JsonFigureGenerator(
         json_path=parsed_args.json)
-
-    def predict_caption(figure: Figure) -> None:
-        """
-        Apply the full caption splitting pipeline to the given figure.
-        The subcaptions detections are stored in the `detected_subcaptions` attribute.
-
-        Args:
-            figure (Figure):    A figure object.
-        """
-
-        caption: str = figure.caption
-
-        if caption is None:
-            return
-
-        label_dict: Dict = label_identification(caption=caption)
-
-        labels_list: List[str] = label_expansion(label_dict)
-
-        label_structure: LabelStructure = label_filtering.label_filtering(text_labels=labels_list)
-
-        sub_captions_dict: Dict[str, str] = extract_subcaptions(caption=caption,
-                                                                label_structure=label_structure)
-
-        figure.detected_subcaptions = OrderedDict(sub_captions_dict)
-
-        # TODO label 'B' is not detected in this example.
-
-        # if "Microanatomy of P. verrucosa. A) 3D-reconstruction of the central nervous system" in caption:
-        # if "nTE-2-PyP protects prostatic and penile" in caption:
-        # if "" in caption:
-        # if "" in caption:
-        # Case where no label is detected
-        # if "Immunohistochemical staining for PTEN, SFPQ and HDAC1 in PCa and BENIGN tissues" in caption:
-        # if "Transition from PIN to invasive carcinoma is seen in ARR2PBCreER" in caption:
-        # if "Histopathological diagnose was acinar type adenocarcinoma" in caption:
-        # if "PPAR-gamma protein expression in benign prostate tissues by immunohistochemistry" in caption:
-        # if caption.startswith("nTE-2-PyP protects prostatic and penile"):
-            # sys.exit()
 
     prediction_figure_generator: StackedFigureGenerator = StackedFigureGenerator(
         base_figure_generator=figure_generator,

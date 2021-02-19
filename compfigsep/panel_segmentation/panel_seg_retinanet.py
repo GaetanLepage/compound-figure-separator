@@ -344,7 +344,9 @@ class PanelSegRetinaNet(nn.Module):
                                 height / panel_results.image_size[0])
 
             # 1) Panels
-            panel_results = Instances((height, width), **panel_results.get_fields())
+            panel_results = Instances((height,
+                                       width),
+                                      **panel_results.get_fields())
 
             # Clip and scale boxes
             panel_output_boxes = panel_results.pred_boxes

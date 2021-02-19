@@ -118,10 +118,10 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         metrics (dict): A dict containing the computed metrics.
     """
 
-    panel_splitting_results: List[PanelSplittingFigureResult] = []
-    label_recognition_results: List[MultiClassFigureResult] = []
-    panel_segmentation_results: List[MultiClassFigureResult] = []
-    caption_splitting_results: List[CaptionSplittingFigureResult] = []
+    panel_splitting_results:    List[PanelSplittingFigureResult]    = []
+    label_recognition_results:  List[MultiClassFigureResult]        = []
+    panel_segmentation_results: List[MultiClassFigureResult]        = []
+    caption_splitting_results:  List[CaptionSplittingFigureResult]  = []
 
     for figure in figure_generator():
 
@@ -160,28 +160,28 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     psp_imageclef_acc, psp_precision, psp_recall, psp_map = panel_splitting_metrics(
         results=panel_splitting_results)
     metrics['panel_splitting'] = {
-        'imageclef_accuracy': psp_imageclef_acc,
-        'precision': psp_precision,
-        'recall': psp_recall,
-        'mAP': psp_map
+        'imageclef_accuracy':   psp_imageclef_acc,
+        'precision':            psp_precision,
+        'recall':               psp_recall,
+        'mAP':                  psp_map
     }
 
     # Label recognition
     lrec_precision, lrec_recall, lrec_map = multi_class_metrics(
         results=label_recognition_results)
     metrics['label_recognition'] = {
-        'precision': lrec_precision,
-        'recall': lrec_recall,
-        'mAP': lrec_map
+        'precision':    lrec_precision,
+        'recall':       lrec_recall,
+        'mAP':          lrec_map
     }
 
     # Panel segmentation
     pseg_precision, pseg_recall, pseg_map = multi_class_metrics(
         results=panel_segmentation_results)
     metrics['panel_segmentation'] = {
-        'precision': pseg_precision,
-        'recall': pseg_recall,
-        'mAP': pseg_map
+        'precision':    pseg_precision,
+        'recall':       pseg_recall,
+        'mAP':          pseg_map
     }
 
     # Caption splitting

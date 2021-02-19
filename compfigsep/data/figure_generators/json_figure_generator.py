@@ -147,7 +147,7 @@ def get_most_recent_json(folder_path: str = None) -> str:
 
         dates[date] = file_name
 
-    assert len(dates) > 0, f"No valid json annotation file was found in folder {folder_path}."\
+    assert len(dates) > 0, f"No valid json annotation file was found in folder {folder_path}"\
                             "\nExiting"
 
     max_date = max(dates)
@@ -203,7 +203,9 @@ class JsonFigureGenerator(FigureGenerator):
         default_random_order (bool):        Wether to yield figures in a random order.
     """
 
-    def __init__(self, json_path: str, default_random_order: bool = False) -> None:
+    def __init__(self,
+                 json_path: str,
+                 default_random_order: bool = True) -> None:
         """
         Args:
             json (str):                     The path to a json annotation file OR to a folder where

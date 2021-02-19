@@ -124,7 +124,8 @@ class LabelStructure:
             label_structure (LabelStructure):   An instance of the corresponding LabelStructure
                                                     object.
         """
-        labels_list: List[str] = list(set(labels_list))
+        # Remove duplicates
+        labels_list = list(set(labels_list))
         # TODO maybe put in histogram...
         # Case where there are no named labels.
         if labels_list == ['_'] * len(labels_list):
