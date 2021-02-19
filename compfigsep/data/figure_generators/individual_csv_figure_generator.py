@@ -45,7 +45,7 @@ class IndividualCsvFigureGenerator(FigureGenerator):
 
     def __init__(self,
                  csv_annotation_directory: str,
-                 default_random_order: bool = False) -> None:
+                 default_random_order: bool = True) -> None:
         """
         Args:
             csv_annotation_directory (str):     The path of the directory containing the csv

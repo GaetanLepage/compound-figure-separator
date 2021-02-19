@@ -47,7 +47,7 @@ class GlobalCsvFigureGenerator(FigureGenerator):
 
     def __init__(self,
                  csv_annotation_file_path: str,
-                 default_random_order: bool = False) -> None:
+                 default_random_order: bool = True) -> None:
 
         self.csv_annotation_file_path = csv_annotation_file_path
 

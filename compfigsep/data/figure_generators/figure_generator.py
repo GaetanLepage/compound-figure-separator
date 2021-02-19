@@ -108,7 +108,7 @@ class StackedFigureGenerator(FigureGenerator):
     def __init__(self,
                  base_figure_generator: FigureGenerator,
                  function: Callable[[Figure], None],
-                 default_random_order: bool = False) -> None:
+                 default_random_order: bool = True) -> None:
         """
         Args:
             base_figure_generator (FigureGenerator):    A figure generator yielding Figure

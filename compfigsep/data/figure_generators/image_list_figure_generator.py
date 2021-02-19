@@ -48,7 +48,7 @@ class ImageListFigureGenerator(FigureGenerator):
     def __init__(self,
                  image_list_txt: str,
                  image_directory_path: str = None,
-                 default_random_order: bool = False) -> None:
+                 default_random_order: bool = True) -> None:
         """
         Args:
             image_list_txt (str):           The path to the list of images to be loaded.

@@ -55,7 +55,8 @@ def register_panel_segmentation_dataset(dataset_name):
 
     # Create the figure generator to feed the dictionary
     figure_generator = IphotodrawXmlFigureGenerator(
-        file_list_txt=file_list_txt)
+        file_list_txt=file_list_txt,
+        default_random_order=False)
 
 
     # Register the data set and set the ingest function to convert Figures to Detectron dict.
