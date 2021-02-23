@@ -174,13 +174,14 @@ def _is_label_in_prior_zone(label_1: DetectedLabel,
 def _build_neighbors(label_list: List[DetectedLabel]) -> np.ndarray:
     """
     Builds the adjacency matrix.
-    adjacency_matrix[i, j] = 1 if and only if i and j.
+    adjacency_matrix[i, j] = 1 if and only if labels i and j are neighbors.
 
     Args:
         label_list (List[DetectedLabel]):   List of detected labels.
 
     Returns:
-        neighbors_sets (Dict[DetectedLabel, Set[DetectedLabel]]):   TODO
+        adjacency_matrix (np.ndarray):  The asdjacency (symmetric) matrix of the underlying graph.
+                                            -> Shape = (num_labels, num_labels)
     """
     num_labels: int = len(label_list)
 
