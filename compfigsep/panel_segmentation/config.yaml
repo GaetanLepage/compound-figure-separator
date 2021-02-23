@@ -36,7 +36,7 @@ DATASETS:
 
 SOLVER:
   # TODO I don't know why we can only fit 1 img/GPU here...
-  IMS_PER_BATCH: 1
+  IMS_PER_BATCH: 2
   BASE_LR: 0.00001  # Note that RetinaNet uses a different default learning rate
   STEPS: (990000,)
   MAX_ITER: 1000000
