@@ -47,14 +47,14 @@ class Label:
     """
 
     def __init__(self,
-                 text: str = None,
+                 text: str = "",
                  box: Box = None) -> None:
         """
         Args:
             text (str): The label text ('A' or '1' or 'ii'...).
             box (Box):  The bounding box localizing the label on the image.
         """
-        self.text: Optional[str] = text
+        self.text: str = text
 
         if isinstance(box, np.ndarray):
             box = box.tolist()
@@ -76,7 +76,7 @@ class Label:
             label (Label):  The resulting Label object.
         """
 
-        return Label(text=label_dict.get('text'),
+        return Label(text=label_dict.get('text', ''),
                      box=label_dict.get('box'))
 
 
@@ -90,8 +90,7 @@ class Label:
 
         output_dict: Dict[str, Any] = {}
 
-        if self.text is not None:
-            output_dict['text'] = self.text
+        output_dict['text'] = self.text
 
         if hasattr(self, 'box'):
             output_dict['box'] = self.box
@@ -155,7 +154,7 @@ class DetectedLabel(Label):
     """
 
     def __init__(self,
-                 text: str = None,
+                 text: str = '',
                  box: Box = None,
                  detection_score: float = None) -> None:
         """
@@ -206,7 +205,7 @@ class DetectedLabel(Label):
         """
 
         detected_label: DetectedLabel = DetectedLabel(
-            text=label_dict.get('text'),
+            text=label_dict.get('text', ''),
             box=label_dict.get('box'),
             detection_score=label_dict.get('detection_score'))
 
