@@ -42,7 +42,6 @@ from compfigsep.data.figure_generators import (JsonFigureGenerator,
 
 from compfigsep.caption_splitting import (label_identification,
                                           label_expansion,
-                                          label_filtering,
                                           extract_subcaptions,
                                           evaluate_detections)
 
@@ -92,7 +91,7 @@ def predict_caption(figure: Figure) -> None:
 
     labels_list: List[str] = label_expansion(label_dict)
 
-    label_structure: LabelStructure = label_filtering.label_filtering(text_labels=labels_list)
+    label_structure: LabelStructure = LabelStructure.from_labels_list(labels_list=labels_list)
 
     sub_captions_dict: Dict[str, str] = extract_subcaptions(caption=caption,
                                                             label_structure=label_structure)

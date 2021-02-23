@@ -62,7 +62,7 @@ def panel_segmentation_figure_eval(figure: Figure) -> MultiClassFigureResult:
 
         if len(gt_label.text) != 1:
             # TODO: this choice might not be smart
-            # "" stands for "no label"
+            # '' stands for "no label"
             gt_label.text = ''
 
         cls: str = gt_label.text
@@ -131,32 +131,31 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         metrics (dict): A dict containing the computed metrics.
     """
 
-    panel_splitting_results: List[PanelSplittingFigureResult] = []
-    label_recognition_results: List[MultiClassFigureResult] = []
-    panel_segmentation_results: List[MultiClassFigureResult] = []
+    panel_splitting_results:    List[PanelSplittingFigureResult]    = []
+    label_recognition_results:  List[MultiClassFigureResult]        = []
+    panel_segmentation_results: List[MultiClassFigureResult]        = []
 
     for figure in figure_generator():
 
         # 1) Panel splitting
         panel_splitting_results.append(panel_splitting_figure_eval(figure))
-        print("\nPanel splitting figure stats")
+        # print("\nPanel splitting figure stats")
         # pprint(stats['panel_splitting'])
         # figure.show_preview(mode='both', window_name='panel_splitting')
 
         # 2) Label recognition
         label_recognition_results.append(label_recognition_figure_eval(figure))
-        print("\nLabel recognition figure stats")
+        # print("\nLabel recognition figure stats")
         # pprint(stats['label_recognition'])
         # figure.show_preview(mode='both', window_name='label_recognition')
 
         # 3) Panel segmentation
-        panel_segmentation_results.append(panel_segmentation_figure_eval(figure))
+        # if not figure.detected_labels:
+            # figure.match_detected_visual_panels_and_labels()
+
+        # panel_segmentation_results.append(panel_segmentation_figure_eval(figure))
         # Assign detected labels to detected panels using the beam search algorithm
         # TODO manage the case where no labels have been detected
-        if len(figure.detected_labels) > 0:
-            subfigures = beam_search.assign_labels_to_panels(figure.detected_panels,
-                                                             figure.detected_labels)
-
         # Convert output from beam search (list of SubFigure objects) to DetectedSubFigure.
         # figure.detected_subfigures = [DetectedSubFigure.from_normal_sub_figure(subfigure)
                                       # for subfigure in subfigures]

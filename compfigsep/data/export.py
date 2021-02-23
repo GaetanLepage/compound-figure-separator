@@ -175,7 +175,7 @@ def export_figures_to_detectron_dict(figure_generator: FigureGenerator,
 
     dataset_dicts: List[dict] = []
 
-    for index, figure in enumerate(figure_generator()):
+    for index, figure in enumerate(figure_generator(random_order=False)):
         record: Dict[str, Any] = {}
 
         record['file_name'] = figure.image_path
