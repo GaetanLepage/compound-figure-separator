@@ -147,7 +147,8 @@ class LabelStructure:
                                LabelStructureEnum.ROMAN_UC):
 
                 if LABEL_FILTER[label_type](label):
-                    similarity_dict[label_type] += np.exp(-LABEL_INDEX[label_type](label))
+                    similarity_dict[label_type] += 1 / LABEL_INDEX[label_type](label)
+                    # similarity_dict[label_type] += np.exp(-LABEL_INDEX[label_type](label))
 
         # TODO remove
         # pprint(similarity_dict)

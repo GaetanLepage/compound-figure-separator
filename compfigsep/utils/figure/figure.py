@@ -508,7 +508,8 @@ class Figure:
 
                     subfigures.extend(beam_search.assign_labels_to_panels(
                         panels=panel_dict[label_text],
-                        labels=label_dict[label_text]))
+                        labels=label_dict[label_text],
+                        are_detections=False))
 
                 # Single panel and label for the same label text.
                 else:
@@ -652,12 +653,14 @@ class Figure:
 
         # If detected subfigures were already computed (list exists and is not empty), then no need
         # to do anything.
-        if self.detected_subfigures:
+        if hasattr(self, 'detected_subfigures') and self.detected_subfigures:
+            logging.warning("`detected_subfigures` not empty: ABORTING beam search matching.")
             return
 
         self.detected_subfigures = beam_search.assign_labels_to_panels(
             panels=self.detected_panels,
-            labels=self.detected_labels)
+            labels=self.detected_labels,
+            are_detections=True)
 
 
 
@@ -986,7 +989,7 @@ class Figure:
 
             # If this figure contains detected subfigures, they are considered to be
             # the relevant detections to display.
-            if hasattr(self, 'detected_subfigure'):
+            if hasattr(self, 'detected_subfigure') and self.detected_subfigures:
 
                 for detected_subfigure in self.detected_subfigures:
                     detected_subfigure.draw_elements(image=preview_img)
@@ -1085,7 +1088,7 @@ class Figure:
 
         cv2.imshow(window_name, image_preview)
         cv2.waitKey(delay)
-        # cv2.destroyAllWindows()
+        cv2.destroyAllWindows()
 
 
     def save_preview(self,
@@ -1119,6 +1122,8 @@ class Figure:
 
         export_path: str = os.path.join(folder, file_name + "_preview.jpg")
         export_path = os.path.abspath(export_path)
+
+        print(export_path)
 
         # Write the preview image file to destination
         if not cv2.imwrite(export_path, preview_img):

@@ -28,8 +28,10 @@ import logging
 from pprint import pprint
 
 from ..data.figure_generators import FigureGenerator
+from ..panel_splitting import panel_filtering
 from ..panel_splitting.evaluate import panel_splitting_figure_eval, panel_splitting_metrics
 from ..panel_splitting.evaluate import Detection, PanelSplittingFigureResult
+from ..label_recognition import label_filtering
 from ..label_recognition.evaluate import (MultiClassFigureResult,
                                           label_recognition_figure_eval,
                                           multi_class_metrics)
@@ -48,6 +50,10 @@ def panel_segmentation_figure_eval(figure: Figure) -> MultiClassFigureResult:
     Returns:
         result (MultiClassFigureResult):    TODO.
     """
+    # Perform matching on this figure
+    # This tests whether a detected panel is true positive or false positive
+    figure.match_detected_and_gt_panels_segmentation_task()
+
     gt_count: int = 0
     gt_count_by_class: Dict[str, int] = {}
 
@@ -138,30 +144,36 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     for figure in figure_generator():
 
         # 1) Panel splitting
+        figure.detected_panels = panel_filtering.filter_panels(panel_list=figure.detected_panels)
         panel_splitting_results.append(panel_splitting_figure_eval(figure))
         # print("\nPanel splitting figure stats")
         # pprint(stats['panel_splitting'])
         # figure.show_preview(mode='both', window_name='panel_splitting')
 
         # 2) Label recognition
+        print("###############")
+        print(figure.image_filename)
+        figure.detected_labels = label_filtering.filter_labels(label_list=figure.detected_labels)
         label_recognition_results.append(label_recognition_figure_eval(figure))
         # print("\nLabel recognition figure stats")
         # pprint(stats['label_recognition'])
         # figure.show_preview(mode='both', window_name='label_recognition')
 
-        # 3) Panel segmentation
-        # if not figure.detected_labels:
-            # figure.match_detected_visual_panels_and_labels()
 
-        # panel_segmentation_results.append(panel_segmentation_figure_eval(figure))
+        # 3) Panel segmentation
+
         # Assign detected labels to detected panels using the beam search algorithm
+        if not hasattr(figure, 'detected_subfigures') or not figure.detected_subfigures:
+            figure.match_detected_visual_panels_and_labels()
+
+        # figure.show_preview(mode='both')
+        # panel_segmentation_results.append(panel_segmentation_figure_eval(figure))
         # TODO manage the case where no labels have been detected
         # Convert output from beam search (list of SubFigure objects) to DetectedSubFigure.
         # figure.detected_subfigures = [DetectedSubFigure.from_normal_sub_figure(subfigure)
                                       # for subfigure in subfigures]
 
         # print("\nPanel segmentation figure stats")
-        # panel_segmentation_figure_eval(figure, stats['panel_segmentation'])
         #pprint(stats['panel_segmentation'])
         #figure.show_preview(mode='both', window_name='panel_segmentation')
 

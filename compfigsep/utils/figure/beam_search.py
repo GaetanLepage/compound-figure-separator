@@ -24,12 +24,22 @@ Beam search algorithm for mapping panels and labels.
 """
 
 import math
-from typing import List, Tuple
+from typing import List, Tuple, NamedTuple
 
 from ...utils import box
-from ...utils.figure.panel import Panel
-from ...utils.figure.label import Label
-from ...utils.figure.sub_figure import SubFigure
+from ...utils.figure.panel import Panel, DetectedPanel
+from ...utils.figure.label import Label, DetectedLabel
+from ...utils.figure.sub_figure import SubFigure, DetectedSubFigure
+
+
+class Path(NamedTuple):
+    """
+    Attributes:
+        overall_distance (float):   TODO
+        label_indexes (List[int]):  TODO
+    """
+    overall_distance: float
+    label_indexes: List[int]
 
 
 def _compute_panel_label_distances(panels: List[Panel],
@@ -50,16 +60,35 @@ def _compute_panel_label_distances(panels: List[Panel],
     for panel in panels:
         dist_from_current_panel_to_labels: List[float] = []
 
-        panel_center: box.Point = box.get_center(panel.box)
+        panel_box_l: int = panel.box[0]
+        panel_box_r: int = panel.box[2]
+        panel_box_t: int = panel.box[1]
+        panel_box_b: int = panel.box[3]
 
         for label in labels:
             if label.box is None:
                 continue
 
-            label_center: box.Point = box.get_center(label.box)
+            label_box_l: int = label.box[0]
+            label_box_r: int = label.box[2]
+            label_box_t: int = label.box[1]
+            label_box_b: int = label.box[3]
 
-            distance: float = math.hypot(panel_center[0] - label_center[0],
-                                         panel_center[1] - label_center[1])
+            if label_box_r < panel_box_l:
+                h_dist: int = panel_box_l - label_box_r
+            elif label_box_l > panel_box_r:
+                h_dist = label_box_l - panel_box_r
+            else:
+                h_dist = 0
+
+            if label_box_b < panel_box_t:
+                v_dist: int = panel_box_t - label_box_b
+            elif label_box_t > panel_box_b:
+                v_dist = label_box_t - panel_box_b
+            else:
+                v_dist = 0
+
+            distance: float = h_dist + v_dist
             dist_from_current_panel_to_labels.append(distance)
 
         distance_matrix.append(dist_from_current_panel_to_labels)
@@ -69,6 +98,7 @@ def _compute_panel_label_distances(panels: List[Panel],
 
 def assign_labels_to_panels(panels: List[Panel],
                             labels: List[Label],
+                            are_detections: bool,
                             beam_length: int = 100) -> List[SubFigure]:
     """
     Use beam search to assign labels to panels according to the overall distance
@@ -79,6 +109,9 @@ def assign_labels_to_panels(panels: List[Panel],
     Args:
         panels (List[Panel]):   List of panels.
         labels (List[Label]):   List of labels.
+        are_detections (bool):  If the given panels and labels are detections.
+                                    If False, it means that we are matching ground truth
+                                    annotations.
         beam_length (int):      TODO
 
     Returns:
@@ -87,64 +120,122 @@ def assign_labels_to_panels(panels: List[Panel],
     # TODO remove
     # print("###########")
 
+    num_panels: int = len(panels)
+
+    if num_panels == 0:
+        return []
+
+    num_labels: int = len(labels)
+
+    if num_labels == 0:
+        if are_detections:
+            return [DetectedSubFigure(panel=detected_panel) for detected_panel in panels]
+
+        return [SubFigure(panel=gt_panel) for gt_panel in panels]
+
+    print(f"num_panels = {num_panels}")
+    print(f"num_labels = {num_labels}")
+
+    if are_detections:
+
+        assert all(isinstance(panel, DetectedPanel) for panel in panels)
+
+        # Sort the panels according to their detection score
+        panels.sort(key=lambda detected_panel: detected_panel.detection_score)
+
+
+        assert all(isinstance(label, DetectedLabel) for label in labels)
+
+        # Sort the panels according to their detection score
+        labels.sort(key=lambda detected_label: detected_label.detection_score)
+
+
     # Compute the distance matrix.
-    distances = _compute_panel_label_distances(panels, labels)
+    distance_matrix: List[List[float]] = _compute_panel_label_distances(panels, labels)
 
     # Beam search
 
-    # a `pair` represents a path (overall_distance, label_indexes)
-    Pair = Tuple[float, List[int]]
-    all_item_pairs: List[List[Pair]] = []
+    all_paths: List[List[Path]] = []
 
-    for panel_idx in range(len(panels)):
-        item_pairs = []
+    for panel_idx, panel in enumerate(panels):
+
+        panel_paths: List[Path] = []
+
+        panel_width, panel_height = box.get_width_and_height(box=panel.box)
 
         # Initialisation
         if panel_idx == 0:
-            for label_idx in range(len(labels)):
-                dist: float = distances[panel_idx][label_idx]
+            for label_idx in range(num_labels):
+                dist: float = distance_matrix[panel_idx][label_idx]
+                # we do not allow the distance to be larger than the 1/2 of panel side
+                if dist > panel_width / 2 or dist > panel_height/ 2:
+                    continue
+
                 label_indexes: List[int] = [label_idx]
-                item_pair = (dist, label_indexes)
-                item_pairs.append(item_pair)
+                path: Path = Path(overall_distance=dist,
+                                  label_indexes=label_indexes)
+
+                panel_paths.append(path)
+
+            # Manually add the path corresponding to the association of this panel with no label.
+            panel_paths.append(Path(overall_distance=0,
+                                    label_indexes=[-1]))
 
         # Exploring the graph.
         else:
-            prev_item_pairs: List[Pair] = all_item_pairs[panel_idx - 1]
+            prev_paths: List[Path] = all_paths[panel_idx - 1]
 
-            for prev_item_pair in prev_item_pairs:
+            for prev_path in prev_paths:
 
-                prev_dist, prev_label_indexes = prev_item_pair
+                prev_dist = prev_path.overall_distance
+                prev_label_indexes = prev_path.label_indexes
 
-                for label_idx in range(len(labels)):
+                for label_idx in range(num_labels):
                     if label_idx in prev_label_indexes:
-                        # We allow a label assigned to one panel only
+                        # # We allow a label assigned to one panel only
                         continue
 
-                    dist = distances[panel_idx][label_idx] + prev_dist
+                    dist = distance_matrix[panel_idx][label_idx] + prev_dist
+
+                    # we do not allow the distance to be larger than the 1/2 of panel side
+                    if dist > panel_width / 2 or dist > panel_height/ 2:
+                        continue
+
+                    # I think I did this to copy the `prev_label_indexes` list
+                    # Maybe use `.copy()`...
                     label_indexes = list(prev_label_indexes)
                     label_indexes.append(label_idx)
-                    item_pair = (dist, label_indexes)
-                    item_pairs.append(item_pair)
+                    path = Path(overall_distance=dist,
+                                label_indexes=label_indexes)
+                    panel_paths.append(path)
+
+
+                # Manually add the path corresponding to the association of this panel with no
+                # label.
+                label_indexes = list(prev_label_indexes)
+                label_indexes.append(-1)
+                panel_paths.append(Path(overall_distance=prev_dist,
+                                        label_indexes=label_indexes))
 
         # sort item_pairs
-        item_pairs.sort(key=lambda pair: pair[0])
-        # keep only at most beam_length item pairs
-        if len(item_pairs) > 100:
-            item_pairs = item_pairs[:beam_length]
+        panel_paths.sort(key=lambda path: path.overall_distance)
+        # keep only at most beam_length paths
+        if len(panel_paths) > beam_length:
+            panel_paths = panel_paths[:beam_length]
 
-        all_item_pairs.append(item_pairs)
+        all_paths.append(panel_paths)
 
         # TODO remove
-        # print("panel index:", panel_idx)
-        # print("all_item_pairs:", all_item_pairs)
+        print("panel index:", panel_idx)
+        print("all_item_pairs:", all_paths)
 
+    # check the last column of paths (which corresponds to full paths)
+    # all_item_pairs[-1] :                  last "layer" (complete paths)
+    # all_item_pairs[-1][0] :               pair which has the shortest path (it was sorted)
+    # all_item_pairs[-1][0].label_indexes : the complete path from this pair
     # TODO remove
-    # check the last item_pairs
-    # print(all_item_pairs)
-    # all_item_pairs[-1] : last "layer" (complete paths)
-    # all_item_pairs[-1][0] : pair which has the shortest path (it was sorted)
-    # all_item_pairs[-1][0][1] : the complete path from this pair
-    best_path = all_item_pairs[-1][0][1]
+    # print(all_paths[-1])
+    best_path = all_paths[-1][0].label_indexes
 
     subfigures: List[SubFigure] = []
 
@@ -152,7 +243,13 @@ def assign_labels_to_panels(panels: List[Panel],
         # panel.add_label_info(label=labels[best_path[panel_index]])
         matched_label: Label = labels[best_path[panel_index]]
 
-        subfigures.append(SubFigure(panel=panel,
-                                    label=matched_label))
+        if are_detections:
+            subfigure: SubFigure = DetectedSubFigure(panel=panel,
+                                                     label=matched_label)
+        else:
+            subfigure = SubFigure(panel=panel,
+                                  label=matched_label)
+
+        subfigures.append(subfigure)
 
     return subfigures

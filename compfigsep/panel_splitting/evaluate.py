@@ -30,8 +30,10 @@ import numpy as np
 
 from ..data.figure_generators import FigureGenerator
 
-from ..utils.figure import Figure
+from ..utils.figure import Figure, DetectedPanel
 from ..utils.average_precision import compute_average_precision
+
+from . import panel_filtering
 
 
 Detection = namedtuple("Detection",
@@ -168,6 +170,11 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
     Returns:
         metrics (Dict[str, float]): A dict containing the computed metrics.
     """
+    for figure in figure_generator():
+
+        filtered_panels: List[DetectedPanel] = panel_filtering.filter_panels(
+            panel_list=figure.detected_panels)
+        figure.detected_panels = filtered_panels
     # List containing the evaluation statistics for each figure.
     results: List[PanelSplittingFigureResult] = [panel_splitting_figure_eval(figure)
                                                  for figure in figure_generator()]

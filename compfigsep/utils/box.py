@@ -53,6 +53,25 @@ def get_center(box: Box) -> Point:
     return Point(int(x_center), int(y_center))
 
 
+def get_width_and_height(box: Box) -> Tuple[int, int]:
+    """
+    Compute the width and height of the given box.
+
+    Args:
+        box (Box):  A box [x1, y1, x2, y2].
+
+    Returns:
+        width, height (Tuple[int, int]):    The width and heights.
+    """
+    width: int = box[2] - box[0]
+    assert width > 0
+
+    height: int = box[3] - box[1]
+    assert height > 0
+
+    return width, height
+
+
 def union(box_1: Box,
           box_2: Box) -> Box:
     """
