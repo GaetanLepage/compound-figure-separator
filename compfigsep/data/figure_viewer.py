@@ -89,9 +89,6 @@ def view_data_set(figure_generator: FigureGenerator,
 
     for figure in figure_generator():
 
-        if figure.image_filename != "PMC2748693_pone.0007241.g002.jpg":
-            continue
-
         figure.show_preview(mode=mode,
                             delay=delay,
                             window_name=window_name)

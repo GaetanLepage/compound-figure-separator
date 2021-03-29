@@ -1081,6 +1081,19 @@ class Figure:
             window_name (str):  Name of the image display window.
         """
 
+        print("#######################")
+        print(f"Image filename: {self.image_filename}")
+
+        label: str
+        for subfigure in self.gt_subfigures:
+            if hasattr(subfigure, 'label') and subfigure.label is not None and \
+                    subfigure.label.text != '':
+                label = subfigure.label.text
+            else:
+                label = '_'
+
+            print(f"\n{label}: {subfigure.caption}")
+
         image_preview: np.ndarray = self.get_preview(mode)
 
         if window_name is None:
