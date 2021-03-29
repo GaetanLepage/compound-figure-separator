@@ -25,17 +25,19 @@ Ingest caption splitting annotations.
 """
 
 import sys
+import json
 from argparse import ArgumentParser, Namespace
 
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import csv
 
 from compfigsep.data.figure_generators import FigureGenerator
+from compfigsep.utils.figure import SubFigure
 from compfigsep.utils.figure.label import (LabelStructure,
                                            LabelStructureEnum,
+                                           LABEL_INDEX,
                                            map_label)
-from compfigsep.caption_splitting.replaceutf8 import replace_utf8
 from compfigsep.data.figure_generators.json_figure_generator import JsonFigureGenerator
 
 sys.path.append(".")
@@ -87,8 +89,10 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
     with open(annotation_csv, 'r') as csv_annotation_file:
         csv_reader = csv.reader(csv_annotation_file, delimiter='\t')
 
-        rows: List[List[str]] = [row for row in csv_reader][1:]
+        rows: List[List[str]] = list(csv_reader)[1:]
 
+
+    output_dict: Dict[str, Dict] = {}
 
     for figure in figure_generator(random_order=False):
 
@@ -122,63 +126,107 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
 
         # Check if both caption texts match
         if annotation_caption_text != figure.caption:
-            print(f"{annotation_caption_text}\n!=\n{figure.caption}\n{len(annotation_caption_text)} " \
-                  f"|| {len(figure.caption)}")
+            # print(f"{annotation_caption_text}\n!=\n{figure.caption}\n{len(annotation_caption_text)} " \
+            #       f"|| {len(figure.caption)}")
+            figure.caption = annotation_caption_text
 
-        label_text_list: List[str] = [label.strip() for label in matched_row[2].split(',')]
 
-        gt_label_list: List[str] = [map_label(subfigure.label.text)
-                                    for subfigure in figure.gt_subfigures
-                                    if hasattr(subfigure, 'caption')
-                                        and subfigure.label is not None]
+        ########################
+        # Labels list checkups #
+        ########################
 
+        num_subfigures: int = len(figure.gt_subfigures)
+
+        label_text_list: List[str] = [label.strip()
+                                      for label in matched_row[2].split(',')]
+
+        print("annotation label_text_list:", label_text_list)
+
+        gt_label_list: List[str] = [subfigure.label.text
+                                    if hasattr(subfigure, 'label')
+                                    and subfigure.label is not None
+                                    else '_'
+                                    for subfigure in figure.gt_subfigures]
+
+        print("raw GT label list:", gt_label_list)
 
         gt_labels_structure = LabelStructure.from_labels_list(gt_label_list)
         gt_labels_structure.num_labels = len(figure.gt_subfigures)
-        # print("gt label structure:", gt_labels_structure)
-        # print("raw GT label list: ", gt_label_list)
-        gt_label_list = gt_labels_structure.get_core_label_list()
+        print("gt label structure:", gt_labels_structure)
 
-        assert gt_label_list == gt_labels_structure.get_core_label_list(), gt_labels_structure
+        if sorted(label_text_list) != sorted(gt_label_list):
 
+            print("mapping labels to classes.")
+            gt_label_list = [map_label(label) for label in gt_label_list]
+            label_text_list = [map_label(label) for label in label_text_list]
+
+            if sorted(label_text_list) != sorted(gt_label_list):
+                gt_label_list = gt_labels_structure.get_core_label_list()
+
+        print("GT label list:", gt_label_list)
+        print("annotation label_text_list:", label_text_list)
+        assert len(label_text_list) == num_subfigures
+        assert len(gt_label_list) == num_subfigures
+
+        assert sorted(label_text_list) == sorted(gt_label_list)
 
         subcaptions: List[str] = [cell_text.strip()
                                   for cell_text in matched_row[3:]
-                                  if cell_text != '']
+                                  if cell_text.strip() != '']
 
 
-        # Case where there is no labels : ['_', '_', '_']
+        ################################################
+        # Case 1: There is no labels : ['_', '_', '_'] #
+        ################################################
         if gt_labels_structure.labels_type == LabelStructureEnum.NONE:
-            assert len(label_text_list) == len(figure.gt_subfigures)
 
-            print("panel(s) without label(s)")
-            print(f"subcaptions={subcaptions}")
-            print(f"len={len(subcaptions)}")
-            print(f"len_subfigures: {len(figure.gt_subfigures)}")
+            # print("panel(s) without label(s)")
+            # print(f"subcaptions={subcaptions}")
+            # print(f"len={len(subcaptions)}")
+            # print(f"len_subfigures: {len(figure.gt_subfigures)}")
 
-#             if not subcaptions:
-#                 assert len(subcaptions) == 0
-#
-#                 figure.gt_subfigures[0].caption = figure.caption
+            # If different subcaptions have been identified
+            if len(subcaptions) > 0:
+                assert len(subcaptions) == num_subfigures
+                for subcaption, subfigure in zip(subcaptions, figure.gt_subfigures):
+                    subfigure.caption = subcaption
 
-            for subfigure in figure.gt_subfigures:
-                subfigure.caption = "TODO"
+            # If no subcaptions were annotated, just copy the caption as a subcaption for each
+            # subfigure
+            else:
+                for subfigure in figure.gt_subfigures:
+                    subfigure.caption = figure.caption
 
             continue
 
-        # Case 2: explicit labels: ['A', 'B', 'C']
+        ############################################
+        # Case 2: explicit labels: ['A', 'B', 'C'] #
+        ############################################
+        assert len(subcaptions) == num_subfigures
 
-        assert len(subcaptions) == len(figure.gt_subfigures)
+        mapped: int = 0
+        for label, subcaption in zip(label_text_list, subcaptions):
 
-        if len(label_text_list) != len(gt_label_list):
-            print(figure.image_filename)
-            print("No labels")
+            for gt_label, subfigure in zip(gt_label_list, figure.gt_subfigures):
 
-            print("GT label list: ", gt_label_list)
-            print("Annotation label list: ", label_text_list)
+                if hasattr(subfigure, 'label') and subfigure.label is not None:
+                    subfigure_label_text: str = subfigure.label.text
+                    assert (subfigure_label_text == gt_label) or (map_label(subfigure_label_text) == map_label(gt_label)),\
+                            f"{subfigure.label.text} != {gt_label}"
 
-            print("PROBLEM")
+                if label == gt_label:
+                    subfigure.caption = subcaption
+                    mapped += 1
 
+        assert mapped == num_subfigures
+
+        output_dict[figure.image_filename] = figure.to_dict()
+
+
+    with open(json_output_filename, 'w') as json_file:
+        json.dump(obj=output_dict,
+                  fp=json_file,
+                  indent=4)
 
 
 

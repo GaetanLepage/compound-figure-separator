@@ -6,5 +6,7 @@
 # and the sample lists
 !train.txt
 !train.csv
+!train.json
 !eval.txt
 !eval.csv
+!eval.json

@@ -147,6 +147,7 @@ class LabelStructure:
                                LabelStructureEnum.ROMAN_UC):
 
                 if LABEL_FILTER[label_type](label):
+                    # TODO decide which to pick
                     similarity_dict[label_type] += 1 / LABEL_INDEX[label_type](label)
                     # similarity_dict[label_type] += np.exp(-LABEL_INDEX[label_type](label))
 
@@ -226,7 +227,7 @@ class LabelStructure:
             output_list = []
 
         elif self.labels_type == LabelStructureEnum.NUMERICAL:
-            output_list = [str(i) for i in range(self.num_labels)]
+            output_list = [str(i + 1) for i in range(self.num_labels)]
 
         elif self.labels_type == LabelStructureEnum.LATIN_UC:
             output_list = [chr(65 + i) for i in range(self.num_labels)]
