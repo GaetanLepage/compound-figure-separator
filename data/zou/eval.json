@@ -123,26 +123,6 @@
             {
                 "panel": {
                     "box": [
-                        10,
-                        369,
-                        764,
-                        998
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        16,
-                        369,
-                        43,
-                        396
-                    ]
-                },
-                "caption": "Gene expression patterns between TP53 heterozygous and WT breast epithelial and stromal cells. C) Supervised heat-map with gene expression patterns of the top 100 genes noting clusters differentiating diseased vs. non-diseased samples. The bars above the panel depict sample clusters; top: tissue/sample type (left to right: BR, breast epithelial; STR, stromal); middle: ID/cell line (left to right: NA, normal/WT; 50, patient 50; IUSM, cells derived from IUSM patient); bottom: genotype/phenotype (left to right: N, normal/WT; LF, Li-Fraumeni syndrome). The different colored bars on the left of the panel represent different clusters of biological processes. Gene expression variation is depicted by color (red, up-regulated; blue, down-regulated; gray, no significant change). The genes and Gene Ontology of Biological Processes are listed in Supplemental Data."
-            },
-            {
-                "panel": {
-                    "box": [
                         376,
                         3,
                         764,
@@ -159,6 +139,26 @@
                     ]
                 },
                 "caption": "Gene expression patterns between TP53 heterozygous and WT breast epithelial and stromal cells. B) PCA of LFS-50 compared to LFS-IUSM samples."
+            },
+            {
+                "panel": {
+                    "box": [
+                        10,
+                        369,
+                        764,
+                        998
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        16,
+                        369,
+                        43,
+                        396
+                    ]
+                },
+                "caption": "Gene expression patterns between TP53 heterozygous and WT breast epithelial and stromal cells. C) Supervised heat-map with gene expression patterns of the top 100 genes noting clusters differentiating diseased vs. non-diseased samples. The bars above the panel depict sample clusters; top: tissue/sample type (left to right: BR, breast epithelial; STR, stromal); middle: ID/cell line (left to right: NA, normal/WT; 50, patient 50; IUSM, cells derived from IUSM patient); bottom: genotype/phenotype (left to right: N, normal/WT; LF, Li-Fraumeni syndrome). The different colored bars on the left of the panel represent different clusters of biological processes. Gene expression variation is depicted by color (red, up-regulated; blue, down-regulated; gray, no significant change). The genes and Gene Ontology of Biological Processes are listed in Supplemental Data."
             }
         ],
         "caption": "Gene expression patterns between TP53 heterozygous and WT breast epithelial and stromal cells. A) Principal component analyses (PCA) of samples. Spheres depict breast epithelial samples (BR), while triangles depict stromal samples. Red objects represent LFS patient 50 samples, blue objects represent samples derived from IUSM-LFS patient, and green objects represent normal/WT samples. B) PCA of LFS-50 compared to LFS-IUSM samples. C) Supervised heat-map with gene expression patterns of the top 100 genes noting clusters differentiating diseased vs. non-diseased samples. The bars above the panel depict sample clusters; top: tissue/sample type (left to right: BR, breast epithelial; STR, stromal); middle: ID/cell line (left to right: NA, normal/WT; 50, patient 50; IUSM, cells derived from IUSM patient); bottom: genotype/phenotype (left to right: N, normal/WT; LF, Li-Fraumeni syndrome). The different colored bars on the left of the panel represent different clusters of biological processes. Gene expression variation is depicted by color (red, up-regulated; blue, down-regulated; gray, no significant change). The genes and Gene Ontology of Biological Processes are listed in Supplemental Data."
@@ -168,106 +168,6 @@
         "image_width": 688,
         "image_height": 272,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        415,
-                        3,
-                        548,
-                        140
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        419,
-                        122,
-                        432,
-                        137
-                    ]
-                },
-                "caption": "A 66-year-old man with prostate cancer in peripheral zone of the prostate. The tumor hemorrhage was also seen with SWI (D)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        1,
-                        144,
-                        131,
-                        272
-                    ]
-                },
-                "label": {
-                    "text": "F",
-                    "box": [
-                        4,
-                        252,
-                        17,
-                        267
-                    ]
-                },
-                "caption": "The images in second row come from another slice of the same patient. No prostatic calcification is demonstrated on conventional T1WI (F)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        552,
-                        144,
-                        685,
-                        272
-                    ]
-                },
-                "label": {
-                    "text": "J",
-                    "box": [
-                        559,
-                        254,
-                        568,
-                        266
-                    ]
-                },
-                "caption": "The images in second row come from another slice of the same patient. high signal on filtered phase image (J) (arrows) indicates calcificaiton."
-            },
-            {
-                "panel": {
-                    "box": [
-                        415,
-                        142,
-                        548,
-                        271
-                    ]
-                },
-                "label": {
-                    "text": "I",
-                    "box": [
-                        421,
-                        253,
-                        429,
-                        268
-                    ]
-                },
-                "caption": "The images in second row come from another slice of the same patient. low signal on SWI (I) indicates calcificaiton."
-            },
-            {
-                "panel": {
-                    "box": [
-                        134,
-                        144,
-                        270,
-                        270
-                    ]
-                },
-                "label": {
-                    "text": "G",
-                    "box": [
-                        138,
-                        253,
-                        151,
-                        268
-                    ]
-                },
-                "caption": "The images in second row come from another slice of the same patient. No prostatic calcification is demonstrated on T2WI (G)."
-            },
             {
                 "panel": {
                     "box": [
@@ -287,46 +187,6 @@
                     ]
                 },
                 "caption": "A 66-year-old man with prostate cancer in peripheral zone of the prostate. Low signal on conventional T1WI (A) indicates tumor hemorrhage."
-            },
-            {
-                "panel": {
-                    "box": [
-                        273,
-                        1,
-                        411,
-                        138
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        278,
-                        122,
-                        291,
-                        137
-                    ]
-                },
-                "caption": "A 66-year-old man with prostate cancer in peripheral zone of the prostate. No hemorrhage is demonstrated on CT (C)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        273,
-                        144,
-                        411,
-                        270
-                    ]
-                },
-                "label": {
-                    "text": "H",
-                    "box": [
-                        278,
-                        252,
-                        291,
-                        267
-                    ]
-                },
-                "caption": "The images in second row come from another slice of the same patient. but dot-like high density on CT (H)."
             },
             {
                 "panel": {
@@ -351,6 +211,46 @@
             {
                 "panel": {
                     "box": [
+                        273,
+                        1,
+                        411,
+                        138
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        278,
+                        122,
+                        291,
+                        137
+                    ]
+                },
+                "caption": "A 66-year-old man with prostate cancer in peripheral zone of the prostate. No hemorrhage is demonstrated on CT (C)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        415,
+                        3,
+                        548,
+                        140
+                    ]
+                },
+                "label": {
+                    "text": "D",
+                    "box": [
+                        419,
+                        122,
+                        432,
+                        137
+                    ]
+                },
+                "caption": "A 66-year-old man with prostate cancer in peripheral zone of the prostate. The tumor hemorrhage was also seen with SWI (D)."
+            },
+            {
+                "panel": {
+                    "box": [
                         555,
                         3,
                         685,
@@ -367,6 +267,106 @@
                     ]
                 },
                 "caption": "A 66-year-old man with prostate cancer in peripheral zone of the prostate. The tumor hemorrhage was also seen with filtered phase image (E) (arrows)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        1,
+                        144,
+                        131,
+                        272
+                    ]
+                },
+                "label": {
+                    "text": "F",
+                    "box": [
+                        4,
+                        252,
+                        17,
+                        267
+                    ]
+                },
+                "caption": "The images in second row come from another slice of the same patient. No prostatic calcification is demonstrated on conventional T1WI (F)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        134,
+                        144,
+                        270,
+                        270
+                    ]
+                },
+                "label": {
+                    "text": "G",
+                    "box": [
+                        138,
+                        253,
+                        151,
+                        268
+                    ]
+                },
+                "caption": "The images in second row come from another slice of the same patient. No prostatic calcification is demonstrated on T2WI (G)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        273,
+                        144,
+                        411,
+                        270
+                    ]
+                },
+                "label": {
+                    "text": "H",
+                    "box": [
+                        278,
+                        252,
+                        291,
+                        267
+                    ]
+                },
+                "caption": "The images in second row come from another slice of the same patient. but dot-like high density on CT (H)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        415,
+                        142,
+                        548,
+                        271
+                    ]
+                },
+                "label": {
+                    "text": "I",
+                    "box": [
+                        421,
+                        253,
+                        429,
+                        268
+                    ]
+                },
+                "caption": "The images in second row come from another slice of the same patient. low signal on SWI (I) indicates calcificaiton."
+            },
+            {
+                "panel": {
+                    "box": [
+                        552,
+                        144,
+                        685,
+                        272
+                    ]
+                },
+                "label": {
+                    "text": "J",
+                    "box": [
+                        559,
+                        254,
+                        568,
+                        266
+                    ]
+                },
+                "caption": "The images in second row come from another slice of the same patient. high signal on filtered phase image (J) (arrows) indicates calcificaiton."
             }
         ],
         "caption": "A 66-year-old man with prostate cancer in peripheral zone of the prostate. Low signal on conventional T1WI (A) and T2WI (B) (arrows) indicates tumor hemorrhage. No hemorrhage is demonstrated on CT (C). The tumor hemorrhage was also seen with SWI (D) and filtered phase image (E) (arrows). The images in second row come from another slice of the same patient. No prostatic calcification is demonstrated on conventional T1WI (F) and T2WI (G), but dot-like high density on CT (H), low signal on SWI (I) and high signal on filtered phase image (J) (arrows) indicates calcificaiton."
@@ -427,26 +427,6 @@
             {
                 "panel": {
                     "box": [
-                        345,
-                        7,
-                        583,
-                        492
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        486,
-                        472,
-                        506,
-                        492
-                    ]
-                },
-                "caption": "Analysis/comparison of CSA-binding and non-binding DBL domains with A4 DBL 3X (PDB code: 2BQK). (b) Superposition of non-CSA-binding DBL domains 3D7 DBL 1X and A4 DBL 4\u03b5 on to A4 DBL 3X structure."
-            },
-            {
-                "panel": {
-                    "box": [
                         1,
                         7,
                         302,
@@ -463,6 +443,26 @@
                     ]
                 },
                 "caption": "Analysis/comparison of CSA-binding and non-binding DBL domains with A4 DBL 3X (PDB code: 2BQK). (a) Superposition of CSA-binding A4 DBL 2X, 5\u03b5, 6\u03b5 domains and 3D7 DBL 2X, 3X, 5\u03b5 and 6\u03b5 domains onto A4 DBL 3X structure."
+            },
+            {
+                "panel": {
+                    "box": [
+                        345,
+                        7,
+                        583,
+                        492
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        486,
+                        472,
+                        506,
+                        492
+                    ]
+                },
+                "caption": "Analysis/comparison of CSA-binding and non-binding DBL domains with A4 DBL 3X (PDB code: 2BQK). (b) Superposition of non-CSA-binding DBL domains 3D7 DBL 1X and A4 DBL 4\u03b5 on to A4 DBL 3X structure."
             }
         ],
         "caption": "Analysis/comparison of CSA-binding and non-binding DBL domains with A4 DBL 3X (PDB code: 2BQK). (a) Superposition of CSA-binding A4 DBL 2X, 5\u03b5, 6\u03b5 domains and 3D7 DBL 2X, 3X, 5\u03b5 and 6\u03b5 domains onto A4 DBL 3X structure. (b) Superposition of non-CSA-binding DBL domains 3D7 DBL 1X and A4 DBL 4\u03b5 on to A4 DBL 3X structure."
@@ -495,26 +495,6 @@
             {
                 "panel": {
                     "box": [
-                        378,
-                        0,
-                        549,
-                        179
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        401,
-                        0,
-                        415,
-                        13
-                    ]
-                },
-                "caption": "Contribution of Pak1 and Pak2 to cell proliferation and tumor growth in meningioma cells (C) Cells bearing shPak1 and shPak2 were stained with propidium iodide and subjected to cell cycle analysis by flow cytometry. The data are representative of 3 independent experiments."
-            },
-            {
-                "panel": {
-                    "box": [
                         190,
                         0,
                         373,
@@ -531,6 +511,26 @@
                     ]
                 },
                 "caption": "Contribution of Pak1 and Pak2 to cell proliferation and tumor growth in meningioma cells (B) Proliferation of KT21 cells after infection with shRNA was measured by MTT assay. Immunoblot analysis showed loss of Pak1 and Pak2 in shRNA-infected cells."
+            },
+            {
+                "panel": {
+                    "box": [
+                        378,
+                        0,
+                        549,
+                        179
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        401,
+                        0,
+                        415,
+                        13
+                    ]
+                },
+                "caption": "Contribution of Pak1 and Pak2 to cell proliferation and tumor growth in meningioma cells (C) Cells bearing shPak1 and shPak2 were stained with propidium iodide and subjected to cell cycle analysis by flow cytometry. The data are representative of 3 independent experiments."
             },
             {
                 "panel": {
@@ -823,26 +823,6 @@
             {
                 "panel": {
                     "box": [
-                        2,
-                        162,
-                        204,
-                        292
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        2,
-                        162,
-                        29,
-                        189
-                    ]
-                },
-                "caption": "Loss of lamin A/C expression in ovarian cancers. Ovarian normal and tumor tissues were analyzed by immunostaining for lamin A/C. (C) A representative example of ovarian carcinomas showing heterogeneous expression of lamin A/C among the tumor cells."
-            },
-            {
-                "panel": {
-                    "box": [
                         211,
                         16,
                         595,
@@ -859,6 +839,26 @@
                     ]
                 },
                 "caption": "Loss of lamin A/C expression in ovarian cancers. Ovarian normal and tumor tissues were analyzed by immunostaining for lamin A/C. (B) Two examples show loss of lamin A/C expression in ovarian carcinomas. Some stromal cells show strong lamin A/C staining around the nucleus, serving as an internal positive control. The nuclear morphology of tumor cells is heterogeneous, and some cells with large and deformed nuclei are present."
+            },
+            {
+                "panel": {
+                    "box": [
+                        2,
+                        162,
+                        204,
+                        292
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        2,
+                        162,
+                        29,
+                        189
+                    ]
+                },
+                "caption": "Loss of lamin A/C expression in ovarian cancers. Ovarian normal and tumor tissues were analyzed by immunostaining for lamin A/C. (C) A representative example of ovarian carcinomas showing heterogeneous expression of lamin A/C among the tumor cells."
             },
             {
                 "panel": {
@@ -939,46 +939,6 @@
             {
                 "panel": {
                     "box": [
-                        415,
-                        349,
-                        774,
-                        634
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        417,
-                        500,
-                        442,
-                        535
-                    ]
-                },
-                "caption": "Volume-rendered CT-based images of the indeterminate titanosaurian sauropod braincase MCCM-HUE-1667 from the Cretaceous of Fuentes, Spain. semitransparent with the endocast and associated structures in left lateral view (D). dorsal is to the top in (C-F). Abbreviations: BP, basipterygoid process; BT, basal tuber; CP, capitate process; CA, crista antotica; CO, crista otosphenoidea; CT, crista tuberalis; FM, foramen magnum; OC, occipital condyle; OF, olfactory fenestra; OR, orbital recess; PP, paroccipital process; PSR, parasphenoidal rostrum; PTF, posttemporal fenestra; SNC, sagittal nuchal crest; STF, supratemporal fenestra; TNC, transverse nuchal crest; V, trigeminal foramen. Scale bar equals 10 cm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        414,
-                        690,
-                        792,
-                        1046
-                    ]
-                },
-                "label": {
-                    "text": "F",
-                    "box": [
-                        417,
-                        863,
-                        436,
-                        900
-                    ]
-                },
-                "caption": "Volume-rendered CT-based images of the indeterminate titanosaurian sauropod braincase MCCM-HUE-1667 from the Cretaceous of Fuentes, Spain. Opaque and unfilled in caudal (F) views and semitransparent with the endocast and associated structures in left lateral view (D). dorsal is to the top in (C-F). Abbreviations: BP, basipterygoid process; BT, basal tuber; CP, capitate process; CA, crista antotica; CO, crista otosphenoidea; CT, crista tuberalis; FM, foramen magnum; OC, occipital condyle; OF, olfactory fenestra; OR, orbital recess; PP, paroccipital process; PSR, parasphenoidal rostrum; PTF, posttemporal fenestra; SNC, sagittal nuchal crest; STF, supratemporal fenestra; TNC, transverse nuchal crest; V, trigeminal foramen. Scale bar equals 10 cm."
-            },
-            {
-                "panel": {
-                    "box": [
                         1,
                         1,
                         387,
@@ -995,26 +955,6 @@
                     ]
                 },
                 "caption": "Volume-rendered CT-based images of the indeterminate titanosaurian sauropod braincase MCCM-HUE-1667 from the Cretaceous of Fuentes, Spain. Opaque and unfilled in dorsal (A). Rostral is to the top in (A, B). Abbreviations: BP, basipterygoid process; BT, basal tuber; CP, capitate process; CA, crista antotica; CO, crista otosphenoidea; CT, crista tuberalis; FM, foramen magnum; OC, occipital condyle; OF, olfactory fenestra; OR, orbital recess; PP, paroccipital process; PSR, parasphenoidal rostrum; PTF, posttemporal fenestra; SNC, sagittal nuchal crest; STF, supratemporal fenestra; TNC, transverse nuchal crest; V, trigeminal foramen. Scale bar equals 10 cm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        0,
-                        295,
-                        381,
-                        673
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        3,
-                        502,
-                        30,
-                        532
-                    ]
-                },
-                "caption": "Volume-rendered CT-based images of the indeterminate titanosaurian sauropod braincase MCCM-HUE-1667 from the Cretaceous of Fuentes, Spain. Opaque and unfilled in left lateral (C). dorsal is to the top in (C-F). Abbreviations: BP, basipterygoid process; BT, basal tuber; CP, capitate process; CA, crista antotica; CO, crista otosphenoidea; CT, crista tuberalis; FM, foramen magnum; OC, occipital condyle; OF, olfactory fenestra; OR, orbital recess; PP, paroccipital process; PSR, parasphenoidal rostrum; PTF, posttemporal fenestra; SNC, sagittal nuchal crest; STF, supratemporal fenestra; TNC, transverse nuchal crest; V, trigeminal foramen. Scale bar equals 10 cm."
             },
             {
                 "panel": {
@@ -1040,6 +980,46 @@
                 "panel": {
                     "box": [
                         0,
+                        295,
+                        381,
+                        673
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        3,
+                        502,
+                        30,
+                        532
+                    ]
+                },
+                "caption": "Volume-rendered CT-based images of the indeterminate titanosaurian sauropod braincase MCCM-HUE-1667 from the Cretaceous of Fuentes, Spain. Opaque and unfilled in left lateral (C). dorsal is to the top in (C-F). Abbreviations: BP, basipterygoid process; BT, basal tuber; CP, capitate process; CA, crista antotica; CO, crista otosphenoidea; CT, crista tuberalis; FM, foramen magnum; OC, occipital condyle; OF, olfactory fenestra; OR, orbital recess; PP, paroccipital process; PSR, parasphenoidal rostrum; PTF, posttemporal fenestra; SNC, sagittal nuchal crest; STF, supratemporal fenestra; TNC, transverse nuchal crest; V, trigeminal foramen. Scale bar equals 10 cm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        415,
+                        349,
+                        774,
+                        634
+                    ]
+                },
+                "label": {
+                    "text": "D",
+                    "box": [
+                        417,
+                        500,
+                        442,
+                        535
+                    ]
+                },
+                "caption": "Volume-rendered CT-based images of the indeterminate titanosaurian sauropod braincase MCCM-HUE-1667 from the Cretaceous of Fuentes, Spain. semitransparent with the endocast and associated structures in left lateral view (D). dorsal is to the top in (C-F). Abbreviations: BP, basipterygoid process; BT, basal tuber; CP, capitate process; CA, crista antotica; CO, crista otosphenoidea; CT, crista tuberalis; FM, foramen magnum; OC, occipital condyle; OF, olfactory fenestra; OR, orbital recess; PP, paroccipital process; PSR, parasphenoidal rostrum; PTF, posttemporal fenestra; SNC, sagittal nuchal crest; STF, supratemporal fenestra; TNC, transverse nuchal crest; V, trigeminal foramen. Scale bar equals 10 cm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
                         689,
                         374,
                         1038
@@ -1055,6 +1035,26 @@
                     ]
                 },
                 "caption": "Volume-rendered CT-based images of the indeterminate titanosaurian sauropod braincase MCCM-HUE-1667 from the Cretaceous of Fuentes, Spain. Opaque and unfilled in rostral (E). dorsal is to the top in (C-F). Abbreviations: BP, basipterygoid process; BT, basal tuber; CP, capitate process; CA, crista antotica; CO, crista otosphenoidea; CT, crista tuberalis; FM, foramen magnum; OC, occipital condyle; OF, olfactory fenestra; OR, orbital recess; PP, paroccipital process; PSR, parasphenoidal rostrum; PTF, posttemporal fenestra; SNC, sagittal nuchal crest; STF, supratemporal fenestra; TNC, transverse nuchal crest; V, trigeminal foramen. Scale bar equals 10 cm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        414,
+                        690,
+                        792,
+                        1046
+                    ]
+                },
+                "label": {
+                    "text": "F",
+                    "box": [
+                        417,
+                        863,
+                        436,
+                        900
+                    ]
+                },
+                "caption": "Volume-rendered CT-based images of the indeterminate titanosaurian sauropod braincase MCCM-HUE-1667 from the Cretaceous of Fuentes, Spain. Opaque and unfilled in caudal (F) views and semitransparent with the endocast and associated structures in left lateral view (D). dorsal is to the top in (C-F). Abbreviations: BP, basipterygoid process; BT, basal tuber; CP, capitate process; CA, crista antotica; CO, crista otosphenoidea; CT, crista tuberalis; FM, foramen magnum; OC, occipital condyle; OF, olfactory fenestra; OR, orbital recess; PP, paroccipital process; PSR, parasphenoidal rostrum; PTF, posttemporal fenestra; SNC, sagittal nuchal crest; STF, supratemporal fenestra; TNC, transverse nuchal crest; V, trigeminal foramen. Scale bar equals 10 cm."
             }
         ],
         "caption": "Volume-rendered CT-based images of the indeterminate titanosaurian sauropod braincase MCCM-HUE-1667 from the Cretaceous of Fuentes, Spain. Opaque and unfilled in dorsal (A), ventral (B), left lateral (C), rostral (E), and caudal (F) views and semitransparent with the endocast and associated structures in left lateral view (D). Rostral is to the top in (A, B), dorsal is to the top in (C-F). Abbreviations: BP, basipterygoid process; BT, basal tuber; CP, capitate process; CA, crista antotica; CO, crista otosphenoidea; CT, crista tuberalis; FM, foramen magnum; OC, occipital condyle; OF, olfactory fenestra; OR, orbital recess; PP, paroccipital process; PSR, parasphenoidal rostrum; PTF, posttemporal fenestra; SNC, sagittal nuchal crest; STF, supratemporal fenestra; TNC, transverse nuchal crest; V, trigeminal foramen. Scale bar equals 10 cm."
@@ -1088,26 +1088,6 @@
                 "panel": {
                     "box": [
                         3,
-                        615,
-                        741,
-                        932
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        57,
-                        615,
-                        80,
-                        638
-                    ]
-                },
-                "caption": "Reconstruction of the skull of Pliosaurus kevani n. sp. In right ventral (C) views. Abbreviations: ang, angular; art, articular; den, dentary; en, external naris; exoc-opis, exoccipital-opisthotic; in, internal naris; jug, jugal; fr, frontal; lac, \u2018lacrimal\u2019; mx, maxilla; occ, occipital condyle; pal, palatine; palp, palpebral; par, parietal; pifor, pineal foramen; pmx, premaxilla; po, postorbital; pofr, postfrontal; prfr, prefrontal; proo, prootic; ps, parasphenoid; pt, pterygoid; sa, surangular; soc, supraoccipital; sq, squamosal; vom, vomer. Total skull length is approximately 2 metres."
-            },
-            {
-                "panel": {
-                    "box": [
-                        3,
                         279,
                         741,
                         615
@@ -1123,6 +1103,26 @@
                     ]
                 },
                 "caption": "Reconstruction of the skull of Pliosaurus kevani n. sp. In right dorsal (B) views. Abbreviations: ang, angular; art, articular; den, dentary; en, external naris; exoc-opis, exoccipital-opisthotic; in, internal naris; jug, jugal; fr, frontal; lac, \u2018lacrimal\u2019; mx, maxilla; occ, occipital condyle; pal, palatine; palp, palpebral; par, parietal; pifor, pineal foramen; pmx, premaxilla; po, postorbital; pofr, postfrontal; prfr, prefrontal; proo, prootic; ps, parasphenoid; pt, pterygoid; sa, surangular; soc, supraoccipital; sq, squamosal; vom, vomer. Total skull length is approximately 2 metres."
+            },
+            {
+                "panel": {
+                    "box": [
+                        3,
+                        615,
+                        741,
+                        932
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        57,
+                        615,
+                        80,
+                        638
+                    ]
+                },
+                "caption": "Reconstruction of the skull of Pliosaurus kevani n. sp. In right ventral (C) views. Abbreviations: ang, angular; art, articular; den, dentary; en, external naris; exoc-opis, exoccipital-opisthotic; in, internal naris; jug, jugal; fr, frontal; lac, \u2018lacrimal\u2019; mx, maxilla; occ, occipital condyle; pal, palatine; palp, palpebral; par, parietal; pifor, pineal foramen; pmx, premaxilla; po, postorbital; pofr, postfrontal; prfr, prefrontal; proo, prootic; ps, parasphenoid; pt, pterygoid; sa, surangular; soc, supraoccipital; sq, squamosal; vom, vomer. Total skull length is approximately 2 metres."
             }
         ],
         "caption": "Reconstruction of the skull of Pliosaurus kevani n. sp. In right lateral (A), dorsal (B), and ventral (C) views. Abbreviations: ang, angular; art, articular; den, dentary; en, external naris; exoc-opis, exoccipital-opisthotic; in, internal naris; jug, jugal; fr, frontal; lac, \u2018lacrimal\u2019; mx, maxilla; occ, occipital condyle; pal, palatine; palp, palpebral; par, parietal; pifor, pineal foramen; pmx, premaxilla; po, postorbital; pofr, postfrontal; prfr, prefrontal; proo, prootic; ps, parasphenoid; pt, pterygoid; sa, surangular; soc, supraoccipital; sq, squamosal; vom, vomer. Total skull length is approximately 2 metres."
@@ -1183,26 +1183,6 @@
             {
                 "panel": {
                     "box": [
-                        1,
-                        293,
-                        395,
-                        612
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        12,
-                        305,
-                        30,
-                        323
-                    ]
-                },
-                "caption": "Preoperative & postoperative anterior and posterior x-ray images of the injured hip with INTERTAN\u2122 nails resulting in iatrogenic fractures in an obese patient then fixed with short and long INTERTAN\u2122 nail. Preoperative anteroposterior X-ray image of the injured hip of another obese patient (D)."
-            },
-            {
-                "panel": {
-                    "box": [
                         0,
                         1,
                         196,
@@ -1219,6 +1199,26 @@
                     ]
                 },
                 "caption": "Preoperative & postoperative anterior and posterior x-ray images of the injured hip with INTERTAN\u2122 nails resulting in iatrogenic fractures in an obese patient then fixed with short and long INTERTAN\u2122 nail. (A) Preoperative anteroposterior X-ray image of the injured hip."
+            },
+            {
+                "panel": {
+                    "box": [
+                        200,
+                        1,
+                        396,
+                        286
+                    ]
+                },
+                "label": {
+                    "text": "B",
+                    "box": [
+                        205,
+                        12,
+                        225,
+                        32
+                    ]
+                },
+                "caption": "Preoperative & postoperative anterior and posterior x-ray images of the injured hip with INTERTAN\u2122 nails resulting in iatrogenic fractures in an obese patient then fixed with short and long INTERTAN\u2122 nail. (B) Postoperative anteroposterior X-ray image of the injured hip."
             },
             {
                 "panel": {
@@ -1243,22 +1243,22 @@
             {
                 "panel": {
                     "box": [
-                        200,
                         1,
-                        396,
-                        286
+                        293,
+                        395,
+                        612
                     ]
                 },
                 "label": {
-                    "text": "B",
+                    "text": "D",
                     "box": [
-                        205,
                         12,
-                        225,
-                        32
+                        305,
+                        30,
+                        323
                     ]
                 },
-                "caption": "Preoperative & postoperative anterior and posterior x-ray images of the injured hip with INTERTAN\u2122 nails resulting in iatrogenic fractures in an obese patient then fixed with short and long INTERTAN\u2122 nail. (B) Postoperative anteroposterior X-ray image of the injured hip."
+                "caption": "Preoperative & postoperative anterior and posterior x-ray images of the injured hip with INTERTAN\u2122 nails resulting in iatrogenic fractures in an obese patient then fixed with short and long INTERTAN\u2122 nail. Preoperative anteroposterior X-ray image of the injured hip of another obese patient (D)."
             },
             {
                 "panel": {
@@ -1311,26 +1311,6 @@
             {
                 "panel": {
                     "box": [
-                        344,
-                        0,
-                        492,
-                        676
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        357,
-                        0,
-                        374,
-                        17
-                    ]
-                },
-                "caption": "Immunization with DBL4-6 and DBL1-6 VAR2CSA recombinant proteins induces antibodies against the surface of IEs-CSA. mouse plasma raised against 3D7 DBL1-6 (C) is shown compared to the corresponding preimmune plasma (shaded histograms). In (C), individual mouse plasma were tested; blue (mouse 1), green (mouse 2), and orange (mouse 3)."
-            },
-            {
-                "panel": {
-                    "box": [
                         183,
                         1,
                         340,
@@ -1347,6 +1327,26 @@
                     ]
                 },
                 "caption": "Immunization with DBL4-6 and DBL1-6 VAR2CSA recombinant proteins induces antibodies against the surface of IEs-CSA. Fluorescence of IEs labeled by rabbit plasma raised against 3D7 DBL4-6 (B). In (B), blue histograms represent labeling with polyclonal plasma, green histograms show the corresponding purified IgG."
+            },
+            {
+                "panel": {
+                    "box": [
+                        344,
+                        0,
+                        492,
+                        676
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        357,
+                        0,
+                        374,
+                        17
+                    ]
+                },
+                "caption": "Immunization with DBL4-6 and DBL1-6 VAR2CSA recombinant proteins induces antibodies against the surface of IEs-CSA. mouse plasma raised against 3D7 DBL1-6 (C) is shown compared to the corresponding preimmune plasma (shaded histograms). In (C), individual mouse plasma were tested; blue (mouse 1), green (mouse 2), and orange (mouse 3)."
             },
             {
                 "panel": {
@@ -1379,26 +1379,6 @@
             {
                 "panel": {
                     "box": [
-                        278,
-                        0,
-                        625,
-                        306
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        281,
-                        276,
-                        307,
-                        302
-                    ]
-                },
-                "caption": "(a-c) A 67-year-old female with biopsy proven ovarian carcinoma. transaxial PET/computed tomography images (b and c) revealed multiple enlarged 18F-2-fluoro-2-deoxy-glucose avid cervical, axillary, mediastinal, retroperitoneal, mesenteric and pelvic metastatic lymph nodes (arrows)."
-            },
-            {
-                "panel": {
-                    "box": [
                         0,
                         0,
                         275,
@@ -1415,6 +1395,26 @@
                     ]
                 },
                 "caption": "(a-c) A 67-year-old female with biopsy proven ovarian carcinoma. Maximum intensity projection positron emission tomography (PET) image (a) revealed multiple enlarged 18F-2-fluoro-2-deoxy-glucose avid cervical, axillary, mediastinal, retroperitoneal, mesenteric and pelvic metastatic lymph nodes (arrows)"
+            },
+            {
+                "panel": {
+                    "box": [
+                        278,
+                        0,
+                        625,
+                        306
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        281,
+                        276,
+                        307,
+                        302
+                    ]
+                },
+                "caption": "(a-c) A 67-year-old female with biopsy proven ovarian carcinoma. transaxial PET/computed tomography images (b and c) revealed multiple enlarged 18F-2-fluoro-2-deoxy-glucose avid cervical, axillary, mediastinal, retroperitoneal, mesenteric and pelvic metastatic lymph nodes (arrows)."
             },
             {
                 "panel": {
@@ -1448,26 +1448,6 @@
                 "panel": {
                     "box": [
                         0,
-                        660,
-                        705,
-                        1150
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        0,
-                        675,
-                        14,
-                        698
-                    ]
-                },
-                "caption": "(b) 2D representation of 3D structure of [Figure 2 (a)] created with LigPlot. [7] The hydrogen bonds were identified with HBPLUS [8] as were the hydrophobic contacts formed between demethoxy curcumin and the TrxR residues."
-            },
-            {
-                "panel": {
-                    "box": [
-                        0,
                         0,
                         775,
                         651
@@ -1483,6 +1463,26 @@
                     ]
                 },
                 "caption": "(a) Bound conformation of demethoxy curcumin visualized by ADT in the active site of E-chain of TrxR. Curcumin and TrxR both molecules are in line model with all interacting residues."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
+                        660,
+                        705,
+                        1150
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        0,
+                        675,
+                        14,
+                        698
+                    ]
+                },
+                "caption": "(b) 2D representation of 3D structure of [Figure 2 (a)] created with LigPlot. [7] The hydrogen bonds were identified with HBPLUS [8] as were the hydrophobic contacts formed between demethoxy curcumin and the TrxR residues."
             }
         ],
         "caption": "(a) Bound conformation of demethoxy curcumin visualized by ADT in the active site of E-chain of TrxR. Curcumin and TrxR both molecules are in line model with all interacting residues. (b) 2D representation of 3D structure of [Figure 2 (a)] created with LigPlot. [7] The hydrogen bonds were identified with HBPLUS [8] as were the hydrophobic contacts formed between demethoxy curcumin and the TrxR residues."
@@ -1515,26 +1515,6 @@
             {
                 "panel": {
                     "box": [
-                        4,
-                        273,
-                        418,
-                        875
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        7,
-                        276,
-                        29,
-                        298
-                    ]
-                },
-                "caption": "Holotypic sacrum H. allocotus (HBV-20001) from the Upper Cretaceous of Shanxi, China. In (C) dorsal (A\u2013C) depict the sacrum during original preparation. Abbreviations: cd1\u20134, caudal vertebrae 1\u20134; do, dorsal vertebra; ftd, flat-topped diapophysis; pra, preacetabular process; s1\u20136, sacral vertebral neural spines 1\u20136. Dashed lines in (A\u2013C) indicate broken bone margins; dashed lines in D indicate general locations of the last dorsal rib and the six sacral ribs."
-            },
-            {
-                "panel": {
-                    "box": [
                         413,
                         4,
                         752,
@@ -1551,6 +1531,26 @@
                     ]
                 },
                 "caption": "Holotypic sacrum H. allocotus (HBV-20001) from the Upper Cretaceous of Shanxi, China. In (B) right dorsolateral. (A\u2013C) depict the sacrum during original preparation. Abbreviations: cd1\u20134, caudal vertebrae 1\u20134; do, dorsal vertebra; ftd, flat-topped diapophysis; pra, preacetabular process; s1\u20136, sacral vertebral neural spines 1\u20136. Dashed lines in (A\u2013C) indicate broken bone margins; dashed lines in D indicate general locations of the last dorsal rib and the six sacral ribs."
+            },
+            {
+                "panel": {
+                    "box": [
+                        4,
+                        273,
+                        418,
+                        875
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        7,
+                        276,
+                        29,
+                        298
+                    ]
+                },
+                "caption": "Holotypic sacrum H. allocotus (HBV-20001) from the Upper Cretaceous of Shanxi, China. In (C) dorsal (A\u2013C) depict the sacrum during original preparation. Abbreviations: cd1\u20134, caudal vertebrae 1\u20134; do, dorsal vertebra; ftd, flat-topped diapophysis; pra, preacetabular process; s1\u20136, sacral vertebral neural spines 1\u20136. Dashed lines in (A\u2013C) indicate broken bone margins; dashed lines in D indicate general locations of the last dorsal rib and the six sacral ribs."
             },
             {
                 "panel": {
@@ -1584,46 +1584,6 @@
                 "panel": {
                     "box": [
                         1,
-                        157,
-                        198,
-                        312
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        1,
-                        294,
-                        16,
-                        309
-                    ]
-                },
-                "caption": "Paraffin-embedded ovarian tumor tissue immunostained with GPER-1 antibody. GPER-1 immunostaining of ovarian cancer tissue: (D) weak staining of GPER-1 in ovarian cancer tissue. Original magnification: x 100."
-            },
-            {
-                "panel": {
-                    "box": [
-                        402,
-                        157,
-                        599,
-                        312
-                    ]
-                },
-                "label": {
-                    "text": "F",
-                    "box": [
-                        403,
-                        294,
-                        418,
-                        309
-                    ]
-                },
-                "caption": "Paraffin-embedded ovarian tumor tissue immunostained with GPER-1 antibody. GPER-1 immunostaining of ovarian cancer tissue: (F) strong positive staining of GPER-1 in ovarian cancer tissue. Original magnification: x 100."
-            },
-            {
-                "panel": {
-                    "box": [
-                        1,
                         0,
                         198,
                         155
@@ -1639,26 +1599,6 @@
                     ]
                 },
                 "caption": "Paraffin-embedded ovarian tumor tissue immunostained with GPER-1 antibody. GPER-1 immunostaining of ovarian cancer tissue: (A) strong positive expression in benign ovarian tumor;"
-            },
-            {
-                "panel": {
-                    "box": [
-                        402,
-                        0,
-                        599,
-                        155
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        404,
-                        138,
-                        418,
-                        152
-                    ]
-                },
-                "caption": "Paraffin-embedded ovarian tumor tissue immunostained with GPER-1 antibody. GPER-1 immunostaining of ovarian cancer tissue: (C) negative staining of GPER-1 in ovarian cancer tissue. Original magnification: x 100."
             },
             {
                 "panel": {
@@ -1683,6 +1623,46 @@
             {
                 "panel": {
                     "box": [
+                        402,
+                        0,
+                        599,
+                        155
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        404,
+                        138,
+                        418,
+                        152
+                    ]
+                },
+                "caption": "Paraffin-embedded ovarian tumor tissue immunostained with GPER-1 antibody. GPER-1 immunostaining of ovarian cancer tissue: (C) negative staining of GPER-1 in ovarian cancer tissue. Original magnification: x 100."
+            },
+            {
+                "panel": {
+                    "box": [
+                        1,
+                        157,
+                        198,
+                        312
+                    ]
+                },
+                "label": {
+                    "text": "D",
+                    "box": [
+                        1,
+                        294,
+                        16,
+                        309
+                    ]
+                },
+                "caption": "Paraffin-embedded ovarian tumor tissue immunostained with GPER-1 antibody. GPER-1 immunostaining of ovarian cancer tissue: (D) weak staining of GPER-1 in ovarian cancer tissue. Original magnification: x 100."
+            },
+            {
+                "panel": {
+                    "box": [
                         200,
                         157,
                         398,
@@ -1699,6 +1679,26 @@
                     ]
                 },
                 "caption": "Paraffin-embedded ovarian tumor tissue immunostained with GPER-1 antibody. GPER-1 immunostaining of ovarian cancer tissue: (E) moderate staining of GPER-1 in ovarian cancer tissue. Original magnification: x 100."
+            },
+            {
+                "panel": {
+                    "box": [
+                        402,
+                        157,
+                        599,
+                        312
+                    ]
+                },
+                "label": {
+                    "text": "F",
+                    "box": [
+                        403,
+                        294,
+                        418,
+                        309
+                    ]
+                },
+                "caption": "Paraffin-embedded ovarian tumor tissue immunostained with GPER-1 antibody. GPER-1 immunostaining of ovarian cancer tissue: (F) strong positive staining of GPER-1 in ovarian cancer tissue. Original magnification: x 100."
             }
         ],
         "caption": "Paraffin-embedded ovarian tumor tissue immunostained with GPER-1 antibody. GPER-1 immunostaining of ovarian cancer tissue: (A) strong positive expression in benign ovarian tumor; (B) strong positive expression in tumor of low malignant potential; (C) negative, (D) weak, (E) moderate and (F) strong positive staining of GPER-1 in ovarian cancer tissue. Original magnification: x 100."
@@ -1708,46 +1708,6 @@
         "image_width": 600,
         "image_height": 399,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        0,
-                        200,
-                        198,
-                        397
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        2,
-                        209,
-                        21,
-                        228
-                    ]
-                },
-                "caption": "Absence of fibrosis in ALI/ARDS lungs. Light microscopy of Masson\u2019s Trichrome stain (A and D) and ALI/ARDS (D, E and F) lungs. There was no evidence of fibrosis in the ALI/ARDS lungs. Collagen was visible in small, localized areas by TEM in both the non-infected and ALI/ARDS lungs (B and D)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        402,
-                        200,
-                        599,
-                        397
-                    ]
-                },
-                "label": {
-                    "text": "F",
-                    "box": [
-                        405,
-                        207,
-                        425,
-                        227
-                    ]
-                },
-                "caption": "Absence of fibrosis in ALI/ARDS lungs. TEM (C and F) of ALI/ARDS (D, E and F) lungs."
-            },
             {
                 "panel": {
                     "box": [
@@ -1767,26 +1727,6 @@
                     ]
                 },
                 "caption": "Absence of fibrosis in ALI/ARDS lungs. Light microscopy of Masson\u2019s Trichrome stain (A and D), of non-infected control (A, B and C). Masson\u2019s Trichrome technique stains collagen blue of the non-infected lung (A). There was no evidence of fibrosis in the ALI/ARDS lungs."
-            },
-            {
-                "panel": {
-                    "box": [
-                        402,
-                        0,
-                        599,
-                        197
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        407,
-                        2,
-                        426,
-                        21
-                    ]
-                },
-                "caption": "Absence of fibrosis in ALI/ARDS lungs. TEM (C and F) of non-infected control (A, B and C). There was no evidence of fibrosis in the ALI/ARDS lungs."
             },
             {
                 "panel": {
@@ -1811,6 +1751,46 @@
             {
                 "panel": {
                     "box": [
+                        402,
+                        0,
+                        599,
+                        197
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        407,
+                        2,
+                        426,
+                        21
+                    ]
+                },
+                "caption": "Absence of fibrosis in ALI/ARDS lungs. TEM (C and F) of non-infected control (A, B and C). There was no evidence of fibrosis in the ALI/ARDS lungs."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
+                        200,
+                        198,
+                        397
+                    ]
+                },
+                "label": {
+                    "text": "D",
+                    "box": [
+                        2,
+                        209,
+                        21,
+                        228
+                    ]
+                },
+                "caption": "Absence of fibrosis in ALI/ARDS lungs. Light microscopy of Masson\u2019s Trichrome stain (A and D) and ALI/ARDS (D, E and F) lungs. There was no evidence of fibrosis in the ALI/ARDS lungs. Collagen was visible in small, localized areas by TEM in both the non-infected and ALI/ARDS lungs (B and D)."
+            },
+            {
+                "panel": {
+                    "box": [
                         200,
                         200,
                         399,
@@ -1827,6 +1807,26 @@
                     ]
                 },
                 "caption": "Absence of fibrosis in ALI/ARDS lungs. Picrosirius Red (B and E) and ALI/ARDS (D, E and F) lungs. Collagen was visible in small, localized areas by TEM in both the non-infected and ALI/ARDS lungs (B and D)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        402,
+                        200,
+                        599,
+                        397
+                    ]
+                },
+                "label": {
+                    "text": "F",
+                    "box": [
+                        405,
+                        207,
+                        425,
+                        227
+                    ]
+                },
+                "caption": "Absence of fibrosis in ALI/ARDS lungs. TEM (C and F) of ALI/ARDS (D, E and F) lungs."
             }
         ],
         "caption": "Absence of fibrosis in ALI/ARDS lungs. Light microscopy of Masson\u2019s Trichrome stain (A and D), Picrosirius Red (B and E) and TEM (C and F) of non-infected control (A, B and C) and ALI/ARDS (D, E and F) lungs. Masson\u2019s Trichrome technique stains collagen blue of the non-infected lung (A). There was no evidence of fibrosis in the ALI/ARDS lungs. Collagen was visible in small, localized areas by TEM in both the non-infected and ALI/ARDS lungs (B and D). ALI/ARDS lung, lung from DBA/2 mouse that died with acute lung injury/acute respiratory distress syndrome after infection with P. berghei ANKA. Arrow heads, localized areas of collagen. Note image (B) is a close up of tissue shown in 2B."
@@ -1836,26 +1836,6 @@
         "image_width": 447,
         "image_height": 464,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        0,
-                        215,
-                        244,
-                        447
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        0,
-                        215,
-                        15,
-                        233
-                    ]
-                },
-                "caption": "Short-term exposure to extracellular 10 \u03bcM curcumin does not affect IClswell. IClswell was activated in human renal cells (HEK293 Phoenix) by hypotonic shock and measured by the patch clamp technique in whole cell configuration. (b) Current density-to-voltage relations measured in extracellular hypertonic solution (hyper), at the maximal activation of the current in extracellular hypotonic solution (or steady state (hypo ss)) and after a 10 min exposure to an extracellular hypotonic solution containing 0.1% DMSO as the vehicle. The current is not affected by 10 min exposure to curcumin or DMSO (paired Student's t-test)."
-            },
             {
                 "panel": {
                     "box": [
@@ -1875,6 +1855,26 @@
                     ]
                 },
                 "caption": "Short-term exposure to extracellular 10 \u03bcM curcumin does not affect IClswell. IClswell was activated in human renal cells (HEK293 Phoenix) by hypotonic shock and measured by the patch clamp technique in whole cell configuration. (a) Current density-to-voltage relations measured in extracellular hypertonic solution (hyper), at the maximal activation of the current in extracellular hypotonic solution (or steady state (hypo ss)), and after a 10 min exposure to an extracellular hypotonic solution containing 10 \u03bcM curcumin."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
+                        215,
+                        244,
+                        447
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        0,
+                        215,
+                        15,
+                        233
+                    ]
+                },
+                "caption": "Short-term exposure to extracellular 10 \u03bcM curcumin does not affect IClswell. IClswell was activated in human renal cells (HEK293 Phoenix) by hypotonic shock and measured by the patch clamp technique in whole cell configuration. (b) Current density-to-voltage relations measured in extracellular hypertonic solution (hyper), at the maximal activation of the current in extracellular hypotonic solution (or steady state (hypo ss)) and after a 10 min exposure to an extracellular hypotonic solution containing 0.1% DMSO as the vehicle. The current is not affected by 10 min exposure to curcumin or DMSO (paired Student's t-test)."
             },
             {
                 "panel": {
@@ -2044,6 +2044,26 @@
                 "panel": {
                     "box": [
                         0,
+                        108,
+                        598,
+                        240
+                    ]
+                },
+                "label": {
+                    "text": "B",
+                    "box": [
+                        0,
+                        109,
+                        12,
+                        124
+                    ]
+                },
+                "caption": "YAP-dependent amphiregulin (AREG) production/secretion mediated EGFR-dependent LPA-induced cell migration. B, Basal and LPA (10 \u03bcM)-induced AREG in conditioned media (CM) of OVCA433 cells (a). mRNA level of AREG was increased by LPA (b). LPA (10 \u03bcM, 8 hr)-induced AREG in CM was YAP- and LPA3-, but not LPA1-dependent (c). LPA-induced AREG production/secretion was blocked by dn-G13, dn-RhoA, but not PTX (100 ng/mL, 16 hr) or dn-Gq (d and e)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
                         257,
                         282,
                         426
@@ -2079,26 +2099,6 @@
                     ]
                 },
                 "caption": "YAP-dependent amphiregulin (AREG) production/secretion mediated EGFR-dependent LPA-induced cell migration. D, Summary the LPA-YAP signaling pathway revealed in this work (OVCA433 cell line, left panel) and the previous work [1] (HEK293A cell line, right panel)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        0,
-                        108,
-                        598,
-                        240
-                    ]
-                },
-                "label": {
-                    "text": "B",
-                    "box": [
-                        0,
-                        109,
-                        12,
-                        124
-                    ]
-                },
-                "caption": "YAP-dependent amphiregulin (AREG) production/secretion mediated EGFR-dependent LPA-induced cell migration. B, Basal and LPA (10 \u03bcM)-induced AREG in conditioned media (CM) of OVCA433 cells (a). mRNA level of AREG was increased by LPA (b). LPA (10 \u03bcM, 8 hr)-induced AREG in CM was YAP- and LPA3-, but not LPA1-dependent (c). LPA-induced AREG production/secretion was blocked by dn-G13, dn-RhoA, but not PTX (100 ng/mL, 16 hr) or dn-Gq (d and e)."
             }
         ],
         "caption": "YAP-dependent amphiregulin (AREG) production/secretion mediated EGFR-dependent LPA-induced cell migration. A, The effects of AG1478 (1 \u03bcM, 1 hr pretreatment) and PD153035 (4 \u03bcM, 1 hr pretreatment) on LPA-dpYAP (a), or cell migration (b); AREG (100 pg/mL) induced AG1478 (1 \u03bcM, 1 hr)-sensitive migration of OVCA433 cells (c). *P < 0.05. B, Basal and LPA (10 \u03bcM)-induced AREG in conditioned media (CM) of OVCA433 cells (a). mRNA level of AREG was increased by LPA (b). LPA (10 \u03bcM, 8 hr)-induced AREG in CM was YAP- and LPA3-, but not LPA1-dependent (c). LPA-induced AREG production/secretion was blocked by dn-G13, dn-RhoA, but not PTX (100 ng/mL, 16 hr) or dn-Gq (d and e). C, LPA-induced short-term migration (4 hr) was not dependent on YAP or transcription (ActD, 1 \u03bcg/mL, 1 hr pretreatment), but was sensitive to PTX (100 ng/mL, 16 hr), LY294002 (10 \u03bcM, 1 hr pretreatment) and dn-Rac1 transfection (a). LPA-induced long-term cell migration was sensitive to ActD and CHX treatment (20 \u03bcg/mL, 1 hr pretreatment), as well as PTX and LY294002 (b). Data are from three independent experiments (means \u00b1 SD). *P < 0.05, **P < 0.01. D, Summary the LPA-YAP signaling pathway revealed in this work (OVCA433 cell line, left panel) and the previous work [1] (HEK293A cell line, right panel)."
@@ -2159,26 +2159,6 @@
             {
                 "panel": {
                     "box": [
-                        0,
-                        309,
-                        786,
-                        616
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        3,
-                        310,
-                        34,
-                        356
-                    ]
-                },
-                "caption": "Similarities between the DNA and peptide binding modes of (b) zTDP2-DNA interactions as in (a), from a slightly rotated view. Only one of the two conformers for the Ser320 sidechain with higher occupancy is shown for clarity. Wall-eye stereo pairs are shown for (a\u2013c). Hydrogen bonding and salt bridge interactions are indicated by the black dotted lines."
-            },
-            {
-                "panel": {
-                    "box": [
                         2,
                         5,
                         792,
@@ -2195,6 +2175,26 @@
                     ]
                 },
                 "caption": "Similarities between the DNA and peptide binding modes of TDP2 (a) Single-stranded DNA bound in the DNA-binding groove of zTDP2. The simulated annealing composite omit 2Fo\u2212Fc electron density (1.0\u03c3) is shown for 1.8\u00c5 from DNA or protein atoms or a water molecule involved in the protein-DNA interaction. Wall-eye stereo pairs are shown for (a\u2013c). Hydrogen bonding and salt bridge interactions are indicated by the black dotted lines."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
+                        309,
+                        786,
+                        616
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        3,
+                        310,
+                        34,
+                        356
+                    ]
+                },
+                "caption": "Similarities between the DNA and peptide binding modes of (b) zTDP2-DNA interactions as in (a), from a slightly rotated view. Only one of the two conformers for the Ser320 sidechain with higher occupancy is shown for clarity. Wall-eye stereo pairs are shown for (a\u2013c). Hydrogen bonding and salt bridge interactions are indicated by the black dotted lines."
             },
             {
                 "panel": {
@@ -2228,26 +2228,6 @@
                 "panel": {
                     "box": [
                         0,
-                        325,
-                        419,
-                        616
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        4,
-                        601,
-                        19,
-                        616
-                    ]
-                },
-                "caption": "(b) Immunostaining of human pituitary gland cells abolished by testing with anti-FSH serum which had been previusly absorbed with hFSH (IPx500)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        0,
                         0,
                         419,
                         297
@@ -2263,6 +2243,26 @@
                     ]
                 },
                 "caption": "(a) A section of normal human pituitary gland showing FSH-dependent staining in the gonadotrope cells (IPx500)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
+                        325,
+                        419,
+                        616
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        4,
+                        601,
+                        19,
+                        616
+                    ]
+                },
+                "caption": "(b) Immunostaining of human pituitary gland cells abolished by testing with anti-FSH serum which had been previusly absorbed with hFSH (IPx500)."
             }
         ],
         "caption": "(a) A section of normal human pituitary gland showing FSH-dependent staining in the gonadotrope cells (IPx500). (b) Immunostaining of human pituitary gland cells abolished by testing with anti-FSH serum which had been previusly absorbed with hFSH (IPx500)."
@@ -2272,26 +2272,6 @@
         "image_width": 568,
         "image_height": 1680,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        0,
-                        380,
-                        563,
-                        1085
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        296,
-                        1053,
-                        316,
-                        1082
-                    ]
-                },
-                "caption": "Hirsutenone-facilitated CDDP-induced apoptosis in chemoresistant OVCA cells is mediated by AIF and by suppressed XIAP-AIF interaction.(b) Effects of XIAP overexpression on apoptosis induced by hirsutenone (10 \u03bcM) and CDDP treatment (10 \u03bcM, 24 h). Chemoresistant cells were transfected with XIAP overexpression constructs (Pc-XIAP, 1 \u03bcg, 48 h) or GFP control constructs (Pc-GFP, 1 \u03bcg, 48 h), prior to treatment."
-            },
             {
                 "panel": {
                     "box": [
@@ -2311,6 +2291,26 @@
                     ]
                 },
                 "caption": "Hirsutenone-facilitated CDDP-induced apoptosis in chemoresistant OVCA cells is mediated by AIF and by suppressed XIAP-AIF interaction. (a) Effects of hirsutenone (10 \u03bcM) and CDDP (10 \u03bcM) treatment (12 h) on AIF nuclear translocation, in the presence and absence of XIAP overexpression. Chemoresistant cells were transfected with XIAP overexpression constructs (Pc-XIAP, 0.1 \u03bcg, 48 h) or GFP control constructs (Pc-GFP, 0.1 \u03bcg, 48 h), prior to treatment. Blue: DAPI, red: AIF, and green: TOM20 (mitochondrial membrane marker)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
+                        380,
+                        563,
+                        1085
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        296,
+                        1053,
+                        316,
+                        1082
+                    ]
+                },
+                "caption": "Hirsutenone-facilitated CDDP-induced apoptosis in chemoresistant OVCA cells is mediated by AIF and by suppressed XIAP-AIF interaction.(b) Effects of XIAP overexpression on apoptosis induced by hirsutenone (10 \u03bcM) and CDDP treatment (10 \u03bcM, 24 h). Chemoresistant cells were transfected with XIAP overexpression constructs (Pc-XIAP, 1 \u03bcg, 48 h) or GFP control constructs (Pc-GFP, 1 \u03bcg, 48 h), prior to treatment."
             },
             {
                 "panel": {
@@ -2343,46 +2343,6 @@
             {
                 "panel": {
                     "box": [
-                        379,
-                        492,
-                        743,
-                        1088
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        379,
-                        1057,
-                        404,
-                        1088
-                    ]
-                },
-                "caption": "Leucotrichia interrupta Flint, 1991 (USNM104528). Male genitalia: dorsal D segments VII\u2013IX"
-            },
-            {
-                "panel": {
-                    "box": [
-                        214,
-                        646,
-                        382,
-                        998
-                    ]
-                },
-                "label": {
-                    "text": "F",
-                    "box": [
-                        272,
-                        961,
-                        293,
-                        992
-                    ]
-                },
-                "caption": "Leucotrichia interrupta Flint, 1991 (USNM104528). Male genitalia: lateral F phallus, dorsal."
-            },
-            {
-                "panel": {
-                    "box": [
                         392,
                         3,
                         745,
@@ -2399,26 +2359,6 @@
                     ]
                 },
                 "caption": "Leucotrichia interrupta Flint, 1991 (USNM104528). Male genitalia: A segments IX\u2013X, lateral (base of phallus crosshatched)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        1,
-                        737,
-                        210,
-                        1088
-                    ]
-                },
-                "label": {
-                    "text": "C",
-                    "box": [
-                        54,
-                        1057,
-                        76,
-                        1088
-                    ]
-                },
-                "caption": "Leucotrichia interrupta Flint, 1991 (USNM104528). Male genitalia: lateral C segments IX\u2013X."
             },
             {
                 "panel": {
@@ -2443,6 +2383,46 @@
             {
                 "panel": {
                     "box": [
+                        1,
+                        737,
+                        210,
+                        1088
+                    ]
+                },
+                "label": {
+                    "text": "C",
+                    "box": [
+                        54,
+                        1057,
+                        76,
+                        1088
+                    ]
+                },
+                "caption": "Leucotrichia interrupta Flint, 1991 (USNM104528). Male genitalia: lateral C segments IX\u2013X."
+            },
+            {
+                "panel": {
+                    "box": [
+                        379,
+                        492,
+                        743,
+                        1088
+                    ]
+                },
+                "label": {
+                    "text": "D",
+                    "box": [
+                        379,
+                        1057,
+                        404,
+                        1088
+                    ]
+                },
+                "caption": "Leucotrichia interrupta Flint, 1991 (USNM104528). Male genitalia: dorsal D segments VII\u2013IX"
+            },
+            {
+                "panel": {
+                    "box": [
                         0,
                         516,
                         314,
@@ -2459,6 +2439,26 @@
                     ]
                 },
                 "caption": "Leucotrichia interrupta Flint, 1991 (USNM104528). Male genitalia: ventral E phallus,"
+            },
+            {
+                "panel": {
+                    "box": [
+                        214,
+                        646,
+                        382,
+                        998
+                    ]
+                },
+                "label": {
+                    "text": "F",
+                    "box": [
+                        272,
+                        961,
+                        293,
+                        992
+                    ]
+                },
+                "caption": "Leucotrichia interrupta Flint, 1991 (USNM104528). Male genitalia: lateral F phallus, dorsal."
             }
         ],
         "caption": "Leucotrichia interrupta Flint, 1991 (USNM104528). Male genitalia: A segments IX\u2013X, lateral (base of phallus crosshatched) B segments VII\u2013VIII and segment IX margin, lateral C segments IX\u2013X, dorsal D segments VII\u2013IX, ventral E phallus, lateral F phallus, dorsal."
@@ -2471,42 +2471,82 @@
             {
                 "panel": {
                     "box": [
-                        181,
-                        372,
-                        364,
-                        720
+                        2,
+                        5,
+                        179,
+                        186
                     ]
                 },
                 "label": {
-                    "text": "h",
+                    "text": "a",
                     "box": [
-                        181,
-                        372,
-                        197,
-                        388
+                        2,
+                        5,
+                        16,
+                        19
                     ]
                 },
-                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: h, few positive cells in an infiltrating ductal carcinoma;"
+                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: a, supranuclear dot positivity in morphologically normal breast sample;"
             },
             {
                 "panel": {
                     "box": [
-                        365,
-                        371,
-                        552,
-                        722
+                        181,
+                        4,
+                        364,
+                        186
                     ]
                 },
                 "label": {
-                    "text": "i",
+                    "text": "b",
                     "box": [
-                        369,
-                        372,
-                        378,
-                        389
+                        183,
+                        5,
+                        197,
+                        22
                     ]
                 },
-                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: i, completely negative neoplastic cells of an invasive carcinoma; the arrow points to positive cells with large elongate nuclei in a non neoplastic duct facing normal negative cells."
+                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: b, strong, abundant surface immunoreactivity in a case of fibrocystic disease;"
+            },
+            {
+                "panel": {
+                    "box": [
+                        368,
+                        6,
+                        551,
+                        186
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        368,
+                        6,
+                        383,
+                        21
+                    ]
+                },
+                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: c, intraluminal immunoreactive material in a case of gynecomastia;"
+            },
+            {
+                "panel": {
+                    "box": [
+                        1,
+                        192,
+                        175,
+                        368
+                    ]
+                },
+                "label": {
+                    "text": "d",
+                    "box": [
+                        3,
+                        192,
+                        17,
+                        208
+                    ]
+                },
+                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: d, numerous supranuclear and randomly distributed positive dots in intraductal papillomatosis near an infiltrating ductal carcinoma;"
             },
             {
                 "panel": {
@@ -2572,81 +2612,41 @@
                 "panel": {
                     "box": [
                         181,
-                        4,
+                        372,
                         364,
-                        186
+                        720
                     ]
                 },
                 "label": {
-                    "text": "b",
+                    "text": "h",
                     "box": [
-                        183,
-                        5,
+                        181,
+                        372,
                         197,
-                        22
+                        388
                     ]
                 },
-                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: b, strong, abundant surface immunoreactivity in a case of fibrocystic disease;"
+                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: h, few positive cells in an infiltrating ductal carcinoma;"
             },
             {
                 "panel": {
                     "box": [
-                        368,
-                        6,
-                        551,
-                        186
+                        365,
+                        371,
+                        552,
+                        722
                     ]
                 },
                 "label": {
-                    "text": "c",
+                    "text": "i",
                     "box": [
-                        368,
-                        6,
-                        383,
-                        21
+                        369,
+                        372,
+                        378,
+                        389
                     ]
                 },
-                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: c, intraluminal immunoreactive material in a case of gynecomastia;"
-            },
-            {
-                "panel": {
-                    "box": [
-                        1,
-                        192,
-                        175,
-                        368
-                    ]
-                },
-                "label": {
-                    "text": "d",
-                    "box": [
-                        3,
-                        192,
-                        17,
-                        208
-                    ]
-                },
-                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: d, numerous supranuclear and randomly distributed positive dots in intraductal papillomatosis near an infiltrating ductal carcinoma;"
-            },
-            {
-                "panel": {
-                    "box": [
-                        2,
-                        5,
-                        179,
-                        186
-                    ]
-                },
-                "label": {
-                    "text": "a",
-                    "box": [
-                        2,
-                        5,
-                        16,
-                        19
-                    ]
-                },
-                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: a, supranuclear dot positivity in morphologically normal breast sample;"
+                "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: i, completely negative neoplastic cells of an invasive carcinoma; the arrow points to positive cells with large elongate nuclei in a non neoplastic duct facing normal negative cells."
             }
         ],
         "caption": "Immunoreactivity of mammary epithelium with anti DMBTh12 Ab: a, supranuclear dot positivity in morphologically normal breast sample; b, strong, abundant surface immunoreactivity in a case of fibrocystic disease; c, intraluminal immunoreactive material in a case of gynecomastia; d, numerous supranuclear and randomly distributed positive dots in intraductal papillomatosis near an infiltrating ductal carcinoma; e, strong supranuclear and baso-lateral cytoplasmic immunoreactivity of hyperplastic ductal cells in a case of mucinous infiltrating carcinoma; f, granular diffuse intracytoplasmic positivity of hyperplastic intraductal cells in a case of carcinoma in situ; g, numerous positive malignant tumour cells of an infiltrating ductal carcinoma; h, few positive cells in an infiltrating ductal carcinoma; i, completely negative neoplastic cells of an invasive carcinoma; the arrow points to positive cells with large elongate nuclei in a non neoplastic duct facing normal negative cells."
@@ -2656,26 +2656,6 @@
         "image_width": 595,
         "image_height": 142,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        295,
-                        0,
-                        442,
-                        141
-                    ]
-                },
-                "label": {
-                    "text": "3",
-                    "box": [
-                        297,
-                        4,
-                        310,
-                        21
-                    ]
-                },
-                "caption": "Endoscopic oophorectomy using the 3-loop ligation technique in four steps. 3. Endocoagulation of the ovarian stump"
-            },
             {
                 "panel": {
                     "box": [
@@ -2699,26 +2679,6 @@
             {
                 "panel": {
                     "box": [
-                        445,
-                        0,
-                        594,
-                        138
-                    ]
-                },
-                "label": {
-                    "text": "4",
-                    "box": [
-                        447,
-                        2,
-                        460,
-                        19
-                    ]
-                },
-                "caption": "Endoscopic oophorectomy using the 3-loop ligation technique in four steps. 4. Ovarian morcellation using 15 or 20 mm trocars"
-            },
-            {
-                "panel": {
-                    "box": [
                         144,
                         1,
                         293,
@@ -2735,6 +2695,46 @@
                     ]
                 },
                 "caption": "Endoscopic oophorectomy using the 3-loop ligation technique in four steps. 2. After placement of 3 loops ovarian resection"
+            },
+            {
+                "panel": {
+                    "box": [
+                        295,
+                        0,
+                        442,
+                        141
+                    ]
+                },
+                "label": {
+                    "text": "3",
+                    "box": [
+                        297,
+                        4,
+                        310,
+                        21
+                    ]
+                },
+                "caption": "Endoscopic oophorectomy using the 3-loop ligation technique in four steps. 3. Endocoagulation of the ovarian stump"
+            },
+            {
+                "panel": {
+                    "box": [
+                        445,
+                        0,
+                        594,
+                        138
+                    ]
+                },
+                "label": {
+                    "text": "4",
+                    "box": [
+                        447,
+                        2,
+                        460,
+                        19
+                    ]
+                },
+                "caption": "Endoscopic oophorectomy using the 3-loop ligation technique in four steps. 4. Ovarian morcellation using 15 or 20 mm trocars"
             }
         ],
         "caption": "Endoscopic oophorectomy using the 3-loop ligation technique in four steps. 1. Positioning of the frist Roeder loop 2. After placement of 3 loops ovarian resection 3. Endocoagulation of the ovarian stump 4. Ovarian morcellation using 15 or 20 mm trocars"
@@ -2744,26 +2744,6 @@
         "image_width": 675,
         "image_height": 488,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        308,
-                        74,
-                        675,
-                        414
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        311,
-                        385,
-                        339,
-                        413
-                    ]
-                },
-                "caption": "Preoperative MRI images. coronal T1 (b) MRI images with contrast demonstrate a large mass (choroid plexus papilloma) in the left CPA region with significant mass effect on the lower brain stem with obstruction of the fourth ventricle"
-            },
             {
                 "panel": {
                     "box": [
@@ -2783,6 +2763,26 @@
                     ]
                 },
                 "caption": "Preoperative MRI images. Axial T2 (a) demonstrate a large mass (choroid plexus papilloma) in the left CPA region with significant mass effect on the lower brain stem with obstruction of the fourth ventricle"
+            },
+            {
+                "panel": {
+                    "box": [
+                        308,
+                        74,
+                        675,
+                        414
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        311,
+                        385,
+                        339,
+                        413
+                    ]
+                },
+                "caption": "Preoperative MRI images. coronal T1 (b) MRI images with contrast demonstrate a large mass (choroid plexus papilloma) in the left CPA region with significant mass effect on the lower brain stem with obstruction of the fourth ventricle"
             }
         ],
         "caption": "Preoperative MRI images. Axial T2 (a) and coronal T1 (b) MRI images with contrast demonstrate a large mass (choroid plexus papilloma) in the left CPA region with significant mass effect on the lower brain stem with obstruction of the fourth ventricle"
@@ -2792,26 +2792,6 @@
         "image_width": 560,
         "image_height": 1593,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        0,
-                        884,
-                        560,
-                        1593
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        292,
-                        1574,
-                        314,
-                        1593
-                    ]
-                },
-                "caption": "Critical ostial and mid portion stenosis of the right coronary artery and a moderate ostial stenosis of the LMCA on coronary angiography."
-            },
             {
                 "panel": {
                     "box": [
@@ -2831,6 +2811,26 @@
                     ]
                 },
                 "caption": "Critical ostial and mid portion stenosis of the right coronary artery and a moderate ostial stenosis of the LMCA on coronary angiography."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
+                        884,
+                        560,
+                        1593
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        292,
+                        1574,
+                        314,
+                        1593
+                    ]
+                },
+                "caption": "Critical ostial and mid portion stenosis of the right coronary artery and a moderate ostial stenosis of the LMCA on coronary angiography."
             }
         ],
         "caption": "Critical ostial and mid portion stenosis of the right coronary artery and a moderate ostial stenosis of the LMCA on coronary angiography."
@@ -2840,26 +2840,6 @@
         "image_width": 538,
         "image_height": 374,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        129,
-                        186,
-                        405,
-                        372
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        130,
-                        354,
-                        148,
-                        372
-                    ]
-                },
-                "caption": "(b) Fluorescein angiography shows characteristic \u201ccapping\u201d of the dye in the aneurysms due to settling of erythrocytes; the anteriorly-located aneurysms showed a similar pattern but are out of focus"
-            },
             {
                 "panel": {
                     "box": [
@@ -2879,6 +2859,26 @@
                     ]
                 },
                 "caption": "(a) The fibrovascular stalk representing persistent fetal vasculature (PFV) stretches from the optic disc to the nasal periphery of lens. The aneurysms of cavernous hemangioma are visible on the optic disc, in the peripapillary area, base of the PFV stalk and on its apex (inset); note the spontaneously-settled retinal detachment nasally."
+            },
+            {
+                "panel": {
+                    "box": [
+                        129,
+                        186,
+                        405,
+                        372
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        130,
+                        354,
+                        148,
+                        372
+                    ]
+                },
+                "caption": "(b) Fluorescein angiography shows characteristic \u201ccapping\u201d of the dye in the aneurysms due to settling of erythrocytes; the anteriorly-located aneurysms showed a similar pattern but are out of focus"
             }
         ],
         "caption": "(a) The fibrovascular stalk representing persistent fetal vasculature (PFV) stretches from the optic disc to the nasal periphery of lens. The aneurysms of cavernous hemangioma are visible on the optic disc, in the peripapillary area, base of the PFV stalk and on its apex (inset); note the spontaneously-settled retinal detachment nasally. (b) Fluorescein angiography shows characteristic \u201ccapping\u201d of the dye in the aneurysms due to settling of erythrocytes; the anteriorly-located aneurysms showed a similar pattern but are out of focus"
@@ -2888,6 +2888,226 @@
         "image_width": 600,
         "image_height": 426,
         "gt_subfigures": [
+            {
+                "panel": {
+                    "box": [
+                        20,
+                        15,
+                        158,
+                        110
+                    ]
+                },
+                "label": {
+                    "text": "A",
+                    "box": [
+                        135,
+                        23,
+                        146,
+                        33
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (A, B, C, D) Sections from fetuses at day 30 of gestation showing positive immunostaining for ghrelin (A) in the fetal testis and mesonephros (meson.). The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        162,
+                        15,
+                        298,
+                        111
+                    ]
+                },
+                "label": {
+                    "text": "B",
+                    "box": [
+                        276,
+                        23,
+                        285,
+                        33
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (A, B, C, D) Sections from fetuses at day 30 of gestation showing positive immunostaining for GHSR-1a (B) in the fetal testis and mesonephros (meson.). The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        305,
+                        16,
+                        442,
+                        111
+                    ]
+                },
+                "label": {
+                    "text": "C",
+                    "box": [
+                        418,
+                        23,
+                        427,
+                        33
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (A, B, C, D) Sections from fetuses at day 30 of gestation showing positive immunostaining for SCF (C) in the fetal testis and mesonephros (meson.). The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        449,
+                        15,
+                        586,
+                        111
+                    ]
+                },
+                "label": {
+                    "text": "D",
+                    "box": [
+                        562,
+                        23,
+                        571,
+                        33
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (A, B, C, D) Sections from fetuses at day 30 of gestation showing positive immunostaining for PCNA (D) in the fetal testis and mesonephros (meson.). The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        20,
+                        117,
+                        157,
+                        212
+                    ]
+                },
+                "label": {
+                    "text": "E",
+                    "box": [
+                        136,
+                        123,
+                        146,
+                        133
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (E, F, G, H) Testicular sections from fetuses at day 50 of gestation showing positive immunostaining for ghrelin (E). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        162,
+                        116,
+                        299,
+                        212
+                    ]
+                },
+                "label": {
+                    "text": "F",
+                    "box": [
+                        277,
+                        123,
+                        285,
+                        134
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (E, F, G, H) Testicular sections from fetuses at day 50 of gestation showing positive immunostaining for GHSR-1a (F). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        306,
+                        116,
+                        443,
+                        212
+                    ]
+                },
+                "label": {
+                    "text": "G",
+                    "box": [
+                        419,
+                        124,
+                        428,
+                        133
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (E, F, G, H) Testicular sections from fetuses at day 50 of gestation showing positive immunostaining for SCF (G). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        449,
+                        116,
+                        586,
+                        212
+                    ]
+                },
+                "label": {
+                    "text": "H",
+                    "box": [
+                        562,
+                        123,
+                        571,
+                        133
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (E, F, G, H) Testicular sections from fetuses at day 50 of gestation showing positive immunostaining for PCNA (H). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        20,
+                        218,
+                        156,
+                        313
+                    ]
+                },
+                "label": {
+                    "text": "I",
+                    "box": [
+                        137,
+                        224,
+                        145,
+                        235
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (I, J, K, L) Testicular sections from fetuses at day 70 of gestation showing positive immunostaining for ghrelin (I). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        162,
+                        218,
+                        299,
+                        314
+                    ]
+                },
+                "label": {
+                    "text": "J",
+                    "box": [
+                        277,
+                        225,
+                        285,
+                        236
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (I, J, K, L) Testicular sections from fetuses at day 70 of gestation showing positive immunostaining for GHSR-1a (J). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        305,
+                        218,
+                        442,
+                        314
+                    ]
+                },
+                "label": {
+                    "text": "K",
+                    "box": [
+                        418,
+                        225,
+                        426,
+                        236
+                    ]
+                },
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (I, J, K, L) Testicular sections from fetuses at day 70 of gestation showing positive immunostaining for SCF (K). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+            },
             {
                 "panel": {
                     "box": [
@@ -2931,146 +3151,6 @@
             {
                 "panel": {
                     "box": [
-                        305,
-                        218,
-                        442,
-                        314
-                    ]
-                },
-                "label": {
-                    "text": "K",
-                    "box": [
-                        418,
-                        225,
-                        426,
-                        236
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (I, J, K, L) Testicular sections from fetuses at day 70 of gestation showing positive immunostaining for SCF (K). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        449,
-                        15,
-                        586,
-                        111
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        562,
-                        23,
-                        571,
-                        33
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (A, B, C, D) Sections from fetuses at day 30 of gestation showing positive immunostaining for PCNA (D) in the fetal testis and mesonephros (meson.). The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        162,
-                        116,
-                        299,
-                        212
-                    ]
-                },
-                "label": {
-                    "text": "F",
-                    "box": [
-                        277,
-                        123,
-                        285,
-                        134
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (E, F, G, H) Testicular sections from fetuses at day 50 of gestation showing positive immunostaining for GHSR-1a (F). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        162,
-                        218,
-                        299,
-                        314
-                    ]
-                },
-                "label": {
-                    "text": "J",
-                    "box": [
-                        277,
-                        225,
-                        285,
-                        236
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (I, J, K, L) Testicular sections from fetuses at day 70 of gestation showing positive immunostaining for GHSR-1a (J). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        20,
-                        218,
-                        156,
-                        313
-                    ]
-                },
-                "label": {
-                    "text": "I",
-                    "box": [
-                        137,
-                        224,
-                        145,
-                        235
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (I, J, K, L) Testicular sections from fetuses at day 70 of gestation showing positive immunostaining for ghrelin (I). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        306,
-                        116,
-                        443,
-                        212
-                    ]
-                },
-                "label": {
-                    "text": "G",
-                    "box": [
-                        419,
-                        124,
-                        428,
-                        133
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (E, F, G, H) Testicular sections from fetuses at day 50 of gestation showing positive immunostaining for SCF (G). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        20,
-                        15,
-                        158,
-                        110
-                    ]
-                },
-                "label": {
-                    "text": "A",
-                    "box": [
-                        135,
-                        23,
-                        146,
-                        33
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (A, B, C, D) Sections from fetuses at day 30 of gestation showing positive immunostaining for ghrelin (A) in the fetal testis and mesonephros (meson.). The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
                         162,
                         318,
                         299,
@@ -3087,26 +3167,6 @@
                     ]
                 },
                 "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (M, N, O, P) Testicular sections from fetuses at day 140 of gestation showing positive immunostaining for GHSR-1a (N) in the seminiferous cords (C) and interstitium (INT). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        448,
-                        318,
-                        585,
-                        412
-                    ]
-                },
-                "label": {
-                    "text": "P",
-                    "box": [
-                        562,
-                        326,
-                        571,
-                        337
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (M, N, O, P) Testicular sections from fetuses at day 140 of gestation showing positive immunostaining for PCNA (P) in the seminiferous cords (C) and interstitium (INT). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
             },
             {
                 "panel": {
@@ -3131,82 +3191,22 @@
             {
                 "panel": {
                     "box": [
-                        449,
-                        116,
-                        586,
-                        212
+                        448,
+                        318,
+                        585,
+                        412
                     ]
                 },
                 "label": {
-                    "text": "H",
+                    "text": "P",
                     "box": [
                         562,
-                        123,
+                        326,
                         571,
-                        133
+                        337
                     ]
                 },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (E, F, G, H) Testicular sections from fetuses at day 50 of gestation showing positive immunostaining for PCNA (H). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        305,
-                        16,
-                        442,
-                        111
-                    ]
-                },
-                "label": {
-                    "text": "C",
-                    "box": [
-                        418,
-                        23,
-                        427,
-                        33
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (A, B, C, D) Sections from fetuses at day 30 of gestation showing positive immunostaining for SCF (C) in the fetal testis and mesonephros (meson.). The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        162,
-                        15,
-                        298,
-                        111
-                    ]
-                },
-                "label": {
-                    "text": "B",
-                    "box": [
-                        276,
-                        23,
-                        285,
-                        33
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (A, B, C, D) Sections from fetuses at day 30 of gestation showing positive immunostaining for GHSR-1a (B) in the fetal testis and mesonephros (meson.). The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        20,
-                        117,
-                        157,
-                        212
-                    ]
-                },
-                "label": {
-                    "text": "E",
-                    "box": [
-                        136,
-                        123,
-                        146,
-                        133
-                    ]
-                },
-                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (E, F, G, H) Testicular sections from fetuses at day 50 of gestation showing positive immunostaining for ghrelin (E). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
+                "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (M, N, O, P) Testicular sections from fetuses at day 140 of gestation showing positive immunostaining for PCNA (P) in the seminiferous cords (C) and interstitium (INT). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
             }
         ],
         "caption": "Immunolocalisation of ghrelin and GHSR-1a in fetal sheep testes. Photomicrographs of fetal sheep testicular sections. (A, B, C, D) Sections from fetuses at day 30 of gestation showing positive immunostaining for ghrelin (A), GHSR-1a (B), SCF (C) and PCNA (D) in the fetal testis and mesonephros (meson.). (E, F, G, H) Testicular sections from fetuses at day 50 of gestation showing positive immunostaining for ghrelin (E), GHSR-1a (F), SCF (G) and PCNA (H). (I, J, K, L) Testicular sections from fetuses at day 70 of gestation showing positive immunostaining for ghrelin (I), GHSR-1a (J), SCF (K) and PCNA (L). (M, N, O, P) Testicular sections from fetuses at day 140 of gestation showing positive immunostaining for ghrelin (M), GHSR-1a (N), SCF (O) and PCNA (P) in the seminiferous cords (C) and interstitium (INT). Arrows depict germ cells. The scale bars of A, B, C, D represent 150 \u03bcm, and for the rest they represent 100 \u03bcm."
@@ -3239,26 +3239,6 @@
             {
                 "panel": {
                     "box": [
-                        436,
-                        1,
-                        741,
-                        270
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        443,
-                        238,
-                        468,
-                        263
-                    ]
-                },
-                "caption": "(C) Chest X-ray posterioanterior view showing left side pleural effusion."
-            },
-            {
-                "panel": {
-                    "box": [
                         189,
                         1,
                         429,
@@ -3275,6 +3255,26 @@
                     ]
                 },
                 "caption": "(B) X-ray right shoulder showing osteolysis involving Scapula and Head of Humerus."
+            },
+            {
+                "panel": {
+                    "box": [
+                        436,
+                        1,
+                        741,
+                        270
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        443,
+                        238,
+                        468,
+                        263
+                    ]
+                },
+                "caption": "(C) Chest X-ray posterioanterior view showing left side pleural effusion."
             }
         ],
         "caption": "(A) X-ray cervical and thoracic spine anterioposterior view showing broken implant at cervicothoracic junction. (B) X-ray right shoulder showing osteolysis involving Scapula and Head of Humerus. (C) Chest X-ray posterioanterior view showing left side pleural effusion."
@@ -3307,26 +3307,6 @@
             {
                 "panel": {
                     "box": [
-                        534,
-                        2,
-                        773,
-                        785
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        540,
-                        4,
-                        563,
-                        28
-                    ]
-                },
-                "caption": "Distinct States of the c-Abl and c-Src Kinase Domains Three key kinase domain conformations considered at length in the text are shown in (A\u2013C). At the top, a schematic representation of each state and an enlarged schematic are shown, detailing the conformations of the DFG motif (red) and helix \u03b1C (blue). Below the schematics the crystal structure of each conformation is shown. The activation loop is colored red, helix \u03b1C blue, and the catalytic loop orange. (C) Active Abl (molecule C, structure 2). The interconversion between the different states of Abl is shown in the context of this competition."
-            },
-            {
-                "panel": {
-                    "box": [
                         266,
                         0,
                         525,
@@ -3343,6 +3323,26 @@
                     ]
                 },
                 "caption": "Distinct States of the c-Abl and c-Src Kinase Domains Three key kinase domain conformations considered at length in the text are shown in (A\u2013C). At the top, a schematic representation of each state and an enlarged schematic are shown, detailing the conformations of the DFG motif (red) and helix \u03b1C (blue). Below the schematics the crystal structure of each conformation is shown. The activation loop is colored red, helix \u03b1C blue, and the catalytic loop orange. (B) The conformation of the inactive Src family kinases. This conformation is now seen in Abl as well (molecule B, structure 1). Both the c-Src and Abl numbering are indicated. The interconversion between the different states of Abl is shown in the context of this competition."
+            },
+            {
+                "panel": {
+                    "box": [
+                        534,
+                        2,
+                        773,
+                        785
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        540,
+                        4,
+                        563,
+                        28
+                    ]
+                },
+                "caption": "Distinct States of the c-Abl and c-Src Kinase Domains Three key kinase domain conformations considered at length in the text are shown in (A\u2013C). At the top, a schematic representation of each state and an enlarged schematic are shown, detailing the conformations of the DFG motif (red) and helix \u03b1C (blue). Below the schematics the crystal structure of each conformation is shown. The activation loop is colored red, helix \u03b1C blue, and the catalytic loop orange. (C) Active Abl (molecule C, structure 2). The interconversion between the different states of Abl is shown in the context of this competition."
             },
             {
                 "panel": {
@@ -3375,42 +3375,22 @@
             {
                 "panel": {
                     "box": [
-                        205,
-                        169,
-                        396,
-                        327
+                        0,
+                        0,
+                        192,
+                        158
                     ]
                 },
                 "label": {
-                    "text": "e",
+                    "text": "a",
                     "box": [
-                        211,
-                        173,
-                        229,
-                        191
+                        1,
+                        8,
+                        17,
+                        24
                     ]
                 },
-                "caption": "A 57-year-old female patient with thecoma. (e) On DWI-MRI (b = 700 s/mm2), the lesion appeared as a homogeneous hyperintense signal."
-            },
-            {
-                "panel": {
-                    "box": [
-                        408,
-                        169,
-                        600,
-                        326
-                    ]
-                },
-                "label": {
-                    "text": "f",
-                    "box": [
-                        408,
-                        169,
-                        426,
-                        187
-                    ]
-                },
-                "caption": "A 57-year-old female patient with thecoma. (f) ADC map shows the hypointense signal with a marked peripheral hypointense signal. The ADC value at the corresponding site is 1.75 \u00d7 10\u20133 mm2/s."
+                "caption": "A 57-year-old female patient with thecoma. (a) Axial T1WI revealed a solid mass with a mostly iso\u2013hypointense signal in the left adnexal region (arrow)."
             },
             {
                 "panel": {
@@ -3475,22 +3455,42 @@
             {
                 "panel": {
                     "box": [
-                        0,
-                        0,
-                        192,
-                        158
+                        205,
+                        169,
+                        396,
+                        327
                     ]
                 },
                 "label": {
-                    "text": "a",
+                    "text": "e",
                     "box": [
-                        1,
-                        8,
-                        17,
-                        24
+                        211,
+                        173,
+                        229,
+                        191
                     ]
                 },
-                "caption": "A 57-year-old female patient with thecoma. (a) Axial T1WI revealed a solid mass with a mostly iso\u2013hypointense signal in the left adnexal region (arrow)."
+                "caption": "A 57-year-old female patient with thecoma. (e) On DWI-MRI (b = 700 s/mm2), the lesion appeared as a homogeneous hyperintense signal."
+            },
+            {
+                "panel": {
+                    "box": [
+                        408,
+                        169,
+                        600,
+                        326
+                    ]
+                },
+                "label": {
+                    "text": "f",
+                    "box": [
+                        408,
+                        169,
+                        426,
+                        187
+                    ]
+                },
+                "caption": "A 57-year-old female patient with thecoma. (f) ADC map shows the hypointense signal with a marked peripheral hypointense signal. The ADC value at the corresponding site is 1.75 \u00d7 10\u20133 mm2/s."
             }
         ],
         "caption": "A 57-year-old female patient with thecoma. (a) Axial T1WI revealed a solid mass with a mostly iso\u2013hypointense signal in the left adnexal region (arrow). (b) On sagittal T2WI, the solid tumor, 116 mm in maximum diameter, showed a heterogeneous signal with patchy high signal located eccentrically and an intermediate signal located peripherally. (c) On fat-suppressed T2WI, the signal of the mass was similar to that in (b). (d) On contrast-enhanced fat-suppressed T1WI, the lesion showed mild enhancement, less than that of the myometrium. (e) On DWI-MRI (b = 700 s/mm2), the lesion appeared as a homogeneous hyperintense signal. (f) ADC map shows the hypointense signal with a marked peripheral hypointense signal. The ADC value at the corresponding site is 1.75 \u00d7 10\u20133 mm2/s."
@@ -3500,26 +3500,6 @@
         "image_width": 733,
         "image_height": 916,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        97,
-                        355,
-                        607,
-                        598
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        116,
-                        360,
-                        127,
-                        374
-                    ]
-                },
-                "caption": "FAC antagonizes the reduction in cell survival induced by DFO, an iron chelating agent, in ovarian cancer cells. (b) T80 cells were transfected with EGFP\u2013LC3 and treated with (1) 250 \u03bcM DFO, (2) 250 \u03bcM FAC, or (3) 250 \u03bcM DFO with 250 \u03bcM FAC for 18 h. EGFP\u2013LC3 fluorescence was captured using an inverted fluorescence microscope at \u00d7 40 magnification. Representative images of experiments conducted in duplicate are shown."
-            },
             {
                 "panel": {
                     "box": [
@@ -3539,6 +3519,26 @@
                     ]
                 },
                 "caption": "FAC antagonizes the reduction in cell survival induced by DFO, an iron chelating agent, in ovarian cancer cells. (a) T80 cells were treated with (1) 100 \u03bcM DFO, (2) 250 \u03bcM DFO, (3) 250 \u03bcM FAC, (4) 250 \u03bcM FAC with 100 \u03bcM DFO, or (5) 250 \u03bcM FAC with 250 \u03bcM DFO for 1 or 18 h. Cell lysates were harvested and analyzed by western blotting for the indicated proteins. Results are representative of two independent experiments."
+            },
+            {
+                "panel": {
+                    "box": [
+                        97,
+                        355,
+                        607,
+                        598
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        116,
+                        360,
+                        127,
+                        374
+                    ]
+                },
+                "caption": "FAC antagonizes the reduction in cell survival induced by DFO, an iron chelating agent, in ovarian cancer cells. (b) T80 cells were transfected with EGFP\u2013LC3 and treated with (1) 250 \u03bcM DFO, (2) 250 \u03bcM FAC, or (3) 250 \u03bcM DFO with 250 \u03bcM FAC for 18 h. EGFP\u2013LC3 fluorescence was captured using an inverted fluorescence microscope at \u00d7 40 magnification. Representative images of experiments conducted in duplicate are shown."
             },
             {
                 "panel": {
@@ -3640,46 +3640,6 @@
                 "panel": {
                     "box": [
                         2,
-                        213,
-                        257,
-                        418
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        3,
-                        217,
-                        21,
-                        235
-                    ]
-                },
-                "caption": "Microscopic architectural patterns of the mass removed by resectoscopic surgery. (D) Positive for CD99 (CD99, \u00d7200)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        523,
-                        216,
-                        775,
-                        420
-                    ]
-                },
-                "label": {
-                    "text": "F",
-                    "box": [
-                        529,
-                        219,
-                        547,
-                        237
-                    ]
-                },
-                "caption": "Microscopic architectural patterns of the mass removed by resectoscopic surgery. (F) Negative for CD10 (CD10, \u00d7200)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        2,
                         2,
                         254,
                         207
@@ -3695,26 +3655,6 @@
                     ]
                 },
                 "caption": "Microscopic architectural patterns of the mass removed by resectoscopic surgery. (A) A relatively well-demarcated nodular mass within the superficial myometrium (H&E, \u00d740)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        524,
-                        2,
-                        776,
-                        206
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        527,
-                        3,
-                        547,
-                        23
-                    ]
-                },
-                "caption": "Microscopic architectural patterns of the mass removed by resectoscopic surgery. (C) Positive for calretinin (calretinin, \u00d7200)."
             },
             {
                 "panel": {
@@ -3739,6 +3679,46 @@
             {
                 "panel": {
                     "box": [
+                        524,
+                        2,
+                        776,
+                        206
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        527,
+                        3,
+                        547,
+                        23
+                    ]
+                },
+                "caption": "Microscopic architectural patterns of the mass removed by resectoscopic surgery. (C) Positive for calretinin (calretinin, \u00d7200)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        2,
+                        213,
+                        257,
+                        418
+                    ]
+                },
+                "label": {
+                    "text": "D",
+                    "box": [
+                        3,
+                        217,
+                        21,
+                        235
+                    ]
+                },
+                "caption": "Microscopic architectural patterns of the mass removed by resectoscopic surgery. (D) Positive for CD99 (CD99, \u00d7200)."
+            },
+            {
+                "panel": {
+                    "box": [
                         261,
                         213,
                         513,
@@ -3755,6 +3735,26 @@
                     ]
                 },
                 "caption": "Microscopic architectural patterns of the mass removed by resectoscopic surgery. (E) Positive for CD56 (CD56, \u00d7200)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        523,
+                        216,
+                        775,
+                        420
+                    ]
+                },
+                "label": {
+                    "text": "F",
+                    "box": [
+                        529,
+                        219,
+                        547,
+                        237
+                    ]
+                },
+                "caption": "Microscopic architectural patterns of the mass removed by resectoscopic surgery. (F) Negative for CD10 (CD10, \u00d7200)."
             }
         ],
         "caption": "Microscopic architectural patterns of the mass removed by resectoscopic surgery. (A) A relatively well-demarcated nodular mass within the superficial myometrium (H&E, \u00d740). (B) The tumor cells have relatively benign appearing, small round vesicular nuclei with nucleoli and eosinophilic cytoplasm (H&E, \u00d7200). Immunohistochemical profile of the uterine tumors resembling ovarian sex cord tumor. (C) Positive for calretinin (calretinin, \u00d7200). (D) Positive for CD99 (CD99, \u00d7200). (E) Positive for CD56 (CD56, \u00d7200). (F) Negative for CD10 (CD10, \u00d7200)."
@@ -3764,6 +3764,66 @@
         "image_width": 600,
         "image_height": 281,
         "gt_subfigures": [
+            {
+                "panel": {
+                    "box": [
+                        2,
+                        0,
+                        148,
+                        137
+                    ]
+                },
+                "label": {
+                    "text": "A",
+                    "box": [
+                        8,
+                        0,
+                        18,
+                        10
+                    ]
+                },
+                "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: A, \u00d7400;"
+            },
+            {
+                "panel": {
+                    "box": [
+                        149,
+                        0,
+                        298,
+                        136
+                    ]
+                },
+                "label": {
+                    "text": "B",
+                    "box": [
+                        152,
+                        0,
+                        160,
+                        10
+                    ]
+                },
+                "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: B, \u00d7400;"
+            },
+            {
+                "panel": {
+                    "box": [
+                        301,
+                        0,
+                        445,
+                        137
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        302,
+                        0,
+                        312,
+                        10
+                    ]
+                },
+                "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: C, \u00d7100;"
+            },
             {
                 "panel": {
                     "box": [
@@ -3783,6 +3843,26 @@
                     ]
                 },
                 "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: D, \u00d7100;"
+            },
+            {
+                "panel": {
+                    "box": [
+                        5,
+                        142,
+                        150,
+                        279
+                    ]
+                },
+                "label": {
+                    "text": "E",
+                    "box": [
+                        7,
+                        142,
+                        17,
+                        153
+                    ]
+                },
+                "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: E, \u00d7100;"
             },
             {
                 "panel": {
@@ -3827,46 +3907,6 @@
             {
                 "panel": {
                     "box": [
-                        2,
-                        0,
-                        148,
-                        137
-                    ]
-                },
-                "label": {
-                    "text": "A",
-                    "box": [
-                        8,
-                        0,
-                        18,
-                        10
-                    ]
-                },
-                "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: A, \u00d7400;"
-            },
-            {
-                "panel": {
-                    "box": [
-                        301,
-                        0,
-                        445,
-                        137
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        302,
-                        0,
-                        312,
-                        10
-                    ]
-                },
-                "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: C, \u00d7100;"
-            },
-            {
-                "panel": {
-                    "box": [
                         445,
                         141,
                         595,
@@ -3883,46 +3923,6 @@
                     ]
                 },
                 "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: H, \u00d740."
-            },
-            {
-                "panel": {
-                    "box": [
-                        149,
-                        0,
-                        298,
-                        136
-                    ]
-                },
-                "label": {
-                    "text": "B",
-                    "box": [
-                        152,
-                        0,
-                        160,
-                        10
-                    ]
-                },
-                "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: B, \u00d7400;"
-            },
-            {
-                "panel": {
-                    "box": [
-                        5,
-                        142,
-                        150,
-                        279
-                    ]
-                },
-                "label": {
-                    "text": "E",
-                    "box": [
-                        7,
-                        142,
-                        17,
-                        153
-                    ]
-                },
-                "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: E, \u00d7100;"
             }
         ],
         "caption": "Immunohistochemical detection of HIF-1\u03b1 protein in human tissues. The nature of the tissue is indicated on top of each figure. Original magnifications are as follows: A, \u00d7400; B, \u00d7400; C, \u00d7100; D, \u00d7100; E, \u00d7100; F, \u00d7100; G, \u00d740; H, \u00d740."
@@ -4003,26 +4003,6 @@
             {
                 "panel": {
                     "box": [
-                        184,
-                        296,
-                        431,
-                        594
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        187,
-                        298,
-                        199,
-                        312
-                    ]
-                },
-                "caption": "Serous borderline ovarian tumours with papillary architecture. (c) Histopathology of the specimen showed that that this was a serous borderline ovarian tumour with papillary architecture."
-            },
-            {
-                "panel": {
-                    "box": [
                         285,
                         0,
                         600,
@@ -4039,6 +4019,26 @@
                     ]
                 },
                 "caption": "Serous borderline ovarian tumours with papillary architecture. Sagittal (b) fat suppressed T1-weighted images after intravenous gadolinium shows a cystic mass with fronds of tissues."
+            },
+            {
+                "panel": {
+                    "box": [
+                        184,
+                        296,
+                        431,
+                        594
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        187,
+                        298,
+                        199,
+                        312
+                    ]
+                },
+                "caption": "Serous borderline ovarian tumours with papillary architecture. (c) Histopathology of the specimen showed that that this was a serous borderline ovarian tumour with papillary architecture."
             }
         ],
         "caption": "Serous borderline ovarian tumours with papillary architecture. Sagittal (a) T2-weighted and (b) fat suppressed T1-weighted images after intravenous gadolinium shows a cystic mass with fronds of tissues. (c) Histopathology of the specimen showed that that this was a serous borderline ovarian tumour with papillary architecture."
@@ -4048,26 +4048,6 @@
         "image_width": 619,
         "image_height": 207,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        179,
-                        1,
-                        369,
-                        207
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        268,
-                        195,
-                        276,
-                        206
-                    ]
-                },
-                "caption": "(b) Resected whole stomach."
-            },
             {
                 "panel": {
                     "box": [
@@ -4087,6 +4067,26 @@
                     ]
                 },
                 "caption": "(a) Follow-up gastroscopy revealed another polypoid lesion in the residual stomach."
+            },
+            {
+                "panel": {
+                    "box": [
+                        179,
+                        1,
+                        369,
+                        207
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        268,
+                        195,
+                        276,
+                        206
+                    ]
+                },
+                "caption": "(b) Resected whole stomach."
             },
             {
                 "panel": {
@@ -4215,26 +4215,6 @@
             {
                 "panel": {
                     "box": [
-                        6,
-                        488,
-                        568,
-                        949
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        295,
-                        915,
-                        317,
-                        937
-                    ]
-                },
-                "caption": "Effect of curcumin on the liver content of oxidative stress markers of rats treated with K2Cr2O7. (b) protein carbonyl content. Values are mean \u00b1 SEM, n = 5-6. a P < 0.05 versus control; b P < 0.05 versus K2Cr2O7 (24 h); c P < 0.05 versus K2Cr2O7 (48 h)."
-            },
-            {
-                "panel": {
-                    "box": [
                         1,
                         4,
                         567,
@@ -4251,6 +4231,26 @@
                     ]
                 },
                 "caption": "Effect of curcumin on the liver content of oxidative stress markers of rats treated with K2Cr2O7. (a) MDA content. Values are mean \u00b1 SEM, n = 5-6. a P < 0.05 versus control; b P < 0.05 versus K2Cr2O7 (24 h); c P < 0.05 versus K2Cr2O7 (48 h)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        6,
+                        488,
+                        568,
+                        949
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        295,
+                        915,
+                        317,
+                        937
+                    ]
+                },
+                "caption": "Effect of curcumin on the liver content of oxidative stress markers of rats treated with K2Cr2O7. (b) protein carbonyl content. Values are mean \u00b1 SEM, n = 5-6. a P < 0.05 versus control; b P < 0.05 versus K2Cr2O7 (24 h); c P < 0.05 versus K2Cr2O7 (48 h)."
             },
             {
                 "panel": {
@@ -4303,26 +4303,6 @@
             {
                 "panel": {
                     "box": [
-                        6,
-                        88,
-                        284,
-                        156
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        262,
-                        134,
-                        279,
-                        151
-                    ]
-                },
-                "caption": "Genotyping of transgenic mice by PCR using sense PTTG primer 16207 and EGFP antisense primer. (C-D) a representative genotyping of offspring. Lane 1, 1 kb ladder; lane 2, blank; lanes 3-end, individual mice."
-            },
-            {
-                "panel": {
-                    "box": [
                         287,
                         7,
                         569,
@@ -4339,6 +4319,26 @@
                     ]
                 },
                 "caption": "Genotyping of transgenic mice by PCR using sense PTTG primer 16207 and EGFP antisense primer. (A-B) founders. Lane 1, 1 kb ladder; lane 2, blank; lanes 3-end, individual mice."
+            },
+            {
+                "panel": {
+                    "box": [
+                        6,
+                        88,
+                        284,
+                        156
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        262,
+                        134,
+                        279,
+                        151
+                    ]
+                },
+                "caption": "Genotyping of transgenic mice by PCR using sense PTTG primer 16207 and EGFP antisense primer. (C-D) a representative genotyping of offspring. Lane 1, 1 kb ladder; lane 2, blank; lanes 3-end, individual mice."
             },
             {
                 "panel": {
@@ -4372,26 +4372,6 @@
                 "panel": {
                     "box": [
                         1,
-                        290,
-                        243,
-                        565
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        1,
-                        543,
-                        21,
-                        563
-                    ]
-                },
-                "caption": "No evidence of peritumoral edema was observed (C, D, and E)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        1,
                         1,
                         243,
                         286
@@ -4404,6 +4384,26 @@
                         262,
                         23,
                         282
+                    ]
+                },
+                "caption": "Computed tomography (CT) revealed a giant high density lesion in the central protion of the mass indicating dense calcification (A and B). Gadolinium-enhanced axial magnetic resonance imaging (MRI) revealed a solitary mass in the prepontine cistern extending to the suprasellar cistern. The lesion showed heterogeneous nonenhancement following the intravenous administration of a gadolinium-based contrast agent."
+            },
+            {
+                "panel": {
+                    "box": [
+                        245,
+                        1,
+                        487,
+                        286
+                    ]
+                },
+                "label": {
+                    "text": "B",
+                    "box": [
+                        245,
+                        262,
+                        267,
+                        284
                     ]
                 },
                 "caption": "Computed tomography (CT) revealed a giant high density lesion in the central protion of the mass indicating dense calcification (A and B). Gadolinium-enhanced axial magnetic resonance imaging (MRI) revealed a solitary mass in the prepontine cistern extending to the suprasellar cistern. The lesion showed heterogeneous nonenhancement following the intravenous administration of a gadolinium-based contrast agent."
@@ -4431,22 +4431,22 @@
             {
                 "panel": {
                     "box": [
-                        245,
                         1,
-                        487,
-                        286
+                        290,
+                        243,
+                        565
                     ]
                 },
                 "label": {
-                    "text": "B",
+                    "text": "D",
                     "box": [
-                        245,
-                        262,
-                        267,
-                        284
+                        1,
+                        543,
+                        21,
+                        563
                     ]
                 },
-                "caption": "Computed tomography (CT) revealed a giant high density lesion in the central protion of the mass indicating dense calcification (A and B). Gadolinium-enhanced axial magnetic resonance imaging (MRI) revealed a solitary mass in the prepontine cistern extending to the suprasellar cistern. The lesion showed heterogeneous nonenhancement following the intravenous administration of a gadolinium-based contrast agent."
+                "caption": "No evidence of peritumoral edema was observed (C, D, and E)."
             },
             {
                 "panel": {
@@ -4479,22 +4479,22 @@
             {
                 "panel": {
                     "box": [
-                        468,
-                        228,
-                        592,
-                        424
+                        9,
+                        6,
+                        127,
+                        181
                     ]
                 },
                 "label": {
-                    "text": "9",
+                    "text": "1",
                     "box": [
-                        468,
-                        390,
-                        490,
-                        420
+                        13,
+                        151,
+                        35,
+                        181
                     ]
                 },
-                "caption": "9\u201310 Salganea guangxiensis (Feng & Woo, 1990), male: 9 holotype of Panesthia guangxiensis Feng & Woo, 1990, dorsal view. Scale bars = 1.0 cm."
+                "caption": "1\u20132 Salganea quinquedentata sp. n., male: 1 holotype, dorsal view. Scale bars = 1.0 cm."
             },
             {
                 "panel": {
@@ -4519,62 +4519,42 @@
             {
                 "panel": {
                     "box": [
-                        4,
-                        229,
-                        127,
-                        417
-                    ]
-                },
-                "label": {
-                    "text": "6",
-                    "box": [
-                        4,
-                        387,
-                        26,
-                        417
-                    ]
-                },
-                "caption": "5\u20136 Salganea anisodonta sp. n., male: 6 same, ventral view. Scale bars = 1.0 cm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        132,
-                        682,
-                        274,
-                        866
-                    ]
-                },
-                "label": {
-                    "text": "17",
-                    "box": [
-                        132,
-                        836,
-                        164,
-                        866
-                    ]
-                },
-                "caption": "17\u201318 Salganea raggei Roth, 1979, nymph: 17 dorsal view. Scale bars = 1.0 cm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        9,
-                        6,
-                        127,
+                        297,
+                        7,
+                        459,
                         181
                     ]
                 },
                 "label": {
-                    "text": "1",
+                    "text": "3",
                     "box": [
-                        13,
-                        151,
-                        35,
-                        181
+                        319,
+                        149,
+                        341,
+                        179
                     ]
                 },
-                "caption": "1\u20132 Salganea quinquedentata sp. n., male: 1 holotype, dorsal view. Scale bars = 1.0 cm."
+                "caption": "3\u20134 Salganea quinquedentata sp. n., nymph: 3 paratype, dorsal view. Scale bars = 1.0 cm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        470,
+                        4,
+                        606,
+                        178
+                    ]
+                },
+                "label": {
+                    "text": "4",
+                    "box": [
+                        495,
+                        148,
+                        517,
+                        178
+                    ]
+                },
+                "caption": "3\u20134 Salganea quinquedentata sp. n., nymph: 4 same, ventral view. Scale bars = 1.0 cm."
             },
             {
                 "panel": {
@@ -4599,22 +4579,22 @@
             {
                 "panel": {
                     "box": [
-                        7,
-                        469,
-                        122,
-                        647
+                        4,
+                        229,
+                        127,
+                        417
                     ]
                 },
                 "label": {
-                    "text": "11",
+                    "text": "6",
                     "box": [
-                        8,
-                        617,
-                        40,
-                        647
+                        4,
+                        387,
+                        26,
+                        417
                     ]
                 },
-                "caption": "11\u201312 Salganea incerta (Brunner von Wattenwyl, 1893), male: 11 dorsal view. Scale bars = 1.0 cm."
+                "caption": "5\u20136 Salganea anisodonta sp. n., male: 6 same, ventral view. Scale bars = 1.0 cm."
             },
             {
                 "panel": {
@@ -4639,82 +4619,42 @@
             {
                 "panel": {
                     "box": [
-                        476,
-                        473,
-                        599,
-                        648
+                        322,
+                        229,
+                        445,
+                        418
                     ]
                 },
                 "label": {
-                    "text": "14",
+                    "text": "8",
                     "box": [
-                        477,
-                        618,
-                        509,
-                        648
+                        322,
+                        388,
+                        344,
+                        418
                     ]
                 },
-                "caption": "13\u201314 Salganea incerta (Brunner von Wattenwyl, 1893), nymph: 14 ventral view. Scale bars = 1.0 cm."
+                "caption": "7\u20138 Salganea taiwanensis Roth, 1979, male: 8 same, ventral view. Scale bars = 1.0 cm."
             },
             {
                 "panel": {
                     "box": [
-                        618,
-                        473,
-                        739,
-                        647
+                        468,
+                        228,
+                        592,
+                        424
                     ]
                 },
                 "label": {
-                    "text": "15",
+                    "text": "9",
                     "box": [
-                        620,
-                        617,
-                        652,
-                        647
+                        468,
+                        390,
+                        490,
+                        420
                     ]
                 },
-                "caption": "15\u201316 Salganea raggei Roth, 1979, male: 15 dorsal view. Scale bars = 1.0 cm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        297,
-                        7,
-                        459,
-                        181
-                    ]
-                },
-                "label": {
-                    "text": "3",
-                    "box": [
-                        319,
-                        149,
-                        341,
-                        179
-                    ]
-                },
-                "caption": "3\u20134 Salganea quinquedentata sp. n., nymph: 3 paratype, dorsal view. Scale bars = 1.0 cm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        297,
-                        682,
-                        430,
-                        868
-                    ]
-                },
-                "label": {
-                    "text": "18",
-                    "box": [
-                        301,
-                        838,
-                        333,
-                        868
-                    ]
-                },
-                "caption": "17\u201318 Salganea raggei Roth, 1979, nymph: 18 ventral view. Scale bars = 1.0 cm."
+                "caption": "9\u201310 Salganea guangxiensis (Feng & Woo, 1990), male: 9 holotype of Panesthia guangxiensis Feng & Woo, 1990, dorsal view. Scale bars = 1.0 cm."
             },
             {
                 "panel": {
@@ -4739,62 +4679,22 @@
             {
                 "panel": {
                     "box": [
-                        1,
-                        682,
-                        114,
-                        866
+                        7,
+                        469,
+                        122,
+                        647
                     ]
                 },
                 "label": {
-                    "text": "16",
+                    "text": "11",
                     "box": [
-                        1,
-                        836,
-                        33,
-                        866
+                        8,
+                        617,
+                        40,
+                        647
                     ]
                 },
-                "caption": "15\u201316 Salganea raggei Roth, 1979, male: 16 ventral view. Scale bars = 1.0 cm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        322,
-                        229,
-                        445,
-                        418
-                    ]
-                },
-                "label": {
-                    "text": "8",
-                    "box": [
-                        322,
-                        388,
-                        344,
-                        418
-                    ]
-                },
-                "caption": "7\u20138 Salganea taiwanensis Roth, 1979, male: 8 same, ventral view. Scale bars = 1.0 cm."
-            },
-            {
-                "panel": {
-                    "box": [
-                        605,
-                        675,
-                        741,
-                        865
-                    ]
-                },
-                "label": {
-                    "text": "20",
-                    "box": [
-                        621,
-                        835,
-                        653,
-                        865
-                    ]
-                },
-                "caption": "19\u201320 Salganea flexibilis sp. n., male: 20 same, ventral view. Scale bars = 1.0 cm."
+                "caption": "11\u201312 Salganea incerta (Brunner von Wattenwyl, 1893), male: 11 dorsal view. Scale bars = 1.0 cm."
             },
             {
                 "panel": {
@@ -4839,22 +4739,102 @@
             {
                 "panel": {
                     "box": [
-                        470,
-                        4,
-                        606,
-                        178
+                        476,
+                        473,
+                        599,
+                        648
                     ]
                 },
                 "label": {
-                    "text": "4",
+                    "text": "14",
                     "box": [
-                        495,
-                        148,
-                        517,
-                        178
+                        477,
+                        618,
+                        509,
+                        648
                     ]
                 },
-                "caption": "3\u20134 Salganea quinquedentata sp. n., nymph: 4 same, ventral view. Scale bars = 1.0 cm."
+                "caption": "13\u201314 Salganea incerta (Brunner von Wattenwyl, 1893), nymph: 14 ventral view. Scale bars = 1.0 cm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        618,
+                        473,
+                        739,
+                        647
+                    ]
+                },
+                "label": {
+                    "text": "15",
+                    "box": [
+                        620,
+                        617,
+                        652,
+                        647
+                    ]
+                },
+                "caption": "15\u201316 Salganea raggei Roth, 1979, male: 15 dorsal view. Scale bars = 1.0 cm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        1,
+                        682,
+                        114,
+                        866
+                    ]
+                },
+                "label": {
+                    "text": "16",
+                    "box": [
+                        1,
+                        836,
+                        33,
+                        866
+                    ]
+                },
+                "caption": "15\u201316 Salganea raggei Roth, 1979, male: 16 ventral view. Scale bars = 1.0 cm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        132,
+                        682,
+                        274,
+                        866
+                    ]
+                },
+                "label": {
+                    "text": "17",
+                    "box": [
+                        132,
+                        836,
+                        164,
+                        866
+                    ]
+                },
+                "caption": "17\u201318 Salganea raggei Roth, 1979, nymph: 17 dorsal view. Scale bars = 1.0 cm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        297,
+                        682,
+                        430,
+                        868
+                    ]
+                },
+                "label": {
+                    "text": "18",
+                    "box": [
+                        301,
+                        838,
+                        333,
+                        868
+                    ]
+                },
+                "caption": "17\u201318 Salganea raggei Roth, 1979, nymph: 18 ventral view. Scale bars = 1.0 cm."
             },
             {
                 "panel": {
@@ -4872,6 +4852,26 @@
                         836,
                         490,
                         866
+                    ]
+                },
+                "caption": "19\u201320 Salganea flexibilis sp. n., male: 20 same, ventral view. Scale bars = 1.0 cm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        605,
+                        675,
+                        741,
+                        865
+                    ]
+                },
+                "label": {
+                    "text": "20",
+                    "box": [
+                        621,
+                        835,
+                        653,
+                        865
                     ]
                 },
                 "caption": "19\u201320 Salganea flexibilis sp. n., male: 20 same, ventral view. Scale bars = 1.0 cm."
@@ -4907,26 +4907,6 @@
             {
                 "panel": {
                     "box": [
-                        3,
-                        324,
-                        556,
-                        542
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        3,
-                        324,
-                        24,
-                        345
-                    ]
-                },
-                "caption": "Inhibition of cell proliferation by down-regulating MR-1. (C) MR-1 protein levels were also decreased in SKOV3 cells transfected with ShDNA-442, and -232 (but not ShDNA-584). ***P < 0.01, **P < 0.05 compared with shDNA-mock controls."
-            },
-            {
-                "panel": {
-                    "box": [
                         2,
                         104,
                         421,
@@ -4943,6 +4923,26 @@
                     ]
                 },
                 "caption": "Inhibition of cell proliferation by down-regulating MR-1.(B) Expression of the MR-1 gene was markedly reduced in SKOV3 cells transfected with ShDNA-442, -232, and -584, (particularly with ShDNA-442) as analyzed by two-way ANOVA."
+            },
+            {
+                "panel": {
+                    "box": [
+                        3,
+                        324,
+                        556,
+                        542
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        3,
+                        324,
+                        24,
+                        345
+                    ]
+                },
+                "caption": "Inhibition of cell proliferation by down-regulating MR-1. (C) MR-1 protein levels were also decreased in SKOV3 cells transfected with ShDNA-442, and -232 (but not ShDNA-584). ***P < 0.01, **P < 0.05 compared with shDNA-mock controls."
             },
             {
                 "panel": {
@@ -4995,26 +4995,6 @@
             {
                 "panel": {
                     "box": [
-                        0,
-                        296,
-                        706,
-                        456
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        471,
-                        298,
-                        489,
-                        316
-                    ]
-                },
-                "caption": "Salubrinal modulates fluorescence of apoptosis markers after bTBI. Column of panels display immunofluorescence of apoptosis markers: CHOP (green), Caspase-12 (red) and Caspase-3 (red) (top to bottom). Row of Panels are separated by experimental group: CTRL, bTBI and SAL+bTBI (left to right). All images are from the left PFC region and display the blue nuclear counterstain 4\u2019,6-diamidino-2-phenylindole (DAPI). Images are displayed at 20x; arrows demarcate insets at 40x. (Scale bars = 50 \u03bcm). (C) Immunohistochemistry also shows bTBI augmented Caspase-3 fluorescence in the left PFC at 24 h (**p < 0.01 vs. Ctrl). Salubrinal administration prior to bTBI mitigated Caspase-3 fluorescence at 24 h (##p < 0.01 vs. bTBI) (values represent mean \u00b1 s.e.m.) (n = 4; 12 randomly selected areas from left PFC)."
-            },
-            {
-                "panel": {
-                    "box": [
                         1,
                         139,
                         704,
@@ -5031,6 +5011,26 @@
                     ]
                 },
                 "caption": "Salubrinal modulates fluorescence of apoptosis markers after bTBI. Column of panels display immunofluorescence of apoptosis markers: CHOP (green), Caspase-12 (red) and Caspase-3 (red) (top to bottom). Row of Panels are separated by experimental group: CTRL, bTBI and SAL+bTBI (left to right). All images are from the left PFC region and display the blue nuclear counterstain 4\u2019,6-diamidino-2-phenylindole (DAPI). Images are displayed at 20x; arrows demarcate insets at 40x. (Scale bars = 50 \u03bcm). (B) Immunohistochemistry shows bTBI increased Caspase-12 fluorescence in the left PFC at 24 h (***p < 0.001 vs. Ctrl). Salubrinal administration prior to bTBI had no significant effect on Caspase-12 fluorescence (p > 0.05 vs. bTBI)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
+                        296,
+                        706,
+                        456
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        471,
+                        298,
+                        489,
+                        316
+                    ]
+                },
+                "caption": "Salubrinal modulates fluorescence of apoptosis markers after bTBI. Column of panels display immunofluorescence of apoptosis markers: CHOP (green), Caspase-12 (red) and Caspase-3 (red) (top to bottom). Row of Panels are separated by experimental group: CTRL, bTBI and SAL+bTBI (left to right). All images are from the left PFC region and display the blue nuclear counterstain 4\u2019,6-diamidino-2-phenylindole (DAPI). Images are displayed at 20x; arrows demarcate insets at 40x. (Scale bars = 50 \u03bcm). (C) Immunohistochemistry also shows bTBI augmented Caspase-3 fluorescence in the left PFC at 24 h (**p < 0.01 vs. Ctrl). Salubrinal administration prior to bTBI mitigated Caspase-3 fluorescence at 24 h (##p < 0.01 vs. bTBI) (values represent mean \u00b1 s.e.m.) (n = 4; 12 randomly selected areas from left PFC)."
             }
         ],
         "caption": "Salubrinal modulates fluorescence of apoptosis markers after bTBI. Column of panels display immunofluorescence of apoptosis markers: CHOP (green), Caspase-12 (red) and Caspase-3 (red) (top to bottom). Row of Panels are separated by experimental group: CTRL, bTBI and SAL+bTBI (left to right). All images are from the left PFC region and display the blue nuclear counterstain 4\u2019,6-diamidino-2-phenylindole (DAPI). Images are displayed at 20x; arrows demarcate insets at 40x. (Scale bars = 50 \u03bcm). (A) Immunohistochemistry (IHC) shows bTBI augmented CHOP fluorescence in the left PFC at 24 h (***p < 0.001 vs. Ctrl). Salubrinal administration prior to bTBI attenuated CHOP fluorescence at 24 h (###p < 0.001 vs. bTBI). (B) Immunohistochemistry shows bTBI increased Caspase-12 fluorescence in the left PFC at 24 h (***p < 0.001 vs. Ctrl). Salubrinal administration prior to bTBI had no significant effect on Caspase-12 fluorescence (p > 0.05 vs. bTBI). (C) Immunohistochemistry also shows bTBI augmented Caspase-3 fluorescence in the left PFC at 24 h (**p < 0.01 vs. Ctrl). Salubrinal administration prior to bTBI mitigated Caspase-3 fluorescence at 24 h (##p < 0.01 vs. bTBI) (values represent mean \u00b1 s.e.m.) (n = 4; 12 randomly selected areas from left PFC)."
@@ -5140,46 +5140,6 @@
                 "panel": {
                     "box": [
                         0,
-                        545,
-                        227,
-                        854
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        5,
-                        568,
-                        31,
-                        594
-                    ]
-                },
-                "caption": "S100A14 is highly expressed in human ovarian cancer cells and tissue specimens, and its expression correlates with tumor stage and outcome of disease A. D. IHC staining scores of S100A14 in EOC samples were significantly higher than those of healthy controls, benign ovarian tumors, and borderline ovarian tumors (P < 0.001)."
-            },
-            {
-                "panel": {
-                    "box": [
-                        430,
-                        545,
-                        700,
-                        854
-                    ]
-                },
-                "label": {
-                    "text": "F",
-                    "box": [
-                        435,
-                        565,
-                        466,
-                        596
-                    ]
-                },
-                "caption": "S100A14 is highly expressed in human ovarian cancer cells and tissue specimens, and its expression correlates with tumor stage and outcome of disease F. Kaplan-Meier plots for patients with epithelial ovarian cancer were stratified according to S100A14 expression."
-            },
-            {
-                "panel": {
-                    "box": [
-                        0,
                         0,
                         415,
                         341
@@ -5195,26 +5155,6 @@
                     ]
                 },
                 "caption": "S100A14 is highly expressed in human ovarian cancer cells and tissue specimens, and its expression correlates with tumor stage and outcome of disease A. S100A14 mRNA levels were assessed using RT-PCR (upper panel) and real-time PCR (lower panel) in human ovarian surface epithelial (HOSE) cells and ovarian cancer cells. Expression of GAPDH was included as an internal loading control. Kruskal-Wallis analysis of variance and post hoc Dunn method revealed statistically significant differences between EOC and HOSE cell lines (P = 0.019). Each value is expressed as a mean of triplicate samples. The reference cell line, HOSE 311, was considered to have a value of 1."
-            },
-            {
-                "panel": {
-                    "box": [
-                        0,
-                        341,
-                        700,
-                        545
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        5,
-                        360,
-                        31,
-                        386
-                    ]
-                },
-                "caption": "S100A14 is highly expressed in human ovarian cancer cells and tissue specimens, and its expression correlates with tumor stage and outcome of disease C. Representative immunohistochemical staining for S100A14 in formalin-fixed, paraffin-embedded EOC tissues. Bars: 100 \u03bcm."
             },
             {
                 "panel": {
@@ -5239,6 +5179,46 @@
             {
                 "panel": {
                     "box": [
+                        0,
+                        341,
+                        700,
+                        545
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        5,
+                        360,
+                        31,
+                        386
+                    ]
+                },
+                "caption": "S100A14 is highly expressed in human ovarian cancer cells and tissue specimens, and its expression correlates with tumor stage and outcome of disease C. Representative immunohistochemical staining for S100A14 in formalin-fixed, paraffin-embedded EOC tissues. Bars: 100 \u03bcm."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
+                        545,
+                        227,
+                        854
+                    ]
+                },
+                "label": {
+                    "text": "D",
+                    "box": [
+                        5,
+                        568,
+                        31,
+                        594
+                    ]
+                },
+                "caption": "S100A14 is highly expressed in human ovarian cancer cells and tissue specimens, and its expression correlates with tumor stage and outcome of disease A. D. IHC staining scores of S100A14 in EOC samples were significantly higher than those of healthy controls, benign ovarian tumors, and borderline ovarian tumors (P < 0.001)."
+            },
+            {
+                "panel": {
+                    "box": [
                         227,
                         545,
                         486,
@@ -5255,6 +5235,26 @@
                     ]
                 },
                 "caption": "S100A14 is highly expressed in human ovarian cancer cells and tissue specimens, and its expression correlates with tumor stage and outcome of disease E. When we combined seven microarray data sets from GEO database, S100A14 mRNA expression was significantly increased in ovarian cancer (n = 149) when compared to normal ovarian surface epithelium (n = 29) (P < 0.001)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        430,
+                        545,
+                        700,
+                        854
+                    ]
+                },
+                "label": {
+                    "text": "F",
+                    "box": [
+                        435,
+                        565,
+                        466,
+                        596
+                    ]
+                },
+                "caption": "S100A14 is highly expressed in human ovarian cancer cells and tissue specimens, and its expression correlates with tumor stage and outcome of disease F. Kaplan-Meier plots for patients with epithelial ovarian cancer were stratified according to S100A14 expression."
             }
         ],
         "caption": "S100A14 is highly expressed in human ovarian cancer cells and tissue specimens, and its expression correlates with tumor stage and outcome of disease A. S100A14 mRNA levels were assessed using RT-PCR (upper panel) and real-time PCR (lower panel) in human ovarian surface epithelial (HOSE) cells and ovarian cancer cells. Expression of GAPDH was included as an internal loading control. Kruskal-Wallis analysis of variance and post hoc Dunn method revealed statistically significant differences between EOC and HOSE cell lines (P = 0.019). Each value is expressed as a mean of triplicate samples. The reference cell line, HOSE 311, was considered to have a value of 1. B. S100A14 protein levels were analyzed using immunoblot. GAPDH was included as an internal loading control. C. Representative immunohistochemical staining for S100A14 in formalin-fixed, paraffin-embedded EOC tissues. Bars: 100 \u03bcm. D. IHC staining scores of S100A14 in EOC samples were significantly higher than those of healthy controls, benign ovarian tumors, and borderline ovarian tumors (P < 0.001). E. When we combined seven microarray data sets from GEO database, S100A14 mRNA expression was significantly increased in ovarian cancer (n = 149) when compared to normal ovarian surface epithelium (n = 29) (P < 0.001). F. Kaplan-Meier plots for patients with epithelial ovarian cancer were stratified according to S100A14 expression."
@@ -5287,26 +5287,6 @@
             {
                 "panel": {
                     "box": [
-                        2,
-                        994,
-                        716,
-                        1478
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        14,
-                        1010,
-                        45,
-                        1047
-                    ]
-                },
-                "caption": "Pfdhfr/Pfdhps haplotyping results for Plasmodium falciparum parasite isolates from 54 parasite isolates in 49 pregnant women, Korogwe District, Tanga Region, Tanzania, September 2008\u2013October 2010. C) Proportions of Pfdhfr/Pfdhps quadruple or less, quintuple, and sextuple mutant haplotypes from the cohort of pregnant women. The derivations of the allelic haplotypes were based on a combination of 2 or 3 Pfdhfr SNPs with 2 or 3 Pfdhps SNPs forming quadruple (4 SNPs), quintuple (5 SNPs), and sextuple (6 SNPs) haplotypes. Quadruple haplotype or less included 4 SNPs (quadruple) and triple Pfdhfr (CIRNI, n = 1) or double dhps (SGEAA, n = 1) with wild-type dhfr (CNCSI, n = 1) or wild-type dhps (AKAA, n = 1). Less than 4 haplotypes had 1 triple or double mutation in 1 gene combined with a wild-type mutation in the other gene."
-            },
-            {
-                "panel": {
-                    "box": [
                         10,
                         507,
                         684,
@@ -5323,6 +5303,26 @@
                     ]
                 },
                 "caption": "Pfdhfr/Pfdhps haplotyping results for Plasmodium falciparum parasite isolates from 54 parasite isolates in 49 pregnant women, Korogwe District, Tanga Region, Tanzania, September 2008\u2013October 2010. B) Proportion of SNPs conferring sulfadoxine\u2013pyrimethamine resistance on the P. falciparum dihydropteroate synthetase (Pfdhps) gene at codons S436A, A437G, K540E, A613S/T, and A581G with allelic haplotypes AKAA (wild-type), AGEAA (double Pfdhps mutant), SGEAA (double Pfdhps mutant), and SGEGA (triple Pfdhps mutant)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        2,
+                        994,
+                        716,
+                        1478
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        14,
+                        1010,
+                        45,
+                        1047
+                    ]
+                },
+                "caption": "Pfdhfr/Pfdhps haplotyping results for Plasmodium falciparum parasite isolates from 54 parasite isolates in 49 pregnant women, Korogwe District, Tanga Region, Tanzania, September 2008\u2013October 2010. C) Proportions of Pfdhfr/Pfdhps quadruple or less, quintuple, and sextuple mutant haplotypes from the cohort of pregnant women. The derivations of the allelic haplotypes were based on a combination of 2 or 3 Pfdhfr SNPs with 2 or 3 Pfdhps SNPs forming quadruple (4 SNPs), quintuple (5 SNPs), and sextuple (6 SNPs) haplotypes. Quadruple haplotype or less included 4 SNPs (quadruple) and triple Pfdhfr (CIRNI, n = 1) or double dhps (SGEAA, n = 1) with wild-type dhfr (CNCSI, n = 1) or wild-type dhps (AKAA, n = 1). Less than 4 haplotypes had 1 triple or double mutation in 1 gene combined with a wild-type mutation in the other gene."
             }
         ],
         "caption": "Pfdhfr/Pfdhps haplotyping results for Plasmodium falciparum parasite isolates from 54 parasite isolates in 49 pregnant women, Korogwe District, Tanga Region, Tanzania, September 2008\u2013October 2010. A) Proportion of single nucleotide polymorphisms (SNPs) conferring sulfadoxine\u2013pyrimethamine resistance on the P. falciparum dihydrofolate reductase gene (Pfdhfr) at codons C50, N51I, C59R, S108N, and L164I, resulting in allelic haplotypes CNCSI (wild-type), CICNI (double Pfdhfr mutant), CNRNI (double Pfdhfr mutant), and CIRNI (triple Pfdhfr mutant). B) Proportion of SNPs conferring sulfadoxine\u2013pyrimethamine resistance on the P. falciparum dihydropteroate synthetase (Pfdhps) gene at codons S436A, A437G, K540E, A613S/T, and A581G with allelic haplotypes AKAA (wild-type), AGEAA (double Pfdhps mutant), SGEAA (double Pfdhps mutant), and SGEGA (triple Pfdhps mutant). C) Proportions of Pfdhfr/Pfdhps quadruple or less, quintuple, and sextuple mutant haplotypes from the cohort of pregnant women. The derivations of the allelic haplotypes were based on a combination of 2 or 3 Pfdhfr SNPs with 2 or 3 Pfdhps SNPs forming quadruple (4 SNPs), quintuple (5 SNPs), and sextuple (6 SNPs) haplotypes. Quadruple haplotype or less included 4 SNPs (quadruple) and triple Pfdhfr (CIRNI, n = 1) or double dhps (SGEAA, n = 1) with wild-type dhfr (CNCSI, n = 1) or wild-type dhps (AKAA, n = 1). Less than 4 haplotypes had 1 triple or double mutation in 1 gene combined with a wild-type mutation in the other gene."
@@ -5332,26 +5332,6 @@
         "image_width": 600,
         "image_height": 452,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        307,
-                        4,
-                        599,
-                        224
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        308,
-                        9,
-                        330,
-                        31
-                    ]
-                },
-                "caption": "IHC-P analysis of hOGG1 protein expression in serous ovarian cancer: (B) serous cystadenoma with positive staining (magnification 200 x);"
-            },
             {
                 "panel": {
                     "box": [
@@ -5371,6 +5351,26 @@
                     ]
                 },
                 "caption": "IHC-P analysis of hOGG1 protein expression in serous ovarian cancer: (A) Normal ovarian tissue treated with anti-hOGG1 antibody, biotinylated anti-rabbit IgG secondary antibody, and avidin-biotin-peroxidase complex, and counterstained with p-dimethylaminobenzaldehyde reagent (magnification 100 x)"
+            },
+            {
+                "panel": {
+                    "box": [
+                        307,
+                        4,
+                        599,
+                        224
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        308,
+                        9,
+                        330,
+                        31
+                    ]
+                },
+                "caption": "IHC-P analysis of hOGG1 protein expression in serous ovarian cancer: (B) serous cystadenoma with positive staining (magnification 200 x);"
             },
             {
                 "panel": {
@@ -5423,26 +5423,6 @@
             {
                 "panel": {
                     "box": [
-                        155,
-                        0,
-                        301,
-                        119
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        159,
-                        5,
-                        178,
-                        24
-                    ]
-                },
-                "caption": "Wound management from primary surgery to delayed secondary closure. (b) Cross-over technique for wound edge adaptation."
-            },
-            {
-                "panel": {
-                    "box": [
                         6,
                         0,
                         152,
@@ -5459,6 +5439,26 @@
                     ]
                 },
                 "caption": "Wound management from primary surgery to delayed secondary closure. (a) Large-scale tissue damage at right lower extremity."
+            },
+            {
+                "panel": {
+                    "box": [
+                        155,
+                        0,
+                        301,
+                        119
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        159,
+                        5,
+                        178,
+                        24
+                    ]
+                },
+                "caption": "Wound management from primary surgery to delayed secondary closure. (b) Cross-over technique for wound edge adaptation."
             },
             {
                 "panel": {
