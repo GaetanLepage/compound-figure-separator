@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluator for the label recognition task.
 """
 
-from typing import List, Dict, Any
+from typing import Any
 
 from ..utils.figure import Figure, DetectedLabel
 from ..utils.figure.label import CLASS_LABEL_MAPPING
@@ -55,18 +55,16 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
                          export=export,
                          export_dir=export_dir)
 
-
     def process(self,
-                inputs: List[dict],
-                outputs: List[dict]) -> None:
+                inputs: list[dict],
+                outputs: list[dict]) -> None:
         """
         Process pairs of inputs and outputs.
 
         Args:
-            inputs (List[dict]):    The inputs that's used to call the model.
-            outputs (List[dict]):   The return value of `model(inputs)`.
+            inputs (list[dict]):    The inputs that's used to call the model.
+            outputs (list[dict]):   The return value of `model(inputs)`.
         """
-
         for input_element, output_element in zip(inputs, outputs):
             image_id = input_element["image_id"]
             instances = output_element["instances"].to(self._cpu_device)
@@ -87,7 +85,6 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
 
             self._predictions[image_id] = predicted_panels
 
-
     def _predict(self, figure: Figure) -> None:
         """
         Write the predictions (stored in the `_predictions` attribute) in the appropriate
@@ -97,10 +94,9 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
         Args:
             figure (Figure):    A Figure object to augment with prediction data.
         """
+        detected_labels_dicts: list[dict[str, Any]] = self._predictions[figure.index]
 
-        detected_labels_dicts: List[Dict[str, Any]] = self._predictions[figure.index]
-
-        detected_labels: List[DetectedLabel] = []
+        detected_labels: list[DetectedLabel] = []
 
         for detected_label_dict in detected_labels_dicts:
 

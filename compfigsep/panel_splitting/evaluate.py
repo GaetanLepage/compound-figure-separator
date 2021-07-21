@@ -22,8 +22,6 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 ####################################################
 Module to evaluate the panel splitting task metrics.
 """
-
-from typing import Dict, Tuple, List
 from collections import namedtuple
 
 import numpy as np
@@ -67,12 +65,12 @@ def panel_splitting_figure_eval(figure: Figure) -> PanelSplittingFigureResult:
     num_correct_imageclef: int = 0
     num_correct_iou_thresh: int = 0
 
-    detections: List[Detection] = []
+    detections: list[Detection] = []
 
     for detected_panel in figure.detected_panels:
         if detected_panel.is_true_positive_overlap is None \
                 or detected_panel.is_true_positive_iou is None:
-            raise ValueError("It seems like the evaluation process was not done" \
+            raise ValueError("It seems like the evaluation process was not done"
                              " (is_true_positive_* attributes not set)")
 
         num_correct_imageclef += int(detected_panel.is_true_positive_overlap)
@@ -93,13 +91,13 @@ def panel_splitting_figure_eval(figure: Figure) -> PanelSplittingFigureResult:
                                       detections=detections)
 
 
-def panel_splitting_metrics(results: List[PanelSplittingFigureResult]
-                            ) -> Tuple[float, float, float, float]:
+def panel_splitting_metrics(results: list[PanelSplittingFigureResult]
+                            ) -> tuple[float, float, float, float]:
     """
     Evaluate the panel splitting metrics.
 
     Args:
-        results (List[PanelSplittingFigureResult]): TODO.
+        results (list[PanelSplittingFigureResult]): TODO.
 
     Returns:
         imageclef_accuracy (int):   The ImageCLEF accuracy as presented in this paper:
@@ -113,7 +111,7 @@ def panel_splitting_metrics(results: List[PanelSplittingFigureResult]
     overall_gt_count: int = 0
     overall_detected_count: int = 0
     sum_imageclef_accuracies: float = 0.0
-    detections: List[Detection] = []
+    detections: list[Detection] = []
 
     # Loop through the results to compute statistics.
     for figure_result in results:
@@ -132,7 +130,7 @@ def panel_splitting_metrics(results: List[PanelSplittingFigureResult]
     imageclef_accuracy: float = sum_imageclef_accuracies / len(results)
 
     # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
-    true_positives: List[int] = [int(detection.is_true_positive)
+    true_positives: list[int] = [int(detection.is_true_positive)
                                  for detection in detections]
 
     overall_correct_count: int = sum(true_positives)
@@ -159,7 +157,7 @@ def panel_splitting_metrics(results: List[PanelSplittingFigureResult]
     return imageclef_accuracy, precision, recall, mean_average_precision
 
 
-def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
+def evaluate_detections(figure_generator: FigureGenerator) -> dict[str, float]:
     """
     Compute the metrics (ImageCLEF and mAP) from a given set of panel slitting detections.
 
@@ -168,26 +166,26 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
                                                     augmented with detected panels.
 
     Returns:
-        metrics (Dict[str, float]): A dict containing the computed metrics.
+        metrics (dict[str, float]): A dict containing the computed metrics.
     """
     for figure in figure_generator():
 
-        filtered_panels: List[DetectedPanel] = panel_filtering.filter_panels(
+        filtered_panels: list[DetectedPanel] = panel_filtering.filter_panels(
             panel_list=figure.detected_panels)
         figure.detected_panels = filtered_panels
-    # List containing the evaluation statistics for each figure.
-    results: List[PanelSplittingFigureResult] = [panel_splitting_figure_eval(figure)
+    # list containing the evaluation statistics for each figure.
+    results: list[PanelSplittingFigureResult] = [panel_splitting_figure_eval(figure)
                                                  for figure in figure_generator()]
 
     imageclef_accuracy, precision, recall, mean_average_precision = panel_splitting_metrics(
         results=results)
 
-    print(f"ImageCLEF Accuracy (overlap threshold = 0.66): {imageclef_accuracy:.3f}\n"\
-          f"Precision: {precision:.3f}\n"\
-          f"Recall: {recall:.3f}\n"\
+    print(f"ImageCLEF Accuracy (overlap threshold = 0.66): {imageclef_accuracy:.3f}\n"
+          f"Precision: {precision:.3f}\n"
+          f"Recall: {recall:.3f}\n"
           f"mAP (IoU threshold = 0.5): {mean_average_precision:.3f}")
 
-    metrics: Dict[str, float] = {
+    metrics: dict[str, float] = {
         'image_clef_accuracy': imageclef_accuracy,
         'precision': precision,
         'recall': recall,

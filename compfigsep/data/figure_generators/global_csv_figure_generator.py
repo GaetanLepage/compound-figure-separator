@@ -27,7 +27,7 @@ import os
 import logging
 import csv
 import random
-from typing import cast, Optional, Iterable, List
+from typing import cast, Optional, Iterable
 
 from ...utils.figure import Panel, Label, SubFigure, Figure
 from ...utils.box import Box
@@ -54,9 +54,8 @@ class GlobalCsvFigureGenerator(FigureGenerator):
         super().__init__(default_random_order=default_random_order)
 
         if not os.path.isfile(csv_annotation_file_path):
-            raise FileNotFoundError("The prediction annotation csv file does not exist :"\
-                "\n\t {}".format(csv_annotation_file_path))
-
+            raise FileNotFoundError("The prediction annotation csv file does not exist :"
+                                    f"\n\t {csv_annotation_file_path}")
 
     def __call__(self, random_order: bool = None) -> Iterable[Figure]:
         """
@@ -76,13 +75,13 @@ class GlobalCsvFigureGenerator(FigureGenerator):
         with open(self.csv_annotation_file_path, 'r') as csv_annotation_file:
             csv_reader = csv.reader(csv_annotation_file, delimiter=',')
 
-            # Iterate over the rows of the csv file and store them in a list.
-            rows: List[List[str]] = [row for row in csv_reader]
+            # Store the rows of the csv file in a list.
+            rows: list[list[str]] = list(csv_reader)
 
             if random_order:
                 random.shuffle(rows)
 
-        subfigures: List[SubFigure] = []
+        subfigures: list[SubFigure] = []
         image_path: str = ''
         figure: Optional[Figure] = None
 
@@ -102,8 +101,8 @@ class GlobalCsvFigureGenerator(FigureGenerator):
                 if not os.path.isfile(image_path):
                     image_path = os.path.join('data/', image_path)
                 if not os.path.isfile(image_path):
-                    raise FileNotFoundError("The following image file does not exist :"\
-                        "\n\t {}".format(image_path))
+                    raise FileNotFoundError("The following image file does not exist :"
+                                            f"\n\t {image_path}")
 
                 figure = Figure(image_path=image_path,
                                 index=image_counter)
@@ -116,7 +115,6 @@ class GlobalCsvFigureGenerator(FigureGenerator):
 
                 # Create empty list of subfigures.
                 subfigures = []
-
 
             # Panel segmentation + panel splitting
             if len(row) == 11:

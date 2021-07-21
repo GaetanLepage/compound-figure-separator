@@ -32,7 +32,6 @@ import logging
 from argparse import ArgumentParser, Namespace
 from collections import OrderedDict
 
-from typing import List, Dict
 from compfigsep.utils.figure import Figure, LabelStructure
 
 
@@ -54,12 +53,12 @@ sys.path.append('.')
 MODULE_DIR = os.path.dirname(compfigsep.__file__)
 
 
-def _parse_args(args: List[str]) -> Namespace:
+def _parse_args(args: list[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]):   The arguments from the command line call.
+        args (list[str]):   The arguments from the command line call.
 
     Returns:
         parser (Namespace): Populated namespace.
@@ -68,18 +67,18 @@ def _parse_args(args: List[str]) -> Namespace:
         description="Evaluate caption splitting on the prostate data set.")
 
     add_json_arg(parser=parser,
-                 json_default_relative_path=\
-                    '../data/pubmed_caption_splitting/prostate_data_only_annotated_captions.json')
+                 json_default_relative_path='../data/pubmed_caption_splitting/'
+                                            'prostate_data_only_annotated_captions.json')
 
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None) -> None:
+def main(args: list[str] = None) -> None:
     """
     Launch detection and evaluation of the compound figure separation task on a JSON data set.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        args (list[str]):   Arguments from the command line.
     """
 
     # Parse arguments.

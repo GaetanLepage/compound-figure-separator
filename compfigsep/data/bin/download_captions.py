@@ -29,7 +29,7 @@ import sys
 import os
 import logging
 import urllib.request
-from typing import List, Optional
+from typing import Optional
 from argparse import ArgumentParser, Namespace
 
 import xml.etree.ElementTree as ET
@@ -43,12 +43,12 @@ from compfigsep.data.figure_generators import DATA_DIR
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&retmode=xml&id="
 
 
-def parse_args(args: List[str]) -> Namespace:
+def parse_args(args: list[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]):   The arguments from the command line call.
+        args (list[str]):   The arguments from the command line call.
 
     Returns:
         namespace (Namespace):  Populated namespace.
@@ -77,7 +77,6 @@ def get_captions(file_list_txt: str,
         file_list_txt (str):    The path to the txt file listing the images.
         override (bool):        Override caption txt file if exists.
     """
-
     # Read the file list and store the image names.
     if file_list_txt is not None:
 
@@ -108,13 +107,12 @@ def get_captions(file_list_txt: str,
                                                                    '_caption.txt')
 
             if os.path.isfile(caption_annotation_file_path) and not override:
-                logging.warning("Caption file %s for image %s already exists."\
-                                "\n==> As `override` has been set to False,"\
+                logging.warning("Caption file %s for image %s already exists."
+                                "\n==> As `override` has been set to False,"
                                 " this image is skipped.",
                                 caption_annotation_file_path,
                                 image_path)
                 continue
-
 
             # If it is the same article as the previous iteration, no need to
             # re-download the xml data.
@@ -168,14 +166,13 @@ def get_captions(file_list_txt: str,
             logging.warning("Not a PMC article: %s", image_filename)
 
 
-def main(args: List[str] = None) -> None:
+def main(args: list[str] = None) -> None:
     """
     Download caption data from PubMedCentral data base.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        args (list[str]):   Arguments from the command line.
     """
-
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
@@ -185,6 +182,7 @@ def main(args: List[str] = None) -> None:
     # Get the captions
     get_captions(file_list_txt=parsed_args.file_list_txt,
                  override=parsed_args.override)
+
 
 if __name__ == '__main__':
     main()

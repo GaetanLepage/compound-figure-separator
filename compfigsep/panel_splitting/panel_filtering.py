@@ -23,27 +23,25 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Function to filter out unlikely panels.
 """
 
-from typing import List, Dict, Set
-
 from ..utils.figure.panel import DetectedPanel
 from ..utils import box
 
 
-def filter_panels(panel_list: List[DetectedPanel],
-                  overlap_threshold: float = 0.2) -> List[DetectedPanel]:
+def filter_panels(panel_list: list[DetectedPanel],
+                  overlap_threshold: float = 0.2) -> list[DetectedPanel]:
     """
     TODO
 
     Args:
-        panel_list (List[DetectedPanel]):   A list of detected panels.
+        panel_list (list[DetectedPanel]):   A list of detected panels.
 
     Returns:
-        filtered_panels (List[DetectedPanel]):  The list of filtered panels.
+        filtered_panels (list[DetectedPanel]):  The list of filtered panels.
     """
 
-    kept_panels: List[DetectedPanel] = panel_list.copy()
+    kept_panels: list[DetectedPanel] = panel_list.copy()
 
-    mask: List[bool] = [True for _ in range(len(panel_list))]
+    mask: list[bool] = [True for _ in range(len(panel_list))]
 
     # Cycle through the detections to see if we discard them.
     for index_1, panel_1 in enumerate(panel_list):

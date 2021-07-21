@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluator for the panel segmentation task.
 """
 
-from typing import List, Dict, Any
+from typing import Any
 
 from ..utils.figure import (Figure,
                             DetectedPanel,
@@ -58,16 +58,15 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
                          export=export,
                          export_dir=export_dir)
 
-
     def process(self,
-                inputs: List[dict],
-                outputs: List[dict]) -> None:
+                inputs: list[dict],
+                outputs: list[dict]) -> None:
         """
         Process pairs of inputs and outputs.
 
         Args:
-            inputs (List[dict]):    The inputs that's used to call the model.
-            outputs (List[dict]):   The return value of `model(inputs)`.
+            inputs (list[dict]):    The inputs that's used to call the model.
+            outputs (list[dict]):   The return value of `model(inputs)`.
         """
 
         for input_element, output_element in zip(inputs, outputs):
@@ -80,13 +79,13 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
             panel_boxes = panel_instances.pred_boxes.tensor.numpy()
             panel_scores = panel_instances.scores.tolist()
 
-            predicted_panels: List[Dict[str, Any]] = []
-            for box, score in zip(panel_boxes, panel_scores):
-                prediction = {
+            predicted_panels: list[dict[str, Any]] = [
+                {
                     'box': box,
-                    'score': score}
-
-                predicted_panels.append(prediction)
+                    'score': score
+                }
+                for box, score in zip(panel_boxes, panel_scores)
+            ]
 
             self._predictions[image_id]['panels'] = predicted_panels
 
@@ -96,18 +95,16 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
             label_scores = label_instances.scores.tolist()
             label_classes = label_instances.pred_classes.tolist()
 
-            predicted_labels: List[Dict[str, Any]] = []
-
-            for box, score, l_cls in zip(label_boxes, label_scores, label_classes):
-                prediction = {
+            predicted_labels: list[dict[str, Any]] = [
+                {
                     'box': box,
                     'score': score,
                     'label': l_cls
                 }
-                predicted_labels.append(prediction)
+                for box, score, l_cls in zip(label_boxes, label_scores, label_classes)
+            ]
 
             self._predictions[image_id]['labels'] = predicted_labels
-
 
     def _predict(self, figure: Figure) -> None:
         """
@@ -124,7 +121,6 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
             detected_labels = self._predictions[figure.index]['labels']
         except KeyError:
             return
-
 
         # Convert panels and labels from dict to DetectedPanel objects
         figure.detected_panels = [DetectedPanel(box=panel['box'],

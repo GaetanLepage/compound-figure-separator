@@ -28,7 +28,7 @@ import os
 import logging
 import random
 import xml.etree.ElementTree as ET
-from typing import cast, Iterable, List, Optional
+from typing import cast, Iterable, Optional
 from argparse import ArgumentParser
 
 from ...utils.figure import Figure, Panel, SubFigure
@@ -45,9 +45,9 @@ def add_image_clef_args(parser: ArgumentParser) -> None:
     """
 
     parser.add_argument('--annotation_xml',
-                help="The path to the xml annotation file.",
-                default="data/ImageCLEF/training/FigureSeparationTraining2016GT.xml",
-                type=str)
+                        help="The path to the xml annotation file.",
+                        default="data/ImageCLEF/training/FigureSeparationTraining2016GT.xml",
+                        type=str)
 
     parser.add_argument('--image_directory_path',
                         help="The path to the directory where the images are stored.",
@@ -65,7 +65,7 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
         current_index (int):                    Index of the currently handled figure. This helps
                                                     knowing the "progression" of the data loading
                                                     process.
-        annotation_items (List[ET.Element]):    List of annotations for the whole data set.
+        annotation_items (list[ET.Element]):    List of annotations for the whole data set.
         num_images (int):                       The number of images in the data set.
         image_directory_path (str):             Path to the directory where image files are
                                                     stored.
@@ -106,13 +106,11 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
         # path of the directory where the images are stored.
         self.image_directory_path = image_directory_path
 
-
     def __copy__(self) -> ImageClefXmlFigureGenerator:
 
         return ImageClefXmlFigureGenerator(xml_annotation_file_path=self.xml_annotation_file_path,
                                            image_directory_path=self.image_directory_path,
                                            default_random_order=self.default_random_order)
-
 
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """
@@ -168,10 +166,10 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
                                point_items[3].get('x'),
                                point_items[3].get('y')]
 
-                if any([coord is None for coord in coordinates]):
+                if any(coord is None for coord in coordinates):
                     continue
 
-                str_coordinates: List[str] = cast(List[str],
+                str_coordinates: list[str] = cast(list[str],
                                                   coordinates)
 
                 # Create Panel object

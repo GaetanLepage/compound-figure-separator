@@ -30,45 +30,42 @@ Tensorflow's Object Detection API.
 import sys
 from argparse import ArgumentParser, Namespace
 
-from typing import List
-
 sys.path.append(".")
 
 from compfigsep.data.figure_generators import add_image_clef_args, ImageClefXmlFigureGenerator
 from compfigsep.data.export import export_figures_to_tf_record
 
 
-def parse_args(args: List[str]) -> Namespace:
+def parse_args(args: list[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]):   The arguments from the command line call.
+        args (list[str]):   The arguments from the command line call.
 
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser = ArgumentParser(description="Convert the ImageCLEF dataset to a"\
+    parser = ArgumentParser(description="Convert the ImageCLEF dataset to a"
                                         " TFRecord file.")
 
     add_image_clef_args(parser=parser)
 
     parser.add_argument('--output_tfrecord',
-                        help="The path of the tfrecord file to which annotations"\
+                        help="The path of the tfrecord file to which annotations"
                              " have to be exported.",
                         default="data/ImageCLEF/training/training.tfrecord",
                         type=str)
 
-
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None) -> None:
+def main(args: list[str] = None) -> None:
     """
     Export the ImageCLEF dataset to a TFRecord file.
 
     Args:
-        args (List[str]):   The arguments from the command line call.
+        args (list[str]):   The arguments from the command line call.
     """
 
     # Parse arguments.

@@ -28,7 +28,6 @@ This scripts reads a given config file and runs the training or evaluation.
 """
 
 from argparse import Namespace, ArgumentParser
-from typing import List, Dict
 
 import torch
 from torch import nn
@@ -80,14 +79,14 @@ class Trainer(DefaultTrainer):
                                    export_dir=cfg.OUTPUT_DIR)
 
 
-    def build_hooks(self) -> List[HookBase]:
+    def build_hooks(self) -> list[HookBase]:
         """
         This method overwrites the default one from DefaultTrainer.
         It adds (if necessary) the `LossEvalHook` that allows evaluating the loss on the
         validation set.
 
         Returns:
-            List[HookBase]: The augmented list of hooks.
+            list[HookBase]: The augmented list of hooks.
         """
         # Build a list of default hooks, including timing, evaluation,
         # checkpointing, lr scheduling, precise BN, writing events.
@@ -139,7 +138,7 @@ def setup(parsed_args: Namespace) -> CfgNode:
     Create configs and perform basic setups.
 
     Args:
-        args (List[str]): Arguments from the command line.
+        args (list[str]): Arguments from the command line.
 
     Retuns:
         cfg (CfgNode): A config node filled with necessary options.
@@ -177,7 +176,7 @@ def register_datasets(cfg: CfgNode):
         register_label_recognition_dataset(dataset_name=cfg.DATASETS.VALIDATION)
 
 
-def main(parsed_args: Namespace) -> Dict:
+def main(parsed_args: Namespace) -> dict:
     """
     Launch training/testing for the label recognition task on a single device.
 
@@ -203,7 +202,7 @@ def main(parsed_args: Namespace) -> Dict:
         DetectionCheckpointer(model,
                               save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS,
                                                                       resume=parsed_args.resume)
-        res: Dict = Trainer.test(cfg, model)
+        res: dict = Trainer.test(cfg, model)
         if comm.is_main_process():
             verify_results(cfg=cfg,
                            results=res)

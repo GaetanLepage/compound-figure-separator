@@ -26,13 +26,14 @@ In every 'box' function, boxes should respect the format [x1, y1, x2, y2].
 """
 from typing import NamedTuple
 
-from typing import Tuple
-Box = Tuple[int, int, int, int]
+Box = tuple[int, int, int, int]
+
 
 class Point(NamedTuple):
     """
     NamedTuple representing a point in a 2D image.
     """
+
     x: int
     y: int
 
@@ -53,7 +54,7 @@ def get_center(box: Box) -> Point:
     return Point(int(x_center), int(y_center))
 
 
-def get_width_and_height(box: Box) -> Tuple[int, int]:
+def get_width_and_height(box: Box) -> tuple[int, int]:
     """
     Compute the width and height of the given box.
 
@@ -61,7 +62,7 @@ def get_width_and_height(box: Box) -> Tuple[int, int]:
         box (Box):  A box [x1, y1, x2, y2].
 
     Returns:
-        width, height (Tuple[int, int]):    The width and heights.
+        width, height (tuple[int, int]):    The width and heights.
     """
     width: int = box[2] - box[0]
     assert width > 0
@@ -84,7 +85,6 @@ def union(box_1: Box,
     Returns:
         union (Box):    The union of box_1 and box_2 [x, y, x+w, y+h].
     """
-
     x_union: int = min(box_1[0], box_2[0])
     y_union: int = min(box_1[1], box_2[1])
     width_union: int = max(box_1[2], box_2[2]) - x_union
@@ -109,7 +109,6 @@ def intersection(box_1: Box,
         intersection (Box): The intersection of box_1 and box_2
                                 [x, y, x+w, y+h].
     """
-
     # box_1 and box_2 should be [x1, y1, x2, y2]
     x_intersect = max(box_1[0], box_2[0])
     y_intersect = max(box_1[1], box_2[1])
@@ -135,7 +134,6 @@ def area(box: Box) -> int:
     Returns:
         area (int): The area of the box.
     """
-
     return (box[2] - box[0]) * (box[3] - box[1])
 
 
@@ -153,7 +151,6 @@ def union_area(box_1: Box,
     Returns:
         union_area (int):   The area of the union of box_1 and box_2.
     """
-
     area_1: int = area(box_1)
     area_2: int = area(box_2)
 
@@ -174,7 +171,6 @@ def intersection_area(box_1: Box,
     Returns:
         intersection_area (int):    The area of the intersection of box_1 and box_2.
     """
-
     x_intersect: int = max(box_1[0], box_2[0])
     y_intersect: int = max(box_1[1], box_2[1])
     width_intersect: int = min(box_1[2], box_2[2]) - x_intersect
@@ -198,7 +194,6 @@ def iou(box_1: Box,
     Returns:
         iou (float):    The IoU between box_1 and box_2.
     """
-
     if box_1[0] >= box_1[2] \
             or box_2[1] >= box_2[3] \
             or box_2[0] >= box_2[2] \

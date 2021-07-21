@@ -28,7 +28,6 @@ This scripts reads a given config file and runs the training or evaluation.
 """
 
 from argparse import ArgumentParser, Namespace
-from typing import List
 
 from torch.utils.data import DataLoader
 from torch import nn
@@ -76,7 +75,7 @@ class Trainer(DefaultTrainer):
                                    export_dir=cfg.OUTPUT_DIR)
 
 
-    def build_hooks(self) -> List[HookBase]:
+    def build_hooks(self) -> list[HookBase]:
         """
         This method overwrites the default one from DefaultTrainer.
         It adds the `LossEvalHook` that allows
@@ -84,9 +83,9 @@ class Trainer(DefaultTrainer):
         checkpointing, lr scheduling, precise BN, writing events.
 
         Returns:
-            List[HookBase]: The augmented list of hooks.
+            list[HookBase]: The augmented list of hooks.
         """
-        hooks: List[HookBase] = super().build_hooks()
+        hooks: list[HookBase] = super().build_hooks()
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":

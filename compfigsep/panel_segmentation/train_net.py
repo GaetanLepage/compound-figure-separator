@@ -28,7 +28,6 @@ This scripts reads a given config file and runs the training or evaluation.
 """
 
 from argparse import Namespace
-from typing import List
 
 from logging import Logger
 
@@ -123,7 +122,7 @@ class Trainer(DefaultTrainer):
                                            mapper=mapper)
 
 
-    def build_hooks(self) -> List[HookBase]:
+    def build_hooks(self) -> list[HookBase]:
         """
         This method overwrites the default one from DefaultTrainer.
         It adds the `LossEvalHook` that allows evaluating results on the validation set.
@@ -133,7 +132,7 @@ class Trainer(DefaultTrainer):
         Returns:
             list[HookBase]: The list of hooks to call during training.
         """
-        hooks: List[HookBase] = super().build_hooks()
+        hooks: list[HookBase] = super().build_hooks()
 
         # TODO remove as it can't work
         # input_example = next(iter(self.data_loader))

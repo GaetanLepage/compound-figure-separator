@@ -23,7 +23,6 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel splitting task metrics.
 """
 
-from typing import Tuple, Dict, List
 from pprint import pprint
 from collections import namedtuple
 
@@ -37,13 +36,14 @@ from ..utils.average_precision import compute_average_precision
 from ..panel_splitting.evaluate import Detection
 
 MultiClassFigureResult = namedtuple("MultiClassFigureResult",
-                                        [
-                                            'gt_count',
-                                            'gt_count_by_class',
-                                            'detected_count',
-                                            'detections_by_class',
-                                            'correct_count'
-                                        ])
+                                    [
+                                        'gt_count',
+                                        'gt_count_by_class',
+                                        'detected_count',
+                                        'detections_by_class',
+                                        'correct_count'
+                                    ])
+
 
 def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
     """
@@ -60,7 +60,7 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
     figure.match_detected_and_gt_labels()
 
     gt_count: int = 0
-    gt_count_by_class: Dict[str, int] = {}
+    gt_count_by_class: dict[str, int] = {}
 
     # Keep track of the number of gt labels for each class
     for gt_subfigure in figure.gt_subfigures:
@@ -83,7 +83,6 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
         else:
             gt_count_by_class[cls] += 1
 
-
     detected_count: int = len(figure.detected_labels)
 
     # TODO remove
@@ -91,10 +90,10 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
     # print("Number of detected labels :", len(figure.detected_labels))
 
     num_correct: int = 0
-    detections_by_class: Dict[str, List[Detection]] = {}
+    detections_by_class: dict[str, list[Detection]] = {}
 
     for detected_label in figure.detected_labels:
-        detected_count +=1
+        detected_count += 1
         num_correct += int(detected_label.is_true_positive)
 
         if detected_label.text is None:
@@ -121,13 +120,13 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
                                   correct_count=num_correct)
 
 
-def multi_class_metrics(results: List[MultiClassFigureResult]) -> Tuple[float, float, float]:
+def multi_class_metrics(results: list[MultiClassFigureResult]) -> tuple[float, float, float]:
     """
     Compute the metrics for a multi class detection task.
     Used for both label recognition and panel segmentation tasks
 
     Args:
-        results (List[MultiClassFigureResult]): TODO
+        results (list[MultiClassFigureResult]): TODO
 
     Returns:
         precision (float):  Precision value (TP / TP + FN).
@@ -139,9 +138,9 @@ def multi_class_metrics(results: List[MultiClassFigureResult]) -> Tuple[float, f
     overall_correct_count: int = 0
 
     # detections_by_class is like: {class -> [(score, is_tp)]}
-    detections_by_class: Dict[str, SortedKeyList[Detection]] = {}
+    detections_by_class: dict[str, SortedKeyList[Detection]] = {}
     # gt_count_by_class {class -> number_of_gt}
-    gt_count_by_class: Dict[str, int] = {}
+    gt_count_by_class: dict[str, int] = {}
 
     for figure_result in results:
         overall_gt_count += figure_result.gt_count
@@ -159,7 +158,6 @@ def multi_class_metrics(results: List[MultiClassFigureResult]) -> Tuple[float, f
             if cls not in detections_by_class:
                 detections_by_class[cls] = SortedKeyList(key=lambda detection: -detection.score)
 
-
             for detection in detection_list:
                 detections_by_class[cls].add(detection)
 
@@ -174,7 +172,7 @@ def multi_class_metrics(results: List[MultiClassFigureResult]) -> Tuple[float, f
     for cls in detections_by_class:
 
         # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
-        class_true_positives: List[int] = [int(detection.is_true_positive)
+        class_true_positives: list[int] = [int(detection.is_true_positive)
                                            for detection
                                            in detections_by_class[cls]]
 
@@ -200,14 +198,13 @@ def multi_class_metrics(results: List[MultiClassFigureResult]) -> Tuple[float, f
             recall=class_cumulated_recalls,
             precision=class_cumulated_precisions)
 
-
     # normalize mAP by the number of classes
     mean_average_precision /= len(detections_by_class)
 
     return precision, recall, mean_average_precision
 
 
-def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
+def evaluate_detections(figure_generator: FigureGenerator) -> dict[str, float]:
     """
     Compute the metrics (precision, recall and mAP) from a given set of label recognition
     detections.
@@ -217,15 +214,15 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
                                                 with detected labels.
 
     Returns:
-        metrics (Dict[str, float]): A dict containing the computed metrics.
+        metrics (dict[str, float]): A dict containing the computed metrics.
     """
     # List containing the evaluation statistics for each figure.
-    results: List[MultiClassFigureResult] = [label_recognition_figure_eval(figure)
+    results: list[MultiClassFigureResult] = [label_recognition_figure_eval(figure)
                                              for figure in figure_generator()]
 
     precision, recall, mean_average_precision = multi_class_metrics(results=results)
 
-    metrics: Dict[str, float] = {
+    metrics: dict[str, float] = {
         'precision': precision,
         'recall': recall,
         'mAP': mean_average_precision

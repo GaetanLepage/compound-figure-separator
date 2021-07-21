@@ -29,9 +29,6 @@ import sys
 import os
 from argparse import ArgumentParser, Namespace
 
-from typing import List
-
-
 from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
 from compfigsep.caption_splitting import evaluate_detections
 
@@ -42,12 +39,12 @@ MODULE_DIR = os.path.dirname(compfigsep.__file__)
 
 
 
-def _parse_args(args: List[str]) -> Namespace:
+def _parse_args(args: list[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]):   The arguments from the command line call.
+        args (list[str]):   The arguments from the command line call.
 
     Returns:
         parser (Namespace): Populated namespace.
@@ -60,12 +57,12 @@ def _parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None) -> None:
+def main(args: list[str] = None) -> None:
     """
     Launch evaluation of the caption_splitting task on a JSON data set.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        args (list[str]):   Arguments from the command line.
     """
 
     # Parse arguments.

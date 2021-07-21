@@ -28,7 +28,7 @@ import sys
 import json
 from argparse import ArgumentParser, Namespace
 
-from typing import List, Optional, Dict
+from typing import Optional
 
 import csv
 
@@ -42,18 +42,18 @@ from compfigsep.data.figure_generators.json_figure_generator import JsonFigureGe
 
 sys.path.append(".")
 
-def parse_args(args: List[str]) -> Namespace:
+
+def parse_args(args: list[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]):   The arguments from the command line call.
+        args (list[str]):   The arguments from the command line call.
 
     Returns:
         namespace (Namespace):  Populated namespace.
     """
     parser: ArgumentParser = ArgumentParser(description="TODO")
-
 
     parser.add_argument('--initial_json',
                         dest="initial_json",
@@ -69,7 +69,6 @@ def parse_args(args: List[str]) -> Namespace:
                         dest="json_output_filename",
                         help="Name of the json export file.",
                         type=str)
-
 
     return parser.parse_args(args)
 
@@ -89,10 +88,9 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
     with open(annotation_csv, 'r') as csv_annotation_file:
         csv_reader = csv.reader(csv_annotation_file, delimiter='\t')
 
-        rows: List[List[str]] = list(csv_reader)[1:]
+        rows: list[list[str]] = list(csv_reader)[1:]
 
-
-    output_dict: Dict[str, Dict] = {}
+    output_dict: dict[str, dict] = {}
 
     for figure in figure_generator(random_order=False):
 
@@ -100,7 +98,7 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
         print('->', figure.image_filename)
 
         # Find the corresponding row in the annotation file.
-        matched_row: Optional[List[str]] = None
+        matched_row: Optional[list[str]] = None
 
         for row_index, row in enumerate(rows):
 
@@ -130,19 +128,18 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
             #       f"|| {len(figure.caption)}")
             figure.caption = annotation_caption_text
 
-
         ########################
         # Labels list checkups #
         ########################
 
         num_subfigures: int = len(figure.gt_subfigures)
 
-        label_text_list: List[str] = [label.strip()
+        label_text_list: list[str] = [label.strip()
                                       for label in matched_row[2].split(',')]
 
         print("annotation label_text_list:", label_text_list)
 
-        gt_label_list: List[str] = [subfigure.label.text
+        gt_label_list: list[str] = [subfigure.label.text
                                     if hasattr(subfigure, 'label')
                                     and subfigure.label is not None
                                     else '_'
@@ -170,10 +167,9 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
 
         assert sorted(label_text_list) == sorted(gt_label_list)
 
-        subcaptions: List[str] = [cell_text.strip()
+        subcaptions: list[str] = [cell_text.strip()
                                   for cell_text in matched_row[3:]
                                   if cell_text.strip() != '']
-
 
         ################################################
         # Case 1: There is no labels : ['_', '_', '_'] #
@@ -211,8 +207,9 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
 
                 if hasattr(subfigure, 'label') and subfigure.label is not None:
                     subfigure_label_text: str = subfigure.label.text
-                    assert (subfigure_label_text == gt_label) or (map_label(subfigure_label_text) == map_label(gt_label)),\
-                            f"{subfigure.label.text} != {gt_label}"
+                    assert (subfigure_label_text == gt_label) \
+                        or (map_label(subfigure_label_text) == map_label(gt_label)),\
+                        f"{subfigure.label.text} != {gt_label}"
 
                 if label == gt_label:
                     subfigure.caption = subcaption
@@ -222,20 +219,18 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
 
         output_dict[figure.image_filename] = figure.to_dict()
 
-
     with open(json_output_filename, 'w') as json_file:
         json.dump(obj=output_dict,
                   fp=json_file,
                   indent=4)
 
 
-
-def main(args: List[str] = None) -> None:
+def main(args: list[str] = None) -> None:
     """
     TODO
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        args (list[str]):   Arguments from the command line.
     """
 
     # Parse arguments.

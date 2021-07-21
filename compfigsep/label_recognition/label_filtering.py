@@ -26,7 +26,7 @@ Based on the Belief-Propagation algorithm proposed in this paper:
 https://lhncbc.nlm.nih.gov/system/files/pub2011-082.pdf
 """
 
-from typing import List, Dict, Set, Tuple, Optional
+from typing import Optional
 import numpy as np
 
 from ..utils.figure.label import (DetectedLabel,
@@ -37,16 +37,16 @@ from ..utils.figure.label import (DetectedLabel,
 from ..utils import box
 
 ALPHA: float = 0.5
-BETA:  float = 1 - ALPHA
+BETA: float = 1 - ALPHA
 GAMMA: float = 0.5
 DELTA: float = 1 - GAMMA
 
 
 def _unary_compatibility(label: DetectedLabel,
-                         label_index:                       int,
-                         number_of_labels_in_prior_zone:    int,
-                         alpha:                             float = ALPHA,
-                         beta:                              float = BETA) -> np.ndarray:
+                         label_index: int,
+                         number_of_labels_in_prior_zone: int,
+                         alpha: float = ALPHA,
+                         beta: float = BETA) -> np.ndarray:
     """
     Computes the unary compatibility function values for the detected label for both possible
     values of assigned label f_i.
@@ -75,11 +75,10 @@ def _unary_compatibility(label: DetectedLabel,
     return result
 
 
-
-def _binary_compatibility(label_1:          DetectedLabel,
-                          label_2:          DetectedLabel,
-                          label_1_index:    int,
-                          label_2_index:    int) -> np.ndarray:
+def _binary_compatibility(label_1: DetectedLabel,
+                          label_2: DetectedLabel,
+                          label_1_index: int,
+                          label_2_index: int) -> np.ndarray:
     """
     Computes the binary compatibility function values for two given detected labels for all
     possible values of assigned labels f_i and f_j.
@@ -96,8 +95,7 @@ def _binary_compatibility(label_1:          DetectedLabel,
                                     possible pairs of input values (f_i, f_j).
                                     -> Shape = (2, 2)
     """
-
-    assert label_1.box  is not None and label_2.box is not None
+    assert label_1.box is not None and label_2.box is not None
     assert label_1.text is not None and label_2.text is not None
 
     ratio_areas: float = box.area(label_1.box) / box.area(label_2.box)
@@ -162,7 +160,6 @@ def _is_label_in_prior_zone(label_1: DetectedLabel,
     Returns:
         is_in_prior_zone (bool):    True if label_2 is in the prior zone of label_1.
     """
-
     label_1_pos: box.Point = box.get_center(label_1.box)
     label_2_pos: box.Point = box.get_center(label_2.box)
 
@@ -173,7 +170,7 @@ def _is_label_in_prior_zone(label_1: DetectedLabel,
     return is_at_left or is_above
 
 
-def _build_neighbors(label_list: List[DetectedLabel]) -> np.ndarray:
+def _build_neighbors(label_list: list[DetectedLabel]) -> np.ndarray:
     """
     Builds the adjacency matrix.
     adjacency_matrix[i, j] = 1 if and only if labels j is in the neighborhood of label i.
@@ -181,7 +178,7 @@ def _build_neighbors(label_list: List[DetectedLabel]) -> np.ndarray:
     the adjacency matrix can be asymetric.
 
     Args:
-        label_list (List[DetectedLabel]):   List of detected labels.
+        label_list (list[DetectedLabel]):   list of detected labels.
 
     Returns:
         adjacency_matrix (np.ndarray):  The asdjacency (symmetric) matrix of the underlying graph.
@@ -217,13 +214,13 @@ def _build_neighbors(label_list: List[DetectedLabel]) -> np.ndarray:
     return adjacency_matrix
 
 
-def _precompute_compatibility_functions(label_list: List[DetectedLabel]
-                                        ) -> Tuple[np.ndarray, np.ndarray]:
+def _precompute_compatibility_functions(label_list: list[DetectedLabel]
+                                        ) -> tuple[np.ndarray, np.ndarray]:
     """
     Precompute the compatibility function values.
 
     Args:
-        label_list (List[DetectedLabel]):   The list of originally detected labels.
+        label_list (list[DetectedLabel]):   The list of originally detected labels.
 
     Returns:
         unary_compatibility_values (np.ndarray):    The values of the unary compatibility function
@@ -239,11 +236,10 @@ def _precompute_compatibility_functions(label_list: List[DetectedLabel]
                                                         -> Shape = (num_labels, num_labels, 2, 2)
 
     """
-    label_text_list: List[str] = [label.text for label in label_list]
-
+    label_text_list: list[str] = [label.text for label in label_list]
 
     label_structure_type: LabelStructureEnum = LabelStructure.from_labels_list(
-    labels_list=label_text_list).labels_type
+        labels_list=label_text_list).labels_type
 
     print(label_text_list)
     print(label_structure_type)
@@ -263,29 +259,25 @@ def _precompute_compatibility_functions(label_list: List[DetectedLabel]
             num_labels_in_prior_zone += int(_is_label_in_prior_zone(label_1=label_i,
                                                                     label_2=label_j))
 
-
             label_j_index: int = LABEL_INDEX[label_structure_type](label_j.text)
             binary_compatibility_values[i, j] = _binary_compatibility(label_1=label_i,
                                                                       label_2=label_j,
                                                                       label_1_index=label_i_index,
                                                                       label_2_index=label_j_index)
 
-
         unary_compatibility_values[i] = _unary_compatibility(
             label=label_i,
             label_index=label_i_index,
             number_of_labels_in_prior_zone=num_labels_in_prior_zone)
 
-
     return unary_compatibility_values, binary_compatibility_values
 
-
-def _belief_propagation(label_list: List[DetectedLabel]) -> np.ndarray:
+def _belief_propagation(label_list: list[DetectedLabel]) -> np.ndarray:
     """
     Apply the belief propagation algorithm to compute the beliefs.
 
     Args:
-        label_list (List[DetectedLabel]):   The list of detected labels.
+        label_list (list[DetectedLabel]):   The list of detected labels.
 
     Returns:
         beliefs (np.ndarray):   The value of the beliefs for each label.
@@ -325,21 +317,19 @@ def _belief_propagation(label_list: List[DetectedLabel]) -> np.ndarray:
                 # m_ij(f_j) = max f_i [r_i(f_i) r_ij(f_i, f_j) max k m_ki(f_i)]
                 messages[i, j] = [
                     np.max([
-                       unary_compatibility_values[i][f_i] \
-                           * binary_compatibility_values[i, j][f_i, f_j] \
+                        unary_compatibility_values[i][f_i]
+                           * binary_compatibility_values[i, j][f_i, f_j]
                            * np.max([
                                messages[k, i][f_i]
                                if k != j and adjacency_matrix[k, i] == 1
                                else 0
-                               for k in range(num_labels)]
-                            )
-                       for f_i in (0, 1)]
-                    )
+                               for k in range(num_labels)])
+                           for f_i in (0, 1)]
+                           )
                     for f_j in (0, 1)]
 
     print("messages f_j = 0\n", str(messages[:, :, 0]))
     print("messages f_j = 1\n", str(messages[:, :, 1]))
-
 
     beliefs: np.ndarray = np.zeros(shape=(num_labels, 2))
 
@@ -355,37 +345,36 @@ def _belief_propagation(label_list: List[DetectedLabel]) -> np.ndarray:
         # print(type(value))
         # print(beliefs[i].shape)
         # beliefs[i] = value
-        beliefs[i] = [unary_compatibility_values[i][f_i] * np.max([
-                            messages[j, i][f_i]
-                            if adjacency_matrix[j, i] == 1
-                            else 0
-                            for j in range(num_labels)])
-                       for f_i in (0, 1)]
+        beliefs[i] = [unary_compatibility_values[i][f_i] * np.max([messages[j, i][f_i]
+                                                                   if adjacency_matrix[j, i] == 1
+                                                                   else 0
+                                                                   for j in range(num_labels)])
+                      for f_i in (0, 1)]
 
     return beliefs
 
 
 
-def filter_labels(label_list:       List[DetectedLabel],
-                  belief_threshold: float = 0.8) -> List[DetectedLabel]:
+def filter_labels(label_list: list[DetectedLabel],
+                  belief_threshold: float = 0.8) -> list[DetectedLabel]:
     """
     Filter false positive labels previously detected in the image.
 
     Args:
-        label_list (List[DetectedLabel]):   A list of detected labels.
+        label_list (list[DetectedLabel]):   A list of detected labels.
         belief_threshold (float):           Labels having a belief for f_i=1 which is inferior to
                                                 this value are discarded.
 
     Returns:
-        filtered_labels (List[DetectedLabel]):  The list of filtered labels.
+        filtered_labels (list[DetectedLabel]):  The list of filtered labels.
     """
-    label_text_list: List[str] = [label.text for label in label_list]
+    label_text_list: list[str] = [label.text for label in label_list]
 
     print(label_text_list)
 
     label_structure: LabelStructure = LabelStructure.from_labels_list(labels_list=label_text_list)
 
-    new_label_list: List[DetectedLabel] = []
+    new_label_list: list[DetectedLabel] = []
 
     for label_text in label_structure.get_core_label_list():
 
@@ -412,7 +401,7 @@ def filter_labels(label_list:       List[DetectedLabel],
 
     beliefs: np.ndarray = _belief_propagation(label_list=new_label_list)
 
-    filtered_labels: List[DetectedLabel] = [
+    filtered_labels: list[DetectedLabel] = [
         label
         for i, label in enumerate(new_label_list)
         if beliefs[i][1] > belief_threshold

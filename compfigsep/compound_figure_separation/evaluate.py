@@ -25,10 +25,10 @@ Evaluation tool for compound figure separation.
 TODO
 """
 
-from typing import Dict, Any, List
+from typing import Any
 from pprint import pprint
 
-from sortedcontainers import SortedKeyList # type: ignore
+from sortedcontainers import SortedKeyList  # type: ignore
 
 from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
@@ -50,14 +50,14 @@ from ..caption_splitting.evaluate import (CaptionSplittingFigureResult,
 
 
 def compound_figure_separation_figure_eval(figure: Figure,
-                                           stat_dict: Dict[str, Any]):
+                                           stat_dict: dict[str, Any]):
     """
     Evaluate compound figure separation metrics on a single figure.
 
     Args:
         figure (Figure):            The figure on which to evaluate the compound figure separation
                                         task.
-        stat_dict (Dict[str, any]): A dict containing compound figure evaluation evaluation stats
+        stat_dict (dict[str, any]): A dict containing compound figure evaluation evaluation stats
                                         It will be updated by this function.
 """
     # Keep track of the number of gt panels for each class
@@ -118,10 +118,10 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         metrics (dict): A dict containing the computed metrics.
     """
 
-    panel_splitting_results:    List[PanelSplittingFigureResult]    = []
-    label_recognition_results:  List[MultiClassFigureResult]        = []
-    panel_segmentation_results: List[MultiClassFigureResult]        = []
-    caption_splitting_results:  List[CaptionSplittingFigureResult]  = []
+    panel_splitting_results: list[PanelSplittingFigureResult] = []
+    label_recognition_results: list[MultiClassFigureResult] = []
+    panel_segmentation_results: list[MultiClassFigureResult] = []
+    caption_splitting_results: list[CaptionSplittingFigureResult] = []
 
     for figure in figure_generator():
 
@@ -148,40 +148,39 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
 
         # print("\nPanel segmentation figure stats")
         panel_segmentation_results.append(panel_segmentation_figure_eval(figure))
-        #figure.show_preview(mode='both', window_name='panel_segmentation')
+        # figure.show_preview(mode='both', window_name='panel_segmentation')
 
         # 4) Caption segmentation
         caption_splitting_results.append(caption_splitting_figure_eval(figure))
 
-
-    metrics: Dict[str, Dict[str, float]] = {}
+    metrics: dict[str, dict[str, float]] = {}
 
     # Panel splitting
     psp_imageclef_acc, psp_precision, psp_recall, psp_map = panel_splitting_metrics(
         results=panel_splitting_results)
     metrics['panel_splitting'] = {
-        'imageclef_accuracy':   psp_imageclef_acc,
-        'precision':            psp_precision,
-        'recall':               psp_recall,
-        'mAP':                  psp_map
+        'imageclef_accuracy': psp_imageclef_acc,
+        'precision': psp_precision,
+        'recall': psp_recall,
+        'mAP': psp_map
     }
 
     # Label recognition
     lrec_precision, lrec_recall, lrec_map = multi_class_metrics(
         results=label_recognition_results)
     metrics['label_recognition'] = {
-        'precision':    lrec_precision,
-        'recall':       lrec_recall,
-        'mAP':          lrec_map
+        'precision': lrec_precision,
+        'recall': lrec_recall,
+        'mAP': lrec_map
     }
 
     # Panel segmentation
     pseg_precision, pseg_recall, pseg_map = multi_class_metrics(
         results=panel_segmentation_results)
     metrics['panel_segmentation'] = {
-        'precision':    pseg_precision,
-        'recall':       pseg_recall,
-        'mAP':          pseg_map
+        'precision': pseg_precision,
+        'recall': pseg_recall,
+        'mAP': pseg_map
     }
 
     # Caption splitting

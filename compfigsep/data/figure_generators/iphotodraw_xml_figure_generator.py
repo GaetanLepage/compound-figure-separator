@@ -28,7 +28,7 @@ import os
 import sys
 import logging
 import random
-from typing import Iterable, List, Optional
+from typing import Iterable, Optional
 from argparse import ArgumentParser
 
 import progressbar
@@ -62,7 +62,6 @@ def add_iphotodraw_args(parser: ArgumentParser,
                         type=str)
 
 
-
 class IphotodrawXmlFigureGenerator(FigureGenerator):
     """
     Generator of Figure objects from iPhotoDraw xml annotations (PanelSeg data set).
@@ -72,14 +71,14 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
     Attributes:
         data_dir (str):                 The path to the directory where the image data sets are
                                             stored.
-        image_paths (List[str]):        List of the image paths.
+        image_paths (list[str]):        List of the image paths.
         default_random_order (bool):    Wether to yield figures in a random order.
     """
 
     def __init__(self,
                  file_list_txt: str = None,
                  image_directory_path: str = None,
-                 image_paths_list: List[str] = None,
+                 image_paths_list: list[str] = None,
                  caption_annotation_file: str = None,
                  default_random_order: bool = False) -> None:
         """
@@ -95,7 +94,7 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
 
         # If a list of image paths was provided.
         if image_paths_list is not None:
-            self.image_paths = image_paths_list
+            self.image_paths: list[str] = image_paths_list
 
         # If a list of image files was provided, read it and store the image files.
         elif file_list_txt is not None:
@@ -119,18 +118,15 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
             logging.error("Either one of the options has to be set.")
             sys.exit(1)
 
-
         # Caption annotations
         if caption_annotation_file is not None:
             with open(caption_annotation_file, 'r') as caption_annotation_file_:
                 self.caption_lines = caption_annotation_file_.readlines()
 
-
     def __copy__(self) -> IphotodrawXmlFigureGenerator:
 
         return IphotodrawXmlFigureGenerator(image_paths_list=self.image_paths,
                                             default_random_order=self.default_random_order)
-
 
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """
@@ -146,7 +142,7 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
         if random_order is None:
             random_order = self.default_random_order
 
-        image_paths = self.image_paths.copy()
+        image_paths: list[str] = self.image_paths.copy()
 
         if random_order:
             random.shuffle(image_paths)

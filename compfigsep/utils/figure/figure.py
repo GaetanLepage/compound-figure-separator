@@ -28,7 +28,7 @@ from __future__ import annotations
 import os
 import csv
 import logging
-from typing import cast, List, Dict, Set, Optional, Any
+from typing import cast, Set, Optional, Any
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
 
@@ -62,12 +62,12 @@ class Figure:
         labels_structure (LabelStructure):              Object defining entirely the labels of the
                                                             figure.
         caption (str):                                  The complete caption.
-        detected_subcaptions (Dict[str, str]):          The dict containing detected subcaptions.
+        detected_subcaptions (dict[str, str]):          The dict containing detected subcaptions.
         preview_image (np.ndarray):                     The preview image (image + bounding boxes)
-        gt_subfigures (List[SubFigure]):                Ground truth subfigure objects.
-        detected_panels (List[DetectedPanel]):          Detected panel objects.
-        detected_labels (List[DetectedLabel]):          Detected label objects.
-        detected_subfigures (List[DetectedSubFigure]):  Detected subfigure objects.
+        gt_subfigures (list[SubFigure]):                Ground truth subfigure objects.
+        detected_panels (list[DetectedPanel]):          Detected panel objects.
+        detected_labels (list[DetectedLabel]):          Detected label objects.
+        detected_subfigures (list[DetectedSubFigure]):  Detected subfigure objects.
     """
 
     def __init__(self,
@@ -80,7 +80,6 @@ class Figure:
             image_path (str): The path to the figure image file.
             index (int):      A unique index to identify the figure within the data set.
         """
-
         # Figure identifier
         self.index = index
 
@@ -98,7 +97,7 @@ class Figure:
 
         # Caption
         self.caption: str
-        # Dicts mapping detected sub-captions to labels.
+        # dicts mapping detected sub-captions to labels.
         self.gt_subcaptions: OrderedDict
         self.detected_subcaptions: OrderedDict
 
@@ -106,30 +105,29 @@ class Figure:
         self.preview_image: np.ndarray
 
         # Ground truth subfigure annotations.
-        self.gt_subfigures: List[SubFigure]
+        self.gt_subfigures: list[SubFigure]
 
         # Detected panels
-        self.detected_panels: List[DetectedPanel]
+        self.detected_panels: list[DetectedPanel]
 
         # Detected labels
-        self.detected_labels: List[DetectedLabel]
+        self.detected_labels: list[DetectedLabel]
 
         # Detected subfigures
-        self.detected_subfigures: List[DetectedSubFigure]
+        self.detected_subfigures: list[DetectedSubFigure]
 
         # Logger
         self._logger = logging.getLogger(__name__)
 
-
     @classmethod
     def from_dict(cls,
-                  figure_dict: Dict,
+                  figure_dict: dict,
                   index: int) -> Figure:
         """
         Create a Figure object from a dictionnary.
 
         Args:
-            figure_dict (Dict): A dictionnary representing the figure information.
+            figure_dict (dict): A dictionnary representing the figure information.
 
         Returns:
             figure (Figure):    The resulting Figure object.
@@ -163,23 +161,20 @@ class Figure:
         if 'detected_subcaptions' in figure_dict:
             figure.detected_subcaptions = figure_dict['detected_subcaptions']
 
-
         return figure
-
 
     def load_image(self) -> None:
         """
         Load the image using `self.image_path` and stores it in `self.image`.
         """
-
         # No need to reload the image if it has already been done.
         if self.image is not None:
             return
 
         # check if the image file exists
         if not os.path.isfile(self.image_path):
-            raise FileNotFoundError("The following image file does not exist and thus"\
-                                    " cannot be loaded:\n\t{}".format(self.image_path))
+            raise FileNotFoundError("The following image file does not exist and thus"
+                                    f" cannot be loaded:\n\t{self.image_path}")
 
         # Open the file
         img = cv2.imread(self.image_path)
@@ -190,11 +185,9 @@ class Figure:
         # Store the image size
         self.image_height, self.image_width = img.shape[:2]
 
-
 #########################
 # IMPORT GT ANNOTATIONS #
 #########################
-
     def load_annotation_from_csv(self,
                                  annotations_folder: str,
                                  is_ground_truth: bool = True) -> None:
@@ -215,11 +208,11 @@ class Figure:
         annotation_csv = os.path.join(annotations_folder, base_name, '.csv')
 
         if not os.path.isfile(annotation_csv):
-            raise FileNotFoundError("The annotation csv file does not exist :"\
-                "\n\tShould be {}".format(annotation_csv))
+            raise FileNotFoundError("The annotation csv file does not exist :"
+                                    f"\n\tShould be {annotation_csv}")
 
         # Create empty list of subfigures
-        subfigures: List[SubFigure] = []
+        subfigures: list[SubFigure] = []
 
         # Open the csv file containing annotations
         with open(annotation_csv, 'r') as annotation_csv_file:
@@ -241,7 +234,7 @@ class Figure:
 
                 # Panel splitting only
                 elif len(row) != 6:
-                    raise ValueError("Row should be of length 6 or 11.\n\t"\
+                    raise ValueError("Row should be of length 6 or 11.\n\t"
                                      f"Current row has length {len(row)}: {row}")
 
                 image_path: str = row[0]
@@ -269,7 +262,6 @@ class Figure:
         else:
             self.detected_subfigures = [DetectedSubFigure.from_normal_sub_figure(subfigure)
                                         for subfigure in subfigures]
-
 
     def load_annotation_from_iphotodraw(self,
                                         annotation_file_path: str) -> None:
@@ -312,26 +304,21 @@ class Figure:
             y_max: int = y_min + round(float(height_string))
 
             # Clip values with respect to the image shape.
-            if x_min < 0:
-                x_min = 0
-            if y_min < 0:
-                y_min = 0
-            if x_max > self.image_width:
-                x_max = self.image_width
-            if y_max > self.image_height:
-                y_max = self.image_height
+            x_min = max(0, x_min)
+            y_min = max(0, y_min)
+            x_max = min(self.image_width, x_max)
+            y_max = min(self.image_height, y_max)
 
             return x_min, y_min, x_max, y_max
 
-
-        def extract_panel_info() -> Dict[str, List[Panel]]:
+        def extract_panel_info() -> dict[str, list[Panel]]:
             """
             Extract information from and validate all panel items
 
             Returns:
-                panel_dict (Dict[str, Panel]):  A dict linking Panel objects to their labels.
+                panel_dict (dict[str, Panel]):  A dict linking Panel objects to their labels.
             """
-            panel_dict: Dict[str, List[Panel]] = {}
+            panel_dict: dict[str, list[Panel]] = {}
 
             for panel_item in panel_items:
 
@@ -340,7 +327,7 @@ class Figure:
                     continue
 
                 label_text: str = text_item.text.strip()
-                words: List[str] = label_text.split(' ')
+                words: list[str] = label_text.split(' ')
 
                 # Panels can only have 1 or 2 words:
                 # *) The first one is "panel"
@@ -382,16 +369,15 @@ class Figure:
 
             return panel_dict
 
-
-        def extract_label_info() -> Dict[str, List[Label]]:
+        def extract_label_info() -> dict[str, list[Label]]:
             """
             Extract information from and validate all label items.
 
             Returns:
-                label_dict (Dict[str, List[Label]]):    A list of Label objects representing the
+                label_dict (dict[str, list[Label]]):    A list of Label objects representing the
                                                             detected labels.
             """
-            label_dict: Dict[str, List[Label]] = {}
+            label_dict: dict[str, list[Label]] = {}
 
             for label_item in label_items:
                 text_item: Optional[ET.Element] = label_item.find('./BlockText/Text')
@@ -399,7 +385,7 @@ class Figure:
                     continue
 
                 label_text: str = text_item.text.strip()
-                words: List[str] = label_text.split(' ')
+                words: list[str] = label_text.split(' ')
 
                 # Labels can only have 2 words:
                 # *) The first one is "label"
@@ -432,24 +418,23 @@ class Figure:
 
             return label_dict
 
-
-        def match_panels_with_labels(panel_dict: Dict[str, List[Panel]],
-                                     label_dict: Dict[str, List[Label]]) -> List[SubFigure]:
+        def match_panels_with_labels(panel_dict: dict[str, list[Panel]],
+                                     label_dict: dict[str, list[Label]]) -> list[SubFigure]:
             """
             Match both lists to get a unique list of subfigures.
 
             Args:
-                panel_dict (Dict[str, List[Panel]]):    Dict linking Panel objects to the
+                panel_dict (dict[str, list[Panel]]):    dict linking Panel objects to the
                                                             associated label text.
-                label_dict (Dict[str, List[Panel]]):    Dict linking Label objects to their
+                label_dict (dict[str, list[Panel]]):    dict linking Label objects to their
                                                             associated label text.
 
             Returns:
-                subfigures (List[SubFigure]):   List of subfigures (containing panel and label
+                subfigures (list[SubFigure]):   list of subfigures (containing panel and label
                                                     information).
             """
             # Resulting list of subfigures.
-            subfigures: List[SubFigure] = []
+            subfigures: list[SubFigure] = []
 
             # First, extract unlabeled panels.
             if '' in panel_dict:
@@ -460,7 +445,7 @@ class Figure:
             # Case where the figure has no labels.
             if len(label_dict) == 0:
                 if len(panel_dict) != 0:
-                    self._logger.error("%s: Some panels have label annotations (%s) but there"\
+                    self._logger.error("%s: Some panels have label annotations (%s) but there"
                                        " are no labels.",
                                        annotation_file_path,
                                        panel_dict)
@@ -475,7 +460,7 @@ class Figure:
                                   for labels in label_dict.values())
 
             if num_labeled_panels != num_labels:
-                self._logger.error("%s has a different number of labeled"\
+                self._logger.error("%s has a different number of labeled"
                                    " panels and labels:\n%s\n%s",
                                    annotation_file_path,
                                    str(panel_dict),
@@ -491,7 +476,7 @@ class Figure:
                 # (should be 1).
                 if len(panel_dict[label_text]) != len(label_dict[label_text]):
 
-                    self._logger.error("%s: For label %s, there is not the same number of panels"\
+                    self._logger.error("%s: For label %s, there is not the same number of panels"
                                        " (%s) and labels (%s) have same matching labels!",
                                        annotation_file_path,
                                        label_text,
@@ -501,7 +486,7 @@ class Figure:
 
                 # Multiple panel/label pairs for the same label text.
                 if len(panel_dict[label_text]) > 1:
-                    self._logger.info("%s: Multiple panels/labels with same label %s."\
+                    self._logger.info("%s: Multiple panels/labels with same label %s."
                                       " Matching them with beam search.",
                                       annotation_file_path,
                                       label_text)
@@ -523,14 +508,13 @@ class Figure:
             for subfigure in subfigures:
 
                 if subfigure.label is not None \
-                    and subfigure.label.box is not None\
-                    and subfigure.panel is not None:
+                        and subfigure.label.box is not None \
+                        and subfigure.panel is not None:
 
                     subfigure.panel.box = box.union(box_1=subfigure.panel.box,
                                                     box_2=subfigure.label.box)
 
             return subfigures
-
 
         # Create element tree object.
         tree: ET.ElementTree = ET.parse(annotation_file_path)
@@ -538,11 +522,11 @@ class Figure:
         # Get root element.
         root: ET.Element = tree.getroot()
 
-        shape_items: List[ET.Element] = root.findall('./Layers/Layer/Shapes/Shape')
+        shape_items: list[ET.Element] = root.findall('./Layers/Layer/Shapes/Shape')
 
         # Read All Items (Panels and Labels)
-        panel_items: List[ET.Element] = []
-        label_items: List[ET.Element] = []
+        panel_items: list[ET.Element] = []
+        label_items: list[ET.Element] = []
 
         for shape_item in shape_items:
 
@@ -571,7 +555,6 @@ class Figure:
         self.gt_subfigures = match_panels_with_labels(panel_dict=panel_dict,
                                                       label_dict=label_dict)
 
-
     def load_caption_annotation(self) -> None:
         """
         Load caption text and the ground truth for sub captions (if available).
@@ -584,7 +567,7 @@ class Figure:
             return
 
         with open(caption_annotation_file_path, 'r') as caption_annotation_file:
-            lines: List[str] = caption_annotation_file.readlines()
+            lines: list[str] = caption_annotation_file.readlines()
 
         if len(lines) == 0:
             logging.warning("Caption annotation file %s seems to be empty.",
@@ -597,7 +580,7 @@ class Figure:
             return
 
         labels_line: str = lines[1]
-        labels_list: List[str] = [label.strip() for label in labels_line.split(',')]
+        labels_list: list[str] = [label.strip() for label in labels_line.split(',')]
         labels_structure: LabelStructure = LabelStructure.from_labels_list(labels_list)
 
         if hasattr(self, 'labels_structure'):
@@ -608,7 +591,7 @@ class Figure:
         else:
             self.labels_structure = labels_structure
 
-        caption_dict: Dict[str, str] = {}
+        caption_dict: dict[str, str] = {}
         for caption_line in lines[2:]:
             label, text = caption_line.split(':', maxsplit=1)
             label = label.strip()
@@ -639,18 +622,14 @@ class Figure:
                             gt_subfigure.caption = caption_dict.pop(caption_label)
                             break
 
-
 #########################
 # IMPORT GT ANNOTATIONS #
 #########################
-
-
     def match_detected_visual_panels_and_labels(self) -> None:
         """
         TODO
         Panel segmentation
         """
-
         # If detected subfigures were already computed (list exists and is not empty), then no need
         # to do anything.
         if hasattr(self, 'detected_subfigures') and self.detected_subfigures:
@@ -662,12 +641,9 @@ class Figure:
             labels=self.detected_labels,
             are_detections=True)
 
-
-
 ##############
 # EVALUATION #
 ##############
-
     def match_detected_and_gt_panels_splitting_task(self,
                                                     iou_threshold: float = 0.5,
                                                     overlap_threshold: float = 0.66) -> None:
@@ -693,8 +669,8 @@ class Figure:
                                             true with respect to the overlap value.
         """
         # Keep track of the associations.
-        picked_gt_panels_overlap: List[bool] = [False] * len(self.gt_subfigures)
-        picked_gt_panels_iou: List[bool] = [False] * len(self.gt_subfigures)
+        picked_gt_panels_overlap: list[bool] = [False] * len(self.gt_subfigures)
+        picked_gt_panels_iou: list[bool] = [False] * len(self.gt_subfigures)
 
         for detected_panel in self.detected_panels:
             max_iou: float = -1
@@ -755,7 +731,6 @@ class Figure:
             else:
                 detected_panel.is_true_positive_overlap = False
 
-
     def match_detected_and_gt_labels(self,
                                      iou_threshold: float = 0.5) -> None:
         """
@@ -770,7 +745,7 @@ class Figure:
                                         true.
         """
         # Keep track of the associations.
-        picked_gt_labels_indices: List[bool] = [False] * len(self.gt_subfigures)
+        picked_gt_labels_indices: list[bool] = [False] * len(self.gt_subfigures)
 
         # Loop over detected labels.
         for detected_label in self.detected_labels:
@@ -784,9 +759,9 @@ class Figure:
 
                 gt_label: Label = gt_subfigure.label
 
-                if gt_label.box is None\
-                    or gt_label.text is None\
-                    or len(gt_label.text) != 1:
+                if gt_label.box is None \
+                        or gt_label.text is None \
+                        or len(gt_label.text) != 1:
 
                     continue
 
@@ -815,7 +790,6 @@ class Figure:
             else:
                 detected_label.is_true_positive = False
 
-
     def match_detected_and_gt_panels_segmentation_task(self,
                                                        iou_threshold: float = 0.5) -> None:
         """
@@ -830,7 +804,7 @@ class Figure:
                                         true.
         """
         # Keep track of the associations.
-        picked_gt_subfigures_indices: List[bool] = [False] * len(self.gt_subfigures)
+        picked_gt_subfigures_indices: list[bool] = [False] * len(self.gt_subfigures)
 
         # Loop over detected subfigures.
         for detected_subfigure in self.detected_subfigures:
@@ -888,7 +862,6 @@ class Figure:
             else:
                 detected_subfigure.is_true_positive = False
 
-
     def match_detected_and_gt_captions(self) -> None:
         """
         Match the detected captions with a ground truth one.
@@ -934,11 +907,9 @@ class Figure:
 #            else:
 #                detected_label.is_true_positive = False
 
-
 ##################
 # PREVIEW FIGURE #
 ##################
-
     def get_preview(self, mode: str = 'both') -> np.ndarray:
         """
         Generate an image preview for the figure.
@@ -962,9 +933,8 @@ class Figure:
 
         preview_img: np.ndarray = self.image.copy()
 
-
         # Prepare set of colors for drawing elements:
-        shape_colors: List[Color] = [
+        shape_colors: list[Color] = [
             (255, 0, 0),
             (0, 255, 0),
             (0, 0, 255),
@@ -975,8 +945,8 @@ class Figure:
 
         # Automatically set mode to 'gt' if there is no detected elements.
         if mode == 'both' and not hasattr(self, 'detected_subfigures') \
-                          and not hasattr(self, 'detected_panels') \
-                          and not hasattr(self, 'detected_labels'):
+                and not hasattr(self, 'detected_panels') \
+                and not hasattr(self, 'detected_labels'):
 
             mode = 'gt'
 
@@ -1004,7 +974,6 @@ class Figure:
                     for label in self.detected_labels:
                         label.draw(image=preview_img)
 
-
         # 2nd case ('gt'): Display ground-truth subfigures.
         elif mode == 'gt':
 
@@ -1017,7 +986,6 @@ class Figure:
                 # Draw subfigure.
                 subfigure.draw_elements(image=preview_img,
                                         color=color)
-
 
         # 3rd case ('pred'): Display detections.
         elif mode == 'pred':
@@ -1063,7 +1031,6 @@ class Figure:
 
         return preview_img
 
-
     def show_preview(self,
                      mode: str = 'gt',
                      delay: int = 0,
@@ -1080,7 +1047,6 @@ class Figure:
                                     if 0, the delay is disabled.
             window_name (str):  Name of the image display window.
         """
-
         print("#######################")
         print(f"Image filename: {self.image_filename}")
 
@@ -1103,7 +1069,6 @@ class Figure:
         cv2.waitKey(delay)
         cv2.destroyAllWindows()
 
-
     def save_preview(self,
                      mode: str = 'gt',
                      folder: str = None) -> None:
@@ -1125,7 +1090,6 @@ class Figure:
             folder = os.path.join(os.path.dirname(self.image_path),
                                   'preview/')
 
-
         # Create the preview directory (if needed).
         if not os.path.isdir(folder):
             os.makedirs(folder)
@@ -1142,11 +1106,9 @@ class Figure:
         if not cv2.imwrite(export_path, preview_img):
             logging.error("Could not write preview image : %s", export_path)
 
-
 #################
 # EXPORT FIGURE #
 #################
-
     def export_gt_annotation_to_individual_csv(self,
                                                csv_export_dir: str = None) -> None:
         """
@@ -1155,7 +1117,6 @@ class Figure:
         Args:
             csv_export_dir (str):   Path to the directory where to export the csv file.
         """
-
         # By default the csv is at the same location
         if csv_export_dir is None:
             csv_export_dir = os.path.dirname(self.image_path)
@@ -1174,7 +1135,7 @@ class Figure:
 
         # Check if file already exists.
         if os.path.isfile(csv_file_path):
-            logging.warning("The csv individual annotation file already exist : %s"\
+            logging.warning("The csv individual annotation file already exist : %s"
                             "\n\t==> Skipping.", csv_file_path)
             return
 
@@ -1190,7 +1151,7 @@ class Figure:
                     continue
 
                 # Panel information
-                csv_row: List = [self.image_path,
+                csv_row: list = [self.image_path,
                                  subfigure.panel.box[0],
                                  subfigure.panel.box[1],
                                  subfigure.panel.box[2],
@@ -1199,7 +1160,7 @@ class Figure:
 
                 # Label information
                 if subfigure.label is not None \
-                    and subfigure.label.box is not None:
+                        and subfigure.label.box is not None:
 
                     # Label bounding box
                     csv_row.extend(subfigure.label.box)
@@ -1210,16 +1171,14 @@ class Figure:
                 # Writting to csv file.
                 csv_writer.writerow(csv_row)
 
-
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Export to a dict.
 
         Returns:
-            output_dict (Dict[str, Any]): A Dict representing the figure information.
+            output_dict (dict[str, Any]): A dict representing the figure information.
         """
-
-        output_dict: Dict[str, Any] = {
+        output_dict: dict[str, Any] = {
             'image_path': self.image_path,
             'image_width': self.image_width,
             'image_height': self.image_height

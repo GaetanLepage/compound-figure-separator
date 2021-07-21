@@ -25,8 +25,6 @@ This file contains the mapping that is applied to panel segmentation dataset dic
 Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 """
 
-from typing import List
-
 import copy
 import logging
 import numpy as np
@@ -83,15 +81,15 @@ class PanelSegDatasetMapper:
 
 
     @staticmethod
-    def _annotations_to_instances(panel_annos: List[dict],
-                                  label_annos: List[dict],
+    def _annotations_to_instances(panel_annos: list[dict],
+                                  label_annos: list[dict],
                                   image_size: tuple) -> Instances:
         """
         Create an :class:`Instances` object used by the models,
         from instance annotations in the dataset dict.
 
         Args:
-            annos (List[dict]): a list of instance annotations in one image, each
+            annos (list[dict]): a list of instance annotations in one image, each
                                     element for one instance.
             image_size (tuple): height, width
 
@@ -106,7 +104,7 @@ class PanelSegDatasetMapper:
         # TODO remove
         # print("panel_instances:", panel_instances.get_fields())
 
-        panel_boxes_list: List = [BoxMode.convert(box=obj['bbox'],
+        panel_boxes_list: list = [BoxMode.convert(box=obj['bbox'],
                                                   from_mode=obj['bbox_mode'],
                                                   to_mode=BoxMode.XYXY_ABS)
                                   for obj in panel_annos]
@@ -114,13 +112,13 @@ class PanelSegDatasetMapper:
         panel_boxes.clip(image_size)
 
         # Only one class (panel)
-        panel_classes: List[int] = [0 for obj in panel_annos]
+        panel_classes: list[int] = [0 for obj in panel_annos]
         panel_classes_tensor: torch.Tensor = torch.tensor(panel_classes, dtype=torch.int64)
         panel_instances.gt_classes = panel_classes_tensor
 
 
         # Labels (also handle case where there are no labels)
-        label_boxes_list: List = [BoxMode.convert(box=obj['bbox'],
+        label_boxes_list: list = [BoxMode.convert(box=obj['bbox'],
                                                   from_mode=obj['bbox_mode'],
                                                   to_mode=BoxMode.XYXY_ABS)
                                   for obj in label_annos]
@@ -132,7 +130,7 @@ class PanelSegDatasetMapper:
         label_boxes = label_instances.gt_boxes = Boxes(label_boxes_list)
         label_boxes.clip(image_size)
 
-        label_classes: List[int] = [obj['label'] for obj in label_annos]
+        label_classes: list[int] = [obj['label'] for obj in label_annos]
         label_classes_tensor: torch.Tensor = torch.tensor(label_classes, dtype=torch.int64)
         label_instances.gt_classes = label_classes_tensor
 
@@ -140,7 +138,6 @@ class PanelSegDatasetMapper:
             f"There are {len(label_boxes)} boxes but {len(label_classes)} labels."
 
         return panel_instances, label_instances
-
 
     def __call__(self, dataset_dict: dict) -> dict:
         """
@@ -221,7 +218,6 @@ class PanelSegDatasetMapper:
                               " obj['label']=%s and obj['label_bbox']=%s",
                               obj['label'],
                               obj['label_bbox'])
-
 
         panel_instances, label_instances = self._annotations_to_instances(panel_annos=panel_annos,
                                                                           label_annos=label_annos,
