@@ -27,7 +27,7 @@ This set contains gt annotations for captions
 import os
 import logging
 import random
-from typing import Iterable, Optional, List
+from typing import Iterable, Optional
 
 from progressbar import progressbar
 
@@ -60,16 +60,14 @@ class ProstateCaptionFigureGenerator(ImageListFigureGenerator):
                          image_directory_path=image_directory_path,
                          default_random_order=default_random_order)
 
-
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
-
 
         if random_order is None:
             random_order = self.default_random_order
 
         with open(self.image_list_txt, 'r') as image_list_file:
 
-            lines: List[str] = image_list_file.readlines()
+            lines: list[str] = image_list_file.readlines()
 
         if random_order:
             random.shuffle(lines)

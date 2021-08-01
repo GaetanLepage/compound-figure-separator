@@ -23,9 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Constants and function to deal with characters of caption labels and their classes.
 """
 
-from typing import List, Tuple, Dict
-
-LABEL_CLASS_MAPPING: Dict[str, int] = {
+LABEL_CLASS_MAPPING: dict[str, int] = {
     '1': 0,
     '2': 1,
     '3': 2,
@@ -77,7 +75,7 @@ LABEL_CLASS_MAPPING: Dict[str, int] = {
     'r': 48,
     't': 49,
 }
-CLASS_LABEL_MAPPING: Dict[int, str] = {v: k for k, v in LABEL_CLASS_MAPPING.items()}
+CLASS_LABEL_MAPPING: dict[int, str] = {v: k for k, v in LABEL_CLASS_MAPPING.items()}
 
 
 def map_label(char: str) -> str:
@@ -98,7 +96,7 @@ def map_label(char: str) -> str:
 
     assert len(char) == 1, f"Char should be of length 1: {char}"
 
-    char_classes: List[Tuple[str, str]] = [
+    char_classes: list[tuple[str, str]] = [
         ('c', 'C'),
         ('k', 'K'),
         ('o', 'O'),

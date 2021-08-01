@@ -29,8 +29,6 @@ import sys
 import os
 from argparse import ArgumentParser, Namespace
 
-from typing import List
-
 import compfigsep
 
 sys.path.append('.')
@@ -41,12 +39,12 @@ from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
 from compfigsep.label_recognition.evaluate import evaluate_detections
 
 
-def parse_args(args: List[str]) -> Namespace:
+def parse_args(args: list[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]):   The arguments from the command line call.
+        args (list[str]):   The arguments from the command line call.
 
     Returns:
         namespace (Namespace):  Populated namespace.
@@ -59,12 +57,12 @@ def parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None):
+def main(args: list[str] = None):
     """
     Launch evaluation of the label recognition task on a JSON data set.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        args (list[str]):   Arguments from the command line.
     """
 
     # Parse arguments.

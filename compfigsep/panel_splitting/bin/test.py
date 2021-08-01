@@ -32,7 +32,6 @@ import logging
 from argparse import ArgumentParser, Namespace
 from collections import OrderedDict
 
-from typing import List, Dict
 from compfigsep.utils.figure import Figure, DetectedPanel
 
 
@@ -51,12 +50,12 @@ sys.path.append('.')
 MODULE_DIR = os.path.dirname(compfigsep.__file__)
 
 
-def _parse_args(args: List[str]) -> Namespace:
+def _parse_args(args: list[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]):   The arguments from the command line call.
+        args (list[str]):   The arguments from the command line call.
 
     Returns:
         parser (Namespace): Populated namespace.
@@ -65,34 +64,31 @@ def _parse_args(args: List[str]) -> Namespace:
         description="Evaluate panel splitting.")
 
     add_json_arg(parser=parser,
-                 json_default_relative_path=\
-                    '../data/zou/eval.json')
+                 json_default_relative_path='../data/zou/eval.json')
 
     return parser.parse_args(args)
 
 
 def predict_panels(figure: Figure) -> None:
-   """
-   Apply the full caption splitting pipeline to the given figure.
-   The subcaptions detections are stored in the `detected_subcaptions` attribute.
+    """
+    Apply the full caption splitting pipeline to the given figure.
+    The subcaptions detections are stored in the `detected_subcaptions` attribute.
 
-   Args:
-       figure (Figure):    A figure object.
-   """
+    Args:
+        figure (Figure):    A figure object.
+    """
+    filtered_panels: list[DetectedPanel] = panel_filtering.filter_panels(
+        panel_list=figure.detected_panels)
 
-   filtered_panels: List[DetectedPanel] = panel_filtering.filter_panels(
-       panel_list=figure.detected_panels)
-
-   figure.detected_panels= filtered_panels
-
+    figure.detected_panels = filtered_panels
 
 
-def main(args: List[str] = None) -> None:
+def main(args: list[str] = None) -> None:
     """
     Launch detection and evaluation of the panel splitting task on a JSON data set.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        args (list[str]):   Arguments from the command line.
     """
 
     # Parse arguments.

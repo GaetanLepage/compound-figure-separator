@@ -25,13 +25,13 @@ Also handles the detection information.
 """
 
 from __future__ import annotations
-from typing import Tuple, Dict, Optional
+from typing import Optional
 
 import numpy as np
 
 from . import Panel, DetectedPanel, Label, DetectedLabel
 
-Color = Tuple[int, int, int]
+Color = tuple[int, int, int]
 
 DEFAULT_GT_COLOR = (0, 255, 0)
 DEFAULT_DETECTION_COLOR = (0, 0, 200)
@@ -64,14 +64,13 @@ class SubFigure:
         self.label: Optional[Label] = label
         self.caption: Optional[str] = caption
 
-
     @classmethod
-    def from_dict(cls, sub_figure_dict: Dict) -> SubFigure:
+    def from_dict(cls, sub_figure_dict: dict) -> SubFigure:
         """
         Instanciate a SubFigure object from a dictionnary.
 
         Args:
-            sub_figure_dict (Dict): A dictionnary representing the sub-figure information.
+            sub_figure_dict (dict): A dictionnary representing the sub-figure information.
 
         Returns:
             sub_figure (SubFigure): The resulting SubFigure object.
@@ -88,16 +87,14 @@ class SubFigure:
                          label=label,
                          caption=sub_figure_dict.get('caption'))
 
-
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """
         Export to a dict.
 
         Returns:
-            output_dict (Dict): A Dict representing the sub-figure information.
+            output_dict (dict): A dict representing the sub-figure information.
         """
-
-        output_dict: Dict = {}
+        output_dict: dict = {}
 
         if self.panel is not None:
             output_dict['panel'] = self.panel.to_dict()
@@ -109,7 +106,6 @@ class SubFigure:
             output_dict['caption'] = self.caption
 
         return output_dict
-
 
     def draw_elements(self,
                       image: np.ndarray,
@@ -128,7 +124,6 @@ class SubFigure:
         if self.label is not None:
             self.label.draw(image=image, color=color)
 
-
     def __str__(self) -> str:
 
         string = f"{type(self).__name__}:"
@@ -139,10 +134,8 @@ class SubFigure:
 
         return string
 
-
     def __repr__(self) -> str:
         return str(self)
-
 
 
 class DetectedSubFigure(SubFigure):
@@ -178,7 +171,6 @@ class DetectedSubFigure(SubFigure):
 
         self.caption_is_positive: Optional[bool] = None
 
-
     @classmethod
     def from_normal_sub_figure(cls,
                                subfigure: SubFigure) -> DetectedSubFigure:
@@ -207,14 +199,13 @@ class DetectedSubFigure(SubFigure):
                                  label=label,
                                  caption=subfigure.caption)
 
-
     @classmethod
-    def from_dict(cls, detected_sub_figure_dict: Dict) -> DetectedSubFigure:
+    def from_dict(cls, detected_sub_figure_dict: dict) -> DetectedSubFigure:
         """
         Instanciate a DetectedSubFigure object from a dictionnary.
 
         Args:
-            detected_sub_figure_dict (Dict):    A dictionnary representing the sub-figure
+            detected_sub_figure_dict (dict):    A dictionnary representing the sub-figure
                                                     information.
 
         Returns:
@@ -227,7 +218,6 @@ class DetectedSubFigure(SubFigure):
         label = None
         if 'label' in detected_sub_figure_dict:
             label = DetectedLabel.from_dict(detected_sub_figure_dict['label'])
-
 
         detected_sub_figure = DetectedSubFigure(panel=panel,
                                                 label=label,
@@ -242,15 +232,13 @@ class DetectedSubFigure(SubFigure):
 
         return detected_sub_figure
 
-
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """
         Export to a dict.
 
         Returns:
-            output_dict (Dict): A Dict representing the sub-figure information.
+            output_dict (dict): A dict representing the sub-figure information.
         """
-
         output_dict = super().to_dict()
 
         if self.is_true_positive is not None:
@@ -261,7 +249,6 @@ class DetectedSubFigure(SubFigure):
 
         return output_dict
 
-
     def __str__(self) -> str:
 
         string = super().__str__()
@@ -270,7 +257,6 @@ class DetectedSubFigure(SubFigure):
         string += f", caption_is_positive: {self.caption_is_positive}"
 
         return string
-
 
     def __repr__(self) -> str:
         return str(self)

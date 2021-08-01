@@ -31,7 +31,7 @@ import re
 import random
 from time import strptime
 from datetime import datetime
-from typing import Iterable, Optional, List, Tuple, Any, Dict
+from typing import Iterable, Optional, Any
 from argparse import ArgumentParser
 
 from progressbar import progressbar
@@ -82,7 +82,7 @@ def get_most_recent_json(folder_path: str = None) -> str:
     regexp_time_stamp_file_names: str = \
         r".*_[0-9]{4}-[A-Za-z]+-[0-3][0-9]_[0-2][0-9]:[0-5][0-9]:[0-5][0-9].json"
 
-    dates: Dict[datetime, str] = {}
+    dates: dict[datetime, str] = {}
 
     for file_name in os.listdir(folder_path):
 
@@ -223,8 +223,8 @@ class JsonFigureGenerator(FigureGenerator):
         super().__init__(default_random_order=default_random_order)
 
         if not os.path.isfile(self.json_annotation_file_path):
-            raise FileNotFoundError("The annotation json file does not exist :"\
-                "\n\t {}".format(self.json_annotation_file_path))
+            raise FileNotFoundError("The annotation json file does not exist :"
+                                    f"\n\t {self.json_annotation_file_path}")
 
     def __copy__(self) -> JsonFigureGenerator:
         """
@@ -249,9 +249,9 @@ class JsonFigureGenerator(FigureGenerator):
         print(f"Json file: {self.json_annotation_file_path}")
 
         with open(self.json_annotation_file_path, 'r') as json_annotation_file:
-            data_dict: Dict[str, Any] = json.load(json_annotation_file)
+            data_dict: dict[str, Any] = json.load(json_annotation_file)
 
-        dict_values: List[Tuple[str, Any]] = list(data_dict.values())
+        dict_values: list[tuple[str, Any]] = list(data_dict.values())
 
         if random_order:
             random.shuffle(dict_values)

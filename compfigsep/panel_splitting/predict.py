@@ -23,13 +23,12 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 TODO remove this file
 """
 
-from typing import List, Tuple
 import numpy as np
 
 from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure, Panel
 
-Box = List[int, int, int, int]
+Box = list[int, int, int, int]
 
 
 def _overlap_with_mask(box: Box, mask: Box) -> float:
@@ -62,23 +61,23 @@ def _update_mask(box: Box, mask: Box):
     mask[box[1]:box[3], box[0]:box[2]] = 1
 
 
-def _post_processing(boxes: List[Box],
-                     scores: List[float],
-                     labels: List[str],
-                     image_shape: Tuple[int, int, int]):
+def _post_processing(boxes: list[Box],
+                     scores: list[float],
+                     labels: list[str],
+                     image_shape: tuple[int, int, int]):
     """
     Post processing to remove false positives.
 
     Args:
-        boxes (List[Box]):                  A list of predicted bounding boxes.
-        scores (List[float]):               A list of scores (one for each bbox).
-        labels (List[str]):                 A list of labels.
-        image_shape (Tuple[int, int, int]): The image shape (H, W, C).
+        boxes (list[Box]):                  A list of predicted bounding boxes.
+        scores (list[float]):               A list of scores (one for each bbox).
+        labels (list[str]):                 A list of labels.
+        image_shape (tuple[int, int, int]): The image shape (H, W, C).
 
     Returns:
-        boxes (List[Box]):      The list of filtered bboxes.
-        scores (List[float]):   The list of associated scores.
-        labels (List[str]):     The list of associated labels.
+        boxes (list[Box]):      The list of filtered bboxes.
+        scores (list[float]):   The list of associated scores.
+        labels (list[str]):     The list of associated labels.
     """
     # 1. We keep only scores greater than 0.05.
     indices = []

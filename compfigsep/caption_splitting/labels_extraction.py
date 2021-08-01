@@ -25,7 +25,7 @@ Functions to infer the labels from the caption text.
 The original version of this code was written by Stefano Marchesin.
 """
 
-from typing import List, Dict, Any, Tuple, cast
+from typing import Any, cast
 import re
 
 from ..utils.figure.label import (is_char,
@@ -37,7 +37,7 @@ from ..utils.figure.label import (is_char,
 from . import regex_definitions
 
 
-def label_identification(caption: str) -> Dict:
+def label_identification(caption: str) -> dict:
     """
     Given a caption text, identify the labels.
 
@@ -45,23 +45,23 @@ def label_identification(caption: str) -> Dict:
         caption (str):  The caption text from which to extract captions.
 
     Returns:
-        output_dict (Dict): A dict containing the detection information (list of labels, ranges).
+        output_dict (dict): A dict containing the detection information (list of labels, ranges).
     """
     # To avoid returning to many things, we build an output dict.
-    output_dict: Dict[str, Any] = {
+    output_dict: dict[str, Any] = {
         'labels': {
             'characters': [],
             'romans': [],
             'digits': []
         },
-        'ranges' : {
+        'ranges': {
             'hyphen': None,
             'conj': None
         }
     }
 
     # Detect alphabetical labels.
-    characters: List[str] = [re.sub(pattern=r'[().:]',
+    characters: list[str] = [re.sub(pattern=r'[().:]',
                                     repl='',
                                     string=raw[0])
                              for raw
@@ -78,7 +78,7 @@ def label_identification(caption: str) -> Dict:
 
 
     # Detect roman numbers.
-    romans: List[str] = [re.sub(pattern=r'[().:]',
+    romans: list[str] = [re.sub(pattern=r'[().:]',
                                 repl='',
                                 string=raw[0])
                          for raw in
@@ -94,7 +94,7 @@ def label_identification(caption: str) -> Dict:
 
 
     # Detect numerical labels.
-    digits: List[str] = [re.sub(pattern=r'[().:]',
+    digits: list[str] = [re.sub(pattern=r'[().:]',
                                 repl='',
                                 string=raw[0])
                          for raw
@@ -112,11 +112,11 @@ def label_identification(caption: str) -> Dict:
     # Get hyphens and conjunctions.
     # Extract first element of each tuple and replace the tuple with it.
     # Hyphen range.
-    hyphen_vector: List[str] = [hyphen_tuple[0]
+    hyphen_vector: list[str] = [hyphen_tuple[0]
                                 for hyphen_tuple
                                 in regex_definitions.RE_HYPHEN.findall(caption)]
     # Conjunction range.
-    conj_vector: List[str] = [conj_tuple[0]
+    conj_vector: list[str] = [conj_tuple[0]
                               for conj_tuple
                               in regex_definitions.RE_CONJUNCTIONS.findall(caption)]
 
@@ -128,27 +128,27 @@ def label_identification(caption: str) -> Dict:
 
 
 
-def _expand_hyphen_range(hyphen_expressions: List[str]) -> List[str]:
+def _expand_hyphen_range(hyphen_expressions: list[str]) -> list[str]:
     """
     Expand the label hyphen ranges from the caption.
     ex: ['A-C', 'E-F'] -> ['A', 'B', 'C', 'E', 'F']
 
     Args:
-        hyphen_expressions (List[str]): The list of hyphen matches.
+        hyphen_expressions (list[str]): The list of hyphen matches.
 
     Returns:
-        hyphen_range (List[str]):   The list of expanded elements.
+        hyphen_range (list[str]):   The list of expanded elements.
     """
-    hyphen_range: List[str] = []
+    hyphen_range: list[str] = []
 
     for range_str in hyphen_expressions:
 
         # Split the string by hyphen: 'A-D' -> ['A', 'D']
-        range_pair: Tuple[str, str] = cast(Tuple[str, str],
+        range_pair: tuple[str, str] = cast(tuple[str, str],
                                            range_str.split('-'))
 
         # Check if the range is numerical, roman or alphabetical.
-        ## CAVEAT: set also the roman one
+        # CAVEAT: set also the roman one
         # Case 1/3: numerical.
         if all(d.isdigit() for d in range_pair):
 
@@ -172,8 +172,8 @@ def _expand_hyphen_range(hyphen_expressions: List[str]) -> List[str]:
             sup = roman_to_int(range_pair[-1])
 
             # Expand the range of numerical numbers and revert it back to its roman form.
-            roman_range_int: List[int] = list(range(inf, sup + 1))
-            roman_range_str: List[str]
+            roman_range_int: list[int] = list(range(inf, sup + 1))
+            roman_range_str: list[str]
 
             if is_upper:
                 roman_range_str = [UC_ROMAN_FROM_INT[value] for value in roman_range_int]
@@ -196,7 +196,7 @@ def _expand_hyphen_range(hyphen_expressions: List[str]) -> List[str]:
 
 
 
-def label_expansion(label_dict: Dict) -> List[str]:
+def label_expansion(label_dict: Dict) -> list[str]:
     """
     Expand the label ranges from the caption.
     ex: ['A-C', 'D', 'E and F'] -> ['A', 'B', 'C', 'D', 'E', 'F']
@@ -205,13 +205,13 @@ def label_expansion(label_dict: Dict) -> List[str]:
         label_dict (Dict):  The dict containing labels lists and ranges detections.
 
     Returns:
-        labels (List[str]): The final list of detected labels.
+        labels (list[str]): The final list of detected labels.
     """
-    ranges: List[str] = []
+    ranges: list[str] = []
 
     # ==> Hyphen ranges.
     # Clean the elements and expand the sequences hyphen range.
-    hyphen_cleaned: List[str] = [re.sub(pattern=r'[().:]',
+    hyphen_cleaned: list[str] = [re.sub(pattern=r'[().:]',
                                         repl='',
                                         string=element)
                                  for element in label_dict['ranges']['hyphen']]
@@ -221,7 +221,7 @@ def label_expansion(label_dict: Dict) -> List[str]:
 
     # ==> Conjunction ranges.
     # Clean the identified patterns from useless characters.
-    conj_range: List[str] = [re.sub(pattern=r'[().:,]',
+    conj_range: list[str] = [re.sub(pattern=r'[().:,]',
                                     repl=' ',
                                     string=element.replace('and', ' '))
                              for element in label_dict['ranges']['conj']]
@@ -238,9 +238,9 @@ def label_expansion(label_dict: Dict) -> List[str]:
 
     # Merge the lists containing the expanded ranges and the single labels.
     # ('|' is the union operation between sets).
-    labels = list(set(ranges)\
-                  | set(label_dict['labels']['digits'])\
-                  | set(label_dict['labels']['romans'])\
+    labels = list(set(ranges)
+                  | set(label_dict['labels']['digits'])
+                  | set(label_dict['labels']['romans'])
                   | set(label_dict['labels']['characters'])
                   )
 

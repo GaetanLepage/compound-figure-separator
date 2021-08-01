@@ -23,7 +23,7 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Evaluation tool for caption splitting.
 """
 
-from typing import Dict, Optional, List
+from typing import Optional
 from pprint import pprint
 from collections import namedtuple
 
@@ -61,9 +61,9 @@ def caption_splitting_figure_eval(figure: Figure) -> Optional[CaptionSplittingFi
     normalized_levenshtein_similarity: float = 0
 
     # Get the dictionnary of detected subcaptions (if it exists).
-    detected_subcaptions: Dict[str, str] = figure.detected_subcaptions \
-                                           if hasattr(figure, 'detected_subcaptions')\
-                                           else {}
+    detected_subcaptions: dict[str, str] = figure.detected_subcaptions \
+        if hasattr(figure, 'detected_subcaptions') \
+        else {}
 
     # If the figure was not annotated, return None.
     if not hasattr(figure, 'gt_subfigures'):
@@ -114,12 +114,12 @@ def caption_splitting_figure_eval(figure: Figure) -> Optional[CaptionSplittingFi
     return None
 
 
-def caption_splitting_metrics(results: List[CaptionSplittingFigureResult]) -> float:
+def caption_splitting_metrics(results: list[CaptionSplittingFigureResult]) -> float:
     """
     Compute the metrics for the caption splitting task.
 
     Args:
-        results (List[CaptionSplittingFigureResult]):   TODO.
+        results (list[CaptionSplittingFigureResult]):   TODO.
 
     Returns:
         levenshtein_metric (float):  The averaged levenshtein metric.
@@ -142,7 +142,7 @@ def caption_splitting_metrics(results: List[CaptionSplittingFigureResult]) -> fl
     return normalized_levenshtein_similarity
 
 
-def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
+def evaluate_detections(figure_generator: FigureGenerator) -> dict[str, float]:
     """
     Compute the metrics from a given set of predicted sub captions.
 
@@ -151,19 +151,19 @@ def evaluate_detections(figure_generator: FigureGenerator) -> Dict[str, float]:
                                                 augmented with detected sub captions.
 
     Returns:
-        metrics (Dict[str, any]): A dict containing the computed metrics.
+        metrics (dict[str, any]): A dict containing the computed metrics.
     """
 
     # Parallel computing to speed up the evaluation
     with Parallel(n_jobs=-1) as parallel:
 
-        results: List[CaptionSplittingFigureResult] = parallel(
+        results: list[CaptionSplittingFigureResult] = parallel(
             [delayed(caption_splitting_figure_eval)(figure)
              for figure in figure_generator()])
 
     lavenstein_metric: float = caption_splitting_metrics(results=results)
 
-    metrics: Dict[str, float] = {
+    metrics: dict[str, float] = {
         'levenstein_metric': lavenstein_metric
     }
 

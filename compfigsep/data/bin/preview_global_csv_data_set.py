@@ -29,25 +29,23 @@ along with the corresponding bounding boxes and labels.
 import sys
 from argparse import ArgumentParser, Namespace
 
-from typing import List
-
 from compfigsep.data.figure_generators import GlobalCsvFigureGenerator
 from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
 
 sys.path.append('.')
 
 
-def parse_args(args: List[str]) -> Namespace:
+def parse_args(args: list[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]):   The arguments from the command line call.
+        args (list[str]):   The arguments from the command line call.
 
     Returns:
         parser (Namespace): Populated namespace.
     """
-    parser: ArgumentParser = ArgumentParser(description="Preview all the figures from a data set"\
+    parser: ArgumentParser = ArgumentParser(description="Preview all the figures from a data set"
                                                         " represented by a csv annotation file.")
 
     parser.add_argument('--annotation_csv',
@@ -59,12 +57,12 @@ def parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None) -> None:
+def main(args: list[str] = None) -> None:
     """
     Launch previsualization of a csv data set.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        args (list[str]):   Arguments from the command line.
     """
 
     # Parse arguments.

@@ -25,7 +25,7 @@ Definition of a meta-evaluator for the panel segmentation tasks.
 
 import os
 import logging
-from typing import Optional, List, Dict, Callable
+from typing import Optional, Callable
 from collections import defaultdict, OrderedDict
 from pprint import pprint
 from copy import copy
@@ -88,7 +88,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         data_set = MetadataCatalog.get(dataset_name)
         self._cpu_device = torch.device("cpu")
         self._logger = logging.getLogger(__name__)
-        self._predictions: Dict = {}
+        self._predictions: dict = {}
 
         self._task_name = task_name
         self._evaluation_function = evaluation_function
@@ -104,7 +104,6 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
                                       task_name + '/output/')
         self.export_dir = export_dir
 
-
     def reset(self) -> None:
         """
         Preparation for a new round of evaluation.
@@ -112,10 +111,9 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         """
         self._predictions = dict()
 
-
     def process(self,
-                inputs: List[dict],
-                outputs: List[dict]) -> None:
+                inputs: list[dict],
+                outputs: list[dict]) -> None:
         """
         Process the pair of inputs and outputs.
         If they contain batches, the pairs can be consumed one-by-one using `zip`:
@@ -123,11 +121,10 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         This method is abstract and has to be implemented.
 
         Args:
-            inputs (List[dict]):    The inputs that's used to call the model.
-            outputs (List[dict]):   The return value of `model(inputs)`.
+            inputs (list[dict]):    The inputs that's used to call the model.
+            outputs (list[dict]):   The return value of `model(inputs)`.
         """
         raise NotImplementedError("This method should be implmented in each subclass.")
-
 
     def _predict(self, figure: Figure) -> None:
         """
@@ -140,8 +137,6 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         """
         raise NotImplementedError("This method should be implmented in each subclass.")
 
-
-
     def _augmented_figure_generator(self) -> FigureGenerator:
         """
         Iterate over a Figure generator, process raw predictions and yield back the augmented
@@ -150,7 +145,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         This method is abstract and has to be implemented.
 
         Args:
-            predictions (Dict): The dict containing the predictions from the model.
+            predictions (dict): The dict containing the predictions from the model.
 
         Yields:
             figure_generator (FigureGenerator): FigureGenerator yielding Figure objects augmented
@@ -159,17 +154,16 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         return StackedFigureGenerator(base_figure_generator=self._figure_generator,
                                       function=self._predict)
 
-
-    def evaluate(self) -> Optional[Dict[str, Dict[str, int]]]:
+    def evaluate(self) -> Optional[dict[str, dict[str, int]]]:
         """
         Evaluate/summarize the performance after processing all input/output pairs.
 
         Returns:
-            dict (Dict[str, Dict[str, int]]):
+            dict (dict[str, dict[str, int]]):
                 A dict containing the computed metrics.
                     * key (str):                The name of the task ('panel_splitting',
                                                     'label_recognition', 'panel_segmentation').
-                    * value (Dict[str, int]):   A dict of {metric name: score},
+                    * value (dict[str, int]):   A dict of {metric name: score},
                                                     e.g.: {"AP50": 80}.
         """
         # Gather predictions on the main device.
@@ -188,7 +182,7 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         # Evaluate the metrics on the predictions.
         metrics_dict = self._evaluation_function(
             figure_generator=copy(self._augmented_figure_generator()))\
-                if self._evaluation_function is not None else None
+            if self._evaluation_function is not None else None
 
         # Export predictions and gt in a single JSON file
         if self.export:

@@ -24,14 +24,14 @@ Classes Label and DetectedLabel.
 """
 
 from __future__ import annotations
-from typing import cast, Tuple, Dict, Optional, Any
+from typing import cast, Optional, Any
 
 import cv2
 import numpy as np
 
 from ...box import Box
 
-Color = Tuple[int, int, int]
+Color = tuple[int, int, int]
 
 DEFAULT_GT_COLOR: Color = (0, 255, 0)
 DEFAULT_DETECTION_COLOR: Color = (0, 0, 200)
@@ -61,34 +61,30 @@ class Label:
 
         if box is not None:
             self.box: Box = cast(Box,
-                                 tuple([round(val) for val in box]))
-
+                                 tuple(round(val) for val in box))
 
     @classmethod
-    def from_dict(cls, label_dict: Dict) -> Label:
+    def from_dict(cls, label_dict: dict) -> Label:
         """
         Instanciate a Label object from a dictionnary.
 
         Args:
-            label_dict (Dict):  A dictionnary representing the label information.
+            label_dict (dict):  A dictionnary representing the label information.
 
         Returns:
             label (Label):  The resulting Label object.
         """
-
         return Label(text=label_dict.get('text', ''),
                      box=label_dict.get('box'))
 
-
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """
         Export to a dict.
 
         Returns:
-            output_dict (Dict): A Dict representing the label information.
+            output_dict (dict): A dict representing the label information.
         """
-
-        output_dict: Dict[str, Any] = {}
+        output_dict: dict[str, Any] = {}
 
         output_dict['text'] = self.text
 
@@ -96,7 +92,6 @@ class Label:
             output_dict['box'] = self.box
 
         return output_dict
-
 
     def draw(self,
              image: np.ndarray,
@@ -127,7 +122,6 @@ class Label:
                             fontScale=1,
                             color=color)
 
-
     def __str__(self) -> str:
         string: str = f"{type(self).__name__}:"
         if hasattr(self, 'box'):
@@ -136,10 +130,8 @@ class Label:
 
         return string
 
-
     def __repr__(self) -> str:
         return str(self)
-
 
 
 class DetectedLabel(Label):
@@ -169,7 +161,6 @@ class DetectedLabel(Label):
         self.detection_score: Optional[float] = detection_score
         self.is_true_positive: Optional[bool] = False
 
-
     @classmethod
     def from_normal_label(cls, label: Label) -> DetectedLabel:
         """
@@ -191,19 +182,17 @@ class DetectedLabel(Label):
         return DetectedLabel(text=label.text,
                              box=label.box)
 
-
     @classmethod
-    def from_dict(cls, label_dict: Dict[str, Any]) -> DetectedLabel:
+    def from_dict(cls, label_dict: dict[str, Any]) -> DetectedLabel:
         """
         Instanciate a DetectedLabel object from a dictionnary.
 
         Args:
-            label_dict (Dict):  A dictionnary representing the label information.
+            label_dict (dict):  A dictionnary representing the label information.
 
         Returns:
             detected_label (DetectedLabel): The resulting DetectedLabel object.
         """
-
         detected_label: DetectedLabel = DetectedLabel(
             text=label_dict.get('text', ''),
             box=label_dict.get('box'),
@@ -214,17 +203,15 @@ class DetectedLabel(Label):
 
         return detected_label
 
-
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Export to a dict.
 
         Returns:
-            output_dict (Dict): A Dict representing the panel information.
+            output_dict (dict): A dict representing the panel information.
         """
-
         # Call the method form Panel class.
-        output_dict: Dict = super().to_dict()
+        output_dict: dict = super().to_dict()
 
         if self.box is not None:
             output_dict['box'] = self.box
@@ -236,7 +223,6 @@ class DetectedLabel(Label):
             output_dict['is_true_positive'] = self.is_true_positive
 
         return output_dict
-
 
     def draw(self,
              image: np.ndarray,
@@ -251,7 +237,6 @@ class DetectedLabel(Label):
         """
         super().draw(image, color)
 
-
     def __str__(self) -> str:
         string = super().__str__()
 
@@ -262,7 +247,6 @@ class DetectedLabel(Label):
             string += f", is_true_positive: {self.is_true_positive}"
 
         return string
-
 
     def __repr__(self) -> str:
         return str(self)

@@ -30,25 +30,25 @@ import sys
 import os
 from argparse import ArgumentParser, Namespace
 import logging
-from typing import List
 import csv
 
 from compfigsep.data.figure_generators import IphotodrawXmlFigureGenerator, add_iphotodraw_args
 
 sys.path.append(".")
 
-def parse_args(args: List[str]) -> Namespace:
+
+def parse_args(args: list[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]):   The arguments from the command line call.
+        args (list[str]):   The arguments from the command line call.
 
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser: ArgumentParser = ArgumentParser(description="Convert annotations from individual"\
-                                                        " iPhotoDraw xml annotation files. to a"\
+    parser: ArgumentParser = ArgumentParser(description="Convert annotations from individual"
+                                                        " iPhotoDraw xml annotation files. to a"
                                                         " CSV annotations file.")
 
     add_iphotodraw_args(parser=parser)
@@ -62,19 +62,18 @@ def parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None) -> None:
+def main(args: list[str] = None) -> None:
     """
     Load figures from iPhotoDraw xml annotation files and export them to csv.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        args (list[str]):   Arguments from the command line.
     """
 
     # Parse arguments.
     if args is None:
         args = sys.argv[1:]
     parsed_args: Namespace = parse_args(args)
-
 
     if os.path.isfile(parsed_args.csv_output_filename):
         logging.error("File already exists. Aborting.")
@@ -85,8 +84,8 @@ def main(args: List[str] = None) -> None:
         file_list_txt=parsed_args.file_list_txt,
         image_directory_path=parsed_args.image_directory_path)
 
-    csv_row: List[str] = []
-    labels_list: List[str] = []
+    csv_row: list[str] = []
+    labels_list: list[str] = []
 
     with open(parsed_args.csv_output_filename, 'w') as csv_output_file:
 

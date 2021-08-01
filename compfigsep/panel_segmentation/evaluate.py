@@ -23,7 +23,6 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Module to evaluate the panel segmentation task metrics.
 """
 
-from typing import Dict, List
 import logging
 from pprint import pprint
 
@@ -55,7 +54,7 @@ def panel_segmentation_figure_eval(figure: Figure) -> MultiClassFigureResult:
     figure.match_detected_and_gt_panels_segmentation_task()
 
     gt_count: int = 0
-    gt_count_by_class: Dict[str, int] = {}
+    gt_count_by_class: dict[str, int] = {}
 
     # Keep track of the number of gt panels for each class
     for gt_subfigure in figure.gt_subfigures:
@@ -83,7 +82,7 @@ def panel_segmentation_figure_eval(figure: Figure) -> MultiClassFigureResult:
     detected_count: int = len(figure.detected_subfigures)
 
     num_correct: int = 0
-    detections_by_class: Dict[str, List[Detection]] = {}
+    detections_by_class: dict[str, list[Detection]] = {}
 
     for detected_subfigure in figure.detected_subfigures:
 
@@ -92,7 +91,7 @@ def panel_segmentation_figure_eval(figure: Figure) -> MultiClassFigureResult:
             continue
 
         if detected_subfigure.is_true_positive is None:
-            logging.warning("The `is_true_positive` attribute is None for this detected"\
+            logging.warning("The `is_true_positive` attribute is None for this detected"
                             " subfigure.")
             continue
 
@@ -136,9 +135,9 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     Returns:
         metrics (dict): A dict containing the computed metrics.
     """
-    panel_splitting_results: List[PanelSplittingFigureResult] = []
-    label_recognition_results: List[MultiClassFigureResult] = []
-    panel_segmentation_results: List[MultiClassFigureResult] = []
+    panel_splitting_results: list[PanelSplittingFigureResult] = []
+    label_recognition_results: list[MultiClassFigureResult] = []
+    panel_segmentation_results: list[MultiClassFigureResult] = []
 
     for figure in figure_generator():
 
@@ -158,7 +157,6 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         # pprint(stats['label_recognition'])
         # figure.show_preview(mode='both', window_name='label_recognition')
 
-
         # 3) Panel segmentation
 
         # Assign detected labels to detected panels using the beam search algorithm
@@ -170,13 +168,13 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         # TODO manage the case where no labels have been detected
         # Convert output from beam search (list of SubFigure objects) to DetectedSubFigure.
         # figure.detected_subfigures = [DetectedSubFigure.from_normal_sub_figure(subfigure)
-                                      # for subfigure in subfigures]
+        # for subfigure in subfigures]
 
         # print("\nPanel segmentation figure stats")
         # pprint(stats['panel_segmentation'])
         # figure.show_preview(mode='both', window_name='panel_segmentation')
 
-    metrics: Dict[str, Dict[str, float]] = {}
+    metrics: dict[str, dict[str, float]] = {}
 
     # Panel splitting
     psp_imageclef_acc, psp_precision, psp_recall, psp_map = panel_splitting_metrics(

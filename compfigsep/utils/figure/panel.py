@@ -24,14 +24,14 @@ Classes Panel and DetectedPanel.
 """
 
 from __future__ import annotations
-from typing import cast, Tuple, Dict, Optional, Any
+from typing import cast, Optional, Any
 
 import cv2
 import numpy as np
 
 from ..box import Box
 
-Color = Tuple[int, int, int]
+Color = tuple[int, int, int]
 
 DEFAULT_GT_COLOR: Color = (0, 255, 0)
 DEFAULT_DETECTION_COLOR: Color = (0, 0, 200)
@@ -54,37 +54,34 @@ class Panel:
             box = box.tolist()
 
         self.box: Box = cast(Box,
-                             tuple([round(val) for val in box]))
-
+                             tuple(round(val) for val in box))
 
     @classmethod
-    def from_dict(cls, panel_dict: Dict) -> Panel:
+    def from_dict(cls, panel_dict: dict) -> Panel:
         """
         Instanciate a Panel object from a dictionnary.
 
         Args:
-            panel_dict (Dict):  A dictionnary representing the panel information.
+            panel_dict (dict):  A dictionnary representing the panel information.
 
         Returns:
             panel (Panel):  The resulting Panel object.
         """
         return Panel(box=panel_dict['box'])
 
-
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """
         Export to a dict.
 
         Returns:
-            output_dict (Dict): A Dict representing the panel information.
+            output_dict (dict): A dict representing the panel information.
         """
-        output_dict: Dict[str, Any] = {}
+        output_dict: dict[str, Any] = {}
 
         if self.box is not None:
             output_dict['box'] = self.box
 
         return output_dict
-
 
     def draw(self,
              image: np.ndarray,
@@ -105,17 +102,14 @@ class Panel:
                           color=color,
                           thickness=2)
 
-
     def __str__(self) -> str:
         string: str = f"{type(self).__name__}:"
         string += f" box: {self.box}"
 
         return string
 
-
     def __repr__(self) -> str:
         return str(self)
-
 
 
 class DetectedPanel(Panel):
@@ -148,7 +142,6 @@ class DetectedPanel(Panel):
         self.is_true_positive_iou: Optional[bool] = None
         self.is_true_positive_overlap: Optional[bool] = None
 
-
     @classmethod
     def from_normal_panel(cls, panel: Panel) -> DetectedPanel:
         """
@@ -169,14 +162,13 @@ class DetectedPanel(Panel):
 
         return DetectedPanel(box=panel.box)
 
-
     @classmethod
-    def from_dict(cls, panel_dict: Dict) -> DetectedPanel:
+    def from_dict(cls, panel_dict: dict) -> DetectedPanel:
         """
         Instanciate a DetectedPanel object from a dictionnary.
 
         Args:
-            panel_dict (Dict):  A dictionnary representing the panel information.
+            panel_dict (dict):  A dictionnary representing the panel information.
 
         Returns:
             detected_panel (DetectedPanel): The resulting DetectedPanel object.
@@ -196,16 +188,16 @@ class DetectedPanel(Panel):
         return detected_panel
 
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """
         Export to a dict.
 
         Returns:
-            output_dict (Dict): A Dict representing the panel information.
+            output_dict (dict): A dict representing the panel information.
         """
 
         # Call the method form Panel class.
-        output_dict: Dict = super().to_dict()
+        output_dict: dict = super().to_dict()
 
         if self.box is not None:
             output_dict['box'] = self.box

@@ -29,26 +29,24 @@ keras-retinanet (https://github.com/fizyr/keras-retinanet).
 import sys
 from argparse import ArgumentParser, Namespace
 
-from typing import List
-
 from compfigsep.data.figure_generators import add_image_clef_args, ImageClefXmlFigureGenerator
 from compfigsep.data.export import export_figures_to_csv
 
 sys.path.append(".")
 
-def parse_args(args: List[str]) -> Namespace:
+
+def parse_args(args: list[str]) -> Namespace:
     """
     Parse the arguments from the command line.
 
     Args:
-        args (List[str]): The arguments from the command line call.
+        args (list[str]): The arguments from the command line call.
 
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser: ArgumentParser = ArgumentParser(description="Convert annotations from an ImageCLEF"\
+    parser: ArgumentParser = ArgumentParser(description="Convert annotations from an ImageCLEF"
                                             " xml annotation file to a CSV annotations file.")
-
 
     add_image_clef_args(parser=parser)
 
@@ -62,7 +60,7 @@ def parse_args(args: List[str]) -> Namespace:
                         action='store_true')
 
     parser.add_argument('--individual_export_csv_directory',
-                        help="The path of the directory where to store the individual csv"\
+                        help="The path of the directory where to store the individual csv"
                              " annotation files.",
                         default="data/imageCLEF/test/test.csv",
                         type=str)
@@ -70,12 +68,12 @@ def parse_args(args: List[str]) -> Namespace:
     return parser.parse_args(args)
 
 
-def main(args: List[str] = None) -> None:
+def main(args: list[str] = None) -> None:
     """
     Load figures from ImageCLEF xml annotation files and export them to csv.
 
     Args:
-        args (List[str]):   Arguments from the command line.
+        args (list[str]):   Arguments from the command line.
     """
 
     # Parse arguments.

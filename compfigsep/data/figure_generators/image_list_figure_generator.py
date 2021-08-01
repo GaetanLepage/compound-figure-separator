@@ -28,7 +28,7 @@ import os
 import logging
 import random
 
-from typing import Iterable, Optional, List
+from typing import Iterable, Optional
 
 from ...utils.figure.figure import Figure
 from .figure_generator import FigureGenerator
@@ -58,25 +58,23 @@ class ImageListFigureGenerator(FigureGenerator):
         super().__init__(default_random_order=default_random_order)
 
         if not os.path.isfile(image_list_txt):
-            raise FileNotFoundError("The evaluation list file does not exist :"\
-                                    "\n\t {}".format(image_list_txt))
+            raise FileNotFoundError("The evaluation list file does not exist :"
+                                    f"\n\t {image_list_txt}")
 
         self.image_directory_path: Optional[str] = image_directory_path
 
         self.image_list_txt: str = image_list_txt
-
 
     def __copy__(self) -> ImageListFigureGenerator:
         return ImageListFigureGenerator(image_list_txt=self.image_list_txt,
                                         image_directory_path=self.image_directory_path,
                                         default_random_order=self.default_random_order)
 
-
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
 
         with open(self.image_list_txt, 'r') as image_list_file:
 
-            lines: List[str] = image_list_file.readlines()
+            lines: list[str] = image_list_file.readlines()
 
         if random_order is None:
             random_order = self.default_random_order

@@ -26,13 +26,11 @@ LossEvalHook to evaluate loss on the validation set.
 import time
 import datetime
 import logging
-from typing import List
 
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
 import numpy as np
-
 
 from detectron2.engine.hooks import HookBase
 from detectron2.utils.logger import log_every_n_seconds
@@ -62,7 +60,7 @@ class LossEvalHook(HookBase):
         """
         self._model: nn.Module = model
         self._data_loader: DataLoader = data_loader
-        self._period : int = eval_period
+        self._period: int = eval_period
         self._logger: logging.Logger = setup_logger(name=__name__,
                                                     distributed_rank=comm.get_rank())
 
@@ -81,7 +79,7 @@ class LossEvalHook(HookBase):
 
         start_time: float = time.perf_counter()
         total_compute_time: float = 0
-        losses: List[float] = []
+        losses: list[float] = []
         for idx, inputs in enumerate(self._data_loader):
             if idx == num_warmup:
                 start_time = time.perf_counter()
@@ -107,7 +105,7 @@ class LossEvalHook(HookBase):
                     seconds=int(total_seconds_per_img * (num_samples - idx - 1)))
 
                 log_every_n_seconds(lvl=logging.INFO,
-                                    msg=f"Loss on Validation done {idx + 1}/{num_samples}."\
+                                    msg=f"Loss on Validation done {idx + 1}/{num_samples}."
                                         f" {seconds_per_img:.4f} s / img. ETA={eta}",
                                     n=100,
                                     name=__name__)
@@ -125,7 +123,6 @@ class LossEvalHook(HookBase):
 
         return mean_loss
 
-
     def _get_loss(self, data: dict) -> float:
         """
         Compute the loss value for a single sample.
@@ -139,13 +136,12 @@ class LossEvalHook(HookBase):
         loss_dict = self._model(data)
         loss_dict = {
             k: v.detach().cpu().item()
-               if isinstance(v, torch.Tensor)
-               else float(v)
+            if isinstance(v, torch.Tensor)
+            else float(v)
             for k, v in loss_dict.items()
         }
         total_losses_reduced = sum(loss_dict.values())
         return total_losses_reduced
-
 
     def after_step(self):
         """
