@@ -70,8 +70,7 @@ def main(args: List[str] = None):
     parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
-    figure_generator = JsonFigureGenerator(
-        json_path=parsed_args.json)
+    figure_generator = JsonFigureGenerator(json_path=parsed_args.json)
 
     # Evaluate the data set.
     evaluate_detections(figure_generator=figure_generator)

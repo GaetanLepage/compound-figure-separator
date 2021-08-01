@@ -30,11 +30,11 @@ import json
 import re
 import random
 from time import strptime
-import datetime
-from typing import Iterable, Optional, List, Tuple, Any
+from datetime import datetime
+from typing import Iterable, Optional, List, Tuple, Any, Dict
 from argparse import ArgumentParser
 
-import progressbar
+from progressbar import progressbar
 
 import compfigsep
 
@@ -60,7 +60,7 @@ def get_most_recent_json(folder_path: str = None) -> str:
     Returns:
         json_path (str):    The path to the most recent JSON annotation file.
     """
-    default_path = DEFAULT_JSON_FOLDER
+    default_path: str = DEFAULT_JSON_FOLDER
 
     if folder_path is None:
         folder_path = default_path
@@ -68,7 +68,7 @@ def get_most_recent_json(folder_path: str = None) -> str:
                      default_path)
 
     elif not os.path.isdir(folder_path):
-        logging.warning("Given folder_path %s is not a valid directory."\
+        logging.warning("Given folder_path %s is not a valid directory."
                         " Using default: %s",
                         folder_path, default_path)
         folder_path = default_path
@@ -79,10 +79,10 @@ def get_most_recent_json(folder_path: str = None) -> str:
 
         raise ValueError(f"folder_path {folder_path} does not exist. Aborting.")
 
-    regexp_time_stamp_file_names = \
+    regexp_time_stamp_file_names: str = \
         r".*_[0-9]{4}-[A-Za-z]+-[0-3][0-9]_[0-2][0-9]:[0-5][0-9]:[0-5][0-9].json"
 
-    dates = {}
+    dates: Dict[datetime, str] = {}
 
     for file_name in os.listdir(folder_path):
 
@@ -93,64 +93,64 @@ def get_most_recent_json(folder_path: str = None) -> str:
                      string=file_name) is None:
             continue
 
-        date_match = re.search(pattern=r"[0-9]{4}-[A-Za-z]+-[0-3][0-9]_"\
-                                        "[0-2][0-9]:[0-5][0-9]:[0-5][0-9]",
-                               string=file_name)
+        date_match: Optional[re.Match] = re.search(pattern=r"[0-9]{4}-[A-Za-z]+-[0-3][0-9]_"
+                                                           r"[0-2][0-9]:[0-5][0-9]:[0-5][0-9]",
+                                                   string=file_name)
         if date_match is None:
             continue
 
-        date_string = date_match.group(0)
+        date_string: str = date_match.group(0)
 
         # Year
-        year_match = re.search(pattern=r"[0-9]{4}",
-                               string=date_string)
+        year_match: Optional[re.Match] = re.search(pattern=r"[0-9]{4}",
+                                                   string=date_string)
         if year_match is None:
             continue
 
-        year = int(year_match.group(0))
+        year: int = int(year_match.group(0))
 
         # Month
-        month_match = re.search(pattern=r"[A-Za-z]+",
-                                string=date_string)
+        month_match: Optional[re.Match] = re.search(pattern=r"[A-Za-z]+",
+                                                    string=date_string)
 
         if month_match is None:
             continue
 
-        month_string = month_match.group(0)
+        month_string: str = month_match.group(0)
 
-        month_number = strptime(month_string, '%B').tm_mon
+        month_number: int = strptime(month_string, '%B').tm_mon
 
         # Day
-        day_match = re.search(pattern=r"-[0-3][0-9]_",
-                              string=date_string)
+        day_match: Optional[re.Match] = re.search(pattern=r"-[0-3][0-9]_",
+                                                  string=date_string)
         if day_match is None:
             continue
 
-        day_number = int(day_match.group(0)[1:-1])
+        day_number: int = int(day_match.group(0)[1:-1])
 
         # Time
-        time_match = re.search(pattern=r"[0-2][0-9]:[0-5][0-9]:[0-5][0-9]",
-                               string=date_string)
+        time_match: Optional[re.Match] = re.search(pattern=r"[0-2][0-9]:[0-5][0-9]:[0-5][0-9]",
+                                                   string=date_string)
         if time_match is None:
             continue
 
-        time_string = time_match.group(0)
+        time_string: str = time_match.group(0)
 
         hour, minute, second = (int(value) for value in time_string.split(':'))
 
-        date = datetime.datetime(year=year,
-                                 month=month_number,
-                                 day=day_number,
-                                 hour=hour,
-                                 minute=minute,
-                                 second=second)
+        date: datetime = datetime(year=year,
+                                  month=month_number,
+                                  day=day_number,
+                                  hour=hour,
+                                  minute=minute,
+                                  second=second)
 
         dates[date] = file_name
 
     assert len(dates) > 0, f"No valid json annotation file was found in folder {folder_path}"\
-                            "\nExiting"
+                           "\nExiting"
 
-    max_date = max(dates)
+    max_date: datetime = max(dates)
 
     most_recent_file_name = dates[max_date]
 
@@ -169,7 +169,6 @@ def add_json_arg(parser: ArgumentParser,
         folder_default_relative_path (str): Default folder relative (to MODULE_DIR) path where to
                                                 look for the most recent json file.
     """
-
     if json_default_relative_path is None:
 
         if folder_default_relative_path is None:
@@ -180,7 +179,7 @@ def add_json_arg(parser: ArgumentParser,
 
         folder_default_path = os.path.relpath(folder_default_path)
 
-        json_default_path = get_most_recent_json(folder_path=folder_default_path)
+        json_default_path: str = get_most_recent_json(folder_path=folder_default_path)
 
     else:
         json_default_path = os.path.join(MODULE_DIR,
@@ -227,12 +226,15 @@ class JsonFigureGenerator(FigureGenerator):
             raise FileNotFoundError("The annotation json file does not exist :"\
                 "\n\t {}".format(self.json_annotation_file_path))
 
-
     def __copy__(self) -> JsonFigureGenerator:
+        """
+        Make a copy of a JsonFigureGenerator.
 
+        Returns:
+            json_figure_generator (JsonFigureGenerator):    The copy.
+        """
         return JsonFigureGenerator(json_path=self.json_annotation_file_path,
                                    default_random_order=self.default_random_order)
-
 
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """
@@ -247,14 +249,14 @@ class JsonFigureGenerator(FigureGenerator):
         print(f"Json file: {self.json_annotation_file_path}")
 
         with open(self.json_annotation_file_path, 'r') as json_annotation_file:
-            data_dict = json.load(json_annotation_file)
+            data_dict: Dict[str, Any] = json.load(json_annotation_file)
 
-        dict_values: List[Tuple[str, Any]] = [pair for pair in data_dict.values()]
+        dict_values: List[Tuple[str, Any]] = list(data_dict.values())
 
         if random_order:
             random.shuffle(dict_values)
 
-        for index, figure_dict in enumerate(progressbar.progressbar(dict_values)):
+        for index, figure_dict in enumerate(progressbar(dict_values)):
 
             yield Figure.from_dict(figure_dict=figure_dict,
                                    index=index)

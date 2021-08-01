@@ -75,11 +75,10 @@ def _unary_compatibility(label: DetectedLabel,
     return result
 
 
-
-def _binary_compatibility(label_1:          DetectedLabel,
-                          label_2:          DetectedLabel,
-                          label_1_index:    int,
-                          label_2_index:    int) -> np.ndarray:
+def _binary_compatibility(label_1: DetectedLabel,
+                          label_2: DetectedLabel,
+                          label_1_index: int,
+                          label_2_index: int) -> np.ndarray:
     """
     Computes the binary compatibility function values for two given detected labels for all
     possible values of assigned labels f_i and f_j.
@@ -96,8 +95,7 @@ def _binary_compatibility(label_1:          DetectedLabel,
                                     possible pairs of input values (f_i, f_j).
                                     -> Shape = (2, 2)
     """
-
-    assert label_1.box  is not None and label_2.box is not None
+    assert label_1.box is not None and label_2.box is not None
     assert label_1.text is not None and label_2.text is not None
 
     ratio_areas: float = box.area(label_1.box) / box.area(label_2.box)
@@ -162,7 +160,6 @@ def _is_label_in_prior_zone(label_1: DetectedLabel,
     Returns:
         is_in_prior_zone (bool):    True if label_2 is in the prior zone of label_1.
     """
-
     label_1_pos: box.Point = box.get_center(label_1.box)
     label_2_pos: box.Point = box.get_center(label_2.box)
 
@@ -241,9 +238,8 @@ def _precompute_compatibility_functions(label_list: List[DetectedLabel]
     """
     label_text_list: List[str] = [label.text for label in label_list]
 
-
     label_structure_type: LabelStructureEnum = LabelStructure.from_labels_list(
-    labels_list=label_text_list).labels_type
+        labels_list=label_text_list).labels_type
 
     print(label_text_list)
     print(label_structure_type)
@@ -263,19 +259,16 @@ def _precompute_compatibility_functions(label_list: List[DetectedLabel]
             num_labels_in_prior_zone += int(_is_label_in_prior_zone(label_1=label_i,
                                                                     label_2=label_j))
 
-
             label_j_index: int = LABEL_INDEX[label_structure_type](label_j.text)
             binary_compatibility_values[i, j] = _binary_compatibility(label_1=label_i,
                                                                       label_2=label_j,
                                                                       label_1_index=label_i_index,
                                                                       label_2_index=label_j_index)
 
-
         unary_compatibility_values[i] = _unary_compatibility(
             label=label_i,
             label_index=label_i_index,
             number_of_labels_in_prior_zone=num_labels_in_prior_zone)
-
 
     return unary_compatibility_values, binary_compatibility_values
 
@@ -325,21 +318,21 @@ def _belief_propagation(label_list: List[DetectedLabel]) -> np.ndarray:
                 # m_ij(f_j) = max f_i [r_i(f_i) r_ij(f_i, f_j) max k m_ki(f_i)]
                 messages[i, j] = [
                     np.max([
-                       unary_compatibility_values[i][f_i] \
-                           * binary_compatibility_values[i, j][f_i, f_j] \
-                           * np.max([
-                               messages[k, i][f_i]
-                               if k != j and adjacency_matrix[k, i] == 1
-                               else 0
-                               for k in range(num_labels)]
-                            )
-                       for f_i in (0, 1)]
-                    )
-                    for f_j in (0, 1)]
+                        unary_compatibility_values[i][f_i]
+                        * binary_compatibility_values[i, j][f_i, f_j]
+                        * np.max([
+                            messages[k, i][f_i]
+                            if k != j and adjacency_matrix[k, i] == 1
+                            else 0
+                            for k in range(num_labels)
+                        ])
+                        for f_i in (0, 1)
+                    ])
+                    for f_j in (0, 1)
+                ]
 
     print("messages f_j = 0\n", str(messages[:, :, 0]))
     print("messages f_j = 1\n", str(messages[:, :, 1]))
-
 
     beliefs: np.ndarray = np.zeros(shape=(num_labels, 2))
 

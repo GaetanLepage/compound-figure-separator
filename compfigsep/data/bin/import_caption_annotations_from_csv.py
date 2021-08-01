@@ -33,10 +33,8 @@ from typing import List, Optional, Dict
 import csv
 
 from compfigsep.data.figure_generators import FigureGenerator
-from compfigsep.utils.figure import SubFigure
 from compfigsep.utils.figure.label import (LabelStructure,
                                            LabelStructureEnum,
-                                           LABEL_INDEX,
                                            map_label)
 from compfigsep.data.figure_generators.json_figure_generator import JsonFigureGenerator
 
@@ -126,8 +124,6 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
 
         # Check if both caption texts match
         if annotation_caption_text != figure.caption:
-            # print(f"{annotation_caption_text}\n!=\n{figure.caption}\n{len(annotation_caption_text)} " \
-            #       f"|| {len(figure.caption)}")
             figure.caption = annotation_caption_text
 
 
@@ -211,7 +207,8 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
 
                 if hasattr(subfigure, 'label') and subfigure.label is not None:
                     subfigure_label_text: str = subfigure.label.text
-                    assert (subfigure_label_text == gt_label) or (map_label(subfigure_label_text) == map_label(gt_label)),\
+                    assert (subfigure_label_text == gt_label) \
+                            or (map_label(subfigure_label_text) == map_label(gt_label)),\
                             f"{subfigure.label.text} != {gt_label}"
 
                 if label == gt_label:
