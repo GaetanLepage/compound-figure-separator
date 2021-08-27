@@ -272,6 +272,7 @@ def _precompute_compatibility_functions(label_list: list[DetectedLabel]
 
     return unary_compatibility_values, binary_compatibility_values
 
+
 def _belief_propagation(label_list: list[DetectedLabel]) -> np.ndarray:
     """
     Apply the belief propagation algorithm to compute the beliefs.

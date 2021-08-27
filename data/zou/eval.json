@@ -39234,26 +39234,6 @@
                 "panel": {
                     "box": [
                         0,
-                        310,
-                        379,
-                        468
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        0,
-                        312,
-                        20,
-                        332
-                    ]
-                },
-                "caption": "Gene expression of candidate biomarkers in ovarian tissues. Gene expression levels for normal ovary tissue (N; n = 4) and papillary serous ovarian carcinoma primary tumor samples (C, n = 14) are shown.(C) Two previously reported ovarian cancer biomarkers that were identified in the current dataset."
-            },
-            {
-                "panel": {
-                    "box": [
-                        0,
                         157,
                         685,
                         311
@@ -39269,6 +39249,26 @@
                     ]
                 },
                 "caption": "Gene expression of candidate biomarkers in ovarian tissues. Gene expression levels for normal ovary tissue (N; n = 4) and papillary serous ovarian carcinoma primary tumor samples (C, n = 14) are shown. (B) Representative novel proteins identified in the xenograft mouse plasma."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
+                        310,
+                        379,
+                        468
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        0,
+                        312,
+                        20,
+                        332
+                    ]
+                },
+                "caption": "Gene expression of candidate biomarkers in ovarian tissues. Gene expression levels for normal ovary tissue (N; n = 4) and papillary serous ovarian carcinoma primary tumor samples (C, n = 14) are shown.(C) Two previously reported ovarian cancer biomarkers that were identified in the current dataset."
             }
         ],
         "caption": "Gene expression of candidate biomarkers in ovarian tissues. Gene expression levels for normal ovary tissue (N; n = 4) and papillary serous ovarian carcinoma primary tumor samples (C, n = 14) are shown. (A) Representative candidate proteasome proteins. (B) Representative novel proteins identified in the xenograft mouse plasma. (C) Two previously reported ovarian cancer biomarkers that were identified in the current dataset. Microarray hybridization data were processed and scaled as previously described. [36], [37] Data were extracted from www.BioGPS.org."
@@ -39301,6 +39301,26 @@
             {
                 "panel": {
                     "box": [
+                        2,
+                        399,
+                        717,
+                        1022
+                    ]
+                },
+                "label": {
+                    "text": "B",
+                    "box": [
+                        5,
+                        402,
+                        30,
+                        435
+                    ]
+                },
+                "caption": "Pdx1 homeodomain/DNA interactions from the crystal structure. A) Structure of the Pdx1 homeodomain/DNA complex. Pdx1 (blue ribbon) binds the TAAT core DNA sequence (grey). The N-terminal tail binds in the minor groove, and the recognition helix, helix 3, binds in the major groove. Key residues contacting the DNA are shown as stick figures (red): Arg 5 in the minor groove, and Asn 51 in the major groove. Gln 50 contacts the phosphate backbone or the DNA bases through a water-mediated contact. Arg 3 and Arg 43 (black line representation, circled) help stabilize the N-terminal arm, and Lys 2, in the minor groove when helix 3 is properly positioned in the major groove."
+            },
+            {
+                "panel": {
+                    "box": [
                         1,
                         1025,
                         689,
@@ -39318,26 +39338,6 @@
                 },
                 "caption": "Pdx1 homeodomain/DNA interactions from the crystal structure. C) DNA sequence and numbering in the crystal structure. The TAAT core sequence is in bold."
             },
-            {
-                "panel": {
-                    "box": [
-                        2,
-                        399,
-                        717,
-                        1022
-                    ]
-                },
-                "label": {
-                    "text": "B",
-                    "box": [
-                        5,
-                        402,
-                        30,
-                        435
-                    ]
-                },
-                "caption": "Pdx1 homeodomain/DNA interactions from the crystal structure. A) Structure of the Pdx1 homeodomain/DNA complex. Pdx1 (blue ribbon) binds the TAAT core DNA sequence (grey). The N-terminal tail binds in the minor groove, and the recognition helix, helix 3, binds in the major groove. Key residues contacting the DNA are shown as stick figures (red): Arg 5 in the minor groove, and Asn 51 in the major groove. Gln 50 contacts the phosphate backbone or the DNA bases through a water-mediated contact. Arg 3 and Arg 43 (black line representation, circled) help stabilize the N-terminal arm, and Lys 2, in the minor groove when helix 3 is properly positioned in the major groove."
-            }
         ],
         "caption": "Pdx1 homeodomain/DNA interactions from the crystal structure. A) Structure of the Pdx1 homeodomain/DNA complex. Pdx1 (blue ribbon) binds the TAAT core DNA sequence (grey). The N-terminal tail binds in the minor groove, and the recognition helix, helix 3, binds in the major groove. Key residues contacting the DNA are shown as stick figures (red): Arg 5 in the minor groove, and Asn 51 in the major groove. Gln 50 contacts the phosphate backbone or the DNA bases through a water-mediated contact. Arg 3 and Arg 43 (black line representation, circled) help stabilize the N-terminal arm, and Lys 2, in the minor groove when helix 3 is properly positioned in the major groove. B) Hydrogen bond contacts with the DNA differ between Conformation A and B in the Pdx1 homeodomain/DNA crystal structure (PDB 2H1K) (www.rcsb.org) [56]. In both conformations (left) Arg 5 contacts Thy 1 and Gua \u22121* through the minor grove, and Asn 51 contacts Ade 3 through the major grove. The difference in the DNA contacts between Conformations A (orange) and B (blue) is shown on the right. Conformation B makes additional base contacts by Asn 51, by Lys 2 from the ordered N-terminal arm, and a water-mediated contact by Gln 50. Conformation A forms additional phosphate contacts. Arrows represent hydrogen bonds. C) DNA sequence and numbering in the crystal structure. The TAAT core sequence is in bold."
     },
@@ -39346,26 +39346,6 @@
         "image_width": 636,
         "image_height": 1266,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        1,
-                        803,
-                        632,
-                        1263
-                    ]
-                },
-                "label": {
-                    "text": "b",
-                    "box": [
-                        184,
-                        861,
-                        207,
-                        888
-                    ]
-                },
-                "caption": "Strand separation pathway of stretched DNA. Here the pathway is characterized through 5\u2032-end to 5\u2032-end distance (extension), stacking energy of DNA bases, and intermediate DNA geometries. (b) Stacking energy versus extension data from two 90-ns-long constant force (F = 200 pN) simulations pulling DNA (red, simulation G1; blue, simulation H1). mDNA adopts a shorter, ordered zipper-like conformation with fewer bubbles (left), while nDNA adopts a longer, zipper-like conformation with more bubbles (right). Orange circles indicate the positions of methylated cytosines."
-            },
             {
                 "panel": {
                     "box": [
@@ -39385,6 +39365,26 @@
                     ]
                 },
                 "caption": "Strand separation pathway of stretched DNA. Here the pathway is characterized through 5\u2032-end to 5\u2032-end distance (extension), stacking energy of DNA bases, and intermediate DNA geometries. (a) Stacking energy versus extension curves of 15 trajectories of DNA pulled at 10 \u00c5/ns velocity. Structures shown are representative snapshots taken from the simulations. Pink star: simulations D1\u2013D5; green plus: simulations E1\u2013E5; blue circle: simulations F1\u2013F5. The arrows indicate three different pathways for nDNA (red arrows), cDNA (green arrows) and fDNA (blue arrows)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        1,
+                        803,
+                        632,
+                        1263
+                    ]
+                },
+                "label": {
+                    "text": "b",
+                    "box": [
+                        184,
+                        861,
+                        207,
+                        888
+                    ]
+                },
+                "caption": "Strand separation pathway of stretched DNA. Here the pathway is characterized through 5\u2032-end to 5\u2032-end distance (extension), stacking energy of DNA bases, and intermediate DNA geometries. (b) Stacking energy versus extension data from two 90-ns-long constant force (F = 200 pN) simulations pulling DNA (red, simulation G1; blue, simulation H1). mDNA adopts a shorter, ordered zipper-like conformation with fewer bubbles (left), while nDNA adopts a longer, zipper-like conformation with more bubbles (right). Orange circles indicate the positions of methylated cytosines."
             }
         ],
         "caption": "Strand separation pathway of stretched DNA. Here the pathway is characterized through 5\u2032-end to 5\u2032-end distance (extension), stacking energy of DNA bases, and intermediate DNA geometries. (a) Stacking energy versus extension curves of 15 trajectories of DNA pulled at 10 \u00c5/ns velocity. Structures shown are representative snapshots taken from the simulations. Pink star: simulations D1\u2013D5; green plus: simulations E1\u2013E5; blue circle: simulations F1\u2013F5. The arrows indicate three different pathways for nDNA (red arrows), cDNA (green arrows) and fDNA (blue arrows). (b) Stacking energy versus extension data from two 90-ns-long constant force (F = 200 pN) simulations pulling DNA (red, simulation G1; blue, simulation H1). mDNA adopts a shorter, ordered zipper-like conformation with fewer bubbles (left), while nDNA adopts a longer, zipper-like conformation with more bubbles (right). Orange circles indicate the positions of methylated cytosines."
@@ -39465,26 +39465,6 @@
             {
                 "panel": {
                     "box": [
-                        6,
-                        324,
-                        365,
-                        616
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        6,
-                        325,
-                        27,
-                        346
-                    ]
-                },
-                "caption": "Acacetin inhibits 4-AP and KCl-evoked glutamate release from rat hippocampal nerve terminals in a concentration-dependent manner. C: Glutamate release was measured under control conditions or in the presence of 30 \u00b5M acacetin added 10 min prior to the addition of 4-AP (1 mM) or KCl (15 mM)."
-            },
-            {
-                "panel": {
-                    "box": [
                         366,
                         0,
                         715,
@@ -39501,6 +39481,26 @@
                     ]
                 },
                 "caption": "Acacetin inhibits 4-AP and KCl-evoked glutamate release from rat hippocampal nerve terminals in a concentration-dependent manner.  B: Glutamate release was measured under control conditions or in the presence of 30 \u00b5M acacetin added 10 min prior to the addition of 4-AP (1 mM) or KCl (15 mM)."
+            },
+            {
+                "panel": {
+                    "box": [
+                        6,
+                        324,
+                        365,
+                        616
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        6,
+                        325,
+                        27,
+                        346
+                    ]
+                },
+                "caption": "Acacetin inhibits 4-AP and KCl-evoked glutamate release from rat hippocampal nerve terminals in a concentration-dependent manner. C: Glutamate release was measured under control conditions or in the presence of 30 \u00b5M acacetin added 10 min prior to the addition of 4-AP (1 mM) or KCl (15 mM)."
             },
             {
                 "panel": {
@@ -39582,6 +39582,66 @@
                 "panel": {
                     "box": [
                         6,
+                        7,
+                        195,
+                        162
+                    ]
+                },
+                "label": {
+                    "text": "A",
+                    "box": [
+                        140,
+                        17,
+                        156,
+                        33
+                    ]
+                },
+                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
+            },
+            {
+                "panel": {
+                    "box": [
+                        196,
+                        7,
+                        367,
+                        162
+                    ]
+                },
+                "label": {
+                    "text": "B",
+                    "box": [
+                        322,
+                        14,
+                        339,
+                        31
+                    ]
+                },
+                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
+            },
+            {
+                "panel": {
+                    "box": [
+                        367,
+                        7,
+                        541,
+                        162
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        484,
+                        18,
+                        500,
+                        34
+                    ]
+                },
+                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
+            },
+            {
+                "panel": {
+                    "box": [
+                        6,
                         162,
                         194,
                         313
@@ -39594,6 +39654,26 @@
                         178,
                         163,
                         198
+                    ]
+                },
+                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
+            },
+            {
+                "panel": {
+                    "box": [
+                        194,
+                        162,
+                        381,
+                        313
+                    ]
+                },
+                "label": {
+                    "text": "E",
+                    "box": [
+                        342,
+                        178,
+                        364,
+                        200
                     ]
                 },
                 "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
@@ -39614,6 +39694,66 @@
                         169,
                         516,
                         187
+                    ]
+                },
+                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
+            },
+            {
+                "panel": {
+                    "box": [
+                        6,
+                        313,
+                        197,
+                        452
+                    ]
+                },
+                "label": {
+                    "text": "G",
+                    "box": [
+                        145,
+                        319,
+                        161,
+                        335
+                    ]
+                },
+                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
+            },
+            {
+                "panel": {
+                    "box": [
+                        197,
+                        313,
+                        386,
+                        449
+                    ]
+                },
+                "label": {
+                    "text": "H",
+                    "box": [
+                        340,
+                        323,
+                        356,
+                        339
+                    ]
+                },
+                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
+            },
+            {
+                "panel": {
+                    "box": [
+                        386,
+                        312,
+                        577,
+                        447
+                    ]
+                },
+                "label": {
+                    "text": "I",
+                    "box": [
+                        502,
+                        314,
+                        517,
+                        329
                     ]
                 },
                 "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
@@ -39657,146 +39797,6 @@
                     ]
                 },
                 "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
-            },
-            {
-                "panel": {
-                    "box": [
-                        386,
-                        312,
-                        577,
-                        447
-                    ]
-                },
-                "label": {
-                    "text": "I",
-                    "box": [
-                        502,
-                        314,
-                        517,
-                        329
-                    ]
-                },
-                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
-            },
-            {
-                "panel": {
-                    "box": [
-                        6,
-                        313,
-                        197,
-                        452
-                    ]
-                },
-                "label": {
-                    "text": "G",
-                    "box": [
-                        145,
-                        319,
-                        161,
-                        335
-                    ]
-                },
-                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
-            },
-            {
-                "panel": {
-                    "box": [
-                        6,
-                        7,
-                        195,
-                        162
-                    ]
-                },
-                "label": {
-                    "text": "A",
-                    "box": [
-                        140,
-                        17,
-                        156,
-                        33
-                    ]
-                },
-                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
-            },
-            {
-                "panel": {
-                    "box": [
-                        367,
-                        7,
-                        541,
-                        162
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        484,
-                        18,
-                        500,
-                        34
-                    ]
-                },
-                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
-            },
-            {
-                "panel": {
-                    "box": [
-                        197,
-                        313,
-                        386,
-                        449
-                    ]
-                },
-                "label": {
-                    "text": "H",
-                    "box": [
-                        340,
-                        323,
-                        356,
-                        339
-                    ]
-                },
-                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
-            },
-            {
-                "panel": {
-                    "box": [
-                        196,
-                        7,
-                        367,
-                        162
-                    ]
-                },
-                "label": {
-                    "text": "B",
-                    "box": [
-                        322,
-                        14,
-                        339,
-                        31
-                    ]
-                },
-                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
-            },
-            {
-                "panel": {
-                    "box": [
-                        194,
-                        162,
-                        381,
-                        313
-                    ]
-                },
-                "label": {
-                    "text": "E",
-                    "box": [
-                        342,
-                        178,
-                        364,
-                        200
-                    ]
-                },
-                "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
             }
         ],
         "caption": "The level of perturbed metabolites in the urine of Plasmodium vivax-infected and healthy individuals. All peak intensities were calculated in terms of actual integrated value of individual NMR spectral peak normalized to the total spectral intensity. Panels with more than one metabolite represent an overlap in the peak of metabolites in the spectrum. Red = P. vivax-infected individuals and black = healthy individuals. + indicates p < 0.05."
@@ -39806,46 +39806,6 @@
         "image_width": 484,
         "image_height": 652,
         "gt_subfigures": [
-            {
-                "panel": {
-                    "box": [
-                        250,
-                        205,
-                        483,
-                        401
-                    ]
-                },
-                "label": {
-                    "text": "D",
-                    "box": [
-                        270,
-                        370,
-                        287,
-                        390
-                    ]
-                },
-                "caption": "Brasiella bellorum, sp. n., female. Allotype 2D Body, anterior, dorsal. [Scale lines = 1 mm]."
-            },
-            {
-                "panel": {
-                    "box": [
-                        250,
-                        418,
-                        483,
-                        652
-                    ]
-                },
-                "label": {
-                    "text": "F",
-                    "box": [
-                        267,
-                        619,
-                        285,
-                        643
-                    ]
-                },
-                "caption": "Brasiella bellorum, sp. n., female. Allotype 2F Head, anterior. [Scale lines = 1 mm]."
-            },
             {
                 "panel": {
                     "box": [
@@ -39865,26 +39825,6 @@
                     ]
                 },
                 "caption": "Brasiella bellorum, sp. n., female. Allotype 2A Body. [Scale lines = 1 mm]."
-            },
-            {
-                "panel": {
-                    "box": [
-                        0,
-                        207,
-                        231,
-                        407
-                    ]
-                },
-                "label": {
-                    "text": "C",
-                    "box": [
-                        19,
-                        382,
-                        34,
-                        400
-                    ]
-                },
-                "caption": "Brasiella bellorum, sp. n., female. Allotype 2C Body, anterior, left lateral\u2013CS, coupling sulcus. [Scale lines = 1 mm]."
             },
             {
                 "panel": {
@@ -39910,6 +39850,46 @@
                 "panel": {
                     "box": [
                         0,
+                        207,
+                        231,
+                        407
+                    ]
+                },
+                "label": {
+                    "text": "C",
+                    "box": [
+                        19,
+                        382,
+                        34,
+                        400
+                    ]
+                },
+                "caption": "Brasiella bellorum, sp. n., female. Allotype 2C Body, anterior, left lateral\u2013CS, coupling sulcus. [Scale lines = 1 mm]."
+            },
+            {
+                "panel": {
+                    "box": [
+                        250,
+                        205,
+                        483,
+                        401
+                    ]
+                },
+                "label": {
+                    "text": "D",
+                    "box": [
+                        270,
+                        370,
+                        287,
+                        390
+                    ]
+                },
+                "caption": "Brasiella bellorum, sp. n., female. Allotype 2D Body, anterior, dorsal. [Scale lines = 1 mm]."
+            },
+            {
+                "panel": {
+                    "box": [
+                        0,
                         418,
                         242,
                         651
@@ -39925,6 +39905,26 @@
                     ]
                 },
                 "caption": "Brasiella bellorum, sp. n., female. Allotype 2E Abdomen, sterna, ventral\u20135th sternum, MB, membranous band; MW, membranous wedge; 6th sternum, LG, lateral gibbosity. [Scale lines = 1 mm]."
+            },
+            {
+                "panel": {
+                    "box": [
+                        250,
+                        418,
+                        483,
+                        652
+                    ]
+                },
+                "label": {
+                    "text": "F",
+                    "box": [
+                        267,
+                        619,
+                        285,
+                        643
+                    ]
+                },
+                "caption": "Brasiella bellorum, sp. n., female. Allotype 2F Head, anterior. [Scale lines = 1 mm]."
             }
         ],
         "caption": "Brasiella bellorum, sp. n., female. Allotype 2A Body, dorsal 2B Body, ventral 2C Body, anterior, left lateral\u2013CS, coupling sulcus 2D Body, anterior, dorsal 2E Abdomen, sterna, ventral\u20135th sternum, MB, membranous band; MW, membranous wedge; 6th sternum, LG, lateral gibbosity 2F Head, anterior. [Scale lines = 1 mm]."
@@ -40006,26 +40006,6 @@
                 "panel": {
                     "box": [
                         1,
-                        675,
-                        676,
-                        991
-                    ]
-                },
-                "label": {
-                    "text": "c",
-                    "box": [
-                        7,
-                        675,
-                        32,
-                        700
-                    ]
-                },
-                "caption": "The level of SLP-2 protein expression affects progression free survival and overall survival. c Kaplan\u2013Meier curves with univariate analysis (log-rank) for epithelial ovarian cancer patients with high SLP-2 expression (n = 28) versus low or no SLP-2 expression (n = 8) for progression free survival and overall survival for poorly differentiated types"
-            },
-            {
-                "panel": {
-                    "box": [
-                        1,
                         314,
                         676,
                         660
@@ -40041,6 +40021,26 @@
                     ]
                 },
                 "caption": "The level of SLP-2 protein expression affects progression free survival and overall survival. b Kaplan\u2013Meier curves with univariate analysis (log-rank) for epithelial ovarian cancer patients with high SLP-2 expression (n = 60) versus low or no SLP-2 expression (n = 20) for progression free survival and overall survival for serous types."
+            },
+            {
+                "panel": {
+                    "box": [
+                        1,
+                        675,
+                        676,
+                        991
+                    ]
+                },
+                "label": {
+                    "text": "c",
+                    "box": [
+                        7,
+                        675,
+                        32,
+                        700
+                    ]
+                },
+                "caption": "The level of SLP-2 protein expression affects progression free survival and overall survival. c Kaplan\u2013Meier curves with univariate analysis (log-rank) for epithelial ovarian cancer patients with high SLP-2 expression (n = 28) versus low or no SLP-2 expression (n = 8) for progression free survival and overall survival for poorly differentiated types"
             }
         ],
         "caption": "The level of SLP-2 protein expression affects progression free survival and overall survival. a Kaplan\u2013Meier curves with univariate analysis (log-rank) for epithelial ovarian cancer patients with high SLP-2 expression (n = 102) versus low or no SLP-2 expression (n = 38) for progression free survival and overall survival for all histological types. b Kaplan\u2013Meier curves with univariate analysis (log-rank) for epithelial ovarian cancer patients with high SLP-2 expression (n = 60) versus low or no SLP-2 expression (n = 20) for progression free survival and overall survival for serous types. c Kaplan\u2013Meier curves with univariate analysis (log-rank) for epithelial ovarian cancer patients with high SLP-2 expression (n = 28) versus low or no SLP-2 expression (n = 8) for progression free survival and overall survival for poorly differentiated types"

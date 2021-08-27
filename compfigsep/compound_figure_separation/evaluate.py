@@ -28,19 +28,19 @@ TODO
 from typing import Any
 from pprint import pprint
 
-from sortedcontainers import SortedKeyList  # type: ignore
+from sortedcontainers import SortedKeyList
 
 from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
 from ..utils.figure import Label
 
-from ..panel_splitting.evaluate import(PanelSplittingFigureResult,
-                                       panel_splitting_figure_eval,
-                                       panel_splitting_metrics)
+from ..panel_splitting.evaluate import (PanelSplittingFigureResult,
+                                        panel_splitting_figure_eval,
+                                        panel_splitting_metrics)
 
-from ..label_recognition.evaluate import(MultiClassFigureResult,
-                                         label_recognition_figure_eval,
-                                         multi_class_metrics)
+from ..label_recognition.evaluate import (MultiClassFigureResult,
+                                          label_recognition_figure_eval,
+                                          multi_class_metrics)
 
 from ..panel_segmentation.evaluate import panel_segmentation_figure_eval
 
@@ -59,7 +59,7 @@ def compound_figure_separation_figure_eval(figure: Figure,
                                         task.
         stat_dict (dict[str, any]): A dict containing compound figure evaluation evaluation stats
                                         It will be updated by this function.
-"""
+    """
     # Keep track of the number of gt panels for each class
     for gt_subfigure in figure.gt_subfigures:
 
@@ -82,7 +82,6 @@ def compound_figure_separation_figure_eval(figure: Figure,
             stat_dict['gt_count_by_class'][cls] = 1
         else:
             stat_dict['gt_count_by_class'][cls] += 1
-
 
     stat_dict['overall_detected_count'] += len(figure.detected_subfigures)
 
@@ -117,7 +116,6 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     Returns:
         metrics (dict): A dict containing the computed metrics.
     """
-
     panel_splitting_results: list[PanelSplittingFigureResult] = []
     label_recognition_results: list[MultiClassFigureResult] = []
     panel_segmentation_results: list[MultiClassFigureResult] = []
@@ -140,11 +138,11 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
         # TODO manage the case where no labels have been detected
         # if len(detected_labels) > 0:
         # subfigures = beam_search.assign_labels_to_panels(figure.detected_panels,
-                                                         # figure.detected_labels)
+        # figure.detected_labels)
 
         # Convert output from beam search (list of SubFigure objects) to DetectedSubFigure.
         # figure.detected_subfigures = [DetectedSubFigure.from_normal_sub_figure(subfigure)
-                                      # for subfigure in subfigures]
+        # for subfigure in subfigures]
 
         # print("\nPanel segmentation figure stats")
         panel_segmentation_results.append(panel_segmentation_figure_eval(figure))
