@@ -1,0 +1,103 @@
+Bootstrap: docker
+From: ubuntu:latest
+
+# vim: ft=sh
+
+# Description of this container.
+%help
+    This is a basic singularity image for general python execution with a focus on deep learning.
+    To build this container from your workstation at Inria, use:
+        sudo singularity build container.sif container.def
+
+
+# Metadata for this container
+%labels
+    Author gaetan.lepage@inria.fr
+    Version v0.1.0
+
+
+# List of host files to be copied inside the container.
+%files
+    # You can specify a single path.
+    # In this case, the file will be copied to the same path from / in the container
+    # Example:
+    #   foo/bar/hello.txt
+    # will copy `foo/bar/hello.txt` to `/foo/bar/hello.txt` in the container.
+
+    # You may also specify the location in the container
+    # Example:
+    #   foo/bar/hello.txt   /bonjour
+    # will copy `foo/bar/hello.txt` to `/bonjour/hello.txt` in the container.
+    requirements.txt
+
+
+# The `%environment` section allows you to define environment variables that will be set at runtime.
+# Note that these variables are not made available at build time by their inclusion in the
+# `%environment` section.
+# This means that if you need the same variables during the build process, you should also define
+# them in your `%post` section.
+%environment
+
+
+# This section is where we download files from the internet with tools like git and wget, install
+# new software and libraries, write configuration files, create new directories, etc.
+%post
+    export DEBIAN_FRONTEND="noninteractive"
+    export TZ="Europe/Paris"
+
+    ################
+    # APT packages #
+    ################
+
+    # Update Ubuntu apt repository
+    apt-get update
+
+    # Upgrade packages
+    apt-get upgrade -y
+
+    # Install apt packages
+    alias apt_install="apt-get install -y --no-install-recommends"
+
+    # Python
+    apt_install curl                    # To download `get-pip.py` from the internet
+    apt_install ca-certificates         # Required by `curl`
+    apt_install python3.9               # Latest version of Python
+    apt_install python3.9-dev           # Header files, a static library and development tools for
+                                        # building Python modules and more.
+    apt_install python3.9-distutils     # Support for building and installing additional Python
+                                        # modules
+
+    # >>> Here you can install your apt packages
+    # For example,
+    #   apt_install cmake
+    #   apt_install nvidia-cuda-toolkit
+    #   apt_install sox time gcc
+    apt_install git
+    apt_install gcc g++
+
+
+    ##########
+    # Python #
+    ##########
+
+    # Set python 3.9 as the default
+    ln -sf /usr/bin/python3.9 /usr/bin/python3
+    ln -sf /usr/bin/python3 /usr/bin/python
+
+    # Install pip
+    curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
+    python /tmp/get-pip.py
+
+    # Install some pip packages
+    alias pip_install="python -m pip install"
+
+    pip_install -U pip setuptools
+
+    # >>> Here you can install your python packages
+    # For example,
+    #   pip_install torch
+    #   pip_install numpy
+    # Install other projects requirements
+
+    pip_install torch
+    pip_install -r /requirements.txt
