@@ -45,25 +45,32 @@ def parse_args(args: list[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser: ArgumentParser = ArgumentParser(description="Convert annotations from an ImageCLEF"
-                                            " xml annotation file to a CSV annotations file.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Convert annotations from an ImageCLEF"
+                    " xml annotation file to a CSV annotations file."
+    )
 
     add_image_clef_args(parser=parser)
 
-    parser.add_argument('--output_csv',
-                        help="The path of the csv file to which annotations have to be exported.",
-                        default="data/imageCLEF/test/test.csv",
-                        type=str)
+    parser.add_argument(
+        '--output_csv',
+        help="The path of the csv file to which annotations have to be exported.",
+        default="data/imageCLEF/test/test.csv",
+        type=str
+    )
 
-    parser.add_argument('--individual_csv',
-                        help="Also export the annotations to a single csv file.",
-                        action='store_true')
+    parser.add_argument(
+        '--individual_csv',
+        help="Also export the annotations to a single csv file.",
+        action='store_true'
+    )
 
-    parser.add_argument('--individual_export_csv_directory',
-                        help="The path of the directory where to store the individual csv"
-                             " annotation files.",
-                        default="data/imageCLEF/test/test.csv",
-                        type=str)
+    parser.add_argument(
+        '--individual_export_csv_directory',
+        help="The path of the directory where to store the individual csv annotation files.",
+        default="data/imageCLEF/test/test.csv",
+        type=str
+    )
 
     return parser.parse_args(args)
 
@@ -84,14 +91,16 @@ def main(args: list[str] = None) -> None:
     # Create the figure generator handling xml annotation files
     figure_generator = ImageClefXmlFigureGenerator(
         xml_annotation_file_path=parsed_args.annotation_xml,
-        image_directory_path=parsed_args.image_directory_path)
+        image_directory_path=parsed_args.image_directory_path
+    )
 
     # Export figures to csv
     export_figures_to_csv(
         figure_generator=figure_generator,
         output_csv_file=parsed_args.output_csv,
         individual_export=parsed_args.individual_csv,
-        individual_export_csv_directory=parsed_args.individual_export_csv_directory)
+        individual_export_csv_directory=parsed_args.individual_export_csv_directory
+    )
 
 
 if __name__ == '__main__':

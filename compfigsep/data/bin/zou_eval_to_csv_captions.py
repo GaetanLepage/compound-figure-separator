@@ -34,7 +34,7 @@ import csv
 
 from compfigsep.data.figure_generators import IphotodrawXmlFigureGenerator, add_iphotodraw_args
 
-sys.path.append(".")
+sys.path.append('.')
 
 
 def parse_args(args: list[str]) -> Namespace:
@@ -47,17 +47,20 @@ def parse_args(args: list[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser: ArgumentParser = ArgumentParser(description="Convert annotations from individual"
-                                                        " iPhotoDraw xml annotation files. to a"
-                                                        " CSV annotations file.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Convert annotations from individual iPhotoDraw xml annotation files to a CSV"
+                    " annotations file."
+    )
 
     add_iphotodraw_args(parser=parser)
 
-    parser.add_argument('--output_filename',
-                        dest="csv_output_filename",
-                        help="Name of the csv export file.",
-                        default="captions_eval.csv",
-                        type=str)
+    parser.add_argument(
+        '--output_filename',
+        dest="csv_output_filename",
+        help="Name of the csv export file.",
+        default="captions_eval.csv",
+        type=str
+    )
 
     return parser.parse_args(args)
 
@@ -82,7 +85,8 @@ def main(args: list[str] = None) -> None:
     # Create the figure generator handling xml annotation files.
     figure_generator: IphotodrawXmlFigureGenerator = IphotodrawXmlFigureGenerator(
         file_list_txt=parsed_args.file_list_txt,
-        image_directory_path=parsed_args.image_directory_path)
+        image_directory_path=parsed_args.image_directory_path
+    )
 
     csv_row: list[str] = []
     labels_list: list[str] = []

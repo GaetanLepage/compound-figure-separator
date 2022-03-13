@@ -35,10 +35,9 @@ import compfigsep
 from ...utils.figure.figure import Figure
 
 # Localize data folder
-PROJECT_DIR = os.path.join(os.path.dirname(compfigsep.__file__),
-                           os.pardir)
-DATA_DIR = os.path.join(PROJECT_DIR,
-                        "data/")
+PROJECT_DIR: str = os.path.join(os.path.dirname(compfigsep.__file__),
+                                os.pardir)
+DATA_DIR: str = os.path.join(PROJECT_DIR, "data/")
 DATA_DIR = os.path.realpath(DATA_DIR)
 
 
@@ -50,9 +49,11 @@ def add_common_figure_generator_args(parser: ArgumentParser) -> None:
         parser (ArgumentParser):        An ArgumentParser.
         default_eval_list_path (str):   Default path to a txt file list.
     """
-    parser.add_argument('--random_order',
-                        help="Wether to yield figures in a random order.",
-                        action='store_true')
+    parser.add_argument(
+        '--random_order',
+        help="Wether to yield figures in a random order.",
+        action='store_true'
+    )
 
 
 class FigureGenerator(ABC):
@@ -67,14 +68,12 @@ class FigureGenerator(ABC):
     """
 
     def __init__(self, default_random_order: bool = False) -> None:
-        self.data_dir = DATA_DIR
-        self.default_random_order = default_random_order
-
+        self.data_dir: str = DATA_DIR
+        self.default_random_order: bool = default_random_order
 
     @abstractmethod
     def __copy__(self) -> FigureGenerator:
         raise NotImplementedError('This method has to be implemented for each subclass.')
-
 
     @abstractmethod
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
@@ -122,14 +121,13 @@ class StackedFigureGenerator(FigureGenerator):
         self._base_figure_generator = base_figure_generator
         self._function = function
 
-
     def __copy__(self) -> StackedFigureGenerator:
 
         return StackedFigureGenerator(
             base_figure_generator=copy.copy(self._base_figure_generator),
             function=self._function,
-            default_random_order=self.default_random_order)
-
+            default_random_order=self.default_random_order
+        )
 
     def __call__(self,
                  random_order: bool = None) -> Iterable[Figure]:

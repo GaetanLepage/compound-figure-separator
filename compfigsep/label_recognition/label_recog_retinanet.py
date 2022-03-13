@@ -27,6 +27,7 @@ Custom variation of RetinaNet to handle label recognition.
 
 import math
 from typing import Any, Union
+
 import torch
 from torch import nn, Tensor, LongTensor
 from torch.nn import functional as F
@@ -49,7 +50,6 @@ from detectron2.modeling.backbone.fpn import FPN
 
 
 __all__ = ["LabelRecogRetinaNet"]
-
 
 
 def build_fpn_backbone(cfg: CfgNode,
@@ -108,7 +108,8 @@ class LabelRecogRetinaNet(nn.Module):
 
         self.fpn: FPN = build_fpn_backbone(
             cfg,
-            input_shape=ShapeSpec(channels=len(cfg.MODEL.PIXEL_MEAN)))
+            input_shape=ShapeSpec(channels=len(cfg.MODEL.PIXEL_MEAN))
+        )
 
         backbone_fpn_output_shape: dict[str, ShapeSpec] = self.fpn.output_shape()
 
@@ -120,12 +121,14 @@ class LabelRecogRetinaNet(nn.Module):
 
         # Matching and loss
         self.box2box_transform: Box2BoxTransform = Box2BoxTransform(
-            weights=cfg.MODEL.RPN.BBOX_REG_WEIGHTS)
+            weights=cfg.MODEL.RPN.BBOX_REG_WEIGHTS
+        )
 
         self.anchor_matcher: Matcher = Matcher(
             thresholds=cfg.MODEL.RETINANET.IOU_THRESHOLDS,
             labels=cfg.MODEL.RETINANET.IOU_LABELS,
-            allow_low_quality_matches=True)
+            allow_low_quality_matches=True
+        )
 
         self.register_buffer("pixel_mean",
                              torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
@@ -149,7 +152,6 @@ class LabelRecogRetinaNet(nn.Module):
         """
         return self.pixel_mean.device
 
-
     def forward(self, batched_inputs: list[dict]) -> Union[dict[str, Any],
                                                            list[dict[str, Instances]]]:
         """
@@ -171,7 +173,6 @@ class LabelRecogRetinaNet(nn.Module):
                                     Used during training only.
         """
         images: ImageList = self.preprocess_image(batched_inputs)
-
 
         features_dict: dict[str, ShapeSpec] = self.fpn(images.tensor)
         features: list[ShapeSpec] = [features_dict[f] for f in self.in_features]
@@ -252,26 +253,32 @@ class LabelRecogRetinaNet(nn.Module):
         num_pos_anchors: int = pos_mask.sum().item()
         get_event_storage().put_scalar("num_pos_anchors",
                                        num_pos_anchors / num_images)
-        self.loss_normalizer = self.loss_normalizer_momentum * self.loss_normalizer\
-                               + (1 - self.loss_normalizer_momentum) * max(num_pos_anchors, 1)
+        self.loss_normalizer = self.loss_normalizer_momentum * self.loss_normalizer \
+            + (1 - self.loss_normalizer_momentum) * max(num_pos_anchors, 1)
 
         # classification and regression loss
         # no loss for the last (background) class --> [:, :-1]
-        gt_classes_target: LongTensor = F.one_hot(gt_classes_tensor[valid_mask],
-                                                  num_classes=self.num_classes + 1)[:, :-1]
+        gt_classes_target: LongTensor = F.one_hot(
+            gt_classes_tensor[valid_mask],
+            num_classes=self.num_classes + 1
+        )[:, :-1]
 
         # logits loss
-        loss_cls = sigmoid_focal_loss_jit(inputs=cat(pred_logits, dim=1)[valid_mask],
-                                          targets=gt_classes_target.to(pred_logits[0].dtype),
-                                          alpha=self.focal_loss_alpha,
-                                          gamma=self.focal_loss_gamma,
-                                          reduction="sum") / self.loss_normalizer
+        loss_cls = sigmoid_focal_loss_jit(
+            inputs=cat(pred_logits, dim=1)[valid_mask],
+            targets=gt_classes_target.to(pred_logits[0].dtype),
+            alpha=self.focal_loss_alpha,
+            gamma=self.focal_loss_gamma,
+            reduction="sum"
+        ) / self.loss_normalizer
 
         # regression loss
-        loss_box_reg = smooth_l1_loss(input=cat(pred_anchor_deltas, dim=1)[pos_mask],
-                                      target=gt_anchor_deltas_tensor[pos_mask],
-                                      beta=self.smooth_l1_loss_beta,
-                                      reduction="sum") / self.loss_normalizer
+        loss_box_reg = smooth_l1_loss(
+            input=cat(pred_anchor_deltas, dim=1)[pos_mask],
+            target=gt_anchor_deltas_tensor[pos_mask],
+            beta=self.smooth_l1_loss_beta,
+            reduction="sum"
+        ) / self.loss_normalizer
 
         return {"loss_cls": loss_cls, "loss_box_reg": loss_box_reg}
 
@@ -364,10 +371,12 @@ class LabelRecogRetinaNet(nn.Module):
         for img_idx, image_size in enumerate(image_sizes):
             pred_logits_per_image: list[Tensor] = [x[img_idx] for x in pred_logits]
             deltas_per_image: list[Tensor] = [x[img_idx] for x in pred_anchor_deltas]
-            results_per_image = self._inference_single_image(anchors=anchors,
-                                                             box_cls=pred_logits_per_image,
-                                                             box_delta=deltas_per_image,
-                                                             image_size=tuple(image_size))
+            results_per_image = self._inference_single_image(
+                anchors=anchors,
+                box_cls=pred_logits_per_image,
+                box_delta=deltas_per_image,
+                image_size=tuple(image_size)
+            )
             results.append(results_per_image)
 
         return results
@@ -430,21 +439,29 @@ class LabelRecogRetinaNet(nn.Module):
         boxes_all_tensor: Tensor
         scores_all_tensor: Tensor
         class_idxs_all_tensor: Tensor
-        boxes_all_tensor, scores_all_tensor, class_idxs_all_tensor = [cat(x)
-                                                                      for x in [boxes_all,
-                                                                                scores_all,
-                                                                                class_idxs_all]]
+        boxes_all_tensor, scores_all_tensor, class_idxs_all_tensor = [
+            cat(x)
+            for x in [
+                boxes_all,
+                scores_all,
+                class_idxs_all
+            ]
+        ]
 
-        keep = batched_nms(boxes=boxes_all_tensor,
-                           scores=scores_all_tensor,
-                           idxs=class_idxs_all_tensor,
-                           iou_threshold=self.nms_threshold)
+        keep = batched_nms(
+            boxes=boxes_all_tensor,
+            scores=scores_all_tensor,
+            idxs=class_idxs_all_tensor,
+            iou_threshold=self.nms_threshold
+        )
 
         # Second nms to avoid labels from different classes to overlap
-        keep = batched_nms(boxes=boxes_all_tensor,
-                           scores=scores_all_tensor,
-                           idxs=torch.ones(size=class_idxs_all_tensor.shape),
-                           iou_threshold=self.nms_threshold)
+        keep = batched_nms(
+            boxes=boxes_all_tensor,
+            scores=scores_all_tensor,
+            idxs=torch.ones(size=class_idxs_all_tensor.shape),
+            iou_threshold=self.nms_threshold
+        )
 
         keep = keep[:self.max_detections_per_image]
 
@@ -502,39 +519,52 @@ class RetinaNetHead(nn.Module):
         cls_subnet: list[nn.Module] = []
         bbox_subnet: list[nn.Module] = []
         for _ in range(num_convs):
-            cls_subnet.append(nn.Conv2d(in_channels,
-                                        in_channels,
-                                        kernel_size=3,
-                                        stride=1,
-                                        padding=1))
+            cls_subnet.append(
+                nn.Conv2d(
+                    in_channels,
+                    in_channels,
+                    kernel_size=3,
+                    stride=1,
+                    padding=1
+                )
+            )
             cls_subnet.append(nn.ReLU())
-            bbox_subnet.append(nn.Conv2d(in_channels,
-                                         in_channels,
-                                         kernel_size=3,
-                                         stride=1,
-                                         padding=1))
+            bbox_subnet.append(
+                nn.Conv2d(
+                    in_channels,
+                    in_channels,
+                    kernel_size=3,
+                    stride=1,
+                    padding=1
+                )
+            )
             bbox_subnet.append(nn.ReLU())
 
         self.cls_subnet = nn.Sequential(*cls_subnet)
         self.bbox_subnet = nn.Sequential(*bbox_subnet)
-        self.cls_score = nn.Conv2d(in_channels,
-                                   num_anchors_int
-                                   * num_classes,
-                                   kernel_size=3,
-                                   stride=1,
-                                   padding=1)
+        self.cls_score = nn.Conv2d(
+            in_channels,
+            num_anchors_int
+            * num_classes,
+            kernel_size=3,
+            stride=1,
+            padding=1
+        )
 
-        self.bbox_pred = nn.Conv2d(in_channels,
-                                   num_anchors_int * 4,
-                                   kernel_size=3,
-                                   stride=1,
-                                   padding=1)
+        self.bbox_pred = nn.Conv2d(
+            in_channels,
+            num_anchors_int * 4,
+            kernel_size=3,
+            stride=1,
+            padding=1
+        )
 
         # Initialization
-        for modules in [self.cls_subnet,
-                        self.bbox_subnet,
-                        self.cls_score,
-                        self.bbox_pred]:
+        for modules in [
+                self.cls_subnet,
+                self.bbox_subnet,
+                self.cls_score,
+                self.bbox_pred]:
 
             for layer in modules.modules():
                 if isinstance(layer, nn.Conv2d):

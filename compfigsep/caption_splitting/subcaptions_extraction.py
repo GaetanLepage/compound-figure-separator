@@ -32,16 +32,18 @@ import itertools
 
 import nltk
 
-from .regex_definitions import (RE_DIGITS,
-                                RE_DIGITS_POS,
-                                RE_CHARACTERS,
-                                RE_CHARACTERS_POS,
-                                RE_ROMAN,
-                                RE_ROMAN_POS,
-                                RE_HYPHEN,
-                                RE_CONJUNCTIONS,
-                                RE_HYPHEN_POS,
-                                RE_CONJUNCTIONS_POS)
+from .regex_definitions import (
+    RE_DIGITS,
+    RE_DIGITS_POS,
+    RE_CHARACTERS,
+    RE_CHARACTERS_POS,
+    RE_ROMAN,
+    RE_ROMAN_POS,
+    RE_HYPHEN,
+    RE_CONJUNCTIONS,
+    RE_HYPHEN_POS,
+    RE_CONJUNCTIONS_POS
+)
 
 from ..utils.figure.label import LabelStructure, LabelStructureEnum
 
@@ -360,7 +362,6 @@ def _pre_labels(subcaptions: dict[str, str],
         for label in label_list:
             subcaptions[label] += subcapt[init:end] + '. '
 
-
     # Deal with the last label.
     last_position = positions[-1]
 
@@ -540,8 +541,9 @@ def _process_caption_subsentence_pos(caption_subsentence,
         if sub_positions_pos:
             # Check if the last label extracted is at the end of the
             # subsentence and it is not contained in sub_positions_POS.
-            if sub_positions[-1].end_index == subsentence_len\
-                and sub_positions[-1].end_index != sub_positions_pos[-1].end_index:
+            if sub_positions[-1].end_index == subsentence_len \
+                    and sub_positions[-1].end_index != sub_positions_pos[-1].end_index:
+
                 # Consider labels as 'post description' labels.
 
                 # Check for words that are associated to labels like in, from
@@ -609,7 +611,6 @@ def _process_caption_subsentence_pos(caption_subsentence,
     else:
         for label in sub_image_pointers:
             subcaptions[label] += caption_subsentence
-
 
 
 def _process_caption_sentence(caption_sentence: str,
@@ -683,7 +684,7 @@ def _process_caption_sentence(caption_sentence: str,
         # Check if the last label extracted is at the end of the sentence and it is not
         # contained in positions_pos.
         if positions[-1].end_index == len(caption_sentence) \
-            and positions[-1].end_index != positions_pos[-1].end_index:
+                and positions[-1].end_index != positions_pos[-1].end_index:
             # Consider labels as 'post description' labels.
 
             # Check for words that are associated to labels like 'in', 'from' and 'panel'
@@ -817,7 +818,6 @@ def _process_caption_sentence(caption_sentence: str,
             # Set the starter point for looping through the subsentences to counter.
             sub_starter = sub_preface_end_index
 
-
             # Loop through all the subsentences of the sentence after preface.
             for caption_subsentence in splitted_sentence[sub_starter:]:
 
@@ -860,6 +860,9 @@ def extract_subcaptions(caption: str,
 
     if target_regex is None and target_regex_pos is None:
         return {'_': caption}
+
+    assert target_regex is not None
+    assert target_regex_pos is not None
 
     # Split the caption to a list of sentences.
     caption_sentences_list = nltk.sent_tokenize(caption)

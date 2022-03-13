@@ -104,11 +104,13 @@ class LossEvalHook(HookBase):
                 eta = datetime.timedelta(
                     seconds=int(total_seconds_per_img * (num_samples - idx - 1)))
 
-                log_every_n_seconds(lvl=logging.INFO,
-                                    msg=f"Loss on Validation done {idx + 1}/{num_samples}."
-                                        f" {seconds_per_img:.4f} s / img. ETA={eta}",
-                                    n=100,
-                                    name=__name__)
+                log_every_n_seconds(
+                    lvl=logging.INFO,
+                    msg=f"Loss on Validation done {idx + 1}/{num_samples}."
+                        f" {seconds_per_img:.4f} s / img. ETA={eta}",
+                    n=100,
+                    name=__name__
+                )
 
         # Average the losses.
         mean_loss = np.mean(losses)

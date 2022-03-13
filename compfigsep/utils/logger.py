@@ -22,4 +22,3 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 ########################################
 CompFigSep logger configuration routine.
 """
-

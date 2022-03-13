@@ -335,10 +335,10 @@ def _belief_propagation(label_list: list[DetectedLabel]) -> np.ndarray:
     beliefs: np.ndarray = np.zeros(shape=(num_labels, 2))
 
     # def f(f_i):
-        # return unary_compatibility_values[i][f_i] * np.max([
-            # messages[j, i][f_i]
-            # for j in range(num_labels)
-            # if adjacency_matrix[j, i] == 1])
+    #     return unary_compatibility_values[i][f_i] * np.max([
+    #         messages[j, i][f_i]
+    #         for j in range(num_labels)
+    #         if adjacency_matrix[j, i] == 1])
 
     for i in range(num_labels):
         # value = [f(f_i) for f_i in (0, 1)]
@@ -353,7 +353,6 @@ def _belief_propagation(label_list: list[DetectedLabel]) -> np.ndarray:
                       for f_i in (0, 1)]
 
     return beliefs
-
 
 
 def filter_labels(label_list: list[DetectedLabel],
@@ -396,9 +395,7 @@ def filter_labels(label_list: list[DetectedLabel],
         if candidate_label is not None:
             new_label_list.append(candidate_label)
 
-
     print(new_label_list)
-
 
     beliefs: np.ndarray = _belief_propagation(label_list=new_label_list)
 

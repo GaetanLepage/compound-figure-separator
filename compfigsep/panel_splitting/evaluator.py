@@ -50,11 +50,13 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
             export_dir (str):   Path to the directory where to store the inference
                                     results.
         """
-        super().__init__(dataset_name=dataset_name,
-                         task_name='panel_splitting',
-                         evaluation_function=evaluate_detections,
-                         export=export,
-                         export_dir=export_dir)
+        super().__init__(
+            dataset_name=dataset_name,
+            task_name='panel_splitting',
+            evaluation_function=evaluate_detections,
+            export=export,
+            export_dir=export_dir
+        )
 
     def process(self,
                 inputs: list[dict],

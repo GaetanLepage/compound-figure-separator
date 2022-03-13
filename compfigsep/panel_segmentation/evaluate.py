@@ -197,9 +197,9 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
     # Panel segmentation
     # pseg_precision, pseg_recall, pseg_map = multi_class_metrics(results=panel_segmentation_results)
     # metrics['panel_segmentation'] = {
-        # 'precision': pseg_precision,
-        # 'recall': pseg_recall,
-        # 'mAP': pseg_map
+    #     'precision': pseg_precision,
+    #     'recall': pseg_recall,
+    #     'mAP': pseg_map
     # }
     # TODO remove
     metrics['panel_segmentation'] = {}

@@ -84,7 +84,6 @@ class Trainer(DefaultTrainer):
                                  export=True,
                                  export_dir=cfg.OUTPUT_DIR)
 
-
     @classmethod
     def build_train_loader(cls,
                            cfg: CfgNode) -> DataLoader:
@@ -97,10 +96,9 @@ class Trainer(DefaultTrainer):
         Returns:
             a DataLoader yielding formatted training examples.
         """
-        mapper = PanelSegDatasetMapper(cfg, is_train=True)
+        mapper: PanelSegDatasetMapper = PanelSegDatasetMapper(cfg, is_train=True)
         return build_detection_train_loader(cfg,
                                             mapper=mapper)
-
 
     @classmethod
     def build_test_loader(cls,
@@ -121,7 +119,6 @@ class Trainer(DefaultTrainer):
                                            dataset_name=dataset_name,
                                            mapper=mapper)
 
-
     def build_hooks(self) -> list[HookBase]:
         """
         This method overwrites the default one from DefaultTrainer.
@@ -137,27 +134,30 @@ class Trainer(DefaultTrainer):
         # TODO remove as it can't work
         # input_example = next(iter(self.data_loader))
         # hooks.append(ModelWriter(model=self.model,
-                                 # input_example=input_example,
-                                 # log_dir=self.cfg.OUTPUT_DIR))
+        #                          input_example=input_example,
+        #                          log_dir=self.cfg.OUTPUT_DIR))
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            data_set_mapper: PanelSegDatasetMapper = PanelSegDatasetMapper(cfg=self.cfg,
-                                                                           is_train=True)
+            data_set_mapper: PanelSegDatasetMapper = PanelSegDatasetMapper(
+                cfg=self.cfg,
+                is_train=True
+            )
             data_loader: DataLoader = build_detection_test_loader(
                 cfg=self.cfg,
                 dataset_name=self.cfg.DATASETS.VALIDATION,
-                mapper=data_set_mapper)
+                mapper=data_set_mapper
+            )
 
             loss_eval_hook: LossEvalHook = LossEvalHook(
                 eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
                 model=self.model,
-                data_loader=data_loader)
+                data_loader=data_loader
+            )
 
             hooks.insert(-1, loss_eval_hook)
 
         return hooks
-
 
     @classmethod
     def build_model(cls, cfg: CfgNode) -> nn.Module:
@@ -257,23 +257,26 @@ def main(args: Namespace) -> dict:
         return res
 
     # Training
-    trainer = Trainer(cfg)
+    trainer: Trainer = Trainer(cfg)
     trainer.resume_or_load(resume=args.resume)
     return trainer.train()
 
 
 if __name__ == "__main__":
     PARSER = default_argument_parser()
-    PARSER.add_argument('--export-only',
-                        action='store_true',
-                        help="Do not compute metrics, just store the raw predictions of panel"\
-                             "segmentation.")
+    PARSER.add_argument(
+        '--export-only',
+        action='store_true',
+        help="Do not compute metrics, just store the raw predictions of panel segmentation."
+    )
 
     parsed_args: Namespace = PARSER.parse_args()
 
-    launch(main,
-           parsed_args.num_gpus,
-           num_machines=parsed_args.num_machines,
-           machine_rank=parsed_args.machine_rank,
-           dist_url=parsed_args.dist_url,
-           args=(parsed_args,))
+    launch(
+        main,
+        parsed_args.num_gpus,
+        num_machines=parsed_args.num_machines,
+        machine_rank=parsed_args.machine_rank,
+        dist_url=parsed_args.dist_url,
+        args=(parsed_args,)
+    )

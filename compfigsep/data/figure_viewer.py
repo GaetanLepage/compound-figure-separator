@@ -42,23 +42,27 @@ def add_viewer_args(parser: ArgumentParser) -> None:
 
     add_common_figure_generator_args(parser=parser)
 
-    parser.add_argument('--mode',
-                        help="mode: Select which information to display:"\
-                            " ['gt': only the ground truth,"\
-                            " 'pred': only the predictions,"\
-                            " 'both': both predicted and ground truth annotations]",
-                        default='both')
+    parser.add_argument(
+        '--mode',
+        help="mode: Select which information to display:"
+             " ['gt': only the ground truth,"
+             " 'pred': only the predictions,"
+             " 'both': both predicted and ground truth annotations]",
+        default='both'
+    )
 
-    parser.add_argument('--delay',
-                        help="The number of seconds after which the window is closed."\
-                                " If 0, the delay is disabled.",
-                        type=int,
-                        default=100)
+    parser.add_argument(
+        '--delay',
+        help="The number of seconds after which the window is closed. If 0, the delay is disabled.",
+        type=int,
+        default=100
+    )
 
-    parser.add_argument('--save_preview',
-                        help="Save the image previews in image files.",
-                        action='store_true')
-
+    parser.add_argument(
+        '--save_preview',
+        help="Save the image previews in image files.",
+        action='store_true'
+    )
 
 
 def view_data_set(figure_generator: FigureGenerator,

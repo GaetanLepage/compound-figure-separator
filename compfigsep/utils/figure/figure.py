@@ -639,7 +639,8 @@ class Figure:
         self.detected_subfigures = beam_search.assign_labels_to_panels(
             panels=self.detected_panels,
             labels=self.detected_labels,
-            are_detections=True)
+            are_detections=True
+        )
 
 ##############
 # EVALUATION #
@@ -1151,12 +1152,14 @@ class Figure:
                     continue
 
                 # Panel information
-                csv_row: list = [self.image_path,
-                                 subfigure.panel.box[0],
-                                 subfigure.panel.box[1],
-                                 subfigure.panel.box[2],
-                                 subfigure.panel.box[3],
-                                 'panel']
+                csv_row: list = [
+                    self.image_path,
+                    subfigure.panel.box[0],
+                    subfigure.panel.box[1],
+                    subfigure.panel.box[2],
+                    subfigure.panel.box[3],
+                    'panel'
+                ]
 
                 # Label information
                 if subfigure.label is not None \
@@ -1185,23 +1188,31 @@ class Figure:
         }
 
         if hasattr(self, 'gt_subfigures'):
-            output_dict['gt_subfigures'] = [subfigure.to_dict()
-                                            for subfigure in self.gt_subfigures]
+            output_dict['gt_subfigures'] = [
+                subfigure.to_dict()
+                for subfigure in self.gt_subfigures
+            ]
 
         if hasattr(self, 'detected_subfigures'):
-            output_dict['detected_subfigures'] = [subfigure.to_dict()
-                                                  for subfigure in self.detected_subfigures]
+            output_dict['detected_subfigures'] = [
+                subfigure.to_dict()
+                for subfigure in self.detected_subfigures
+            ]
 
         if hasattr(self, 'caption'):
             output_dict['caption'] = self.caption
 
         if hasattr(self, 'detected_panels'):
-            output_dict['detected_panels'] = [panel.to_dict()
-                                              for panel in self.detected_panels]
+            output_dict['detected_panels'] = [
+                panel.to_dict()
+                for panel in self.detected_panels
+            ]
 
         if hasattr(self, 'detected_labels'):
-            output_dict['detected_labels'] = [label.to_dict()
-                                              for label in self.detected_labels]
+            output_dict['detected_labels'] = [
+                label.to_dict()
+                for label in self.detected_labels
+            ]
 
         if hasattr(self, 'detected_subcaptions'):
             output_dict['detected_subcaptions'] = self.detected_subcaptions

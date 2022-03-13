@@ -30,10 +30,11 @@ import sys
 import os
 from argparse import ArgumentParser, Namespace
 
-from compfigsep.data.figure_generators import IphotodrawXmlFigureGenerator
+from compfigsep.data.figure_generators import FigureGenerator, IphotodrawXmlFigureGenerator
 from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
 
-sys.path.append(".")
+sys.path.append('.')
+
 
 def parse_args(args: list[str]) -> Namespace:
     """
@@ -45,18 +46,23 @@ def parse_args(args: list[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser: ArgumentParser = ArgumentParser(description="Preview all the figures from an"\
-                                                        " iPhotoDraw data set.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Preview all the figures from an iPhotoDraw data set."
+    )
 
-    parser.add_argument('--file_list_txt',
-                        help="The path to the txt file listing the images.",
-                        default="data/zou/eval.txt",
-                        type=str)
+    parser.add_argument(
+        '--file_list_txt',
+        help="The path to the txt file listing the images.",
+        default="data/zou/eval.txt",
+        type=str
+    )
 
-    parser.add_argument('--image_directory_path',
-                        help="The path to the directory where the images are stored.",
-                        default=None,
-                        type=str)
+    parser.add_argument(
+        '--image_directory_path',
+        help="The path to the directory where the images are stored.",
+        default=None,
+        type=str
+    )
 
     add_viewer_args(parser)
 
@@ -77,10 +83,11 @@ def main(args: list[str] = None):
     parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling iPhotoDraw annotation files.
-    figure_generator = IphotodrawXmlFigureGenerator(
+    figure_generator: FigureGenerator = IphotodrawXmlFigureGenerator(
         file_list_txt=parsed_args.file_list_txt,
         image_directory_path=parsed_args.image_directory_path,
-        default_random_order=parsed_args.random_order)
+        default_random_order=parsed_args.random_order
+    )
 
     if parsed_args.save_preview:
         if parsed_args.file_list_txt is not None:
@@ -89,16 +96,17 @@ def main(args: list[str] = None):
             preview_folder = parsed_args.image_directory_path
         preview_folder = os.path.join(preview_folder, 'preview')
     else:
-        preview_folder = ""
-
+        preview_folder = ''
 
     # Preview the data set.
-    view_data_set(figure_generator=figure_generator,
-                  mode=parsed_args.mode,
-                  save_preview=parsed_args.save_preview,
-                  preview_folder=preview_folder,
-                  delay=parsed_args.delay,
-                  window_name="PanelSeg data preview")
+    view_data_set(
+        figure_generator=figure_generator,
+        mode=parsed_args.mode,
+        save_preview=parsed_args.save_preview,
+        preview_folder=preview_folder,
+        delay=parsed_args.delay,
+        window_name="PanelSeg data preview"
+    )
 
 
 if __name__ == '__main__':

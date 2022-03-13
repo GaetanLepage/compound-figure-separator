@@ -30,13 +30,12 @@ import os
 from argparse import ArgumentParser, Namespace
 
 import compfigsep
+from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
+from compfigsep.label_recognition.evaluate import evaluate_detections
 
 sys.path.append('.')
 
-MODULE_DIR = os.path.dirname(compfigsep.__file__)
-
-from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
-from compfigsep.label_recognition.evaluate import evaluate_detections
+MODULE_DIR: str = os.path.dirname(compfigsep.__file__)
 
 
 def parse_args(args: list[str]) -> Namespace:
@@ -71,8 +70,7 @@ def main(args: list[str] = None):
     parsed_args = parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
-    figure_generator = JsonFigureGenerator(
-        json_path=parsed_args.json)
+    figure_generator = JsonFigureGenerator(json_path=parsed_args.json)
 
     # Evaluate the data set.
     evaluate_detections(figure_generator=figure_generator)

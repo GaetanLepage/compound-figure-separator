@@ -58,7 +58,8 @@ def register_label_recognition_dataset(dataset_name: str):
 
     # Instanciate the FigureGenerator
     figure_generator = IphotodrawXmlFigureGenerator(
-        file_list_txt=file_list_txt)
+        file_list_txt=file_list_txt
+    )
 
     # Register the data set and set the ingest function to convert Figures to Detectron dict.
     DatasetCatalog.register(name=dataset_name,

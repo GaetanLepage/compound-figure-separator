@@ -23,6 +23,8 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 TODO remove this file
 """
 
+from typing import Callable
+
 import numpy as np
 
 from ..data.figure_generators import FigureGenerator
@@ -110,8 +112,8 @@ def _post_processing(boxes: list[Box],
 
 
 def predict(figure_generator: FigureGenerator,
-            predict_function: callable,
-            pre_processing_function: callable = None) -> Figure:
+            predict_function: Callable,
+            pre_processing_function: Callable = None) -> Figure:
     """
     Predicts the sub figures locations (bounding boxes) and yields the augmented Figure object.
 

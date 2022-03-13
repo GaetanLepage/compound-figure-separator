@@ -117,8 +117,6 @@ def assign_labels_to_panels(panels: list[Panel],
     Returns:
         subfigures (list[SubFigure]):   TODO
     """
-    # TODO remove
-    # print("###########")
 
     num_panels: int = len(panels)
 
@@ -129,7 +127,10 @@ def assign_labels_to_panels(panels: list[Panel],
 
     if num_labels == 0:
         if are_detections:
-            return [DetectedSubFigure(panel=detected_panel) for detected_panel in panels]
+            detected_subfigures: list[DetectedSubFigure] = []
+            for detected_panel in panels:
+                assert isinstance(detected_panel, DetectedPanel)
+                detected_subfigures.append(DetectedSubFigure(panel=detected_panel))
 
         return [SubFigure(panel=gt_panel) for gt_panel in panels]
 
@@ -141,12 +142,12 @@ def assign_labels_to_panels(panels: list[Panel],
         assert all(isinstance(panel, DetectedPanel) for panel in panels)
 
         # Sort the panels according to their detection score
-        panels.sort(key=lambda detected_panel: detected_panel.detection_score)
+        panels.sort(key=lambda detected_panel: detected_panel.detection_score)  # type: ignore
 
         assert all(isinstance(label, DetectedLabel) for label in labels)
 
         # Sort the panels according to their detection score
-        labels.sort(key=lambda detected_label: detected_label.detection_score)
+        labels.sort(key=lambda detected_label: detected_label.detection_score)  # type: ignore
 
     # Compute the distance matrix.
     distance_matrix: list[list[float]] = _compute_panel_label_distances(panels, labels)
@@ -241,6 +242,8 @@ def assign_labels_to_panels(panels: list[Panel],
         matched_label: Label = labels[best_path[panel_index]]
 
         if are_detections:
+            assert isinstance(panel, DetectedPanel)
+            assert isinstance(matched_label, DetectedLabel)
             subfigure: SubFigure = DetectedSubFigure(panel=panel,
                                                      label=matched_label)
         else:

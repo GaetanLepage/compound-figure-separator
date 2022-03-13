@@ -29,14 +29,13 @@ import sys
 import os
 from argparse import ArgumentParser, Namespace
 
-
 from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
 from compfigsep.compound_figure_separation import evaluate_detections
-
 import compfigsep
+
 sys.path.append('.')
 
-MODULE_DIR = os.path.dirname(compfigsep.__file__)
+MODULE_DIR: str = os.path.dirname(compfigsep.__file__)
 
 
 def _parse_args(args: list[str]) -> Namespace:

@@ -42,12 +42,11 @@ from ...utils.figure import Figure
 
 from .figure_generator import FigureGenerator
 
-MODULE_DIR = os.path.dirname(compfigsep.__file__)
-PROJECT_DIR = os.path.join(MODULE_DIR,
-                           os.pardir)
+MODULE_DIR: str = os.path.dirname(compfigsep.__file__)
+PROJECT_DIR: str = os.path.join(MODULE_DIR, os.pardir)
 
-DEFAULT_JSON_FOLDER = os.path.relpath(os.path.join(MODULE_DIR,
-                                                   "compound_figure_separation/output/"))
+DEFAULT_JSON_FOLDER: str = os.path.relpath(os.path.join(MODULE_DIR,
+                                                        "compound_figure_separation/output/"))
 
 
 def get_most_recent_json(folder_path: str = None) -> str:
@@ -93,9 +92,10 @@ def get_most_recent_json(folder_path: str = None) -> str:
                      string=file_name) is None:
             continue
 
-        date_match: Optional[re.Match] = re.search(pattern=r"[0-9]{4}-[A-Za-z]+-[0-3][0-9]_"
-                                                           r"[0-2][0-9]:[0-5][0-9]:[0-5][0-9]",
-                                                   string=file_name)
+        date_match: Optional[re.Match] = re.search(
+            pattern=r"[0-9]{4}-[A-Za-z]+-[0-3][0-9]_[0-2][0-9]:[0-5][0-9]:[0-5][0-9]",
+            string=file_name
+        )
         if date_match is None:
             continue
 
@@ -147,8 +147,8 @@ def get_most_recent_json(folder_path: str = None) -> str:
 
         dates[date] = file_name
 
-    assert len(dates) > 0, f"No valid json annotation file was found in folder {folder_path}"\
-                           "\nExiting"
+    assert len(dates) > 0, \
+        f"No valid json annotation file was found in folder {folder_path}\nExiting"
 
     max_date: datetime = max(dates)
 
@@ -187,10 +187,12 @@ def add_json_arg(parser: ArgumentParser,
 
     json_default_path = os.path.relpath(json_default_path)
 
-    parser.add_argument('--json',
-                        help="The path to the json annotation file.",
-                        default=json_default_path,
-                        type=str)
+    parser.add_argument(
+        '--json',
+        help="The path to the json annotation file.",
+        default=json_default_path,
+        type=str
+    )
 
 
 class JsonFigureGenerator(FigureGenerator):

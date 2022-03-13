@@ -33,7 +33,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
-import detectron2.utils.comm as comm
+from detectron2.utils import comm
 from detectron2.utils.logger import setup_logger
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import CfgNode, get_cfg
@@ -74,10 +74,11 @@ class Trainer(DefaultTrainer):
         Returns:
             LabelRecogEvaluator: The evaluator for testing label recognition results.
         """
-        return LabelRecogEvaluator(dataset_name=dataset_name,
-                                   export=True,
-                                   export_dir=cfg.OUTPUT_DIR)
-
+        return LabelRecogEvaluator(
+            dataset_name=dataset_name,
+            export=True,
+            export_dir=cfg.OUTPUT_DIR
+        )
 
     def build_hooks(self) -> list[HookBase]:
         """
@@ -111,8 +112,6 @@ class Trainer(DefaultTrainer):
                          obj=loss_eval_hook)
 
         return hooks
-
-
 
     @classmethod
     def build_model(cls, cfg: CfgNode) -> nn.Module:
@@ -199,9 +198,13 @@ def main(parsed_args: Namespace) -> dict:
         model: nn.Module = Trainer.build_model(cfg)
 
         # Load the latest weights
-        DetectionCheckpointer(model,
-                              save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS,
-                                                                      resume=parsed_args.resume)
+        DetectionCheckpointer(
+            model,
+            save_dir=cfg.OUTPUT_DIR
+        ).resume_or_load(
+            cfg.MODEL.WEIGHTS,
+            resume=parsed_args.resume
+        )
         res: dict = Trainer.test(cfg, model)
         if comm.is_main_process():
             verify_results(cfg=cfg,
@@ -220,9 +223,11 @@ if __name__ == "__main__":
     PARSED_ARGS: Namespace = PARSER.parse_args()
     print("Command Line Args:", PARSED_ARGS)
 
-    launch(main,
-           PARSED_ARGS.num_gpus,
-           num_machines=PARSED_ARGS.num_machines,
-           machine_rank=PARSED_ARGS.machine_rank,
-           dist_url=PARSED_ARGS.dist_url,
-           args=(PARSED_ARGS,))
+    launch(
+        main,
+        PARSED_ARGS.num_gpus,
+        num_machines=PARSED_ARGS.num_machines,
+        machine_rank=PARSED_ARGS.machine_rank,
+        dist_url=PARSED_ARGS.dist_url,
+        args=(PARSED_ARGS,)
+    )

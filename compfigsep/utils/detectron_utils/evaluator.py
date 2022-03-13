@@ -40,7 +40,7 @@ from ..figure import Figure
 from ...data.figure_generators import FigureGenerator, StackedFigureGenerator
 from ...data.export import export_figures_to_json
 
-MODULE_DIR = os.path.dirname(compfigsep.__file__)
+MODULE_DIR: str = os.path.dirname(compfigsep.__file__)
 
 
 class PanelSegAbstractEvaluator(DatasetEvaluator):
@@ -181,13 +181,15 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
 
         # Evaluate the metrics on the predictions.
         metrics_dict = self._evaluation_function(
-            figure_generator=copy(self._augmented_figure_generator()))\
-            if self._evaluation_function is not None else None
+            figure_generator=copy(self._augmented_figure_generator())
+        ) if self._evaluation_function is not None else None
 
         # Export predictions and gt in a single JSON file
         if self.export:
-            export_figures_to_json(figure_generator=self._augmented_figure_generator(),
-                                   json_output_directory=self.export_dir)
+            export_figures_to_json(
+                figure_generator=self._augmented_figure_generator(),
+                json_output_directory=self.export_dir
+            )
 
         # Print the results
         pprint(metrics_dict)

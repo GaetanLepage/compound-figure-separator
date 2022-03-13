@@ -47,9 +47,10 @@ from compfigsep.caption_splitting import (label_identification,
 from compfigsep.data.export import export_figures_to_json
 
 import compfigsep
+
 sys.path.append('.')
 
-MODULE_DIR = os.path.dirname(compfigsep.__file__)
+MODULE_DIR: str = os.path.dirname(compfigsep.__file__)
 
 
 def _parse_args(args: list[str]) -> Namespace:
@@ -99,17 +100,16 @@ def predict_caption(figure: Figure) -> None:
 
     # TODO label 'B' is not detected in this example.
 
-    # if "Microanatomy of P. verrucosa. A) 3D-reconstruction of the central nervous system" in caption:
-    # if "nTE-2-PyP protects prostatic and penile" in caption:
-    # if "" in caption:
-    # if "" in caption:
+    debug_pattern: str = ''
+    debug_pattern = "Microanatomy of P. verrucosa. A) 3D-reconstruction of the central nervous "
+    debug_pattern = "nTE-2-PyP protects prostatic and penile"
     # Case where no label is detected
-    # if "Immunohistochemical staining for PTEN, SFPQ and HDAC1 in PCa and BENIGN tissues" in caption:
-    # if "Transition from PIN to invasive carcinoma is seen in ARR2PBCreER" in caption:
-    # if "Histopathological diagnose was acinar type adenocarcinoma" in caption:
-    # if "PPAR-gamma protein expression in benign prostate tissues by immunohistochemistry" in caption:
-    # if caption.startswith("nTE-2-PyP protects prostatic and penile"):
-        # sys.exit()
+    debug_pattern = "Immunohistochemical staining for PTEN, SFPQ and HDAC1 in PCa and BENIGN "
+    debug_pattern = "Transition from PIN to invasive carcinoma is seen in ARR2PBCreER"
+    debug_pattern = "Histopathological diagnose was acinar type adenocarcinoma"
+    debug_pattern = "PPAR-gamma protein expression in benign prostate tissues by "
+    if debug_pattern in caption:
+        sys.exit()
 
 
 def main(args: list[str] = None) -> None:

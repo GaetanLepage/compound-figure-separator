@@ -96,11 +96,13 @@ class Panel:
         """
         # Draw the panel box if it exists.
         if self.box is not None:
-            cv2.rectangle(img=image,
-                          pt1=(self.box[0], self.box[1]),
-                          pt2=(self.box[2], self.box[3]),
-                          color=color,
-                          thickness=2)
+            cv2.rectangle(
+                img=image,
+                pt1=(self.box[0], self.box[1]),
+                pt2=(self.box[2], self.box[3]),
+                color=color,
+                thickness=2
+            )
 
     def __str__(self) -> str:
         string: str = f"{type(self).__name__}:"
@@ -179,14 +181,14 @@ class DetectedPanel(Panel):
 
         detected_panel: DetectedPanel = DetectedPanel(
             box=panel_dict['box'],
-            detection_score=panel_dict.get('detection_score'))
+            detection_score=panel_dict.get('detection_score')
+        )
 
         detected_panel.is_true_positive_overlap = panel_dict.get('is_true_positive_overlap')
 
         detected_panel.is_true_positive_iou = panel_dict.get('is_true_positive_iou')
 
         return detected_panel
-
 
     def to_dict(self) -> dict:
         """
@@ -213,7 +215,6 @@ class DetectedPanel(Panel):
 
         return output_dict
 
-
     def draw(self,
              image: np.ndarray,
              color: Color = DEFAULT_DETECTION_COLOR) -> None:
@@ -231,7 +232,6 @@ class DetectedPanel(Panel):
 
         super().draw(image, color)
 
-
     def __str__(self) -> str:
         string = super().__str__()
 
@@ -245,7 +245,6 @@ class DetectedPanel(Panel):
             string += f", is_true_positive_iou: {self.is_true_positive_iou}"
 
         return string
-
 
     def __repr__(self) -> str:
         return str(self)

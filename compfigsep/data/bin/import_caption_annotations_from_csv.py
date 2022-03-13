@@ -33,12 +33,10 @@ from typing import Optional
 import csv
 
 from compfigsep.data.figure_generators import FigureGenerator
-from compfigsep.utils.figure.label import (LabelStructure,
-                                           LabelStructureEnum,
-                                           map_label)
+from compfigsep.utils.figure.label import LabelStructure, LabelStructureEnum, map_label
 from compfigsep.data.figure_generators.json_figure_generator import JsonFigureGenerator
 
-sys.path.append(".")
+sys.path.append('.')
 
 
 def parse_args(args: list[str]) -> Namespace:
@@ -53,20 +51,26 @@ def parse_args(args: list[str]) -> Namespace:
     """
     parser: ArgumentParser = ArgumentParser(description="TODO")
 
-    parser.add_argument('--initial_json',
-                        dest="initial_json",
-                        help="Name of the json file of the initial data set.",
-                        type=str)
+    parser.add_argument(
+        '--initial_json',
+        dest="initial_json",
+        help="Name of the json file of the initial data set.",
+        type=str
+    )
 
-    parser.add_argument('--annotation_csv',
-                        dest="annotation_csv",
-                        help="Name of the csv annotation file.",
-                        type=str)
+    parser.add_argument(
+        '--annotation_csv',
+        dest="annotation_csv",
+        help="Name of the csv annotation file.",
+        type=str
+    )
 
-    parser.add_argument('--output_filename',
-                        dest="json_output_filename",
-                        help="Name of the json export file.",
-                        type=str)
+    parser.add_argument(
+        '--output_filename',
+        dest="json_output_filename",
+        help="Name of the json export file.",
+        type=str
+    )
 
     return parser.parse_args(args)
 
@@ -235,11 +239,14 @@ def main(args: list[str] = None) -> None:
 
     figure_generator: FigureGenerator = JsonFigureGenerator(
         json_path=parsed_args.initial_json,
-        default_random_order=False)
+        default_random_order=False
+    )
 
-    ingest_caption_splitting_annotations(figure_generator=figure_generator,
-                                         annotation_csv=parsed_args.annotation_csv,
-                                         json_output_filename=parsed_args.json_output_filename)
+    ingest_caption_splitting_annotations(
+        figure_generator=figure_generator,
+        annotation_csv=parsed_args.annotation_csv,
+        json_output_filename=parsed_args.json_output_filename
+    )
 
 
 if __name__ == '__main__':

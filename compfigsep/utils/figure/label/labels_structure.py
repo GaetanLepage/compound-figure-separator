@@ -29,8 +29,6 @@ import operator
 from enum import Enum
 from typing import Callable
 
-import numpy as np
-
 from .utils import (is_lower_char,
                     is_upper_char,
                     UC_ROMAN,
@@ -210,7 +208,6 @@ class LabelStructure:
 
         return cls(labels_type=labels_type,
                    num_labels=max_index)
-
 
     def get_core_label_list(self) -> list[str]:
         """

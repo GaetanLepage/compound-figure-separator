@@ -51,15 +51,19 @@ def add_iphotodraw_args(parser: ArgumentParser,
 
         default_eval_list_path = "data/zou/eval.txt"
 
-    parser.add_argument('--file_list_txt',
-                        help="The path to the txt file listing the images.",
-                        default=default_eval_list_path,
-                        type=str)
+    parser.add_argument(
+        '--file_list_txt',
+        help="The path to the txt file listing the images.",
+        default=default_eval_list_path,
+        type=str
+    )
 
-    parser.add_argument('--image_directory_path',
-                        help="The path to the directory where the images are stored.",
-                        default=None,
-                        type=str)
+    parser.add_argument(
+        '--image_directory_path',
+        help="The path to the directory where the images are stored.",
+        default=None,
+        type=str
+    )
 
 
 class IphotodrawXmlFigureGenerator(FigureGenerator):
@@ -125,8 +129,10 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
 
     def __copy__(self) -> IphotodrawXmlFigureGenerator:
 
-        return IphotodrawXmlFigureGenerator(image_paths_list=self.image_paths,
-                                            default_random_order=self.default_random_order)
+        return IphotodrawXmlFigureGenerator(
+            image_paths_list=self.image_paths,
+            default_random_order=self.default_random_order
+        )
 
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """

@@ -44,15 +44,19 @@ def add_image_clef_args(parser: ArgumentParser) -> None:
         parser (ArgumentParser):        An ArgumentParser.
     """
 
-    parser.add_argument('--annotation_xml',
-                        help="The path to the xml annotation file.",
-                        default="data/ImageCLEF/training/FigureSeparationTraining2016GT.xml",
-                        type=str)
+    parser.add_argument(
+        '--annotation_xml',
+        help="The path to the xml annotation file.",
+        default="data/ImageCLEF/training/FigureSeparationTraining2016GT.xml",
+        type=str
+    )
 
-    parser.add_argument('--image_directory_path',
-                        help="The path to the directory where the images are stored.",
-                        default="data/ImageCLEF/training/FigureSeparationTraining2016/",
-                        type=str)
+    parser.add_argument(
+        '--image_directory_path',
+        help="The path to the directory where the images are stored.",
+        default="data/ImageCLEF/training/FigureSeparationTraining2016/",
+        type=str
+    )
 
 
 class ImageClefXmlFigureGenerator(FigureGenerator):
@@ -108,9 +112,11 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
 
     def __copy__(self) -> ImageClefXmlFigureGenerator:
 
-        return ImageClefXmlFigureGenerator(xml_annotation_file_path=self.xml_annotation_file_path,
-                                           image_directory_path=self.image_directory_path,
-                                           default_random_order=self.default_random_order)
+        return ImageClefXmlFigureGenerator(
+            xml_annotation_file_path=self.xml_annotation_file_path,
+            image_directory_path=self.image_directory_path,
+            default_random_order=self.default_random_order
+        )
 
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """
@@ -161,10 +167,12 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
 
                 point_items = object_item.findall('./point')
 
-                coordinates = [point_items[0].get('x'),
-                               point_items[0].get('y'),
-                               point_items[3].get('x'),
-                               point_items[3].get('y')]
+                coordinates = [
+                    point_items[0].get('x'),
+                    point_items[0].get('y'),
+                    point_items[3].get('x'),
+                    point_items[3].get('y')
+                ]
 
                 if any(coord is None for coord in coordinates):
                     continue

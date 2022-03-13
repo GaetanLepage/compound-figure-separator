@@ -70,10 +70,11 @@ class Trainer(DefaultTrainer):
         Returns:
             PanelSplitEvaluator: The evaluator for testing label recognition results.
         """
-        return PanelSplitEvaluator(dataset_name=dataset_name,
-                                   export=True,
-                                   export_dir=cfg.OUTPUT_DIR)
-
+        return PanelSplitEvaluator(
+            dataset_name=dataset_name,
+            export=True,
+            export_dir=cfg.OUTPUT_DIR
+        )
 
     def build_hooks(self) -> list[HookBase]:
         """
@@ -92,9 +93,11 @@ class Trainer(DefaultTrainer):
             data_set_mapper: DatasetMapper = DatasetMapper.from_config(cfg=self.cfg,
                                                                        is_train=True)
 
-            data_loader: DataLoader = build_detection_test_loader(cfg=self.cfg,
-                                                      dataset_name=self.cfg.DATASETS.VALIDATION,
-                                                      mapper=data_set_mapper)
+            data_loader: DataLoader = build_detection_test_loader(
+                cfg=self.cfg,
+                dataset_name=self.cfg.DATASETS.VALIDATION,
+                mapper=data_set_mapper
+            )
 
             loss_eval_hook: LossEvalHook = LossEvalHook(
                 eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
@@ -104,7 +107,6 @@ class Trainer(DefaultTrainer):
             hooks.insert(-1, loss_eval_hook)
 
         return hooks
-
 
 
 def setup(parsed_args: Namespace) -> CfgNode:
@@ -172,9 +174,13 @@ def main(parsed_args: Namespace) -> dict:
         model: nn.Module = Trainer.build_model(cfg)
 
         # Load the latest weights
-        DetectionCheckpointer(model,
-                              save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS,
-                                                                      resume=parsed_args.resume)
+        DetectionCheckpointer(
+            model,
+            save_dir=cfg.OUTPUT_DIR
+        ).resume_or_load(
+            cfg.MODEL.WEIGHTS,
+            resume=parsed_args.resume
+        )
         res: dict = Trainer.test(cfg, model)
         if comm.is_main_process():
             verify_results(cfg, res)
@@ -191,9 +197,11 @@ if __name__ == "__main__":
 
     parsed_args: Namespace = parser.parse_args()
 
-    launch(main,
-           parsed_args.num_gpus,
-           num_machines=parsed_args.num_machines,
-           machine_rank=parsed_args.machine_rank,
-           dist_url=parsed_args.dist_url,
-           args=(parsed_args,))
+    launch(
+        main,
+        parsed_args.num_gpus,
+        num_machines=parsed_args.num_machines,
+        machine_rank=parsed_args.machine_rank,
+        dist_url=parsed_args.dist_url,
+        args=(parsed_args,)
+    )

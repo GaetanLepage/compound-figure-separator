@@ -25,6 +25,7 @@ Additional config options to handle the evaluation of a validation set during tr
 
 from detectron2.config import CfgNode
 
+
 def add_validation_config(cfg: CfgNode) -> None:
     """
     Add config for the evaluation feature.
@@ -33,7 +34,7 @@ def add_validation_config(cfg: CfgNode) -> None:
         cfg (CfgNode):  The config node that will be extended.
     """
     # Name of the validation data set
-    cfg.DATASETS.VALIDATION = ""
+    cfg.DATASETS.VALIDATION = ''
 
     cfg.VALIDATION = CfgNode()
 

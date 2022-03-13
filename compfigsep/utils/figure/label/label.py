@@ -106,21 +106,25 @@ class Label:
         """
         # Draw label box
         if self.box is not None:
-            cv2.rectangle(img=image,
-                          pt1=(self.box[0], self.box[1]),
-                          pt2=(self.box[2], self.box[3]),
-                          color=color,
-                          thickness=2)
+            cv2.rectangle(
+                img=image,
+                pt1=(self.box[0], self.box[1]),
+                pt2=(self.box[2], self.box[3]),
+                color=color,
+                thickness=2
+            )
 
             # Draw label text
             if self.text is not None:
-                cv2.putText(img=image,
-                            text=self.text,
-                            org=(int(self.box[2]) + 10,
-                                 int(self.box[3])),
-                            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                            fontScale=1,
-                            color=color)
+                cv2.putText(
+                    img=image,
+                    text=self.text,
+                    org=(int(self.box[2]) + 10,
+                         int(self.box[3])),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=1,
+                    color=color
+                )
 
     def __str__(self) -> str:
         string: str = f"{type(self).__name__}:"
@@ -196,7 +200,8 @@ class DetectedLabel(Label):
         detected_label: DetectedLabel = DetectedLabel(
             text=label_dict.get('text', ''),
             box=label_dict.get('box'),
-            detection_score=label_dict.get('detection_score'))
+            detection_score=label_dict.get('detection_score')
+        )
 
         if 'is_true_positive' in label_dict:
             detected_label.is_true_positive = label_dict['is_true_positive']

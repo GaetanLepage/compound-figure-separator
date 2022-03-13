@@ -47,7 +47,8 @@ def parse_args(args: list[str]) -> Namespace:
         namespace (Namespace):  Populated namespace.
     """
     parser: ArgumentParser = ArgumentParser(
-        description="Preview all the figures from an ImageCLEF data set.")
+        description="Preview all the figures from an ImageCLEF data set."
+    )
 
     add_image_clef_args(parser=parser)
 
@@ -72,15 +73,18 @@ def main(args: list[str] = None) -> None:
     figure_generator: ImageClefXmlFigureGenerator = ImageClefXmlFigureGenerator(
         xml_annotation_file_path=parsed_args.annotation_xml,
         image_directory_path=parsed_args.image_directory_path,
-        default_random_order=parsed_args.random_order)
+        default_random_order=parsed_args.random_orders
+    )
 
     # Preview the data set.
-    view_data_set(figure_generator=figure_generator,
-                  mode=parsed_args.mode,
-                  save_preview=parsed_args.save_preview,
-                  preview_folder=os.path.join(parsed_args.image_directory_path, "preview"),
-                  delay=parsed_args.delay,
-                  window_name="ImageCLEF data preview")
+    view_data_set(
+        figure_generator=figure_generator,
+        mode=parsed_args.mode,
+        save_preview=parsed_args.save_preview,
+        preview_folder=os.path.join(parsed_args.image_directory_path, "preview"),
+        delay=parsed_args.delay,
+        window_name="ImageCLEF data preview"
+    )
 
 
 if __name__ == '__main__':

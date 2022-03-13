@@ -50,7 +50,6 @@ class ModelWriter(HookBase):
         self._input_example: dict = input_example
         self._log_dir: str = log_dir
 
-
     def before_train(self) -> None:
         """
         Called at the beginning of the training process.

@@ -30,10 +30,6 @@ import os
 import copy
 import logging
 from argparse import ArgumentParser, Namespace
-from collections import OrderedDict
-
-from compfigsep.utils.figure import Figure, LabelStructure
-
 
 from compfigsep.data.figure_generators import (JsonFigureGenerator,
                                                add_json_arg,

@@ -25,6 +25,7 @@ Function to compute the average precision.
 
 import numpy as np
 
+
 def compute_average_precision(recall: np.ndarray,
                               precision: np.ndarray) -> float:
     """
@@ -50,7 +51,6 @@ def compute_average_precision(recall: np.ndarray,
     # Make the precision monotonically decreasing (goes from the end to the beginning)
     for i in range(len(mpre) - 1, 0, -1):
         mpre[i - 1] = np.maximum(mpre[i - 1], mpre[i])
-
 
     # To calculate area under PR curve, look for points
     # where X axis (recall) changes value.

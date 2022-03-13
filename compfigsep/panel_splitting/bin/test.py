@@ -30,7 +30,6 @@ import os
 import copy
 import logging
 from argparse import ArgumentParser, Namespace
-from collections import OrderedDict
 
 from compfigsep.utils.figure import Figure, DetectedPanel
 
@@ -39,12 +38,10 @@ from compfigsep.data.figure_generators import (JsonFigureGenerator,
                                                add_json_arg,
                                                StackedFigureGenerator)
 
-from compfigsep.panel_splitting import (evaluate_detections,
-                                        panel_filtering)
-
+from compfigsep.panel_splitting import evaluate_detections, panel_filtering
 from compfigsep.data.export import export_figures_to_json
-
 import compfigsep
+
 sys.path.append('.')
 
 MODULE_DIR = os.path.dirname(compfigsep.__file__)
@@ -61,10 +58,13 @@ def _parse_args(args: list[str]) -> Namespace:
         parser (Namespace): Populated namespace.
     """
     parser: ArgumentParser = ArgumentParser(
-        description="Evaluate panel splitting.")
+        description="Evaluate panel splitting."
+    )
 
-    add_json_arg(parser=parser,
-                 json_default_relative_path='../data/zou/eval.json')
+    add_json_arg(
+        parser=parser,
+        json_default_relative_path='../data/zou/eval.json'
+    )
 
     return parser.parse_args(args)
 
@@ -78,7 +78,8 @@ def predict_panels(figure: Figure) -> None:
         figure (Figure):    A figure object.
     """
     filtered_panels: list[DetectedPanel] = panel_filtering.filter_panels(
-        panel_list=figure.detected_panels)
+        panel_list=figure.detected_panels
+    )
 
     figure.detected_panels = filtered_panels
 
@@ -98,17 +99,21 @@ def main(args: list[str] = None) -> None:
 
     # Create the figure generator handling JSON annotation files.
     figure_generator: JsonFigureGenerator = JsonFigureGenerator(
-        json_path=parsed_args.json)
+        json_path=parsed_args.json
+    )
 
     prediction_figure_generator: StackedFigureGenerator = StackedFigureGenerator(
         base_figure_generator=figure_generator,
-        function=predict_panels)
+        function=predict_panels
+    )
 
     logging.info("Exporting detected captions")
 
     # Export detections to JSON.
-    export_figures_to_json(figure_generator=copy.copy(figure_generator),
-                           json_output_directory="compfigsep/caption_splitting/output/")
+    export_figures_to_json(
+        figure_generator=copy.copy(figure_generator),
+        json_output_directory="compfigsep/caption_splitting/output/"
+    )
 
     logging.info("Evaluate detections")
 

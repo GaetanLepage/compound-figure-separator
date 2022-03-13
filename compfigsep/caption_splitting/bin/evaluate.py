@@ -29,14 +29,13 @@ import sys
 import os
 from argparse import ArgumentParser, Namespace
 
-from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
+from compfigsep.data.figure_generators import FigureGenerator, JsonFigureGenerator, add_json_arg
 from compfigsep.caption_splitting import evaluate_detections
 
 import compfigsep
 sys.path.append('.')
 
-MODULE_DIR = os.path.dirname(compfigsep.__file__)
-
+MODULE_DIR: str = os.path.dirname(compfigsep.__file__)
 
 
 def _parse_args(args: list[str]) -> Namespace:
@@ -71,7 +70,7 @@ def main(args: list[str] = None) -> None:
     parsed_args: Namespace = _parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
-    figure_generator = JsonFigureGenerator(
+    figure_generator: FigureGenerator = JsonFigureGenerator(
         json_path=parsed_args.json)
 
     # Evaluate the data set.

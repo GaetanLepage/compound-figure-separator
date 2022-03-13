@@ -46,16 +46,19 @@ def parse_args(args: list[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser = ArgumentParser(description="Convert the ImageCLEF dataset to a"
-                                        " TFRecord file.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Convert the ImageCLEF dataset to a TFRecord file."
+    )
 
     add_image_clef_args(parser=parser)
 
-    parser.add_argument('--output_tfrecord',
-                        help="The path of the tfrecord file to which annotations"
-                             " have to be exported.",
-                        default="data/ImageCLEF/training/training.tfrecord",
-                        type=str)
+    parser.add_argument(
+        '--output_tfrecord',
+        help="The path of the tfrecord file to which annotations"
+             " have to be exported.",
+        default="data/ImageCLEF/training/training.tfrecord",
+        type=str
+    )
 
     return parser.parse_args(args)
 
@@ -77,7 +80,8 @@ def main(args: list[str] = None) -> None:
     # Create the figure generator handling xml annotation files
     figure_generator: ImageClefXmlFigureGenerator = ImageClefXmlFigureGenerator(
         xml_annotation_file_path=parsed_args.annotation_xml,
-        image_directory_path=parsed_args.image_directory_path)
+        image_directory_path=parsed_args.image_directory_path
+    )
 
     # Export figures to csv
     export_figures_to_tf_record(figure_generator=figure_generator,

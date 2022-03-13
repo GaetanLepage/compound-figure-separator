@@ -76,7 +76,6 @@ def label_identification(caption: str) -> dict:
     # Store the list of labels in the output dict.
     output_dict['labels']['characters'] = characters
 
-
     # Detect roman numbers.
     romans: list[str] = [re.sub(pattern=r'[().:]',
                                 repl='',
@@ -91,7 +90,6 @@ def label_identification(caption: str) -> dict:
 
     # Store the list of labels in the output dict.
     output_dict['labels']['romans'] = romans
-
 
     # Detect numerical labels.
     digits: list[str] = [re.sub(pattern=r'[().:]',
@@ -125,7 +123,6 @@ def label_identification(caption: str) -> dict:
     output_dict['ranges']['conj'] = conj_vector
 
     return output_dict
-
 
 
 def _expand_hyphen_range(hyphen_expressions: list[str]) -> list[str]:
@@ -195,14 +192,13 @@ def _expand_hyphen_range(hyphen_expressions: list[str]) -> list[str]:
     return hyphen_range
 
 
-
-def label_expansion(label_dict: Dict) -> list[str]:
+def label_expansion(label_dict: dict) -> list[str]:
     """
     Expand the label ranges from the caption.
     ex: ['A-C', 'D', 'E and F'] -> ['A', 'B', 'C', 'D', 'E', 'F']
 
     Args:
-        label_dict (Dict):  The dict containing labels lists and ranges detections.
+        label_dict (dict):  The dict containing labels lists and ranges detections.
 
     Returns:
         labels (list[str]): The final list of detected labels.
@@ -217,7 +213,6 @@ def label_expansion(label_dict: Dict) -> list[str]:
                                  for element in label_dict['ranges']['hyphen']]
 
     ranges = _expand_hyphen_range(hyphen_expressions=hyphen_cleaned)
-
 
     # ==> Conjunction ranges.
     # Clean the identified patterns from useless characters.

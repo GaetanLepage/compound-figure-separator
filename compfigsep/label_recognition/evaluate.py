@@ -35,14 +35,16 @@ from ..utils.figure.label import Label
 from ..utils.average_precision import compute_average_precision
 from ..panel_splitting.evaluate import Detection
 
-MultiClassFigureResult = namedtuple("MultiClassFigureResult",
-                                    [
-                                        'gt_count',
-                                        'gt_count_by_class',
-                                        'detected_count',
-                                        'detections_by_class',
-                                        'correct_count'
-                                    ])
+MultiClassFigureResult = namedtuple(
+    "MultiClassFigureResult",
+    [
+        'gt_count',
+        'gt_count_by_class',
+        'detected_count',
+        'detections_by_class',
+        'correct_count'
+    ]
+)
 
 
 def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
@@ -113,11 +115,13 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
     # TODO remove
     # print("Number of correct detections :", num_correct)
 
-    return MultiClassFigureResult(gt_count=gt_count,
-                                  gt_count_by_class=gt_count_by_class,
-                                  detected_count=detected_count,
-                                  detections_by_class=detections_by_class,
-                                  correct_count=num_correct)
+    return MultiClassFigureResult(
+        gt_count=gt_count,
+        gt_count_by_class=gt_count_by_class,
+        detected_count=detected_count,
+        detections_by_class=detections_by_class,
+        correct_count=num_correct
+    )
 
 
 def multi_class_metrics(results: list[MultiClassFigureResult]) -> tuple[float, float, float]:

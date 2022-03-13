@@ -29,7 +29,7 @@ along with the corresponding bounding boxes and labels.
 import sys
 from argparse import ArgumentParser, Namespace
 
-from compfigsep.data.figure_generators import GlobalCsvFigureGenerator
+from compfigsep.data.figure_generators import FigureGenerator, GlobalCsvFigureGenerator
 from compfigsep.data.figure_viewer import add_viewer_args, view_data_set
 
 sys.path.append('.')
@@ -45,12 +45,15 @@ def parse_args(args: list[str]) -> Namespace:
     Returns:
         parser (Namespace): Populated namespace.
     """
-    parser: ArgumentParser = ArgumentParser(description="Preview all the figures from a data set"
-                                                        " represented by a csv annotation file.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Preview all the figures from a data set represented by a csv annotation file."
+    )
 
-    parser.add_argument('--annotation_csv',
-                        help='The path to the csv annotation file.',
-                        type=str)
+    parser.add_argument(
+        '--annotation_csv',
+        help='The path to the csv annotation file.',
+        type=str
+    )
 
     add_viewer_args(parser)
 
@@ -71,15 +74,18 @@ def main(args: list[str] = None) -> None:
     parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling a csv annotation file.
-    figure_generator = GlobalCsvFigureGenerator(
+    figure_generator: FigureGenerator = GlobalCsvFigureGenerator(
         csv_annotation_file_path=parsed_args.annotation_csv,
-        default_random_order=parsed_args.random_order)
+        default_random_order=parsed_args.random_order
+    )
 
     # Preview the data set.
-    view_data_set(figure_generator=figure_generator,
-                  mode=parsed_args.mode,
-                  delay=parsed_args.delay,
-                  window_name="CSV data preview")
+    view_data_set(
+        figure_generator=figure_generator,
+        mode=parsed_args.mode,
+        delay=parsed_args.delay,
+        window_name="CSV data preview"
+    )
 
 
 if __name__ == '__main__':

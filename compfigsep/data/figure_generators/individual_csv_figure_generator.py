@@ -55,7 +55,6 @@ class IndividualCsvFigureGenerator(FigureGenerator):
 
         self.csv_annotation_directory = csv_annotation_directory
 
-
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """
         Args:

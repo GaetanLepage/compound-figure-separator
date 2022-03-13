@@ -49,10 +49,14 @@ def parse_args(args: list[str]) -> Namespace:
     Returns:
         parser (Namespace): Populated namespace.
     """
-    parser: ArgumentParser = ArgumentParser(description="Evaluate panel splitting detections.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Evaluate panel splitting detections."
+    )
 
-    add_json_arg(parser=parser,
-                 folder_default_relative_path='panel_splitting/output_imageclef/')
+    add_json_arg(
+        parser=parser,
+        folder_default_relative_path='panel_splitting/output_imageclef/'
+    )
 
     return parser.parse_args(args)
 

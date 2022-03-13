@@ -28,7 +28,7 @@ Script to evaluate panel segmentation predictions from a JSON annotation file.
 import sys
 from argparse import ArgumentParser, Namespace
 
-from compfigsep.data.figure_generators import JsonFigureGenerator, add_json_arg
+from compfigsep.data.figure_generators import FigureGenerator, JsonFigureGenerator, add_json_arg
 
 from compfigsep.panel_segmentation.evaluate import evaluate_detections
 
@@ -46,10 +46,14 @@ def parse_args(args: list[str]) -> Namespace:
     Returns:
         parser (Namespace):    Populated namespace.
     """
-    parser = ArgumentParser(description="Evaluate panel segmentation detections.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Evaluate panel segmentation detections."
+    )
 
-    add_json_arg(parser=parser,
-                 folder_default_relative_path='panel_segmentation/output/')
+    add_json_arg(
+        parser=parser,
+        folder_default_relative_path='panel_segmentation/output/'
+    )
 
     return parser.parse_args(args)
 
@@ -67,7 +71,7 @@ def main(args: list[str] = None):
     parsed_args: Namespace = parse_args(args)
 
     # Create the figure generator handling JSON annotation files.
-    figure_generator = JsonFigureGenerator(json_path=parsed_args.json)
+    figure_generator: FigureGenerator = JsonFigureGenerator(json_path=parsed_args.json)
 
     # Evaluate the data set.
     evaluate_detections(figure_generator=figure_generator)

@@ -25,9 +25,7 @@ Evaluator for the panel segmentation task.
 
 from typing import Any
 
-from ..utils.figure import (Figure,
-                            DetectedPanel,
-                            DetectedLabel)
+from ..utils.figure import Figure, DetectedPanel, DetectedLabel
 from ..utils.figure.label import CLASS_LABEL_MAPPING
 from ..utils.detectron_utils.evaluator import PanelSegAbstractEvaluator
 from .evaluate import evaluate_detections
@@ -52,11 +50,13 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
             export (bool):      Whether or not to export predictions as a JSON file.
             export_dir (str):   Path to the directory where to store the inference results.
         """
-        super().__init__(dataset_name=dataset_name,
-                         task_name='panel_seg',
-                         evaluation_function=evaluate_detections,
-                         export=export,
-                         export_dir=export_dir)
+        super().__init__(
+            dataset_name=dataset_name,
+            task_name='panel_seg',
+            evaluation_function=evaluate_detections,
+            export=export,
+            export_dir=export_dir
+        )
 
     def process(self,
                 inputs: list[dict],

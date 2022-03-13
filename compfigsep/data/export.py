@@ -37,8 +37,8 @@ from ..utils.figure import Panel
 from ..utils.figure.label import map_label, LABEL_CLASS_MAPPING
 
 
-PROJECT_DIR = os.path.join(os.path.dirname(compfigsep.__file__),
-                           os.pardir)
+PROJECT_DIR: str = os.path.join(os.path.dirname(compfigsep.__file__),
+                                os.pardir)
 
 
 def export_figures_to_csv(figure_generator: FigureGenerator,
@@ -74,12 +74,14 @@ def export_figures_to_csv(figure_generator: FigureGenerator,
 
                 panel: Panel = subfigure.panel
 
-                csv_row = [figure.image_path,
-                           panel.box[0],
-                           panel.box[1],
-                           panel.box[2],
-                           panel.box[3],
-                           'panel']
+                csv_row = [
+                    figure.image_path,
+                    panel.box[0],
+                    panel.box[1],
+                    panel.box[2],
+                    panel.box[3],
+                    'panel'
+                ]
 
                 label = subfigure.label
                 if label is not None and label.box is not None:
@@ -94,7 +96,8 @@ def export_figures_to_csv(figure_generator: FigureGenerator,
 
                 if individual_export:
                     figure.export_gt_annotation_to_individual_csv(
-                        csv_export_dir=individual_export_csv_directory)
+                        csv_export_dir=individual_export_csv_directory
+                    )
 
 
 def export_figures_to_json(figure_generator: FigureGenerator,

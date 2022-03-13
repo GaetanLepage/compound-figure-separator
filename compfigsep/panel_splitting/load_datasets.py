@@ -26,7 +26,8 @@ panel splitting task.
 
 from detectron2.data import DatasetCatalog, MetadataCatalog
 
-from ..data.figure_generators import (ImageClefXmlFigureGenerator,
+from ..data.figure_generators import (FigureGenerator,
+                                      ImageClefXmlFigureGenerator,
                                       IphotodrawXmlFigureGenerator)
 from ..data.export import export_figures_to_detectron_dict
 
@@ -59,9 +60,10 @@ def register_panel_splitting_dataset(dataset_name: str):
             pass
 
         # Instanciate the FigureGenerator
-        figure_generator = ImageClefXmlFigureGenerator(
+        figure_generator: FigureGenerator = ImageClefXmlFigureGenerator(
             xml_annotation_file_path=xml_annotation_file_path,
-            image_directory_path=image_directory_path)
+            image_directory_path=image_directory_path
+        )
 
     # PanelSeg data set
     elif "zou" in dataset_name:
@@ -76,17 +78,22 @@ def register_panel_splitting_dataset(dataset_name: str):
             pass
 
         # Instanciate the FigureGenerator
-        figure_generator = IphotodrawXmlFigureGenerator(file_list_txt=file_list_txt)
+        figure_generator = IphotodrawXmlFigureGenerator(
+            file_list_txt=file_list_txt
+        )
 
     else:
         # TODO warn the user in this case
         pass
 
     # Register the data set and set the ingest function to convert Figures to Detectron dict.
-    DatasetCatalog.register(name=dataset_name,
-                            func=lambda: export_figures_to_detectron_dict(
-                                figure_generator=figure_generator,
-                                task='panel_splitting'))
+    DatasetCatalog.register(
+        name=dataset_name,
+        func=lambda: export_figures_to_detectron_dict(
+            figure_generator=figure_generator,
+            task='panel_splitting'
+        )
+    )
 
     # Provide the figure generator to the DataSet for later evaluation.
     MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator)

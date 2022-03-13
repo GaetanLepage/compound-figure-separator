@@ -56,8 +56,10 @@ def filter_panels(panel_list: list[DetectedPanel],
             if not mask[index_1]:
                 continue
 
-            overlap = box.intersection_area(box_1=panel_1.box,
-                                            box_2=panel_2.box) / box.area(panel_1.box)
+            overlap = box.intersection_area(
+                box_1=panel_1.box,
+                box_2=panel_2.box
+            ) / box.area(panel_1.box)
 
             if overlap > overlap_threshold:
                 mask[index_1] = False

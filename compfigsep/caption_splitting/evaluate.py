@@ -34,10 +34,12 @@ import textdistance
 from ..utils.figure import Figure
 from ..data.figure_generators import FigureGenerator
 
-CaptionSplittingFigureResult = namedtuple("CaptionSplittingFigureResult",
-                                          [
-                                              'normalized_levenshtein_similarity'
-                                          ])
+CaptionSplittingFigureResult: namedtuple = namedtuple(
+    "CaptionSplittingFigureResult",
+    [
+        'normalized_levenshtein_similarity'
+    ]
+)
 
 
 def caption_splitting_figure_eval(figure: Figure) -> Optional[CaptionSplittingFigureResult]:

@@ -45,17 +45,20 @@ def parse_args(args: list[str]) -> Namespace:
     Returns:
         namespace (Namespace):  Populated namespace.
     """
-    parser: ArgumentParser = ArgumentParser(description="Convert annotations from individual"
-                                                        " iPhotoDraw xml annotation files to a"
-                                                        " CSV annotations file.")
+    parser: ArgumentParser = ArgumentParser(
+        description="Convert annotations from individual iPhotoDraw xml annotation files to a CSV"
+                    " annotations file."
+    )
 
     add_iphotodraw_args(parser=parser)
 
-    parser.add_argument('--output_filename',
-                        dest="json_output_filename",
-                        help="Name of the json export file.",
-                        default="eval.json",
-                        type=str)
+    parser.add_argument(
+        '--output_filename',
+        dest="json_output_filename",
+        help="Name of the json export file.",
+        default="eval.json",
+        type=str
+    )
 
     return parser.parse_args(args)
 
@@ -76,7 +79,8 @@ def main(args: list[str] = None) -> None:
     # Create the figure generator handling xml annotation files.
     figure_generator: IphotodrawXmlFigureGenerator = IphotodrawXmlFigureGenerator(
         file_list_txt=parsed_args.file_list_txt,
-        image_directory_path=parsed_args.image_directory_path)
+        image_directory_path=parsed_args.image_directory_path
+    )
 
     # Export figures to csv.
     export_figures_to_json(figure_generator=figure_generator,

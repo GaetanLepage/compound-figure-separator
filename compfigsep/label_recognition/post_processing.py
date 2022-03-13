@@ -34,5 +34,6 @@ def filter_labels(figure_generator: FigureGenerator):
         figure_generator (FigureGenerator): A generator of Figure objects.
 
     Returns:
-        TODO (TODO): TODO (do we yield figures or do we create a FigureGenerator on the fly, do we return a list of Figure objects...)
+        TODO (TODO):    TODO (do we yield figures or do we create a FigureGenerator on the fly, do
+                            we return a list of Figure objects...)
     """

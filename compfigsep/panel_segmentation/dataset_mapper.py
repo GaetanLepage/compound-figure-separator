@@ -79,7 +79,6 @@ class PanelSegDatasetMapper:
 
         self.is_train = is_train
 
-
     @staticmethod
     def _annotations_to_instances(panel_annos: list[dict],
                                   label_annos: list[dict],
@@ -115,7 +114,6 @@ class PanelSegDatasetMapper:
         panel_classes: list[int] = [0 for obj in panel_annos]
         panel_classes_tensor: torch.Tensor = torch.tensor(panel_classes, dtype=torch.int64)
         panel_instances.gt_classes = panel_classes_tensor
-
 
         # Labels (also handle case where there are no labels)
         label_boxes_list: list = [BoxMode.convert(box=obj['bbox'],
@@ -209,12 +207,12 @@ class PanelSegDatasetMapper:
                                                              transforms=transforms,
                                                              image_size=image_shape))
                 else:
-                    logging.error("Error with annotation: %s has a 'label' field"\
+                    logging.error("Error with annotation: %s has a 'label' field"
                                   " but no corresponding 'label_bbox' field.",
                                   obj)
 
             elif 'label_bbox' in obj:
-                logging.error("Inconsistent label annotation:"\
+                logging.error("Inconsistent label annotation:"
                               " obj['label']=%s and obj['label_bbox']=%s",
                               obj['label'],
                               obj['label_bbox'])

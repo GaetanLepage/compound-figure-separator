@@ -83,9 +83,11 @@ class SubFigure:
         if 'label' in sub_figure_dict:
             label = Label.from_dict(sub_figure_dict['label'])
 
-        return SubFigure(panel=panel,
-                         label=label,
-                         caption=sub_figure_dict.get('caption'))
+        return SubFigure(
+            panel=panel,
+            label=label,
+            caption=sub_figure_dict.get('caption')
+        )
 
     def to_dict(self) -> dict:
         """
@@ -195,9 +197,11 @@ class DetectedSubFigure(SubFigure):
         if subfigure.label is not None:
             label = DetectedLabel.from_normal_label(subfigure.label)
 
-        return DetectedSubFigure(panel=panel,
-                                 label=label,
-                                 caption=subfigure.caption)
+        return DetectedSubFigure(
+            panel=panel,
+            label=label,
+            caption=subfigure.caption
+        )
 
     @classmethod
     def from_dict(cls, detected_sub_figure_dict: dict) -> DetectedSubFigure:
@@ -219,9 +223,11 @@ class DetectedSubFigure(SubFigure):
         if 'label' in detected_sub_figure_dict:
             label = DetectedLabel.from_dict(detected_sub_figure_dict['label'])
 
-        detected_sub_figure = DetectedSubFigure(panel=panel,
-                                                label=label,
-                                                caption=detected_sub_figure_dict.get('caption'))
+        detected_sub_figure = DetectedSubFigure(
+            panel=panel,
+            label=label,
+            caption=detected_sub_figure_dict.get('caption')
+        )
 
         if 'is_true_positive' in detected_sub_figure_dict:
             detected_sub_figure.is_true_positive = detected_sub_figure_dict['is_true_positive']

@@ -66,9 +66,11 @@ class ImageListFigureGenerator(FigureGenerator):
         self.image_list_txt: str = image_list_txt
 
     def __copy__(self) -> ImageListFigureGenerator:
-        return ImageListFigureGenerator(image_list_txt=self.image_list_txt,
-                                        image_directory_path=self.image_directory_path,
-                                        default_random_order=self.default_random_order)
+        return ImageListFigureGenerator(
+            image_list_txt=self.image_list_txt,
+            image_directory_path=self.image_directory_path,
+            default_random_order=self.default_random_order
+        )
 
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
 

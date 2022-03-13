@@ -25,7 +25,7 @@ Load PanelSeg data set to be used with the Detectron API for the panel segmentat
 
 from detectron2.data import DatasetCatalog, MetadataCatalog
 
-from ..data.figure_generators import IphotodrawXmlFigureGenerator
+from ..data.figure_generators import FigureGenerator, IphotodrawXmlFigureGenerator
 
 from ..data.export import export_figures_to_detectron_dict
 
@@ -37,7 +37,7 @@ def register_panel_segmentation_dataset(dataset_name):
     Args:
         dataset_name (str): The name of the data set to register. Has to belong to accepted ones.
     """
-    if not 'zou' in dataset_name:
+    if 'zou' not in dataset_name:
         # TODO warn the user in this case
         return
 
@@ -54,16 +54,19 @@ def register_panel_segmentation_dataset(dataset_name):
         return
 
     # Create the figure generator to feed the dictionary
-    figure_generator = IphotodrawXmlFigureGenerator(
+    figure_generator: FigureGenerator = IphotodrawXmlFigureGenerator(
         file_list_txt=file_list_txt,
-        default_random_order=False)
-
+        default_random_order=False
+    )
 
     # Register the data set and set the ingest function to convert Figures to Detectron dict.
-    DatasetCatalog.register(name=dataset_name,
-                            func=lambda: export_figures_to_detectron_dict(
-                                figure_generator=figure_generator,
-                                task='panel_seg'))
+    DatasetCatalog.register(
+        name=dataset_name,
+        func=lambda: export_figures_to_detectron_dict(
+            figure_generator=figure_generator,
+            task='panel_seg'
+        )
+    )
 
     MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator)
 

@@ -40,7 +40,7 @@ from compfigsep.data.figure_generators import DATA_DIR
 
 
 # API url to download xml
-BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&retmode=xml&id="
+BASE_URL: str = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&retmode=xml&id="
 
 
 def parse_args(args: list[str]) -> Namespace:
@@ -56,14 +56,18 @@ def parse_args(args: list[str]) -> Namespace:
     parser: ArgumentParser = ArgumentParser(
         description="Convert the ImageCLEF dataset to a TFRecord file.")
 
-    parser.add_argument('--file_list_txt',
-                        help="The path to the txt file listing the images.",
-                        default="data/zou/eval.txt",
-                        type=str)
+    parser.add_argument(
+        '--file_list_txt',
+        help="The path to the txt file listing the images.",
+        default="data/zou/eval.txt",
+        type=str
+    )
 
-    parser.add_argument('--override',
-                        help="Override caption txt file if exists.",
-                        action='store_true')
+    parser.add_argument(
+        '--override',
+        help="Override caption txt file if exists.",
+        action='store_true'
+    )
 
     return parser.parse_args(args)
 
