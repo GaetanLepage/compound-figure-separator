@@ -39337,7 +39337,7 @@
                     ]
                 },
                 "caption": "Pdx1 homeodomain/DNA interactions from the crystal structure. C) DNA sequence and numbering in the crystal structure. The TAAT core sequence is in bold."
-            },
+            }
         ],
         "caption": "Pdx1 homeodomain/DNA interactions from the crystal structure. A) Structure of the Pdx1 homeodomain/DNA complex. Pdx1 (blue ribbon) binds the TAAT core DNA sequence (grey). The N-terminal tail binds in the minor groove, and the recognition helix, helix 3, binds in the major groove. Key residues contacting the DNA are shown as stick figures (red): Arg 5 in the minor groove, and Asn 51 in the major groove. Gln 50 contacts the phosphate backbone or the DNA bases through a water-mediated contact. Arg 3 and Arg 43 (black line representation, circled) help stabilize the N-terminal arm, and Lys 2, in the minor groove when helix 3 is properly positioned in the major groove. B) Hydrogen bond contacts with the DNA differ between Conformation A and B in the Pdx1 homeodomain/DNA crystal structure (PDB 2H1K) (www.rcsb.org) [56]. In both conformations (left) Arg 5 contacts Thy 1 and Gua \u22121* through the minor grove, and Asn 51 contacts Ade 3 through the major grove. The difference in the DNA contacts between Conformations A (orange) and B (blue) is shown on the right. Conformation B makes additional base contacts by Asn 51, by Lys 2 from the ordered N-terminal arm, and a water-mediated contact by Gln 50. Conformation A forms additional phosphate contacts. Arrows represent hydrogen bonds. C) DNA sequence and numbering in the crystal structure. The TAAT core sequence is in bold."
     },
