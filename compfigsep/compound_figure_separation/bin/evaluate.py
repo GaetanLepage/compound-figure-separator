@@ -50,8 +50,10 @@ def _parse_args(args: list[str]) -> Namespace:
     """
     parser: ArgumentParser = ArgumentParser(description="Evaluate compound figure separation.")
 
-    add_json_arg(parser=parser,
-                 folder_default_relative_path='compound_figure_separation/output/')
+    add_json_arg(
+        parser=parser,
+        folder_default_relative_path='compound_figure_separation/output/'
+    )
 
     return parser.parse_args(args)
 
@@ -72,7 +74,8 @@ def main(args: list[str] = None) -> None:
 
     # Create the figure generator handling JSON annotation files.
     figure_generator = JsonFigureGenerator(
-        json_path=parsed_args.json)
+        json_path=parsed_args.json
+    )
 
     # Evaluate the data set.
     evaluate_detections(figure_generator=figure_generator)

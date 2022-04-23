@@ -55,5 +55,9 @@ class ModelWriter(HookBase):
         Called at the beginning of the training process.
         Write the model shape to the summary writer.
         """
-        SummaryWriter(log_dir=self._log_dir).add_graph(self._model,
-                                                       self._input_example)
+        SummaryWriter(
+            log_dir=self._log_dir
+        ).add_graph(
+            self._model,
+            self._input_example
+        )

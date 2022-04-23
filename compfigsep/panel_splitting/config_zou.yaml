@@ -1,5 +1,5 @@
 _BASE_: "../utils/detectron_utils/Base-RetinaNet.yaml"
-OUTPUT_DIR: "compfigsep/panel_splitting/output_zou"
+OUTPUT_DIR: "output/training/panel_splitting/output_zou"
 MODEL:
   RETINANET:
     NUM_CLASSES: 1

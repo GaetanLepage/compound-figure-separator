@@ -138,12 +138,14 @@ def get_most_recent_json(folder_path: str = None) -> str:
 
         hour, minute, second = (int(value) for value in time_string.split(':'))
 
-        date: datetime = datetime(year=year,
-                                  month=month_number,
-                                  day=day_number,
-                                  hour=hour,
-                                  minute=minute,
-                                  second=second)
+        date: datetime = datetime(
+            year=year,
+            month=month_number,
+            day=day_number,
+            hour=hour,
+            minute=minute,
+            second=second
+        )
 
         dates[date] = file_name
 
@@ -157,9 +159,11 @@ def get_most_recent_json(folder_path: str = None) -> str:
     return os.path.join(folder_path, most_recent_file_name)
 
 
-def add_json_arg(parser: ArgumentParser,
-                 json_default_relative_path: str = None,
-                 folder_default_relative_path: str = None):
+def add_json_arg(
+        parser: ArgumentParser,
+        json_default_relative_path: str = None,
+        folder_default_relative_path: str = None
+) -> None:
     """
     Parse the argument for loading a json file.
 
@@ -235,8 +239,10 @@ class JsonFigureGenerator(FigureGenerator):
         Returns:
             json_figure_generator (JsonFigureGenerator):    The copy.
         """
-        return JsonFigureGenerator(json_path=self.json_annotation_file_path,
-                                   default_random_order=self.default_random_order)
+        return JsonFigureGenerator(
+            json_path=self.json_annotation_file_path,
+            default_random_order=self.default_random_order
+        )
 
     def __call__(self, random_order: Optional[bool] = None) -> Iterable[Figure]:
         """

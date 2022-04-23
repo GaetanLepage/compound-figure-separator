@@ -82,9 +82,11 @@ class Position(NamedTuple):
         Returns:
             position (Position):    The corresponding Position object.
         """
-        return Position(start_index=match.start(),
-                        end_index=match.end(),
-                        string_list=[match.group(0)])
+        return Position(
+            start_index=match.start(),
+            end_index=match.end(),
+            string_list=[match.group(0)]
+        )
 
 
 def _sentence_preface(sentences_list: list[str],
@@ -672,8 +674,10 @@ def _process_caption_sentence(caption_sentence: str,
     # Define the list of tuples representing POS labels.
     # Loop through all the POS regex (i.e. target, hyphen and conj) and put them into
     # positions_POS.
-    positions_pos: list[Position] = _pos_positions(subcaption=caption_sentence,
-                                                   target_regex_pos=target_regex_pos)
+    positions_pos: list[Position] = _pos_positions(
+        subcaption=caption_sentence,
+        target_regex_pos=target_regex_pos
+    )
 
     # Define the list of image pointers that each subsentence contains.
     sub_image_pointers: list[str] = []
@@ -737,7 +741,8 @@ def _process_caption_sentence(caption_sentence: str,
             # non-preface sentences.
             sub_preface, sub_preface_end_index = _sentence_preface(
                 sentences_list=splitted_sentence,
-                target_regex=target_regex)
+                target_regex=target_regex
+            )
 
             # If preface is not an empty string then the preface has to be associated to
             # subpanel captions within sub_labels.
@@ -749,13 +754,15 @@ def _process_caption_sentence(caption_sentence: str,
             # Loop through all the subsentences of the sentence after preface.
             for caption_subsentence in splitted_sentence[sub_preface_end_index:]:
 
-                _process_caption_subsentence_pos(caption_subsentence=caption_subsentence,
-                                                 sub_labels=sub_labels,
-                                                 sub_image_pointers=sub_image_pointers,
-                                                 subcaptions=subcaptions,
-                                                 fuzzy_captions=fuzzy_captions,
-                                                 target_regex=target_regex,
-                                                 target_regex_pos=target_regex_pos)
+                _process_caption_subsentence_pos(
+                    caption_subsentence=caption_subsentence,
+                    sub_labels=sub_labels,
+                    sub_image_pointers=sub_image_pointers,
+                    subcaptions=subcaptions,
+                    fuzzy_captions=fuzzy_captions,
+                    target_regex=target_regex,
+                    target_regex_pos=target_regex_pos
+                )
 
     # Case where positions_pos is empty.
     else:
@@ -766,18 +773,22 @@ def _process_caption_sentence(caption_sentence: str,
             # Consider labels as 'post description' labels.
 
             # Assign to the subcaptions the related sentences.
-            _post_labels(subcaptions=subcaptions,
-                         subcapt=caption_sentence,
-                         positions=positions)
+            _post_labels(
+                subcaptions=subcaptions,
+                subcapt=caption_sentence,
+                positions=positions
+            )
 
         # Check if the first label extracted is at the beginning of the sentence.
         elif positions[0].start_index == 0:
             # Consider labels as 'pre description' labels.
 
             # Assign to the subcaptions the related sentences.
-            _pre_labels(subcaptions=subcaptions,
-                        subcapt=caption_sentence,
-                        positions=positions)
+            _pre_labels(
+                subcaptions=subcaptions,
+                subcapt=caption_sentence,
+                positions=positions
+            )
 
         # Consider labels as 'in descriptions' labels.
         else:
@@ -806,7 +817,8 @@ def _process_caption_sentence(caption_sentence: str,
             # non-preface sentences.
             sub_preface, sub_preface_end_index = _sentence_preface(
                 sentences_list=splitted_sentence,
-                target_regex=target_regex)
+                target_regex=target_regex
+            )
 
             # If preface is not an empty string then the preface has to be associated to
             # subpanel captions within sub_labels.
@@ -821,12 +833,14 @@ def _process_caption_sentence(caption_sentence: str,
             # Loop through all the subsentences of the sentence after preface.
             for caption_subsentence in splitted_sentence[sub_starter:]:
 
-                _process_caption_subsentence(caption_subsentence=caption_subsentence,
-                                             sub_labels=sub_labels,
-                                             sub_image_pointers=sub_image_pointers,
-                                             subcaptions=subcaptions,
-                                             fuzzy_captions=fuzzy_captions,
-                                             target_regex=target_regex)
+                _process_caption_subsentence(
+                    caption_subsentence=caption_subsentence,
+                    sub_labels=sub_labels,
+                    sub_image_pointers=sub_image_pointers,
+                    subcaptions=subcaptions,
+                    fuzzy_captions=fuzzy_captions,
+                    target_regex=target_regex
+                )
 
     return image_pointers
 
@@ -869,8 +883,10 @@ def extract_subcaptions(caption: str,
 
     # Obtain the preface string and the counter to use for starting to consider
     # non-preface sentences.
-    preface, preface_end_index = _sentence_preface(sentences_list=caption_sentences_list,
-                                                   target_regex=target_regex)
+    preface, preface_end_index = _sentence_preface(
+        sentences_list=caption_sentences_list,
+        target_regex=target_regex
+    )
 
     # CAVEAT: remember to check whether or not the preface (when it's not empty) matches one of
     # the image pointers extracted previously, otherwise remove false positives from it.
@@ -890,12 +906,14 @@ def extract_subcaptions(caption: str,
     for caption_sentence in caption_sentences_list[preface_end_index:]:
         # For each substring extract all the image pointers (labels) and their positions.
 
-        image_pointers = _process_caption_sentence(caption_sentence=caption_sentence,
-                                                   subcaptions=subcaptions,
-                                                   fuzzy_captions=fuzzy_captions,
-                                                   image_pointers=image_pointers,
-                                                   filtered_labels=filtered_labels,
-                                                   target_regex=target_regex,
-                                                   target_regex_pos=target_regex_pos)
+        image_pointers = _process_caption_sentence(
+            caption_sentence=caption_sentence,
+            subcaptions=subcaptions,
+            fuzzy_captions=fuzzy_captions,
+            image_pointers=image_pointers,
+            filtered_labels=filtered_labels,
+            target_regex=target_regex,
+            target_regex_pos=target_regex_pos
+        )
 
     return subcaptions

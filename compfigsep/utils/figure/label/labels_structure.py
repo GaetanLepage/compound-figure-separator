@@ -29,12 +29,14 @@ import operator
 from enum import Enum
 from typing import Callable
 
-from .utils import (is_lower_char,
-                    is_upper_char,
-                    UC_ROMAN,
-                    LC_ROMAN,
-                    UC_ROMAN_TO_INT,
-                    LC_ROMAN_TO_INT)
+from .utils import (
+    is_lower_char,
+    is_upper_char,
+    UC_ROMAN,
+    LC_ROMAN,
+    UC_ROMAN_TO_INT,
+    LC_ROMAN_TO_INT
+)
 
 
 class LabelStructureEnum(Enum):
@@ -97,9 +99,11 @@ class LabelStructure:
         num_labels (int):                   The number of labels.
     """
 
-    def __init__(self,
-                 labels_type: LabelStructureEnum,
-                 num_labels: int) -> None:
+    def __init__(
+            self,
+            labels_type: LabelStructureEnum,
+            num_labels: int
+    ) -> None:
         """
         Args:
             labels_type (LabelStructureEnum):   The type of labels.
@@ -110,8 +114,7 @@ class LabelStructure:
         self.num_labels: int = num_labels
 
     @classmethod
-    def from_labels_list(cls,
-                         labels_list: list[str]) -> LabelStructure:
+    def from_labels_list(cls, labels_list: list[str]) -> LabelStructure:
         """
         Create a LabelStructure object from a list of labels.
 
@@ -127,8 +130,10 @@ class LabelStructure:
         # TODO maybe put in histogram...
         # Case where there are no named labels.
         if labels_list == ['_'] * len(labels_list):
-            return cls(labels_type=LabelStructureEnum.NONE,
-                       num_labels=len(labels_list))
+            return cls(
+                labels_type=LabelStructureEnum.NONE,
+                num_labels=len(labels_list)
+            )
 
         # "Histogram" of the label types.
         similarity_dict: dict[LabelStructureEnum, float] = {
@@ -137,11 +142,13 @@ class LabelStructure:
 
         for label in labels_list:
 
-            for label_type in (LabelStructureEnum.LATIN_LC,
-                               LabelStructureEnum.LATIN_UC,
-                               LabelStructureEnum.NUMERICAL,
-                               LabelStructureEnum.ROMAN_LC,
-                               LabelStructureEnum.ROMAN_UC):
+            for label_type in (
+                    LabelStructureEnum.LATIN_LC,
+                    LabelStructureEnum.LATIN_UC,
+                    LabelStructureEnum.NUMERICAL,
+                    LabelStructureEnum.ROMAN_LC,
+                    LabelStructureEnum.ROMAN_UC
+            ):
 
                 if LABEL_FILTER[label_type](label):
                     # TODO decide which to pick
@@ -151,9 +158,10 @@ class LabelStructure:
         # TODO remove
         # pprint(similarity_dict)
 
-        max_pos = max(similarity_dict.items(),
-                      key=operator.itemgetter(1)
-                      )[0]
+        max_pos = max(
+            similarity_dict.items(),
+            key=operator.itemgetter(1)
+        )[0]
 
         labels_type: LabelStructureEnum = LabelStructureEnum(max_pos)
 
@@ -167,8 +175,12 @@ class LabelStructure:
 
         # Keep only labels from the identified type:
         # ['C', '1', 'B', 'A'] -> ['C', 'B', 'A']
-        filtered_labels = list(filter(LABEL_FILTER[labels_type],
-                                      filtered_labels))
+        filtered_labels = list(
+            filter(
+                LABEL_FILTER[labels_type],
+                filtered_labels
+            )
+        )
         # Sort the labels.
         # ['C', 'B', 'A'] -> ['A', 'B', 'C']
         filtered_labels.sort()
@@ -206,8 +218,10 @@ class LabelStructure:
         # 'C' -> 3
         max_index: int = get_index(last_label)
 
-        return cls(labels_type=labels_type,
-                   num_labels=max_index)
+        return cls(
+            labels_type=labels_type,
+            num_labels=max_index
+        )
 
     def get_core_label_list(self) -> list[str]:
         """

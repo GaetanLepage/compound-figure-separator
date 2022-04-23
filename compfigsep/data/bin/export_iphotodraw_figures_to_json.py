@@ -83,9 +83,11 @@ def main(args: list[str] = None) -> None:
     )
 
     # Export figures to csv.
-    export_figures_to_json(figure_generator=figure_generator,
-                           json_output_filename=parsed_args.json_output_filename,
-                           json_output_directory="data/zou/")
+    export_figures_to_json(
+        figure_generator=figure_generator,
+        json_output_filename=parsed_args.json_output_filename,
+        json_output_directory="data/zou/"
+    )
 
 
 if __name__ == '__main__':

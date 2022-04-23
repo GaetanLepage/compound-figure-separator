@@ -31,15 +31,19 @@ import copy
 import logging
 from argparse import ArgumentParser, Namespace
 
-from compfigsep.data.figure_generators import (JsonFigureGenerator,
-                                               add_json_arg,
-                                               StackedFigureGenerator)
+from compfigsep.data.figure_generators import (
+    JsonFigureGenerator,
+    add_json_arg,
+    StackedFigureGenerator
+)
 
-from compfigsep.caption_splitting import (label_identification,
-                                          label_expansion,
-                                          label_filtering,
-                                          extract_subcaptions,
-                                          evaluate_detections)
+from compfigsep.caption_splitting import (
+    label_identification,
+    label_expansion,
+    label_filtering,
+    extract_subcaptions,
+    evaluate_detections
+)
 
 from compfigsep.data.export import export_figures_to_json
 
@@ -60,11 +64,14 @@ def _parse_args(args: list[str]) -> Namespace:
         parser (Namespace): Populated namespace.
     """
     parser: ArgumentParser = ArgumentParser(
-        description="Evaluate caption splitting on the prostate data set.")
+        description="Evaluate caption splitting on the prostate data set."
+    )
 
-    add_json_arg(parser=parser,
-                 json_default_relative_path='../data/pubmed_caption_splitting/'
-                                            'prostate_data_only_annotated_captions.json')
+    add_json_arg(
+        parser=parser,
+        json_default_relative_path='../data/pubmed_caption_splitting/'
+                                   'prostate_data_only_annotated_captions.json'
+    )
 
     return parser.parse_args(args)
 
@@ -84,17 +91,21 @@ def main(args: list[str] = None) -> None:
 
     # Create the figure generator handling JSON annotation files.
     figure_generator: JsonFigureGenerator = JsonFigureGenerator(
-        json_path=parsed_args.json)
+        json_path=parsed_args.json
+    )
 
     prediction_figure_generator: StackedFigureGenerator = StackedFigureGenerator(
         base_figure_generator=figure_generator,
-        function=predict_caption)
+        function=predict_caption
+    )
 
     logging.info("Exporting detected captions")
 
     # Export detections to JSON.
-    export_figures_to_json(figure_generator=copy.copy(prediction_figure_generator),
-                           json_output_directory="compfigsep/caption_splitting/output/")
+    export_figures_to_json(
+        figure_generator=copy.copy(prediction_figure_generator),
+        json_output_directory="compfigsep/caption_splitting/output/"
+    )
 
     logging.info("Evaluate detections")
 

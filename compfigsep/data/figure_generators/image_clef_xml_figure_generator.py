@@ -76,10 +76,12 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
         default_random_order (bool):    Wether to yield figures in a random order.
     """
 
-    def __init__(self,
-                 xml_annotation_file_path: str,
-                 image_directory_path: str,
-                 default_random_order: bool = True) -> None:
+    def __init__(
+            self,
+            xml_annotation_file_path: str,
+            image_directory_path: str,
+            default_random_order: bool = True
+    ) -> None:
         """
         Generator of Figure objects from ImageCLEF data set.
 

@@ -46,9 +46,11 @@ class Label:
         box (Box):  The bounding box localizing the label on the image.
     """
 
-    def __init__(self,
-                 text: str = "",
-                 box: Box = None) -> None:
+    def __init__(
+            self,
+            text: str = "",
+            box: Box = None
+    ) -> None:
         """
         Args:
             text (str): The label text ('A' or '1' or 'ii'...).
@@ -60,8 +62,10 @@ class Label:
             box = box.tolist()
 
         if box is not None:
-            self.box: Box = cast(Box,
-                                 tuple(round(val) for val in box))
+            self.box: Box = cast(
+                Box,
+                tuple(round(val) for val in box)
+            )
 
     @classmethod
     def from_dict(cls, label_dict: dict) -> Label:
@@ -74,8 +78,10 @@ class Label:
         Returns:
             label (Label):  The resulting Label object.
         """
-        return Label(text=label_dict.get('text', ''),
-                     box=label_dict.get('box'))
+        return Label(
+            text=label_dict.get('text', ''),
+            box=label_dict.get('box')
+        )
 
     def to_dict(self) -> dict:
         """
@@ -93,9 +99,11 @@ class Label:
 
         return output_dict
 
-    def draw(self,
-             image: np.ndarray,
-             color: Color = DEFAULT_GT_COLOR) -> None:
+    def draw(
+            self,
+            image: np.ndarray,
+            color: Color = DEFAULT_GT_COLOR
+    ) -> None:
         """
         Draw the label bounding box and text on the image.
         The image is affected by side-effect.
@@ -149,18 +157,19 @@ class DetectedLabel(Label):
         is_true_positive (Optional[bool]):  Whether this is a correct label detection.
     """
 
-    def __init__(self,
-                 text: str = '',
-                 box: Box = None,
-                 detection_score: float = None) -> None:
+    def __init__(
+            self,
+            text: str = '',
+            box: Box = None,
+            detection_score: float = None
+    ) -> None:
         """
         Args:
             text (str):                 The label text ('A' or '1' or 'ii'...).
             box (Box):                  The bounding box localizing the label on the image.
             detection_score (float):    Detection score (confidence).
         """
-        super().__init__(text=text,
-                         box=box)
+        super().__init__(text=text, box=box)
 
         self.detection_score: Optional[float] = detection_score
         self.is_true_positive: Optional[bool] = False
@@ -183,8 +192,10 @@ class DetectedLabel(Label):
         if not isinstance(label, Label):
             raise ValueError(f"Invalid type for label: {type(label)}")
 
-        return DetectedLabel(text=label.text,
-                             box=label.box)
+        return DetectedLabel(
+            text=label.text,
+            box=label.box
+        )
 
     @classmethod
     def from_dict(cls, label_dict: dict[str, Any]) -> DetectedLabel:
@@ -205,7 +216,6 @@ class DetectedLabel(Label):
 
         if 'is_true_positive' in label_dict:
             detected_label.is_true_positive = label_dict['is_true_positive']
-
         return detected_label
 
     def to_dict(self) -> dict[str, Any]:
@@ -229,9 +239,11 @@ class DetectedLabel(Label):
 
         return output_dict
 
-    def draw(self,
-             image: np.ndarray,
-             color: Color = DEFAULT_DETECTION_COLOR) -> None:
+    def draw(
+            self,
+            image: np.ndarray,
+            color: Color = DEFAULT_DETECTION_COLOR
+    ) -> None:
         """
         Draw the label bounding box and text on the image.
         the image is affected by side-effect.

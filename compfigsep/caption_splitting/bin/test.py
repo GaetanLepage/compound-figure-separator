@@ -127,17 +127,21 @@ def main(args: list[str] = None) -> None:
 
     # Create the figure generator handling JSON annotation files.
     figure_generator: JsonFigureGenerator = JsonFigureGenerator(
-        json_path=parsed_args.json)
+        json_path=parsed_args.json
+    )
 
     prediction_figure_generator: StackedFigureGenerator = StackedFigureGenerator(
         base_figure_generator=figure_generator,
-        function=predict_caption)
+        function=predict_caption
+    )
 
     logging.info("Exporting detected captions")
 
     # Export detections to JSON.
-    export_figures_to_json(figure_generator=copy.copy(prediction_figure_generator),
-                           json_output_directory="compfigsep/caption_splitting/output/")
+    export_figures_to_json(
+        figure_generator=copy.copy(prediction_figure_generator),
+        json_output_directory="compfigsep/caption_splitting/output/"
+    )
 
     logging.info("Evaluate detections")
 

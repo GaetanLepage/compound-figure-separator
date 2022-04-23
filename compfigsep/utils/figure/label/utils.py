@@ -23,26 +23,48 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 Utilities for label text.
 """
 
-LC_ROMAN = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x',
-            'xi', 'xii', 'xiii', 'xiv', 'xv', 'xvi', 'xvii', 'xviii', 'xix', 'xx']
+LC_ROMAN = [
+    'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x',
+    'xi', 'xii', 'xiii', 'xiv', 'xv', 'xvi', 'xvii', 'xviii', 'xix', 'xx'
+]
 
 # {'i': 1, 'ii': 2,..., 'xx': 20}
-LC_ROMAN_TO_INT = dict(zip(LC_ROMAN,
-                           range(1, len(LC_ROMAN) + 1)))
+LC_ROMAN_TO_INT = dict(
+    zip(
+        LC_ROMAN,
+        range(1, len(LC_ROMAN) + 1)
+    )
+)
 
 # {1: 'i', 2: 'ii',..., 20: 'xx'}
-LC_ROMAN_FROM_INT = {value: char for char, value in LC_ROMAN_TO_INT.items()}
+LC_ROMAN_FROM_INT = {
+    value: char
+    for char, value
+    in LC_ROMAN_TO_INT.items()
+}
 
 # ['I', 'II',..., 'XX']
-UC_ROMAN = [char.upper() for char in LC_ROMAN]
+UC_ROMAN = [
+    char.upper()
+    for char
+    in LC_ROMAN
+]
 
 # {'I': 1, 'II': 2,..., 'XX': 20}
-UC_ROMAN_TO_INT = dict(zip(UC_ROMAN,
-                           range(1, len(UC_ROMAN) + 1)))
+UC_ROMAN_TO_INT = dict(
+    zip(
+        UC_ROMAN,
+        range(1, len(UC_ROMAN) + 1)
+    )
+)
 
 
 # {1: 'I', 2: 'II',..., 20: 'XX'}
-UC_ROMAN_FROM_INT = {value: char for char, value in UC_ROMAN_TO_INT.items()}
+UC_ROMAN_FROM_INT = {
+    value: char
+    for char, value
+    in UC_ROMAN_TO_INT.items()
+}
 
 
 def is_upper_char(char: str) -> bool:

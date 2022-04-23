@@ -34,23 +34,30 @@ from ..data.figure_generators import FigureGenerator
 from ..utils.figure import Figure
 from ..utils.figure import Label
 
-from ..panel_splitting.evaluate import (PanelSplittingFigureResult,
-                                        panel_splitting_figure_eval,
-                                        panel_splitting_metrics)
+from ..panel_splitting.evaluate import (
+    PanelSplittingFigureResult,
+    panel_splitting_figure_eval,
+    panel_splitting_metrics
+)
 
-from ..label_recognition.evaluate import (MultiClassFigureResult,
-                                          label_recognition_figure_eval,
-                                          multi_class_metrics)
+from ..label_recognition.evaluate import (
+    MultiClassFigureResult,
+    label_recognition_figure_eval,
+    multi_class_metrics
+)
 
 from ..panel_segmentation.evaluate import panel_segmentation_figure_eval
 
-from ..caption_splitting.evaluate import (CaptionSplittingFigureResult,
-                                          caption_splitting_figure_eval,
-                                          caption_splitting_metrics)
+from ..caption_splitting.evaluate import (
+    CaptionSplittingFigureResult,
+    caption_splitting_figure_eval,
+    caption_splitting_metrics
+)
 
 
-def compound_figure_separation_figure_eval(figure: Figure,
-                                           stat_dict: dict[str, Any]):
+def compound_figure_separation_figure_eval(
+        figure: Figure,
+        stat_dict: dict[str, Any]):
     """
     Evaluate compound figure separation metrics on a single figure.
 
@@ -155,7 +162,8 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
 
     # Panel splitting
     psp_imageclef_acc, psp_precision, psp_recall, psp_map = panel_splitting_metrics(
-        results=panel_splitting_results)
+        results=panel_splitting_results
+    )
     metrics['panel_splitting'] = {
         'imageclef_accuracy': psp_imageclef_acc,
         'precision': psp_precision,
@@ -165,7 +173,8 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
 
     # Label recognition
     lrec_precision, lrec_recall, lrec_map = multi_class_metrics(
-        results=label_recognition_results)
+        results=label_recognition_results
+    )
     metrics['label_recognition'] = {
         'precision': lrec_precision,
         'recall': lrec_recall,
@@ -174,7 +183,8 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict:
 
     # Panel segmentation
     pseg_precision, pseg_recall, pseg_map = multi_class_metrics(
-        results=panel_segmentation_results)
+        results=panel_segmentation_results
+    )
     metrics['panel_segmentation'] = {
         'precision': pseg_precision,
         'recall': pseg_recall,

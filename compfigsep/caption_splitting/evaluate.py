@@ -103,14 +103,16 @@ def caption_splitting_figure_eval(figure: Figure) -> Optional[CaptionSplittingFi
                 # Compute the Levenshtein distance between the GT and the detection.
                 normalized_levenshtein_similarity += textdistance.levenshtein.normalized_similarity(
                     gt_subcaption,
-                    detected_subcaption)
+                    detected_subcaption
+                )
 
     if num_gt_labels > 0:
         # Normalize the socre over the number of GT subcaptions.
         normalized_levenshtein_similarity /= num_gt_labels
 
         return CaptionSplittingFigureResult(
-            normalized_levenshtein_similarity=normalized_levenshtein_similarity)
+            normalized_levenshtein_similarity=normalized_levenshtein_similarity
+        )
 
     # If the ground truth figure was not annotated (no GT labels), return None.
     return None
@@ -160,8 +162,11 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict[str, float]:
     with Parallel(n_jobs=-1) as parallel:
 
         results: list[CaptionSplittingFigureResult] = parallel(
-            [delayed(caption_splitting_figure_eval)(figure)
-             for figure in figure_generator()])
+            [
+                delayed(caption_splitting_figure_eval)(figure)
+                for figure in figure_generator()
+            ]
+        )
 
     lavenstein_metric: float = caption_splitting_metrics(results=results)
 

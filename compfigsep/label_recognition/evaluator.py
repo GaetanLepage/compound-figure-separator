@@ -49,11 +49,13 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
             dataset_name (str): The name of the data set to evaluate.
             export (bool):      Whether or not to export predictions as a JSON file.
         """
-        super().__init__(dataset_name=dataset_name,
-                         task_name='label_recog',
-                         evaluation_function=evaluate_detections,
-                         export=export,
-                         export_dir=export_dir)
+        super().__init__(
+            dataset_name=dataset_name,
+            task_name='label_recog',
+            evaluation_function=evaluate_detections,
+            export=export,
+            export_dir=export_dir
+        )
 
     def process(self,
                 inputs: list[dict],
@@ -104,7 +106,8 @@ class LabelRecogEvaluator(PanelSegAbstractEvaluator):
             detected_label: DetectedLabel = DetectedLabel(
                 text=CLASS_LABEL_MAPPING[detected_label_dict['cls']],
                 box=detected_label_dict['box'],
-                detection_score=detected_label_dict['score'])
+                detection_score=detected_label_dict['score']
+            )
 
             detected_labels.append(detected_label)
 

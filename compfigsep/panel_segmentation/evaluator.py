@@ -37,10 +37,12 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
     Perform the evaluation of panel segmentation metrics on a given test set.
     """
 
-    def __init__(self,
-                 dataset_name: str,
-                 export: bool = False,
-                 export_dir: str = None) -> None:
+    def __init__(
+            self,
+            dataset_name: str,
+            export: bool = False,
+            export_dir: str = None
+    ) -> None:
         """
         Init function.
         Call the init function of the parent class (PanelSegAbstractEvaluator).
@@ -123,11 +125,19 @@ class PanelSegEvaluator(PanelSegAbstractEvaluator):
             return
 
         # Convert panels and labels from dict to DetectedPanel objects
-        figure.detected_panels = [DetectedPanel(box=panel['box'],
-                                                detection_score=panel['score'])
-                                  for panel in detected_panels]
+        figure.detected_panels = [
+            DetectedPanel(
+                box=panel['box'],
+                detection_score=panel['score']
+            )
+            for panel in detected_panels
+        ]
 
-        figure.detected_labels = [DetectedLabel(text=CLASS_LABEL_MAPPING[label['label']],
-                                                box=label['box'],
-                                                detection_score=label['score'])
-                                  for label in detected_labels]
+        figure.detected_labels = [
+            DetectedLabel(
+                text=CLASS_LABEL_MAPPING[label['label']],
+                box=label['box'],
+                detection_score=label['score']
+            )
+            for label in detected_labels
+        ]

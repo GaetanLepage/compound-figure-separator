@@ -56,9 +56,11 @@ class PanelSegDatasetMapper:
         is_train (bool):                Whether we are currently training or testing.
     """
 
-    def __init__(self,
-                 cfg: CfgNode,
-                 is_train: bool = True) -> None:
+    def __init__(
+            self,
+            cfg: CfgNode,
+            is_train: bool = True
+    ) -> None:
         """
         Init method for class PanelSegDatasetMapper.
 
@@ -80,9 +82,11 @@ class PanelSegDatasetMapper:
         self.is_train = is_train
 
     @staticmethod
-    def _annotations_to_instances(panel_annos: list[dict],
-                                  label_annos: list[dict],
-                                  image_size: tuple) -> Instances:
+    def _annotations_to_instances(
+            panel_annos: list[dict],
+            label_annos: list[dict],
+            image_size: tuple
+    ) -> Instances:
         """
         Create an :class:`Instances` object used by the models,
         from instance annotations in the dataset dict.
@@ -103,10 +107,14 @@ class PanelSegDatasetMapper:
         # TODO remove
         # print("panel_instances:", panel_instances.get_fields())
 
-        panel_boxes_list: list = [BoxMode.convert(box=obj['bbox'],
-                                                  from_mode=obj['bbox_mode'],
-                                                  to_mode=BoxMode.XYXY_ABS)
-                                  for obj in panel_annos]
+        panel_boxes_list: list = [
+            BoxMode.convert(
+                box=obj['bbox'],
+                from_mode=obj['bbox_mode'],
+                to_mode=BoxMode.XYXY_ABS
+            )
+            for obj in panel_annos
+        ]
         panel_boxes = panel_instances.gt_boxes = Boxes(panel_boxes_list)
         panel_boxes.clip(image_size)
 
@@ -116,10 +124,14 @@ class PanelSegDatasetMapper:
         panel_instances.gt_classes = panel_classes_tensor
 
         # Labels (also handle case where there are no labels)
-        label_boxes_list: list = [BoxMode.convert(box=obj['bbox'],
-                                                  from_mode=obj['bbox_mode'],
-                                                  to_mode=BoxMode.XYXY_ABS)
-                                  for obj in label_annos]
+        label_boxes_list: list = [
+            BoxMode.convert(
+                box=obj['bbox'],
+                from_mode=obj['bbox_mode'],
+                to_mode=BoxMode.XYXY_ABS
+            )
+            for obj in label_annos
+        ]
 
         # Create an `Instances` object for labels
         label_instances: Instances = Instances(image_size)
@@ -153,10 +165,13 @@ class PanelSegDatasetMapper:
         # TODO simplify this
         if "annotations" not in dataset_dict:
             image, transforms = T.apply_transform_gens(
-                transform_gens=([self.crop_gen]
-                                if self.crop_gen
-                                else []) + self.tfm_gens,
-                img=image)
+                transform_gens=(
+                    [self.crop_gen]
+                    if self.crop_gen
+                    else []
+                ) + self.tfm_gens,
+                img=image
+            )
 
         else:
             # Crop around an instance if there are instances in the image.
@@ -190,9 +205,13 @@ class PanelSegDatasetMapper:
                 'bbox': obj['panel_bbox'],
                 'bbox_mode': obj['bbox_mode']
             }
-            panel_annos.append(utils.transform_instance_annotations(annotation=panel_obj,
-                                                                    transforms=transforms,
-                                                                    image_size=image_shape))
+            panel_annos.append(
+                utils.transform_instance_annotations(
+                    annotation=panel_obj,
+                    transforms=transforms,
+                    image_size=image_shape
+                )
+            )
 
             if 'label' in obj:
                 if 'label_bbox' in obj:
@@ -203,9 +222,12 @@ class PanelSegDatasetMapper:
                     }
 
                     label_annos.append(
-                        utils.transform_instance_annotations(annotation=label_obj,
-                                                             transforms=transforms,
-                                                             image_size=image_shape))
+                        utils.transform_instance_annotations(
+                            annotation=label_obj,
+                            transforms=transforms,
+                            image_size=image_shape
+                        )
+                    )
                 else:
                     logging.error("Error with annotation: %s has a 'label' field"
                                   " but no corresponding 'label_bbox' field.",
@@ -217,9 +239,11 @@ class PanelSegDatasetMapper:
                               obj['label'],
                               obj['label_bbox'])
 
-        panel_instances, label_instances = self._annotations_to_instances(panel_annos=panel_annos,
-                                                                          label_annos=label_annos,
-                                                                          image_size=image_shape)
+        panel_instances, label_instances = self._annotations_to_instances(
+            panel_annos=panel_annos,
+            label_annos=label_annos,
+            image_size=image_shape
+        )
 
         # dataset_dict["instances"] = utils.filter_empty_instances(instances)
 

@@ -71,7 +71,8 @@ def main(args: list[str] = None) -> None:
 
     # Create the figure generator handling JSON annotation files.
     figure_generator: FigureGenerator = JsonFigureGenerator(
-        json_path=parsed_args.json)
+        json_path=parsed_args.json
+    )
 
     # Evaluate the data set.
     evaluate_detections(figure_generator=figure_generator)

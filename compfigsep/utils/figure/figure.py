@@ -70,9 +70,11 @@ class Figure:
         detected_subfigures (list[DetectedSubFigure]):  Detected subfigure objects.
     """
 
-    def __init__(self,
-                 image_path: str,
-                 index: int) -> None:
+    def __init__(
+            self,
+            image_path: str,
+            index: int
+    ) -> None:
         """
         Init for a Figure object.  Neither the image or the annotations are loaded at this stage.
 
@@ -120,9 +122,11 @@ class Figure:
         self._logger = logging.getLogger(__name__)
 
     @classmethod
-    def from_dict(cls,
-                  figure_dict: dict,
-                  index: int) -> Figure:
+    def from_dict(
+            cls,
+            figure_dict: dict,
+            index: int
+    ) -> Figure:
         """
         Create a Figure object from a dictionnary.
 
@@ -132,31 +136,44 @@ class Figure:
         Returns:
             figure (Figure):    The resulting Figure object.
         """
-        figure = Figure(image_path=figure_dict['image_path'],
-                        index=index)
+        figure = Figure(
+            image_path=figure_dict['image_path'],
+            index=index
+        )
 
         figure.image_width = figure_dict['image_width']
         figure.image_height = figure_dict['image_height']
 
         if 'gt_subfigures' in figure_dict:
-            figure.gt_subfigures = [SubFigure.from_dict(subfigure_dict)
-                                    for subfigure_dict in figure_dict['gt_subfigures']]
+            figure.gt_subfigures = [
+                SubFigure.from_dict(subfigure_dict)
+                for subfigure_dict
+                in figure_dict['gt_subfigures']
+            ]
 
         if 'detected_subfigures' in figure_dict:
-            figure.detected_subfigures = [DetectedSubFigure.from_dict(detected_subfigure_dict)
-                                          for detected_subfigure_dict
-                                          in figure_dict['detected_subfigures']]
+            figure.detected_subfigures = [
+                DetectedSubFigure.from_dict(detected_subfigure_dict)
+                for detected_subfigure_dict
+                in figure_dict['detected_subfigures']
+            ]
 
         if 'caption' in figure_dict:
             figure.caption = figure_dict['caption']
 
         if 'detected_panels' in figure_dict:
-            figure.detected_panels = [DetectedPanel.from_dict(panel_dict)
-                                      for panel_dict in figure_dict['detected_panels']]
+            figure.detected_panels = [
+                DetectedPanel.from_dict(panel_dict)
+                for panel_dict
+                in figure_dict['detected_panels']
+            ]
 
         if 'detected_labels' in figure_dict:
-            figure.detected_labels = [DetectedLabel.from_dict(label_dict)
-                                      for label_dict in figure_dict['detected_labels']]
+            figure.detected_labels = [
+                DetectedLabel.from_dict(label_dict)
+                for label_dict
+                in figure_dict['detected_labels']
+            ]
 
         if 'detected_subcaptions' in figure_dict:
             figure.detected_subcaptions = figure_dict['detected_subcaptions']
@@ -188,9 +205,11 @@ class Figure:
 #########################
 # IMPORT GT ANNOTATIONS #
 #########################
-    def load_annotation_from_csv(self,
-                                 annotations_folder: str,
-                                 is_ground_truth: bool = True) -> None:
+    def load_annotation_from_csv(
+            self,
+            annotations_folder: str,
+            is_ground_truth: bool = True
+    ) -> None:
         """
         Load figure annotations from the given (individual) csv file.
 
@@ -223,14 +242,17 @@ class Figure:
 
                 # Panel segmentation + panel splitting
                 if len(row) == 11:
-                    label_coordinates: Box = cast(Box,
-                                                  tuple(int(x)
-                                                        for x in row[6:10]))
+                    label_coordinates: Box = cast(
+                        Box,
+                        tuple(int(x) for x in row[6:10])
+                    )
 
                     label_text: str = label_class.map_label(row[10])
 
-                    label: Label = Label(text=label_text,
-                                         box=label_coordinates)
+                    label: Label = Label(
+                        text=label_text,
+                        box=label_coordinates
+                    )
 
                 # Panel splitting only
                 elif len(row) != 6:
@@ -238,8 +260,10 @@ class Figure:
                                      f"Current row has length {len(row)}: {row}")
 
                 image_path: str = row[0]
-                panel_coordinates: Box = cast(Box,
-                                              tuple(int(x) for x in row[1:5]))
+                panel_coordinates: Box = cast(
+                    Box,
+                    tuple(int(x) for x in row[1:5])
+                )
                 panel_class: str = row[5]
                 assert panel_class == 'panel'
 
@@ -251,8 +275,10 @@ class Figure:
                 # Instanciate Panel object
                 panel: Panel = Panel(box=panel_coordinates)
 
-                subfigure: SubFigure = SubFigure(panel=panel,
-                                                 label=label)
+                subfigure: SubFigure = SubFigure(
+                    panel=panel,
+                    label=label
+                )
 
                 subfigures.append(subfigure)
 
@@ -260,11 +286,16 @@ class Figure:
         if is_ground_truth:
             self.gt_subfigures = subfigures
         else:
-            self.detected_subfigures = [DetectedSubFigure.from_normal_sub_figure(subfigure)
-                                        for subfigure in subfigures]
+            self.detected_subfigures = [
+                DetectedSubFigure.from_normal_sub_figure(subfigure)
+                for subfigure
+                in subfigures
+            ]
 
-    def load_annotation_from_iphotodraw(self,
-                                        annotation_file_path: str) -> None:
+    def load_annotation_from_iphotodraw(
+            self,
+            annotation_file_path: str
+    ) -> None:
         """
         Load iPhotoDraw annotation.
         Deal with PanelSeg data set.
@@ -408,8 +439,7 @@ class Figure:
                 label_rect = (x_min, y_min, x_max, y_max)
 
                 # Instanciate Label object.
-                label: Label = Label(text=label_text,
-                                     box=label_rect)
+                label: Label = Label(text=label_text, box=label_rect)
 
                 if label_text in label_dict:
                     label_dict[label_text].append(label)
@@ -418,8 +448,10 @@ class Figure:
 
             return label_dict
 
-        def match_panels_with_labels(panel_dict: dict[str, list[Panel]],
-                                     label_dict: dict[str, list[Label]]) -> list[SubFigure]:
+        def match_panels_with_labels(
+                panel_dict: dict[str, list[Panel]],
+                label_dict: dict[str, list[Label]]
+        ) -> list[SubFigure]:
             """
             Match both lists to get a unique list of subfigures.
 
@@ -439,8 +471,10 @@ class Figure:
             # First, extract unlabeled panels.
             if '' in panel_dict:
                 unlabeled_panels = panel_dict.pop('')
-                subfigures.extend(SubFigure(panel=panel)
-                                  for panel in unlabeled_panels)
+                subfigures.extend(
+                    SubFigure(panel=panel)
+                    for panel in unlabeled_panels
+                )
 
             # Case where the figure has no labels.
             if len(label_dict) == 0:
@@ -454,10 +488,16 @@ class Figure:
 
             # Case where the figure contains labels.
             # => Check that there are as many labeled panels as there are labels.
-            num_labeled_panels: int = sum(len(panels)
-                                          for panels in panel_dict.values())
-            num_labels: int = sum(len(labels)
-                                  for labels in label_dict.values())
+            num_labeled_panels: int = sum(
+                len(panels)
+                for panels
+                in panel_dict.values()
+            )
+            num_labels: int = sum(
+                len(labels)
+                for labels
+                in label_dict.values()
+            )
 
             if num_labeled_panels != num_labels:
                 self._logger.error("%s has a different number of labeled"
@@ -491,18 +531,25 @@ class Figure:
                                       annotation_file_path,
                                       label_text)
 
-                    subfigures.extend(beam_search.assign_labels_to_panels(
-                        panels=panel_dict[label_text],
-                        labels=label_dict[label_text],
-                        are_detections=False))
+                    subfigures.extend(
+                        beam_search.assign_labels_to_panels(
+                            panels=panel_dict[label_text],
+                            labels=label_dict[label_text],
+                            are_detections=False
+                        )
+                    )
 
                 # Single panel and label for the same label text.
                 else:
                     panel: Panel = panel_dict[label_text][0]
                     label: Label = label_dict[label_text][0]
 
-                    subfigures.append(SubFigure(panel=panel,
-                                                label=label))
+                    subfigures.append(
+                        SubFigure(
+                            panel=panel,
+                            label=label
+                        )
+                    )
 
             # Expand the panel_rect to always include label_rect.
             for subfigure in subfigures:
@@ -511,8 +558,10 @@ class Figure:
                         and subfigure.label.box is not None \
                         and subfigure.panel is not None:
 
-                    subfigure.panel.box = box.union(box_1=subfigure.panel.box,
-                                                    box_2=subfigure.label.box)
+                    subfigure.panel.box = box.union(
+                        box_1=subfigure.panel.box,
+                        box_2=subfigure.label.box
+                    )
 
             return subfigures
 
@@ -552,8 +601,10 @@ class Figure:
         # information of their matching label.
         # Save this list of panels in tha appropriate attribute of
         # the figure object.
-        self.gt_subfigures = match_panels_with_labels(panel_dict=panel_dict,
-                                                      label_dict=label_dict)
+        self.gt_subfigures = match_panels_with_labels(
+            panel_dict=panel_dict,
+            label_dict=label_dict
+        )
 
     def load_caption_annotation(self) -> None:
         """
@@ -599,8 +650,14 @@ class Figure:
             caption_dict[label] = text
 
         # Store the captions gt.
-        self.gt_subcaptions = OrderedDict(dict(sorted(caption_dict.items(),
-                                                      key=lambda item: item[0])))
+        self.gt_subcaptions = OrderedDict(
+            dict(
+                sorted(
+                    caption_dict.items(),
+                    key=lambda item: item[0]
+                )
+            )
+        )
 
         # Loop over gt_subfigures.
         for gt_subfigure in self.gt_subfigures:

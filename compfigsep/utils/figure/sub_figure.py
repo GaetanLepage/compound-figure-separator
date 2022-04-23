@@ -47,10 +47,12 @@ class SubFigure:
         caption (str):  Caption text.
     """
 
-    def __init__(self,
-                 panel: Panel = None,
-                 label: Label = None,
-                 caption: str = None) -> None:
+    def __init__(
+            self,
+            panel: Panel = None,
+            label: Label = None,
+            caption: str = None
+    ) -> None:
         """
         Init for a `SubFigure` object.
 
@@ -109,9 +111,11 @@ class SubFigure:
 
         return output_dict
 
-    def draw_elements(self,
-                      image: np.ndarray,
-                      color: Color = DEFAULT_GT_COLOR) -> None:
+    def draw_elements(
+            self,
+            image: np.ndarray,
+            color: Color = DEFAULT_GT_COLOR
+    ) -> None:
         """
         Draw the panel bounding box and (if applicable) its associated label bounding box.
         This function does not return anything but affect the given image by side-effect.
@@ -153,10 +157,12 @@ class DetectedSubFigure(SubFigure):
         detection_score (Optional[float]):  TODO. (in practice, same as panel detection score)
     """
 
-    def __init__(self,
-                 panel: DetectedPanel = None,
-                 label: DetectedLabel = None,
-                 caption: str = None) -> None:
+    def __init__(
+            self,
+            panel: DetectedPanel = None,
+            label: DetectedLabel = None,
+            caption: str = None
+    ) -> None:
         """
         Init for a `DetectedPanel` object.
 
@@ -174,8 +180,10 @@ class DetectedSubFigure(SubFigure):
         self.caption_is_positive: Optional[bool] = None
 
     @classmethod
-    def from_normal_sub_figure(cls,
-                               subfigure: SubFigure) -> DetectedSubFigure:
+    def from_normal_sub_figure(
+            cls,
+            subfigure: SubFigure
+    ) -> DetectedSubFigure:
         """
         Build a DetectedSubFigure object from a normal Figure object.
 

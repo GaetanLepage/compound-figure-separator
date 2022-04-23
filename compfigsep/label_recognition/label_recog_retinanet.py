@@ -73,12 +73,14 @@ def build_fpn_backbone(cfg: CfgNode,
     # Label FPN
     label_in_features: list[str] = cfg.MODEL.FPN.IN_FEATURES
     label_out_channels: list[str] = cfg.MODEL.FPN.OUT_CHANNELS
-    label_fpn: FPN = FPN(bottom_up=bottom_up,
-                         in_features=label_in_features,
-                         out_channels=label_out_channels,
-                         norm=cfg.MODEL.FPN.NORM,
-                         top_block=None,
-                         fuse_type=cfg.MODEL.FPN.FUSE_TYPE)
+    label_fpn: FPN = FPN(
+        bottom_up=bottom_up,
+        in_features=label_in_features,
+        out_channels=label_out_channels,
+        norm=cfg.MODEL.FPN.NORM,
+        top_block=None,
+        fuse_type=cfg.MODEL.FPN.FUSE_TYPE
+    )
 
     return label_fpn
 
@@ -113,8 +115,10 @@ class LabelRecogRetinaNet(nn.Module):
 
         backbone_fpn_output_shape: dict[str, ShapeSpec] = self.fpn.output_shape()
 
-        feature_shapes: list[ShapeSpec] = [backbone_fpn_output_shape[f]
-                                           for f in self.in_features]
+        feature_shapes: list[ShapeSpec] = [
+            backbone_fpn_output_shape[f]
+            for f in self.in_features
+        ]
         self.head: RetinaNetHead = RetinaNetHead(cfg, feature_shapes)
 
         self.anchor_generator: nn.Module = build_anchor_generator(cfg, feature_shapes)
@@ -130,10 +134,14 @@ class LabelRecogRetinaNet(nn.Module):
             allow_low_quality_matches=True
         )
 
-        self.register_buffer("pixel_mean",
-                             torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
-        self.register_buffer("pixel_std",
-                             torch.Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1))
+        self.register_buffer(
+            "pixel_mean",
+            torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1)
+        )
+        self.register_buffer(
+            "pixel_std",
+            torch.Tensor(cfg.MODEL.PIXEL_STD).view(-1, 1, 1)
+        )
 
         # In Detectron1, loss is normalized by number of foreground samples in the batch.
         # When batch size is 1 per GPU, #foreground has a large variance and
@@ -180,29 +188,39 @@ class LabelRecogRetinaNet(nn.Module):
         anchors: list[Boxes] = self.anchor_generator(features)
 
         # Transpose the Hi*Wi*A dimension to the middle:
-        pred_logits = [permute_to_N_HWA_K(x, K=self.num_classes)
-                       for x in pred_logits]
+        pred_logits = [
+            permute_to_N_HWA_K(x, K=self.num_classes)
+            for x in pred_logits
+        ]
 
-        pred_anchor_deltas = [permute_to_N_HWA_K(x, K=4)
-                              for x in pred_anchor_deltas]
+        pred_anchor_deltas = [
+            permute_to_N_HWA_K(x, K=4)
+            for x in pred_anchor_deltas
+        ]
 
         if self.training:
             gt_instances: Instances = [x['instances'].to(self.device) for x in batched_inputs]
-            gt_classes, gt_boxes = self.get_ground_truth(anchors=anchors,
-                                                         gt_instances=gt_instances)
-            losses: dict[str, float] = self.losses(anchors=anchors,
-                                                   pred_logits=pred_logits,
-                                                   gt_classes=gt_classes,
-                                                   pred_anchor_deltas=pred_anchor_deltas,
-                                                   gt_boxes=gt_boxes)
+            gt_classes, gt_boxes = self.get_ground_truth(
+                anchors=anchors,
+                gt_instances=gt_instances
+            )
+            losses: dict[str, float] = self.losses(
+                anchors=anchors,
+                pred_logits=pred_logits,
+                gt_classes=gt_classes,
+                pred_anchor_deltas=pred_anchor_deltas,
+                gt_boxes=gt_boxes
+            )
 
             return losses
 
         # Otherwise, do inference.
-        results: list[Instances] = self.inference(anchors=anchors,
-                                                  pred_logits=pred_logits,
-                                                  pred_anchor_deltas=pred_anchor_deltas,
-                                                  image_sizes=images.image_sizes)
+        results: list[Instances] = self.inference(
+            anchors=anchors,
+            pred_logits=pred_logits,
+            pred_anchor_deltas=pred_anchor_deltas,
+            image_sizes=images.image_sizes
+        )
 
         processed_results: list[dict[str, Any]] = []
         for results_per_image, input_per_image, image_size in zip(results,
@@ -210,17 +228,25 @@ class LabelRecogRetinaNet(nn.Module):
                                                                   images.image_sizes):
             height = input_per_image.get("height", image_size[0])
             width = input_per_image.get("width", image_size[1])
-            processed_results.append({"instances": detector_postprocess(results_per_image,
-                                                                        height,
-                                                                        width)})
+            processed_results.append(
+                {
+                    "instances": detector_postprocess(
+                        results=results_per_image,
+                        output_height=height,
+                        output_width=width
+                    )
+                }
+            )
         return processed_results
 
-    def losses(self,
-               anchors: list[Boxes],
-               pred_logits: list[Tensor],
-               gt_classes: list[Tensor],
-               pred_anchor_deltas: list[Tensor],
-               gt_boxes: list[Tensor]) -> dict[str, float]:
+    def losses(
+            self,
+            anchors: list[Boxes],
+            pred_logits: list[Tensor],
+            gt_classes: list[Tensor],
+            pred_anchor_deltas: list[Tensor],
+            gt_boxes: list[Tensor]
+    ) -> dict[str, float]:
         """
         Args:
             For `gt_classes` and `gt_anchors_deltas` parameters, see
@@ -243,16 +269,20 @@ class LabelRecogRetinaNet(nn.Module):
 
         # shape(anchors) = (R, 4)
         anchors_tensor: Tensor = type(anchors[0]).cat(anchors).tensor
-        gt_anchor_deltas: list[Tensor] = [self.box2box_transform.get_deltas(anchors_tensor, k)
-                                          for k in gt_boxes]
+        gt_anchor_deltas: list[Tensor] = [
+            self.box2box_transform.get_deltas(anchors_tensor, k)
+            for k in gt_boxes
+        ]
         # shape(gt_anchor_deltas) = (N, R, 4)
         gt_anchor_deltas_tensor: Tensor = torch.stack(gt_anchor_deltas)
 
         valid_mask: Tensor = gt_classes_tensor >= 0
         pos_mask: Tensor = (gt_classes_tensor >= 0) & (gt_classes_tensor != self.num_classes)
         num_pos_anchors: int = pos_mask.sum().item()
-        get_event_storage().put_scalar("num_pos_anchors",
-                                       num_pos_anchors / num_images)
+        get_event_storage().put_scalar(
+            "num_pos_anchors",
+            num_pos_anchors / num_images
+        )
         self.loss_normalizer = self.loss_normalizer_momentum * self.loss_normalizer \
             + (1 - self.loss_normalizer_momentum) * max(num_pos_anchors, 1)
 
@@ -283,10 +313,11 @@ class LabelRecogRetinaNet(nn.Module):
         return {"loss_cls": loss_cls, "loss_box_reg": loss_box_reg}
 
     @torch.no_grad()
-    def get_ground_truth(self,
-                         anchors: list[Boxes],
-                         gt_instances: list[Instances]) -> tuple[list[Tensor],
-                                                                 list[Tensor]]:
+    def get_ground_truth(
+            self,
+            anchors: list[Boxes],
+            gt_instances: list[Instances]
+    ) -> tuple[list[Tensor], list[Tensor]]:
         """
         Args:
             anchors (list[Boxes]):      A list of #feature level Boxes.
@@ -350,11 +381,13 @@ class LabelRecogRetinaNet(nn.Module):
 
         return gt_classes, matched_gt_boxes
 
-    def inference(self,
-                  anchors: list[Boxes],
-                  pred_logits: list[Tensor],
-                  pred_anchor_deltas: list[Tensor],
-                  image_sizes: list[torch.Size]) -> list[Instances]:
+    def inference(
+            self,
+            anchors: list[Boxes],
+            pred_logits: list[Tensor],
+            pred_anchor_deltas: list[Tensor],
+            image_sizes: list[torch.Size]
+    ) -> list[Instances]:
         """
         Args:
             box_cls, box_delta:             Same as the output of :meth:`RetinaNetHead.forward`
@@ -381,11 +414,13 @@ class LabelRecogRetinaNet(nn.Module):
 
         return results
 
-    def _inference_single_image(self,
-                                anchors: list[Boxes],
-                                box_cls: list[Tensor],
-                                box_delta: list[Tensor],
-                                image_size: tuple[int, int]) -> Instances:
+    def _inference_single_image(
+            self,
+            anchors: list[Boxes],
+            box_cls: list[Tensor],
+            box_delta: list[Tensor],
+            image_size: tuple[int, int]
+    ) -> Instances:
         """
         Single-image inference. Return bounding-box detection results by thresholding
         on scores and applying non-maximum suppression (NMS).
@@ -482,13 +517,20 @@ class LabelRecogRetinaNet(nn.Module):
         Returns:
             images (ImageList): An ImageList structure containing the preprocessed image data.
         """
-        images_: list[Tensor] = [x["image"].to(self.device)
-                                 for x in batched_inputs]
+        images_: list[Tensor] = [
+            x["image"].to(self.device)
+            for x in batched_inputs
+        ]
 
-        images_ = [(x - self.pixel_mean) / self.pixel_std
-                   for x in images_]
+        images_ = [
+            (x - self.pixel_mean) / self.pixel_std
+            for x in images_
+        ]
 
-        images: ImageList = ImageList.from_tensors(images_, self.fpn.size_divisibility)
+        images: ImageList = ImageList.from_tensors(
+            tensors=images_,
+            size_divisibility=self.fpn.size_divisibility
+        )
 
         return images
 
@@ -500,16 +542,20 @@ class RetinaNetHead(nn.Module):
     It has two subnets for the two tasks, with a common structure but separate parameters.
     """
 
-    def __init__(self,
-                 cfg: CfgNode,
-                 input_shape: list[ShapeSpec]) -> None:
+    def __init__(
+        self,
+        cfg: CfgNode,
+        input_shape: list[ShapeSpec]
+    ) -> None:
         super().__init__()
         in_channels = input_shape[0].channels
         num_classes: int = cfg.MODEL.RETINANET.NUM_CLASSES
         num_convs: int = cfg.MODEL.RETINANET.NUM_CONVS
         prior_prob: float = cfg.MODEL.RETINANET.PRIOR_PROB
-        num_anchors: list[int] = build_anchor_generator(cfg,
-                                                        input_shape).num_cell_anchors
+        num_anchors: list[int] = build_anchor_generator(
+            cfg,
+            input_shape
+        ).num_cell_anchors
 
         assert len(set(num_anchors)) == 1,\
             "Using different number of anchors between levels is not currently supported!"
@@ -561,25 +607,30 @@ class RetinaNetHead(nn.Module):
 
         # Initialization
         for modules in [
-                self.cls_subnet,
-                self.bbox_subnet,
-                self.cls_score,
-                self.bbox_pred]:
+            self.cls_subnet,
+            self.bbox_subnet,
+            self.cls_score,
+            self.bbox_pred
+        ]:
 
             for layer in modules.modules():
                 if isinstance(layer, nn.Conv2d):
                     torch.nn.init.normal_(tensor=layer.weight,
                                           mean=0,
                                           std=0.01)
-                    torch.nn.init.constant_(tensor=layer.bias,
-                                            val=0)
+                    torch.nn.init.constant_(tensor=layer.bias, val=0)
 
         # Use prior in model initialization to improve stability
         bias_value: float = -math.log((1 - prior_prob) / prior_prob)
-        torch.nn.init.constant_(self.cls_score.bias,
-                                bias_value)
+        torch.nn.init.constant_(
+            self.cls_score.bias,
+            bias_value
+        )
 
-    def forward(self, features: list[Tensor]) -> tuple[list[Tensor], list[Tensor]]:
+    def forward(
+            self,
+            features: list[Tensor]
+    ) -> tuple[list[Tensor], list[Tensor]]:
         """
         Arguments:
             features (list[Tensor]): FPN feature map tensors in high to low resolution.

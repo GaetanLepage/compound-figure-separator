@@ -33,14 +33,14 @@ from . import panel_filtering
 
 
 Detection = namedtuple(
-    "Detection",
+    'Detection',
     [
         'score',
         'is_true_positive'
     ]
 )
 PanelSplittingFigureResult = namedtuple(
-    "PanelSplittingFigureResult",
+    'PanelSplittingFigureResult',
     [
         'gt_count',
         'detected_count',
@@ -55,7 +55,7 @@ def panel_splitting_figure_eval(figure: Figure) -> PanelSplittingFigureResult:
     Evaluate panel splitting metrics on a single figure.
 
     Args:
-        figure (Figure):            The figure on which to evaluate the panel splitting task.
+        figure (Figure):    The figure on which to evaluate the panel splitting task.
 
     Returns:
         result (PanelSplittingFigureResult):    TODO
@@ -80,11 +80,18 @@ def panel_splitting_figure_eval(figure: Figure) -> PanelSplittingFigureResult:
         num_correct_iou_thresh += int(detected_panel.is_true_positive_iou)
 
         # Add this detection in the list
-        detections.append(Detection(score=detected_panel.detection_score,
-                                    is_true_positive=detected_panel.is_true_positive_iou))
+        detections.append(
+            Detection(
+                score=detected_panel.detection_score,
+                is_true_positive=detected_panel.is_true_positive_iou
+            )
+        )
 
     # ImageCLEF accuracy (based on overlap 0.66 threshold)
-    k: int = max(len(figure.gt_subfigures), len(figure.detected_panels))
+    k: int = max(
+        len(figure.gt_subfigures),
+        len(figure.detected_panels)
+    )
     imageclef_accuracy: float = num_correct_imageclef / k
 
     return PanelSplittingFigureResult(
@@ -127,15 +134,19 @@ def panel_splitting_metrics(results: list[PanelSplittingFigureResult]
         detections.extend(figure_result.detections)
 
     # Sort detections by decreasing detection scores
-    detections.sort(reverse=True,
-                    key=lambda detection: detection.score)
+    detections.sort(
+        reverse=True,
+        key=lambda detection: detection.score
+    )
 
     # 1) ImageCLEF accuracy
     imageclef_accuracy: float = sum_imageclef_accuracies / len(results)
 
     # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
-    true_positives: list[int] = [int(detection.is_true_positive)
-                                 for detection in detections]
+    true_positives: list[int] = [
+        int(detection.is_true_positive)
+        for detection in detections
+    ]
 
     overall_correct_count: int = sum(true_positives)
 
@@ -155,8 +166,10 @@ def panel_splitting_metrics(results: list[PanelSplittingFigureResult]
     cumulated_precisions: np.ndarray = cumsum_true_positives / cumsum_detections
 
     # mAP = area under the precison/recall curve (only one 'class' here)
-    mean_average_precision: float = compute_average_precision(recall=cumulated_recalls,
-                                                              precision=cumulated_precisions)
+    mean_average_precision: float = compute_average_precision(
+        recall=cumulated_recalls,
+        precision=cumulated_precisions
+    )
 
     return imageclef_accuracy, precision, recall, mean_average_precision
 

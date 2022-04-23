@@ -43,9 +43,11 @@ class IndividualCsvFigureGenerator(FigureGenerator):
         default_random_order (bool):    Wether to yield figures in a random order.
     """
 
-    def __init__(self,
-                 csv_annotation_directory: str,
-                 default_random_order: bool = True) -> None:
+    def __init__(
+            self,
+            csv_annotation_directory: str,
+            default_random_order: bool = True
+    ) -> None:
         """
         Args:
             csv_annotation_directory (str):     The path of the directory containing the csv

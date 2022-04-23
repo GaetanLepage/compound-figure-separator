@@ -67,9 +67,11 @@ class Trainer(DefaultTrainer):
     """
 
     @classmethod
-    def build_evaluator(cls,
-                        cfg: CfgNode,
-                        dataset_name: str) -> PanelSegEvaluator:
+    def build_evaluator(
+            cls,
+            cfg: CfgNode,
+            dataset_name: str
+    ) -> PanelSegEvaluator:
         """
         Builds the PanelSegEvaluator that will be called at test time.
 
@@ -80,13 +82,17 @@ class Trainer(DefaultTrainer):
         Returns:
             PanelSegEvaluator:  The evaluator for testing label recognition results.
         """
-        return PanelSegEvaluator(dataset_name=dataset_name,
-                                 export=True,
-                                 export_dir=cfg.OUTPUT_DIR)
+        return PanelSegEvaluator(
+            dataset_name=dataset_name,
+            export=True,
+            export_dir=cfg.OUTPUT_DIR
+        )
 
     @classmethod
-    def build_train_loader(cls,
-                           cfg: CfgNode) -> DataLoader:
+    def build_train_loader(
+            cls,
+            cfg: CfgNode
+    ) -> DataLoader:
         """
         Instanciate the training data loader.
 
@@ -96,14 +102,21 @@ class Trainer(DefaultTrainer):
         Returns:
             a DataLoader yielding formatted training examples.
         """
-        mapper: PanelSegDatasetMapper = PanelSegDatasetMapper(cfg, is_train=True)
-        return build_detection_train_loader(cfg,
-                                            mapper=mapper)
+        mapper: PanelSegDatasetMapper = PanelSegDatasetMapper(
+            cfg=cfg,
+            is_train=True
+        )
+        return build_detection_train_loader(
+            cfg,
+            mapper=mapper
+        )
 
     @classmethod
-    def build_test_loader(cls,
-                          cfg: CfgNode,
-                          dataset_name: str) -> DataLoader:
+    def build_test_loader(
+            cls,
+            cfg: CfgNode,
+            dataset_name: str
+    ) -> DataLoader:
         """
         Instanciate the test data loader.
 
@@ -114,10 +127,15 @@ class Trainer(DefaultTrainer):
         Returns:
             a DataLoader yielding formatted test examples.
         """
-        mapper: PanelSegDatasetMapper = PanelSegDatasetMapper(cfg, is_train=False)
-        return build_detection_test_loader(cfg,
-                                           dataset_name=dataset_name,
-                                           mapper=mapper)
+        mapper: PanelSegDatasetMapper = PanelSegDatasetMapper(
+            cfg=cfg,
+            is_train=False
+        )
+        return build_detection_test_loader(
+            cfg,
+            dataset_name=dataset_name,
+            mapper=mapper
+        )
 
     def build_hooks(self) -> list[HookBase]:
         """
@@ -173,8 +191,10 @@ class Trainer(DefaultTrainer):
         model: PanelSegRetinaNet = PanelSegRetinaNet(cfg)
         model.to(torch.device(cfg.MODEL.DEVICE))
 
-        logger: Logger = setup_logger(name=__name__,
-                                      distributed_rank=comm.get_rank())
+        logger: Logger = setup_logger(
+            name=__name__,
+            distributed_rank=comm.get_rank()
+        )
         logger.info("Model:\n%s", model)
 
         return model
@@ -248,9 +268,13 @@ def main(args: Namespace) -> dict:
         model: nn.Module = Trainer.build_model(cfg)
 
         # Load the latest weights
-        DetectionCheckpointer(model,
-                              save_dir=cfg.OUTPUT_DIR).resume_or_load(cfg.MODEL.WEIGHTS,
-                                                                      resume=args.resume)
+        DetectionCheckpointer(
+            model=model,
+            save_dir=cfg.OUTPUT_DIR
+        ).resume_or_load(
+            path=cfg.MODEL.WEIGHTS,
+            resume=args.resume
+        )
         res = Trainer.test(cfg, model)
         if comm.is_main_process():
             verify_results(cfg, res)

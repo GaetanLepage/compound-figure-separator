@@ -26,8 +26,10 @@ Function to compute the average precision.
 import numpy as np
 
 
-def compute_average_precision(recall: np.ndarray,
-                              precision: np.ndarray) -> float:
+def compute_average_precision(
+        recall: np.ndarray,
+        precision: np.ndarray
+) -> float:
     """
     Compute the average precision as the area under the precision/recall curve.
     This computation method is the one used for PascalVOC 2012 challenge.

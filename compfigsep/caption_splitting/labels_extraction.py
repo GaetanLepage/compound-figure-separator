@@ -61,11 +61,13 @@ def label_identification(caption: str) -> dict:
     }
 
     # Detect alphabetical labels.
-    characters: list[str] = [re.sub(pattern=r'[().:]',
-                                    repl='',
-                                    string=raw[0])
-                             for raw
-                             in regex_definitions.RE_CHARACTERS.findall(caption)]
+    characters: list[str] = [
+        re.sub(pattern=r'[().:]',
+               repl='',
+               string=raw[0])
+        for raw
+        in regex_definitions.RE_CHARACTERS.findall(caption)
+    ]
 
     # Remove duplicates.
     characters = list(set(characters))
@@ -77,11 +79,14 @@ def label_identification(caption: str) -> dict:
     output_dict['labels']['characters'] = characters
 
     # Detect roman numbers.
-    romans: list[str] = [re.sub(pattern=r'[().:]',
-                                repl='',
-                                string=raw[0])
-                         for raw in
-                         regex_definitions.RE_ROMAN.findall(caption)]
+    romans: list[str] = [
+        re.sub(pattern=r'[().:]',
+               repl='',
+               string=raw[0])
+        for raw in
+        regex_definitions.RE_ROMAN.findall(caption)
+    ]
+
     # Remove duplicates.
     romans = list(set(romans))
 
@@ -92,11 +97,13 @@ def label_identification(caption: str) -> dict:
     output_dict['labels']['romans'] = romans
 
     # Detect numerical labels.
-    digits: list[str] = [re.sub(pattern=r'[().:]',
-                                repl='',
-                                string=raw[0])
-                         for raw
-                         in regex_definitions.RE_DIGITS.findall(caption)]
+    digits: list[str] = [
+        re.sub(pattern=r'[().:]',
+               repl='',
+               string=raw[0])
+        for raw
+        in regex_definitions.RE_DIGITS.findall(caption)
+    ]
 
     # Remove duplicates.
     digits = list(set(digits))
@@ -110,13 +117,18 @@ def label_identification(caption: str) -> dict:
     # Get hyphens and conjunctions.
     # Extract first element of each tuple and replace the tuple with it.
     # Hyphen range.
-    hyphen_vector: list[str] = [hyphen_tuple[0]
-                                for hyphen_tuple
-                                in regex_definitions.RE_HYPHEN.findall(caption)]
+    hyphen_vector: list[str] = [
+        hyphen_tuple[0]
+        for hyphen_tuple
+        in regex_definitions.RE_HYPHEN.findall(caption)
+    ]
+
     # Conjunction range.
-    conj_vector: list[str] = [conj_tuple[0]
-                              for conj_tuple
-                              in regex_definitions.RE_CONJUNCTIONS.findall(caption)]
+    conj_vector: list[str] = [
+        conj_tuple[0]
+        for conj_tuple
+        in regex_definitions.RE_CONJUNCTIONS.findall(caption)
+    ]
 
     # Store the ranges in the output dict.
     output_dict['ranges']['hyphen'] = hyphen_vector
@@ -207,19 +219,23 @@ def label_expansion(label_dict: dict) -> list[str]:
 
     # ==> Hyphen ranges.
     # Clean the elements and expand the sequences hyphen range.
-    hyphen_cleaned: list[str] = [re.sub(pattern=r'[().:]',
-                                        repl='',
-                                        string=element)
-                                 for element in label_dict['ranges']['hyphen']]
+    hyphen_cleaned: list[str] = [
+        re.sub(pattern=r'[().:]',
+               repl='',
+               string=element)
+        for element in label_dict['ranges']['hyphen']
+    ]
 
     ranges = _expand_hyphen_range(hyphen_expressions=hyphen_cleaned)
 
     # ==> Conjunction ranges.
     # Clean the identified patterns from useless characters.
-    conj_range: list[str] = [re.sub(pattern=r'[().:,]',
-                                    repl=' ',
-                                    string=element.replace('and', ' '))
-                             for element in label_dict['ranges']['conj']]
+    conj_range: list[str] = [
+        re.sub(pattern=r'[().:,]',
+               repl=' ',
+               string=element.replace('and', ' '))
+        for element in label_dict['ranges']['conj']
+    ]
 
     # Append elements to ranges.
     for element in conj_range:

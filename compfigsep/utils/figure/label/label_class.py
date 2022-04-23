@@ -76,7 +76,9 @@ LABEL_CLASS_MAPPING: dict[str, int] = {
     't': 49,
 }
 CLASS_LABEL_MAPPING: dict[int, str] = {
-    v: k for k, v in LABEL_CLASS_MAPPING.items()
+    v: k
+    for k, v
+    in LABEL_CLASS_MAPPING.items()
 }
 
 

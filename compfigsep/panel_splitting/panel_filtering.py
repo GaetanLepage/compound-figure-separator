@@ -27,8 +27,10 @@ from ..utils.figure.panel import DetectedPanel
 from ..utils import box
 
 
-def filter_panels(panel_list: list[DetectedPanel],
-                  overlap_threshold: float = 0.2) -> list[DetectedPanel]:
+def filter_panels(
+        panel_list: list[DetectedPanel],
+        overlap_threshold: float = 0.2
+) -> list[DetectedPanel]:
     """
     TODO
 
@@ -65,6 +67,8 @@ def filter_panels(panel_list: list[DetectedPanel],
                 mask[index_1] = False
                 break
 
-    return [panel for index, panel
-            in enumerate(panel_list)
-            if mask[index]]
+    return [
+        panel for index, panel
+        in enumerate(panel_list)
+        if mask[index]
+    ]

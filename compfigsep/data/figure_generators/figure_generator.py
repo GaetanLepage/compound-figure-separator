@@ -104,10 +104,12 @@ class StackedFigureGenerator(FigureGenerator):
         default_random_order (bool):    Wether to yield figures in a random order.
     """
 
-    def __init__(self,
-                 base_figure_generator: FigureGenerator,
-                 function: Callable[[Figure], None],
-                 default_random_order: bool = True) -> None:
+    def __init__(
+            self,
+            base_figure_generator: FigureGenerator,
+            function: Callable[[Figure], None],
+            default_random_order: bool = True
+    ) -> None:
         """
         Args:
             base_figure_generator (FigureGenerator):    A figure generator yielding Figure

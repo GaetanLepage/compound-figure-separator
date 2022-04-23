@@ -57,9 +57,11 @@ class Trainer(DefaultTrainer):
     """
 
     @classmethod
-    def build_evaluator(cls,
-                        cfg: CfgNode,
-                        dataset_name: str) -> PanelSplitEvaluator:
+    def build_evaluator(
+            cls,
+            cfg: CfgNode,
+            dataset_name: str
+    ) -> PanelSplitEvaluator:
         """
         Builds the PanelSplitEvaluator that will be called at test time.
 
@@ -90,8 +92,10 @@ class Trainer(DefaultTrainer):
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            data_set_mapper: DatasetMapper = DatasetMapper.from_config(cfg=self.cfg,
-                                                                       is_train=True)
+            data_set_mapper: DatasetMapper = DatasetMapper.from_config(
+                cfg=self.cfg,
+                is_train=True
+            )
 
             data_loader: DataLoader = build_detection_test_loader(
                 cfg=self.cfg,
@@ -102,7 +106,8 @@ class Trainer(DefaultTrainer):
             loss_eval_hook: LossEvalHook = LossEvalHook(
                 eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
                 model=self.model,
-                data_loader=data_loader)
+                data_loader=data_loader
+            )
 
             hooks.insert(-1, loss_eval_hook)
 

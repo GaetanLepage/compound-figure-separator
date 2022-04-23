@@ -68,7 +68,11 @@ def register_panel_segmentation_dataset(dataset_name):
         )
     )
 
-    MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator)
+    MetadataCatalog.get(
+        name=dataset_name
+    ).set(
+        figure_generator=figure_generator
+    )
 
     # TODO remove if it is indeed useless
     # Add the class names as metadata.

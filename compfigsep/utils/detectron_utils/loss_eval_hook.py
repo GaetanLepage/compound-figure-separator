@@ -43,11 +43,12 @@ class LossEvalHook(HookBase):
     Custom Hook (subclassing detectron2's `HookBase`) to evaluate loss on the validation set.
     """
 
-    def __init__(self,
-                 eval_period: int,
-                 model: nn.Module,
-                 data_loader: DataLoader
-                 ) -> None:
+    def __init__(
+            self,
+            eval_period: int,
+            model: nn.Module,
+            data_loader: DataLoader
+    ) -> None:
         """
         Init function.
 
@@ -119,8 +120,10 @@ class LossEvalHook(HookBase):
         self._logger.info("Validation loss : {mean_loss}")
 
         # Store the loss value for it to be logged and displayed in TensorBoard.
-        self.trainer.storage.put_scalar('validation_loss',
-                                        mean_loss)
+        self.trainer.storage.put_scalar(
+            'validation_loss',
+            mean_loss
+        )
         comm.synchronize()
 
         return mean_loss

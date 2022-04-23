@@ -134,16 +134,20 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
 
         num_subfigures: int = len(figure.gt_subfigures)
 
-        label_text_list: list[str] = [label.strip()
-                                      for label in matched_row[2].split(',')]
+        label_text_list: list[str] = [
+            label.strip()
+            for label in matched_row[2].split(',')
+        ]
 
         print("annotation label_text_list:", label_text_list)
 
-        gt_label_list: list[str] = [subfigure.label.text
-                                    if hasattr(subfigure, 'label')
-                                    and subfigure.label is not None
-                                    else '_'
-                                    for subfigure in figure.gt_subfigures]
+        gt_label_list: list[str] = [
+            subfigure.label.text
+            if hasattr(subfigure, 'label')
+            and subfigure.label is not None
+            else '_'
+            for subfigure in figure.gt_subfigures
+        ]
 
         print("raw GT label list:", gt_label_list)
 
@@ -167,9 +171,11 @@ def ingest_caption_splitting_annotations(figure_generator: FigureGenerator,
 
         assert sorted(label_text_list) == sorted(gt_label_list)
 
-        subcaptions: list[str] = [cell_text.strip()
-                                  for cell_text in matched_row[3:]
-                                  if cell_text.strip() != '']
+        subcaptions: list[str] = [
+            cell_text.strip()
+            for cell_text in matched_row[3:]
+            if cell_text.strip() != ''
+        ]
 
         ################################################
         # Case 1: There is no labels : ['_', '_', '_'] #

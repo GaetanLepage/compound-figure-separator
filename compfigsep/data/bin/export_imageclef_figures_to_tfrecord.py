@@ -84,8 +84,10 @@ def main(args: list[str] = None) -> None:
     )
 
     # Export figures to csv
-    export_figures_to_tf_record(figure_generator=figure_generator,
-                                tf_record_filename=parsed_args.output_tfrecord)
+    export_figures_to_tf_record(
+        figure_generator=figure_generator,
+        tf_record_filename=parsed_args.output_tfrecord
+    )
 
 
 if __name__ == '__main__':

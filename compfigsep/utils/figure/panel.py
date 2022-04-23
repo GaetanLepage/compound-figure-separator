@@ -53,8 +53,10 @@ class Panel:
         if isinstance(box, np.ndarray):
             box = box.tolist()
 
-        self.box: Box = cast(Box,
-                             tuple(round(val) for val in box))
+        self.box: Box = cast(
+            Box,
+            tuple(round(val) for val in box)
+        )
 
     @classmethod
     def from_dict(cls, panel_dict: dict) -> Panel:
@@ -83,9 +85,11 @@ class Panel:
 
         return output_dict
 
-    def draw(self,
-             image: np.ndarray,
-             color: Color = DEFAULT_GT_COLOR) -> None:
+    def draw(
+            self,
+            image: np.ndarray,
+            color: Color = DEFAULT_GT_COLOR
+    ) -> None:
         """
         Draw the panel bounding box.
         The image is affected by side-effect.
@@ -129,9 +133,11 @@ class DetectedPanel(Panel):
                                                         (ImageCLEF panel splitting criteria).
     """
 
-    def __init__(self,
-                 box: Box,
-                 detection_score: float = None) -> None:
+    def __init__(
+            self,
+            box: Box,
+            detection_score: float = None
+    ) -> None:
         """
         Args:
             box (Box):                  The bounding box localizing the panel on the image.
@@ -215,9 +221,11 @@ class DetectedPanel(Panel):
 
         return output_dict
 
-    def draw(self,
-             image: np.ndarray,
-             color: Color = DEFAULT_DETECTION_COLOR) -> None:
+    def draw(
+            self,
+            image: np.ndarray,
+            color: Color = DEFAULT_DETECTION_COLOR
+    ) -> None:
         """
         Draw the panel bounding box on the image.
         the image is affected by side-effect.

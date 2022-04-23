@@ -113,14 +113,19 @@ def panel_segmentation_figure_eval(figure: Figure) -> MultiClassFigureResult:
 
         # Add this detection in the sorted list.
         detections_by_class[cls].append(
-            Detection(score=detected_subfigure.detection_score,
-                      is_true_positive=detected_subfigure.is_true_positive))
+            Detection(
+                score=detected_subfigure.detection_score,
+                is_true_positive=detected_subfigure.is_true_positive
+            )
+        )
 
-    return MultiClassFigureResult(gt_count=gt_count,
-                                  gt_count_by_class=gt_count_by_class,
-                                  detected_count=detected_count,
-                                  detections_by_class=detections_by_class,
-                                  correct_count=num_correct)
+    return MultiClassFigureResult(
+        gt_count=gt_count,
+        gt_count_by_class=gt_count_by_class,
+        detected_count=detected_count,
+        detections_by_class=detections_by_class,
+        correct_count=num_correct
+    )
 
 
 def evaluate_detections(figure_generator: FigureGenerator) -> dict:

@@ -96,7 +96,15 @@ def register_panel_splitting_dataset(dataset_name: str):
     )
 
     # Provide the figure generator to the DataSet for later evaluation.
-    MetadataCatalog.get(name=dataset_name).set(figure_generator=figure_generator)
+    MetadataCatalog.get(
+        name=dataset_name
+    ).set(
+        figure_generator=figure_generator
+    )
 
     # Add the class names (here, only 'panel') as metadata.
-    MetadataCatalog.get(name=dataset_name).set(thing_classes=["panel"])
+    MetadataCatalog.get(
+        name=dataset_name
+    ).set(
+        thing_classes=["panel"]
+    )

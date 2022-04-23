@@ -73,8 +73,7 @@ def get_width_and_height(box: Box) -> tuple[int, int]:
     return width, height
 
 
-def union(box_1: Box,
-          box_2: Box) -> Box:
+def union(box_1: Box, box_2: Box) -> Box:
     """
     Compute the coordinates of the smallest box containing both box_1 and box_2.
 
@@ -96,8 +95,7 @@ def union(box_1: Box,
             y_union + height_union)
 
 
-def intersection(box_1: Box,
-                 box_2: Box) -> Box:
+def intersection(box_1: Box, box_2: Box) -> Box:
     """
     Compute the coordinates of the intersection of ractangles box_1 and box_2.
 
@@ -137,9 +135,11 @@ def area(box: Box) -> int:
     return (box[2] - box[0]) * (box[3] - box[1])
 
 
-def union_area(box_1: Box,
-               box_2: Box,
-               area_intersection: int) -> int:
+def union_area(
+        box_1: Box,
+        box_2: Box,
+        area_intersection: int
+) -> int:
     """
     Compute the area of the union of the ractangles box_1 and box_2.
 
@@ -159,8 +159,7 @@ def union_area(box_1: Box,
     return area_union
 
 
-def intersection_area(box_1: Box,
-                      box_2: Box) -> int:
+def intersection_area(box_1: Box, box_2: Box) -> int:
     """
     Compute the area of the intersection between box_1 and box_2.
 
@@ -182,8 +181,7 @@ def intersection_area(box_1: Box,
     return width_intersect * height_intersect
 
 
-def iou(box_1: Box,
-        box_2: Box) -> float:
+def iou(box_1: Box, box_2: Box) -> float:
     """
     Compute the 'intersection over union' (IoU) between box_1 and box_2.
 

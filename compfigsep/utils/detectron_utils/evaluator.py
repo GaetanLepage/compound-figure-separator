@@ -61,12 +61,14 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
                                             results.
     """
 
-    def __init__(self,
-                 dataset_name: str,
-                 task_name: str,
-                 evaluation_function: Callable = None,
-                 export: bool = True,
-                 export_dir: str = None) -> None:
+    def __init__(
+            self,
+            dataset_name: str,
+            task_name: str,
+            evaluation_function: Callable = None,
+            export: bool = True,
+            export_dir: str = None
+    ) -> None:
         """
         Init function.
 
@@ -100,8 +102,10 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         # Export
         self.export = export
         if export_dir is None:
-            export_dir = os.path.join(MODULE_DIR,
-                                      task_name + '/output/')
+            export_dir = os.path.join(
+                MODULE_DIR,
+                task_name + '/output/'
+            )
         self.export_dir = export_dir
 
     def reset(self) -> None:
@@ -111,9 +115,11 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
         """
         self._predictions = dict()
 
-    def process(self,
-                inputs: list[dict],
-                outputs: list[dict]) -> None:
+    def process(
+            self,
+            inputs: list[dict],
+            outputs: list[dict]
+    ) -> None:
         """
         Process the pair of inputs and outputs.
         If they contain batches, the pairs can be consumed one-by-one using `zip`:
@@ -151,8 +157,10 @@ class PanelSegAbstractEvaluator(DatasetEvaluator):
             figure_generator (FigureGenerator): FigureGenerator yielding Figure objects augmented
                                                     with predictions.
         """
-        return StackedFigureGenerator(base_figure_generator=self._figure_generator,
-                                      function=self._predict)
+        return StackedFigureGenerator(
+            base_figure_generator=self._figure_generator,
+            function=self._predict
+        )
 
     def evaluate(self) -> Optional[dict[str, dict[str, int]]]:
         """

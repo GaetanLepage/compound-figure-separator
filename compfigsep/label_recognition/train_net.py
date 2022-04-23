@@ -61,9 +61,11 @@ class Trainer(DefaultTrainer):
     """
 
     @classmethod
-    def build_evaluator(cls,
-                        cfg: CfgNode,
-                        dataset_name: str) -> LabelRecogEvaluator:
+    def build_evaluator(
+            cls,
+            cfg: CfgNode,
+            dataset_name: str
+    ) -> LabelRecogEvaluator:
         """
         Builds the LabelRecogEvaluator that will be called at test time.
 
@@ -95,21 +97,24 @@ class Trainer(DefaultTrainer):
 
         # We add our custom validation hook
         if self.cfg.DATASETS.VALIDATION != "":
-            data_set_mapper: DatasetMapper = DatasetMapper.from_config(cfg=self.cfg,
-                                                                       is_train=True)
+            data_set_mapper: DatasetMapper = DatasetMapper.from_config(
+                cfg=self.cfg,
+                is_train=True
+            )
 
             data_loader: DataLoader = build_detection_test_loader(
                 cfg=self.cfg,
                 dataset_name=self.cfg.DATASETS.VALIDATION,
-                mapper=data_set_mapper)
+                mapper=data_set_mapper
+            )
 
             loss_eval_hook: LossEvalHook = LossEvalHook(
                 eval_period=self.cfg.VALIDATION.VALIDATION_PERIOD,
                 model=self.model,
-                data_loader=data_loader)
+                data_loader=data_loader
+            )
 
-            hooks.insert(index=-1,
-                         obj=loss_eval_hook)
+            hooks.insert(index=-1, obj=loss_eval_hook)
 
         return hooks
 
@@ -126,8 +131,10 @@ class Trainer(DefaultTrainer):
         """
         model = LabelRecogRetinaNet(cfg)
         model.to(torch.device(cfg.MODEL.DEVICE))
-        logger = setup_logger(name=__name__,
-                              distributed_rank=comm.get_rank())
+        logger = setup_logger(
+            name=__name__,
+            distributed_rank=comm.get_rank()
+        )
         logger.info("Model:\n%s", model)
         return model
 
@@ -207,8 +214,10 @@ def main(parsed_args: Namespace) -> dict:
         )
         res: dict = Trainer.test(cfg, model)
         if comm.is_main_process():
-            verify_results(cfg=cfg,
-                           results=res)
+            verify_results(
+                cfg=cfg,
+                results=res
+            )
         return res
 
     # Training

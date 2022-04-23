@@ -50,8 +50,10 @@ def parse_args(args: list[str]) -> Namespace:
     """
     parser = ArgumentParser(description="Evaluate label recognition detections.")
 
-    add_json_arg(parser=parser,
-                 folder_default_relative_path='label_recognition/output/')
+    add_json_arg(
+        parser=parser,
+        folder_default_relative_path='label_recognition/output/'
+    )
 
     return parser.parse_args(args)
 

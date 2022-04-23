@@ -25,6 +25,7 @@ Additional configuration options for PanelSegRetinaNet.
 
 from detectron2.config import CfgNode
 
+
 def add_panel_seg_config(cfg: CfgNode):
     """
     Add config for the panel seg adapted retinanet.

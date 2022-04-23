@@ -36,7 +36,7 @@ from ..utils.average_precision import compute_average_precision
 from ..panel_splitting.evaluate import Detection
 
 MultiClassFigureResult = namedtuple(
-    "MultiClassFigureResult",
+    'MultiClassFigureResult',
     [
         'gt_count',
         'gt_count_by_class',
@@ -109,8 +109,10 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
 
         # Add this detection in the sorted list
         detections_by_class[cls].append(
-            Detection(score=detected_label.detection_score,
-                      is_true_positive=detected_label.is_true_positive))
+            Detection(
+                score=detected_label.detection_score,
+                is_true_positive=detected_label.is_true_positive)
+            )
 
     # TODO remove
     # print("Number of correct detections :", num_correct)
@@ -176,9 +178,11 @@ def multi_class_metrics(results: list[MultiClassFigureResult]) -> tuple[float, f
     for cls in detections_by_class:
 
         # true_positives = [1, 0, 1, 1, 1, 0, 1, 0, 0...] with a lot of 1 hopefully ;)
-        class_true_positives: list[int] = [int(detection.is_true_positive)
-                                           for detection
-                                           in detections_by_class[cls]]
+        class_true_positives: list[int] = [
+            int(detection.is_true_positive)
+            for detection
+            in detections_by_class[cls]
+        ]
 
         class_detected_count: int = len(detections_by_class[cls])
         class_gt_count: int = gt_count_by_class[cls] \
@@ -221,8 +225,10 @@ def evaluate_detections(figure_generator: FigureGenerator) -> dict[str, float]:
         metrics (dict[str, float]): A dict containing the computed metrics.
     """
     # List containing the evaluation statistics for each figure.
-    results: list[MultiClassFigureResult] = [label_recognition_figure_eval(figure)
-                                             for figure in figure_generator()]
+    results: list[MultiClassFigureResult] = [
+        label_recognition_figure_eval(figure)
+        for figure in figure_generator()
+    ]
 
     precision, recall, mean_average_precision = multi_class_metrics(results=results)
 

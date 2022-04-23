@@ -54,7 +54,8 @@ def parse_args(args: list[str]) -> Namespace:
         namespace (Namespace):  Populated namespace.
     """
     parser: ArgumentParser = ArgumentParser(
-        description="Convert the ImageCLEF dataset to a TFRecord file.")
+        description="Convert the ImageCLEF dataset to a TFRecord file."
+    )
 
     parser.add_argument(
         '--file_list_txt',
@@ -86,8 +87,10 @@ def get_captions(file_list_txt: str,
 
         # Read list of image files
         with open(file_list_txt, 'r') as list_file:
-            image_paths = [os.path.join(DATA_DIR, path)
-                           for path in list_file.read().splitlines()]
+            image_paths = [
+                os.path.join(DATA_DIR, path)
+                for path in list_file.read().splitlines()
+            ]
 
     pmc_id: str = ''
     for image_path in progressbar.progressbar(image_paths):
@@ -184,8 +187,10 @@ def main(args: list[str] = None) -> None:
     parsed_args: Namespace = parse_args(args)
 
     # Get the captions
-    get_captions(file_list_txt=parsed_args.file_list_txt,
-                 override=parsed_args.override)
+    get_captions(
+        file_list_txt=parsed_args.file_list_txt,
+        override=parsed_args.override
+    )
 
 
 if __name__ == '__main__':

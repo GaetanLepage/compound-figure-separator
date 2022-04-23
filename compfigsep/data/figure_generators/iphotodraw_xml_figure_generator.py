@@ -79,12 +79,14 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
         default_random_order (bool):    Wether to yield figures in a random order.
     """
 
-    def __init__(self,
-                 file_list_txt: str = None,
-                 image_directory_path: str = None,
-                 image_paths_list: list[str] = None,
-                 caption_annotation_file: str = None,
-                 default_random_order: bool = False) -> None:
+    def __init__(
+            self,
+            file_list_txt: str = None,
+            image_directory_path: str = None,
+            image_paths_list: list[str] = None,
+            caption_annotation_file: str = None,
+            default_random_order: bool = False
+    ) -> None:
         """
         Args:
             file_list_txt (str):            The path of the list of figures which annotations
@@ -107,16 +109,19 @@ class IphotodrawXmlFigureGenerator(FigureGenerator):
             with open(file_list_txt, 'r') as eval_list_file:
                 eval_list_lines = eval_list_file.read().splitlines()
 
-            self.image_paths = [line if os.path.isfile(line)
-                                else os.path.join('data/', line)
-                                for line in eval_list_lines]
+            self.image_paths = [
+                line if os.path.isfile(line)
+                else os.path.join('data/', line)
+                for line in eval_list_lines
+            ]
 
         # If a path was provided, list the image files in this directory.
         elif image_directory_path is not None:
 
-            self.image_paths = [f for f in os.listdir(image_directory_path)
-                                if f.endswith('.jpg') and os.path.isfile(
-                                    os.path.join(image_directory_path, f))]
+            self.image_paths = [
+                f for f in os.listdir(image_directory_path)
+                if f.endswith('.jpg') and os.path.isfile(os.path.join(image_directory_path, f))
+            ]
 
         else:
             logging.error("Either one of the options has to be set.")

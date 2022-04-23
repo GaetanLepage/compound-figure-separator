@@ -36,10 +36,12 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
     Perform the evaluation of panel splitting metrics on a given test set.
     """
 
-    def __init__(self,
-                 dataset_name: str,
-                 export: bool = False,
-                 export_dir: str = None):
+    def __init__(
+            self,
+            dataset_name: str,
+            export: bool = False,
+            export_dir: str = None
+    ) -> None:
         """
         Init function.
         Call the init function of the parent class (PanelSegAbstractEvaluator).
@@ -58,9 +60,11 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
             export_dir=export_dir
         )
 
-    def process(self,
-                inputs: list[dict],
-                outputs: list[dict]):
+    def process(
+            self,
+            inputs: list[dict],
+            outputs: list[dict]
+    ) -> None:
         """
         Process pairs of inputs and outputs.
 
@@ -105,8 +109,10 @@ class PanelSplitEvaluator(PanelSegAbstractEvaluator):
         for prediction in predicted_panels:
 
             # Instanciate a Panel object.
-            panel = DetectedPanel(box=prediction['box'],
-                                  detection_score=prediction['score'])
+            panel = DetectedPanel(
+                box=prediction['box'],
+                detection_score=prediction['score']
+            )
 
             predicted_panel_objects.append(panel)
 

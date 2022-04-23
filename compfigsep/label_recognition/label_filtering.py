@@ -42,11 +42,13 @@ GAMMA: float = 0.5
 DELTA: float = 1 - GAMMA
 
 
-def _unary_compatibility(label: DetectedLabel,
-                         label_index: int,
-                         number_of_labels_in_prior_zone: int,
-                         alpha: float = ALPHA,
-                         beta: float = BETA) -> np.ndarray:
+def _unary_compatibility(
+        label: DetectedLabel,
+        label_index: int,
+        number_of_labels_in_prior_zone: int,
+        alpha: float = ALPHA,
+        beta: float = BETA
+) -> np.ndarray:
     """
     Computes the unary compatibility function values for the detected label for both possible
     values of assigned label f_i.
@@ -75,10 +77,12 @@ def _unary_compatibility(label: DetectedLabel,
     return result
 
 
-def _binary_compatibility(label_1: DetectedLabel,
-                          label_2: DetectedLabel,
-                          label_1_index: int,
-                          label_2_index: int) -> np.ndarray:
+def _binary_compatibility(
+        label_1: DetectedLabel,
+        label_2: DetectedLabel,
+        label_1_index: int,
+        label_2_index: int
+) -> np.ndarray:
     """
     Computes the binary compatibility function values for two given detected labels for all
     possible values of assigned labels f_i and f_j.
@@ -150,8 +154,10 @@ def _binary_compatibility(label_1: DetectedLabel,
     return result
 
 
-def _is_label_in_prior_zone(label_1: DetectedLabel,
-                            label_2: DetectedLabel) -> bool:
+def _is_label_in_prior_zone(
+        label_1: DetectedLabel,
+        label_2: DetectedLabel
+) -> bool:
     """
     Args:
         label_1 (DetectedLabel):    A detected label.
@@ -214,8 +220,9 @@ def _build_neighbors(label_list: list[DetectedLabel]) -> np.ndarray:
     return adjacency_matrix
 
 
-def _precompute_compatibility_functions(label_list: list[DetectedLabel]
-                                        ) -> tuple[np.ndarray, np.ndarray]:
+def _precompute_compatibility_functions(
+        label_list: list[DetectedLabel]
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Precompute the compatibility function values.
 
@@ -239,7 +246,8 @@ def _precompute_compatibility_functions(label_list: list[DetectedLabel]
     label_text_list: list[str] = [label.text for label in label_list]
 
     label_structure_type: LabelStructureEnum = LabelStructure.from_labels_list(
-        labels_list=label_text_list).labels_type
+        labels_list=label_text_list
+    ).labels_type
 
     print(label_text_list)
     print(label_structure_type)
@@ -256,19 +264,26 @@ def _precompute_compatibility_functions(label_list: list[DetectedLabel]
 
         for j, label_j in enumerate(label_list):
 
-            num_labels_in_prior_zone += int(_is_label_in_prior_zone(label_1=label_i,
-                                                                    label_2=label_j))
+            num_labels_in_prior_zone += int(
+                _is_label_in_prior_zone(
+                    label_1=label_i,
+                    label_2=label_j
+                )
+            )
 
             label_j_index: int = LABEL_INDEX[label_structure_type](label_j.text)
-            binary_compatibility_values[i, j] = _binary_compatibility(label_1=label_i,
-                                                                      label_2=label_j,
-                                                                      label_1_index=label_i_index,
-                                                                      label_2_index=label_j_index)
+            binary_compatibility_values[i, j] = _binary_compatibility(
+                label_1=label_i,
+                label_2=label_j,
+                label_1_index=label_i_index,
+                label_2_index=label_j_index
+            )
 
         unary_compatibility_values[i] = _unary_compatibility(
             label=label_i,
             label_index=label_i_index,
-            number_of_labels_in_prior_zone=num_labels_in_prior_zone)
+            number_of_labels_in_prior_zone=num_labels_in_prior_zone
+        )
 
     return unary_compatibility_values, binary_compatibility_values
 
@@ -291,7 +306,8 @@ def _belief_propagation(label_list: list[DetectedLabel]) -> np.ndarray:
     print("adjacency matrix =\n", str(adjacency_matrix))
 
     unary_compatibility_values, binary_compatibility_values = _precompute_compatibility_functions(
-        label_list=label_list)
+        label_list=label_list
+    )
 
     num_labels: int = len(label_list)
 
@@ -346,11 +362,17 @@ def _belief_propagation(label_list: list[DetectedLabel]) -> np.ndarray:
         # print(type(value))
         # print(beliefs[i].shape)
         # beliefs[i] = value
-        beliefs[i] = [unary_compatibility_values[i][f_i] * np.max([messages[j, i][f_i]
-                                                                   if adjacency_matrix[j, i] == 1
-                                                                   else 0
-                                                                   for j in range(num_labels)])
-                      for f_i in (0, 1)]
+        beliefs[i] = [
+            unary_compatibility_values[i][f_i] * np.max(
+                [
+                    messages[j, i][f_i]
+                    if adjacency_matrix[j, i] == 1
+                    else 0
+                    for j in range(num_labels)
+                ]
+            )
+            for f_i in (0, 1)
+        ]
 
     return beliefs
 
