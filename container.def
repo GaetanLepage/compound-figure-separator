@@ -74,6 +74,7 @@ From: ubuntu:latest
     #   apt_install sox time gcc
     apt_install git
     apt_install gcc g++
+    apt_install libglib2.0-0 libsm6 libxrender1 libxext6
 
 
     ##########
