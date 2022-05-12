@@ -86,6 +86,7 @@ def main(args: list[str] = None) -> None:
         mode=parsed_args.mode,
         save_preview=parsed_args.save_preview,
         preview_folder=parsed_args.json.replace('.json', '_preview/'),
+        display_in_terminal=parsed_args.display_in_terminal,
         delay=parsed_args.delay,
         window_name="JSON data preview"
     )

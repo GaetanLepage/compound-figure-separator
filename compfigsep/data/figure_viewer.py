@@ -59,6 +59,12 @@ def add_viewer_args(parser: ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        '--display-in-terminal',
+        help="Display the image in the terminal",
+        action='store_true'
+    )
+
+    parser.add_argument(
         '--save_preview',
         help="Save the image previews in image files.",
         action='store_true'
@@ -73,6 +79,7 @@ def view_data_set(
         preview_folder: str = None,
         delay: int = 0,
         window_name: str = None
+    display_in_terminal: bool = False,
 ) -> None:
     """
     Preview all the figures from a data set.
@@ -90,6 +97,7 @@ def view_data_set(
                                                 images.
         delay (int):                        The number of seconds after which the window is
                                                 closed if 0, the delay is disabled.
+        display_in_terminal (bool):         TODO
         window_name (str):                  Name of the image display window.
     """
 
@@ -97,6 +105,7 @@ def view_data_set(
 
         figure.show_preview(mode=mode,
                             delay=delay,
+                            display_in_terminal=display_in_terminal,
                             window_name=window_name)
 
         if save_preview:

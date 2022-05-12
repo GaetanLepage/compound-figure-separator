@@ -82,6 +82,7 @@ def main(args: list[str] = None) -> None:
         mode=parsed_args.mode,
         save_preview=parsed_args.save_preview,
         preview_folder=os.path.join(parsed_args.image_directory_path, "preview"),
+        display_in_terminal=parsed_args.display_in_terminal,
         delay=parsed_args.delay,
         window_name="ImageCLEF data preview"
     )

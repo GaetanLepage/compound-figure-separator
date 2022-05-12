@@ -104,6 +104,7 @@ def main(args: list[str] = None):
         mode=parsed_args.mode,
         save_preview=parsed_args.save_preview,
         preview_folder=preview_folder,
+        display_in_terminal=parsed_args.display_in_terminal,
         delay=parsed_args.delay,
         window_name="PanelSeg data preview"
     )

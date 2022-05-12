@@ -83,6 +83,7 @@ def main(args: list[str] = None) -> None:
     view_data_set(
         figure_generator=figure_generator,
         mode=parsed_args.mode,
+        display_in_terminal=parsed_args.display_in_terminal,
         delay=parsed_args.delay,
         window_name="CSV data preview"
     )

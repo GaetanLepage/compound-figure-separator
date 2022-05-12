@@ -31,9 +31,11 @@ import logging
 from typing import cast, Set, Optional, Any
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
+from time import sleep
 
 import numpy as np
 from cv2 import cv2
+import pixcat
 
 from .sub_figure import SubFigure, DetectedSubFigure, Color
 from .panel import Panel, DetectedPanel
@@ -1092,6 +1094,7 @@ class Figure:
     def show_preview(self,
                      mode: str = 'gt',
                      delay: int = 0,
+                     display_in_terminal: bool = False,
                      window_name: str = None) -> None:
         """
         Display a preview of the image along with the panels and labels drawn on top.
@@ -1123,9 +1126,16 @@ class Figure:
         if window_name is None:
             window_name = self.image_filename
 
-        cv2.imshow(window_name, image_preview)
-        cv2.waitKey(delay)
-        cv2.destroyAllWindows()
+        if display_in_terminal:
+            pixcat.display(
+                image_bytes=cv2.imencode('.png', image_preview)[1]
+            )
+            if delay > 0:
+                sleep(delay)
+        else:
+            cv2.imshow(window_name, image_preview)
+            cv2.waitKey(delay)
+            cv2.destroyAllWindows()
 
     def save_preview(self,
                      mode: str = 'gt',
