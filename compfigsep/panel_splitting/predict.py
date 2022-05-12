@@ -28,7 +28,7 @@ from typing import Callable
 import numpy as np
 
 from ..data.figure_generators import FigureGenerator
-from ..utils.figure import Figure, Panel
+from ..utils.figure import Figure
 
 Box = list[int, int, int, int]
 

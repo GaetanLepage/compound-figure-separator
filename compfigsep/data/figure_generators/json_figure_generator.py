@@ -45,8 +45,12 @@ from .figure_generator import FigureGenerator
 MODULE_DIR: str = os.path.dirname(compfigsep.__file__)
 PROJECT_DIR: str = os.path.join(MODULE_DIR, os.pardir)
 
-DEFAULT_JSON_FOLDER: str = os.path.relpath(os.path.join(MODULE_DIR,
-                                                        "compound_figure_separation/output/"))
+DEFAULT_JSON_FOLDER: str = os.path.relpath(
+    os.path.join(
+        MODULE_DIR,
+        "compound_figure_separation/output/"
+    )
+)
 
 
 def get_most_recent_json(folder_path: str = None) -> str:

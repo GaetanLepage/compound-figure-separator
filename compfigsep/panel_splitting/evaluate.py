@@ -102,8 +102,9 @@ def panel_splitting_figure_eval(figure: Figure) -> PanelSplittingFigureResult:
     )
 
 
-def panel_splitting_metrics(results: list[PanelSplittingFigureResult]
-                            ) -> tuple[float, float, float, float]:
+def panel_splitting_metrics(
+        results: list[PanelSplittingFigureResult]
+) -> tuple[float, float, float, float]:
     """
     Evaluate the panel splitting metrics.
 

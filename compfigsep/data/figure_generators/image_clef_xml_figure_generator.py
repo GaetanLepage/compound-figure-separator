@@ -47,7 +47,7 @@ def add_image_clef_args(parser: ArgumentParser) -> None:
     parser.add_argument(
         '--annotation_xml',
         help="The path to the xml annotation file.",
-        default="data/ImageCLEF/training/FigureSeparationTraining2016GT.xml",
+        default="data/ImageCLEF/training/FigureSeparationTraining2016-GT.xml",
         type=str
     )
 
@@ -183,9 +183,12 @@ class ImageClefXmlFigureGenerator(FigureGenerator):
                                                   coordinates)
 
                 # Create Panel object
-                panel: Panel = Panel(box=cast(Box,
-                                              (int(coord)
-                                               for coord in str_coordinates)))
+                panel: Panel = Panel(
+                    box=cast(
+                        Box,
+                        (int(coord) for coord in str_coordinates)
+                    )
+                )
 
                 # Add this panel to the list of panels
                 subfigures.append(SubFigure(panel=panel))

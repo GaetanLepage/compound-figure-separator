@@ -1014,12 +1014,13 @@ class Figure:
         if mode == 'both':
 
             # Display ground truth subfigures.
-            for subfigure in self.gt_subfigures:
-                subfigure.draw_elements(image=preview_img)
+            if hasattr(self, 'gt_subfigures') and self.gt_subfigures:
+                for subfigure in self.gt_subfigures:
+                    subfigure.draw_elements(image=preview_img)
 
             # If this figure contains detected subfigures, they are considered to be
             # the relevant detections to display.
-            if hasattr(self, 'detected_subfigure') and self.detected_subfigures:
+            if hasattr(self, 'detected_subfigures') and self.detected_subfigures:
 
                 for detected_subfigure in self.detected_subfigures:
                     detected_subfigure.draw_elements(image=preview_img)
@@ -1038,14 +1039,15 @@ class Figure:
         elif mode == 'gt':
 
             # Display ground truth subfigures.
-            for subfigure_index, subfigure in enumerate(self.gt_subfigures):
+            if hasattr(self, 'gt_subfigures') and self.gt_subfigures:
+                for subfigure_index, subfigure in enumerate(self.gt_subfigures):
 
-                # Select color.
-                color: Color = shape_colors[subfigure_index % len(shape_colors)]
+                    # Select color.
+                    color: Color = shape_colors[subfigure_index % len(shape_colors)]
 
-                # Draw subfigure.
-                subfigure.draw_elements(image=preview_img,
-                                        color=color)
+                    # Draw subfigure.
+                    subfigure.draw_elements(image=preview_img,
+                                            color=color)
 
         # 3rd case ('pred'): Display detections.
         elif mode == 'pred':
@@ -1112,14 +1114,15 @@ class Figure:
         print(f"Image filename: {self.image_filename}")
 
         label: str
-        for subfigure in self.gt_subfigures:
-            if hasattr(subfigure, 'label') and subfigure.label is not None and \
-                    subfigure.label.text != '':
-                label = subfigure.label.text
-            else:
-                label = '_'
+        if hasattr(self, 'gt_subfigures'):
+            for subfigure in self.gt_subfigures:
+                if hasattr(subfigure, 'label') and subfigure.label is not None and \
+                        subfigure.label.text != '':
+                    label = subfigure.label.text
+                else:
+                    label = '_'
 
-            print(f"\n{label}: {subfigure.caption}")
+                print(f"\n{label}: {subfigure.caption}")
 
         image_preview: np.ndarray = self.get_preview(mode)
 

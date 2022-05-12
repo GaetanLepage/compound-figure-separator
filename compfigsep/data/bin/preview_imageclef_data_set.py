@@ -73,7 +73,7 @@ def main(args: list[str] = None) -> None:
     figure_generator: ImageClefXmlFigureGenerator = ImageClefXmlFigureGenerator(
         xml_annotation_file_path=parsed_args.annotation_xml,
         image_directory_path=parsed_args.image_directory_path,
-        default_random_order=parsed_args.random_orders
+        default_random_order=parsed_args.random_order
     )
 
     # Preview the data set.

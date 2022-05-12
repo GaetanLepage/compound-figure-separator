@@ -58,9 +58,9 @@ class Trainer(DefaultTrainer):
 
     @classmethod
     def build_evaluator(
-            cls,
-            cfg: CfgNode,
-            dataset_name: str
+        cls,
+        cfg: CfgNode,
+        dataset_name: str
     ) -> PanelSplitEvaluator:
         """
         Builds the PanelSplitEvaluator that will be called at test time.

@@ -58,11 +58,13 @@ class Label:
         """
         self.text: str = text
 
+        self.box: Optional[Box] = None
+
         if isinstance(box, np.ndarray):
             box = box.tolist()
 
         if box is not None:
-            self.box: Box = cast(
+            self.box = cast(
                 Box,
                 tuple(round(val) for val in box)
             )

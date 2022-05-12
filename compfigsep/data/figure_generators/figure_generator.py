@@ -52,7 +52,7 @@ def add_common_figure_generator_args(parser: ArgumentParser) -> None:
     parser.add_argument(
         '--random_order',
         help="Wether to yield figures in a random order.",
-        action='store_true'
+        action='store_false'
     )
 
 
