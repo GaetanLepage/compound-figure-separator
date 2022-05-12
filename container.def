@@ -37,6 +37,7 @@ From: ubuntu:latest
 # This means that if you need the same variables during the build process, you should also define
 # them in your `%post` section.
 %environment
+    export PYTHONPATH=.
 
 
 # This section is where we download files from the internet with tools like git and wget, install
@@ -61,10 +62,10 @@ From: ubuntu:latest
     # Python
     apt_install curl                    # To download `get-pip.py` from the internet
     apt_install ca-certificates         # Required by `curl`
-    apt_install python3.9               # Latest version of Python
-    apt_install python3.9-dev           # Header files, a static library and development tools for
+    apt_install python3                 # Latest version of Python
+    apt_install python3-dev             # Header files, a static library and development tools for
                                         # building Python modules and more.
-    apt_install python3.9-distutils     # Support for building and installing additional Python
+    apt_install python3-distutils       # Support for building and installing additional Python
                                         # modules
 
     # >>> Here you can install your apt packages
@@ -81,8 +82,7 @@ From: ubuntu:latest
     # Python #
     ##########
 
-    # Set python 3.9 as the default
-    ln -sf /usr/bin/python3.9 /usr/bin/python3
+    # Link `python3` to `python` for ease of use
     ln -sf /usr/bin/python3 /usr/bin/python
 
     # Install pip

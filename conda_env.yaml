@@ -1,0 +1,15 @@
+name: compfigsep
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - cudatoolkit=11.3
+  - pytorch
+
+  - pip
+  - pip:
+    - -r requirements.txt
+prefix: conda_env
+

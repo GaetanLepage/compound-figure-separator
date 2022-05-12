@@ -7,12 +7,15 @@
 .vim/
 .nvimlog
 
+# Output folder
+output/
 
 *.iml
 # models/
 others/
 logs/
 snapshots/
+*.pth
 
 #################
 ## Virtual env
