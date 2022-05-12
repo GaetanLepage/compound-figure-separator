@@ -1,5 +1,5 @@
 _BASE_: "../utils/detectron_utils/Base-RetinaNet.yaml"
-OUTPUT_DIR: "compfigsep/panel_splitting/output_imageclef"
+OUTPUT_DIR: "output/panel_splitting/output_imageclef"
 MODEL:
   RETINANET:
     NUM_CLASSES: 1
@@ -10,7 +10,7 @@ DATASETS:
   #TEST: ("image_clef_test",)
   TEST: ("image_clef_test",)
 SOLVER:
-  IMS_PER_BATCH: 4
+  IMS_PER_BATCH: 16
 #VALIDATION:
   #VALIDATION_PERIOD: 5000
 TEST:

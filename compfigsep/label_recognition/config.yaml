@@ -1,6 +1,6 @@
 _BASE_: "../utils/detectron_utils/Base-RetinaNet.yaml"
 #OUTPUT_DIR: "compfigsep/label_recognition/output_backup"
-OUTPUT_DIR: "compfigsep/label_recognition/output"
+OUTPUT_DIR: "output/label_recognition"
 MODEL:
   RESNETS:
     OUT_FEATURES: ['res2', 'res3', 'res4']
@@ -19,7 +19,7 @@ DATASETS:
   #VALIDATION: 'image_clef_val'
   TEST: ('zou_label_recog_test',)
 SOLVER:
-  IMS_PER_BATCH: 1
+  IMS_PER_BATCH: 8
   BASE_LR: 0.001
 ##VALIDATION:
   ##VALIDATION_PERIOD: 5000
