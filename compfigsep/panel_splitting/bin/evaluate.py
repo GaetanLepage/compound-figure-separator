@@ -55,7 +55,7 @@ def parse_args(args: list[str]) -> Namespace:
 
     add_json_arg(
         parser=parser,
-        folder_default_relative_path='panel_splitting/output_imageclef/'
+        folder_default_relative_path='output/panel_splitting/output_imageclef/'
     )
 
     return parser.parse_args(args)
@@ -68,7 +68,7 @@ def main(args: list[str] = None):
     Args:
         args (list[str]):   Arguments from the command line.
     """
-    # Parse arguments.
+    # Parse arguments
     if args is None:
         args = sys.argv[1:]
     parsed_args: Namespace = parse_args(args)

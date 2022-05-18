@@ -156,9 +156,9 @@ class LabelRecogRetinaNet(nn.Module):
     def device(self) -> torch.device:
         """
         Returns:
-        TODO
+            device (torch.device):  The device on which this model is stored.
         """
-        return self.pixel_mean.device
+        return self.pixel_mean.device  # type: ignore
 
     def forward(self, batched_inputs: list[dict]) -> Union[dict[str, Any],
                                                            list[dict[str, Instances]]]:

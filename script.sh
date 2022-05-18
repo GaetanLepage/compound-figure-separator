@@ -4,22 +4,39 @@ export PYTHONPATH=.
 export NUM_GPUS=1
 
 
+########
+# TASK #
+########
 # TASK="panel_splitting"
 TASK="label_recognition"
 # TASK="panel_segmentation"
 
-# SCRIPT_NAME="test_imageclef.sh"
+##########
+# SCRIPT #
+##########
 # SCRIPT_NAME="train_imageclef.sh"
+# SCRIPT_NAME="test_imageclef.sh"
+
 # SCRIPT_NAME="train_panel_seg.sh"
-SCRIPT_NAME="train.sh"
+# SCRIPT_NAME="test_panel_seg.sh"
 
+# SCRIPT_NAME="train.sh"
+SCRIPT_NAME="test.sh"
 SCRIPT_PATH=$TASK/bin/$SCRIPT_NAME
-# SCRIPT="panel_splitting/bin/train_panel_seg.sh"
-# SCRIPT="panel_splitting/bin/test_imageclef.sh"
+
+########
+# DATA #
+########
+
+SCRIPT_NAME="preview_json_data_set.py"
+
+SCRIPT_PATH="data/bin/"$SCRIPT_NAME
+
+# SCRIPT_PATH="data/preview_imageclef_data_set.py"
 
 
-COMMAND="bash compfigsep/${SCRIPT_PATH}"
-# COMMAND="which python"
+# COMMAND="bash compfigsep/${SCRIPT_PATH}"
+COMMAND="python compfigsep/${SCRIPT_PATH}"
 
 if [[ `hostname` =~ "bigfoot" ]]; then
     source /applis/environments/conda.sh

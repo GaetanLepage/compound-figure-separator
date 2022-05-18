@@ -43,8 +43,8 @@ class Path(NamedTuple):
 
 
 def _compute_panel_label_distances(
-        panels: list[Panel],
-        labels: list[Label]
+        panels: Sequence[Panel],
+        labels: Sequence[Label]
 ) -> list[list[float]]:
     """
     Compute distances between each label and each panel.
@@ -116,10 +116,11 @@ def assign_labels_to_panels(
         are_detections (bool):  If the given panels and labels are detections.
                                     If False, it means that we are matching ground truth
                                     annotations.
-        beam_length (int):      TODO
+        beam_length (int):      The number of top paths kept in each column.
 
     Returns:
-        subfigures (list[SubFigure]):   TODO
+        subfigures (list[SubFigure]):   The list of resulting subfigures (i.e. a list of panel-label
+                                            pairs).
     """
 
     num_panels: int = len(panels)

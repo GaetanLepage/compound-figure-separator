@@ -112,7 +112,7 @@ def main(args: list[str] = None) -> None:
     # Export detections to JSON.
     export_figures_to_json(
         figure_generator=copy.copy(figure_generator),
-        json_output_directory="compfigsep/caption_splitting/output/"
+        json_output_directory="output/panel_splitting/caption_splitting/output/"
     )
 
     logging.info("Evaluate detections")

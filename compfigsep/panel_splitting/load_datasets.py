@@ -49,7 +49,8 @@ def register_panel_splitting_dataset(dataset_name: str):
             image_directory_path = "data/ImageCLEF/training/FigureSeparationTraining2016/"
 
         elif dataset_name == "image_clef_test":
-            xml_annotation_file_path = "data/ImageCLEF/test/FigureSeparationTest2016GT.xml"
+            xml_annotation_file_path = \
+                "data/ImageCLEF/test/FigureSeparationTest2016GT.xml"
             image_directory_path = "data/ImageCLEF/test/FigureSeparationTest2016/"
 
         elif dataset_name == "image_clef_validation":

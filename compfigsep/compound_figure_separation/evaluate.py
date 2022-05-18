@@ -21,8 +21,6 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
 
 ###############################################
 Evaluation tool for compound figure separation.
-
-TODO
 """
 
 from typing import Any
