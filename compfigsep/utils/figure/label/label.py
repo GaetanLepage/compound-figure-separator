@@ -196,7 +196,8 @@ class DetectedLabel(Label):
 
         return DetectedLabel(
             text=label.text,
-            box=label.box
+            box=label.box,
+            detection_score=1
         )
 
     @classmethod

@@ -52,7 +52,7 @@ def parse_args(args: list[str]) -> Namespace:
 
     add_json_arg(
         parser=parser,
-        folder_default_relative_path='label_recognition/output/'
+        folder_default_path='label_recognition/output/'
     )
 
     return parser.parse_args(args)

@@ -55,7 +55,7 @@ def parse_args(args: list[str]) -> Namespace:
 
     add_json_arg(
         parser=parser,
-        folder_default_relative_path='output/panel_splitting/output_imageclef/'
+        folder_default_path='output/panel_splitting/output_imageclef/'
     )
 
     return parser.parse_args(args)

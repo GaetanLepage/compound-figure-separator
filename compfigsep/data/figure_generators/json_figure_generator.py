@@ -45,12 +45,7 @@ from .figure_generator import FigureGenerator
 MODULE_DIR: str = os.path.dirname(compfigsep.__file__)
 PROJECT_DIR: str = os.path.join(MODULE_DIR, os.pardir)
 
-DEFAULT_JSON_FOLDER: str = os.path.relpath(
-    os.path.join(
-        MODULE_DIR,
-        "compound_figure_separation/output/"
-    )
-)
+DEFAULT_JSON_FOLDER: str = "output/compound_figure_separation"
 
 
 def get_most_recent_json(folder_path: str = None) -> str:
@@ -153,8 +148,9 @@ def get_most_recent_json(folder_path: str = None) -> str:
 
         dates[date] = file_name
 
-    assert len(dates) > 0, \
-        f"No valid json annotation file was found in folder {folder_path}\nExiting"
+    if len(dates) == 0:
+
+        return ''
 
     max_date: datetime = max(dates)
 
@@ -165,8 +161,8 @@ def get_most_recent_json(folder_path: str = None) -> str:
 
 def add_json_arg(
         parser: ArgumentParser,
-        json_default_relative_path: str = None,
-        folder_default_relative_path: str = None
+        json_default_path: str = None,
+        folder_default_path: str = None
 ) -> None:
     """
     Parse the argument for loading a json file.
@@ -177,23 +173,12 @@ def add_json_arg(
         folder_default_relative_path (str): Default folder relative (to MODULE_DIR) path where to
                                                 look for the most recent json file.
     """
-    if json_default_relative_path is None:
+    if json_default_path is None:
 
-        if folder_default_relative_path is None:
-            folder_default_relative_path = "compound_figure_separation/output/"
+        if folder_default_path is None:
+            folder_default_path = "output/compound_figure_separation/output/"
 
-        folder_default_path = os.path.join(MODULE_DIR,
-                                           folder_default_relative_path)
-
-        folder_default_path = os.path.relpath(folder_default_path)
-
-        json_default_path: str = get_most_recent_json(folder_path=folder_default_path)
-
-    else:
-        json_default_path = os.path.join(MODULE_DIR,
-                                         json_default_relative_path)
-
-    json_default_path = os.path.relpath(json_default_path)
+        json_default_path = get_most_recent_json(folder_path=folder_default_path)
 
     parser.add_argument(
         '--json',

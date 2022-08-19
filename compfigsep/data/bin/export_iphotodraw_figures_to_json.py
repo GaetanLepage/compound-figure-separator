@@ -82,7 +82,7 @@ def main(args: list[str] = None) -> None:
         image_directory_path=parsed_args.image_directory_path
     )
 
-    # Export figures to csv.
+    # Export figures to json.
     export_figures_to_json(
         figure_generator=figure_generator,
         json_output_filename=parsed_args.json_output_filename,

@@ -46,10 +46,6 @@ From: ubuntu:latest
     export DEBIAN_FRONTEND="noninteractive"
     export TZ="Europe/Paris"
 
-    ################
-    # APT packages #
-    ################
-
     # Update Ubuntu apt repository
     apt-get update
 
@@ -59,14 +55,35 @@ From: ubuntu:latest
     # Install apt packages
     alias apt_install="apt-get install -y --no-install-recommends"
 
-    # Python
+    ##########
+    # PYTHON #######################################################################################
+    ##########
+
+    # Secify the version of python you want to install
+    PYTHON_VERSION='3.9'
+
+    PYTHON=python${PYTHON_VERSION}
+    VERSION_NUMBER=$(echo $PYTHON_VERSION | cut -d '.' -f 2)
+
+    # Needed for older versions of python (<3.10)
+    if [ $VERSION_NUMBER -lt 10 ]; then
+    # if true; then
+        apt_install software-properties-common gpg-agent
+        add-apt-repository ppa:deadsnakes/ppa
+        apt update -y
+    fi
+
     apt_install curl                    # To download `get-pip.py` from the internet
     apt_install ca-certificates         # Required by `curl`
-    apt_install python3                 # Latest version of Python
-    apt_install python3-dev             # Header files, a static library and development tools for
+    apt_install $PYTHON                 # The specified version of Python
+    apt_install ${PYTHON}-dev           # Header files, a static library and development tools for
                                         # building Python modules and more.
-    apt_install python3-distutils       # Support for building and installing additional Python
+    apt_install ${PYTHON}-distutils     # Support for building and installing additional Python
                                         # modules
+
+    ################
+    # APT packages #################################################################################
+    ################
 
     # >>> Here you can install your apt packages
     # For example,
@@ -76,13 +93,16 @@ From: ubuntu:latest
     apt_install git
     apt_install gcc g++
     apt_install libglib2.0-0 libsm6 libxrender1 libxext6
+    apt_install cmake make
+    apt_install protobuf-compiler libprotobuf-dev
 
 
-    ##########
-    # Python #
-    ##########
+    ###################
+    # Python packages ##############################################################################
+    ###################
 
-    # Link `python3` to `python` for ease of use
+    # Set the default python
+    ln -sf /usr/bin/$PYTHON /usr/bin/python3
     ln -sf /usr/bin/python3 /usr/bin/python
 
     # Install pip

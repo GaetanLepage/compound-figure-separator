@@ -168,7 +168,10 @@ class DetectedPanel(Panel):
         if not isinstance(panel, Panel):
             raise ValueError(f"Invalid type for panel: {type(panel)}")
 
-        return DetectedPanel(box=panel.box)
+        return DetectedPanel(
+            box=panel.box,
+            detection_score=1
+        )
 
     @classmethod
     def from_dict(cls, panel_dict: dict) -> DetectedPanel:

@@ -819,9 +819,12 @@ class Figure:
 
                 gt_label: Label = gt_subfigure.label
 
+                # TODO why skipping labels with >1 lenth ?
+                # if gt_label.box is None \
+                #         or gt_label.text is None \
+                #         or len(gt_label.text) != 1:
                 if gt_label.box is None \
-                        or gt_label.text is None \
-                        or len(gt_label.text) != 1:
+                        or gt_label.text is None:
 
                     continue
 
@@ -896,7 +899,7 @@ class Figure:
                 if gt_label is None \
                         or gt_label.box is None \
                         or gt_label.text is None \
-                        or len(gt_label.text) != 1:
+                        or len(gt_label.text) < 1:
                     continue
 
                 # If the label classes do not match, no need to compute the IoU.

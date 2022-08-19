@@ -113,12 +113,14 @@ def export_figures_to_json(figure_generator: FigureGenerator,
         json_output_directory (str):        Path to the directory where to save the JSON
                                                 output file.
     """
-
     if json_output_directory is None:
 
         # If no directory was given, use the default one.
         if json_output_filename is not None:
             json_output_directory_: str = os.path.dirname(json_output_filename)
+            if not json_output_directory_:
+                json_output_directory_ = './'
+            json_output_filename = os.path.basename(json_output_filename)
 
             if not os.path.isdir(json_output_directory_):
                 return

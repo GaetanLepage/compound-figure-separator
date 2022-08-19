@@ -55,7 +55,8 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
         figure (Figure):    The figure on which to evaluate the panel splitting task.
 
     Returns:
-        result (MultiClassFigureResult):    TODO
+        result (MultiClassFigureResult):    Quantities needed for later computation of the
+                                                performance metrics
     """
     # Perform matching on this figure
     # This tests whether a detected label is true positive or false positive
@@ -73,7 +74,7 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
         gt_label: Label = gt_subfigure.label
 
         # Drop useless panels for this task
-        if gt_label.box is None or gt_label.text is None or len(gt_label.text) != 1:
+        if gt_label.box is None or gt_label.text is None or len(gt_label.text) < 1:
             continue
 
         cls: str = gt_label.text
@@ -95,7 +96,7 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
     detections_by_class: dict[str, list[Detection]] = {}
 
     for detected_label in figure.detected_labels:
-        detected_count += 1
+        assert detected_label.is_true_positive is not None
         num_correct += int(detected_label.is_true_positive)
 
         if detected_label.text is None:
@@ -111,8 +112,9 @@ def label_recognition_figure_eval(figure: Figure) -> MultiClassFigureResult:
         detections_by_class[cls].append(
             Detection(
                 score=detected_label.detection_score,
-                is_true_positive=detected_label.is_true_positive)
+                is_true_positive=detected_label.is_true_positive
             )
+        )
 
     # TODO remove
     # print("Number of correct detections :", num_correct)

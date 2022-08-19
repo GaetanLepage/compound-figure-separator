@@ -19,14 +19,20 @@ Collaborators:  Niccolò Marini (niccolo.marini@hevs.ch)
                 Stefano Marchesin (stefano.marchesin@unipd.it)
 
 
-################################################
-Panel segmentation module.
-Locate panels, labels and match them together.
-
-Input: Compound (i.e. multi-panel) figure/image.
-
-Output: A list of sub-figures including :
-    * Panel location
-    * Label location
-    * Label text detected from the image
+#####################################
+Datasets definitions for the panel splitting task.
 """
+
+from yolox.data import Dataset
+
+
+class PanelSplittingImageClefDataset(Dataset):
+
+    def __init__(self) -> None:
+        pass
+
+    def __len__(self) -> int:
+        pass
+
+    def __getitem__(self, index: int) -> None:
+        pass

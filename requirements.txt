@@ -12,11 +12,15 @@ progressbar2
 #################
 torch
 # Detectron2:
-git+https://github.com/facebookresearch/detectron2.git
+# git+https://github.com/facebookresearch/detectron2.git
 # Detectron2 requirements:
+
 torchvision
 pycocotools
 fvcore
+
+# YOLOX
+git+https://github.com/Megvii-BaseDetection/YOLOX.git
 
 #########
 # Image #

@@ -5,7 +5,11 @@ pkgs.mkShell {
 
     buildInputs = with pkgs; [
 
-        python3
+        python39
+        # (python39.withPackages(ps: with ps; [
+        #     pybind11
+        #     onnx
+        # ]))
 
         stdenv.cc.cc
 
@@ -20,6 +24,12 @@ pkgs.mkShell {
 
         qt5.full
         qt5.qtbase
+
+        cmake
+        protobuf3_9
+        # python39Packages.pybind11
+
+        bash-language-server
     ];
 
     shellHook = ''
