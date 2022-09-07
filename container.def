@@ -81,6 +81,19 @@ From: ubuntu:latest
     apt_install ${PYTHON}-distutils     # Support for building and installing additional Python
                                         # modules
 
+    # Set the default python
+    ln -sf /usr/bin/$PYTHON /usr/bin/python3
+    ln -sf /usr/bin/python3 /usr/bin/python
+
+    # Install pip
+    curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
+    python /tmp/get-pip.py
+
+    # Install some pip packages
+    alias pip_install="python -m pip install"
+
+    pip_install -U pip setuptools
+
     ################
     # APT packages #################################################################################
     ################
@@ -100,19 +113,6 @@ From: ubuntu:latest
     ###################
     # Python packages ##############################################################################
     ###################
-
-    # Set the default python
-    ln -sf /usr/bin/$PYTHON /usr/bin/python3
-    ln -sf /usr/bin/python3 /usr/bin/python
-
-    # Install pip
-    curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-    python /tmp/get-pip.py
-
-    # Install some pip packages
-    alias pip_install="python -m pip install"
-
-    pip_install -U pip setuptools
 
     # >>> Here you can install your python packages
     # For example,
