@@ -34,15 +34,17 @@ from collections import OrderedDict
 from time import sleep
 
 import numpy as np
-from cv2 import cv2
+import cv2
 import pixcat
 
 from .sub_figure import SubFigure, DetectedSubFigure, Color
 from .panel import Panel, DetectedPanel
-from .label import (Label,
-                    DetectedLabel,
-                    LabelStructure,
-                    label_class)
+from .label import (
+    Label,
+    DetectedLabel,
+    LabelStructure,
+    label_class
+)
 
 from . import beam_search
 from .. import box, Box
@@ -73,9 +75,9 @@ class Figure:
     """
 
     def __init__(
-            self,
-            image_path: str,
-            index: int
+        self,
+        image_path: str,
+        index: int
     ) -> None:
         """
         Init for a Figure object.  Neither the image or the annotations are loaded at this stage.
@@ -125,9 +127,9 @@ class Figure:
 
     @classmethod
     def from_dict(
-            cls,
-            figure_dict: dict,
-            index: int
+        cls,
+        figure_dict: dict,
+        index: int
     ) -> Figure:
         """
         Create a Figure object from a dictionnary.
@@ -208,9 +210,9 @@ class Figure:
 # IMPORT GT ANNOTATIONS #
 #########################
     def load_annotation_from_csv(
-            self,
-            annotations_folder: str,
-            is_ground_truth: bool = True
+        self,
+        annotations_folder: str,
+        is_ground_truth: bool = True
     ) -> None:
         """
         Load figure annotations from the given (individual) csv file.
@@ -295,8 +297,8 @@ class Figure:
             ]
 
     def load_annotation_from_iphotodraw(
-            self,
-            annotation_file_path: str
+        self,
+        annotation_file_path: str
     ) -> None:
         """
         Load iPhotoDraw annotation.
@@ -451,8 +453,8 @@ class Figure:
             return label_dict
 
         def match_panels_with_labels(
-                panel_dict: dict[str, list[Panel]],
-                label_dict: dict[str, list[Label]]
+            panel_dict: dict[str, list[Panel]],
+            label_dict: dict[str, list[Label]]
         ) -> list[SubFigure]:
             """
             Match both lists to get a unique list of subfigures.
@@ -681,9 +683,9 @@ class Figure:
                             gt_subfigure.caption = caption_dict.pop(caption_label)
                             break
 
-#########################
-# IMPORT GT ANNOTATIONS #
-#########################
+######################
+# PANEL SEGMENTATION #
+######################
     def match_detected_visual_panels_and_labels(self) -> None:
         """
         TODO
@@ -704,9 +706,11 @@ class Figure:
 ##############
 # EVALUATION #
 ##############
-    def match_detected_and_gt_panels_splitting_task(self,
-                                                    iou_threshold: float = 0.5,
-                                                    overlap_threshold: float = 0.66) -> None:
+    def match_detected_and_gt_panels_splitting_task(
+        self,
+        iou_threshold: float = 0.5,
+        overlap_threshold: float = 0.66
+    ) -> None:
         """
         Match the detected panels with a ground truth one.
         The `self.detected_panels` attribute is modified by side effect.
@@ -791,8 +795,10 @@ class Figure:
             else:
                 detected_panel.is_true_positive_overlap = False
 
-    def match_detected_and_gt_labels(self,
-                                     iou_threshold: float = 0.5) -> None:
+    def match_detected_and_gt_labels(
+        self,
+        iou_threshold: float = 0.5
+    ) -> None:
         """
         Match the detected labels with a ground truth one.
         The comparison criterion is the IoU which is maximized.
@@ -853,8 +859,10 @@ class Figure:
             else:
                 detected_label.is_true_positive = False
 
-    def match_detected_and_gt_panels_segmentation_task(self,
-                                                       iou_threshold: float = 0.5) -> None:
+    def match_detected_and_gt_panels_segmentation_task(
+        self,
+        iou_threshold: float = 0.5
+    ) -> None:
         """
         Match the detected subfigures with a ground truth one.
         The comparison criterion is the IoU between panels which is maximized.
@@ -1096,11 +1104,13 @@ class Figure:
 
         return preview_img
 
-    def show_preview(self,
-                     mode: str = 'gt',
-                     delay: int = 0,
-                     display_in_terminal: bool = False,
-                     window_name: str = None) -> None:
+    def show_preview(
+        self,
+        mode: str = 'gt',
+        delay: int = 0,
+        display_in_terminal: bool = False,
+        window_name: str = None
+    ) -> None:
         """
         Display a preview of the image along with the panels and labels drawn on top.
 
@@ -1143,9 +1153,11 @@ class Figure:
             cv2.waitKey(delay)
             cv2.destroyAllWindows()
 
-    def save_preview(self,
-                     mode: str = 'gt',
-                     folder: str = None) -> None:
+    def save_preview(
+        self,
+        mode: str = 'gt',
+        folder: str = None
+    ) -> None:
         """
         Save the annotation preview at folder.
 
@@ -1183,8 +1195,10 @@ class Figure:
 #################
 # EXPORT FIGURE #
 #################
-    def export_gt_annotation_to_individual_csv(self,
-                                               csv_export_dir: str = None) -> None:
+    def export_gt_annotation_to_individual_csv(
+        self,
+        csv_export_dir: str = None
+    ) -> None:
         """
         Export the ground truth annotation of the figure to an individual csv file.
 

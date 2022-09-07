@@ -43,8 +43,8 @@ class Path(NamedTuple):
 
 
 def _compute_panel_label_distances(
-        panels: Sequence[Panel],
-        labels: Sequence[Label]
+    panels: Sequence[Panel],
+    labels: Sequence[Label]
 ) -> list[list[float]]:
     """
     Compute distances between each label and each panel.
@@ -99,10 +99,10 @@ def _compute_panel_label_distances(
 
 
 def assign_labels_to_panels(
-        panels: Sequence[Panel],
-        labels: Sequence[Label],
-        are_detections: bool,
-        beam_length: int = 100
+    panels: Sequence[Panel],
+    labels: Sequence[Label],
+    are_detections: bool,
+    beam_length: int = 100
 ) -> list[SubFigure]:
     """
     Use beam search to assign labels to panels according to the overall distance
@@ -145,8 +145,8 @@ def assign_labels_to_panels(
             in panels
         ]
 
-    print(f"num_panels = {num_panels}")
-    print(f"num_labels = {num_labels}")
+    # print(f"num_panels = {num_panels}")
+    # print(f"num_labels = {num_labels}")
 
     if are_detections:
 
@@ -250,8 +250,8 @@ def assign_labels_to_panels(
         all_paths.append(panel_paths)
 
         # TODO remove
-        print("panel index:", panel_idx)
-        print("all_item_pairs:", all_paths)
+        # print("panel index:", panel_idx)
+        # print("all_item_pairs:", all_paths)
 
     # check the last column of paths (which corresponds to full paths)
     # all_item_pairs[-1] :                  last "layer" (complete paths)
@@ -267,10 +267,12 @@ def assign_labels_to_panels(
         # panel.add_label_info(label=labels[best_path[panel_index]])
         matched_label: Label = labels[best_path[panel_index]]
 
+        subfigure: SubFigure
+
         if are_detections:
             assert isinstance(panel, DetectedPanel)
             assert isinstance(matched_label, DetectedLabel)
-            subfigure: SubFigure = DetectedSubFigure(
+            subfigure = DetectedSubFigure(
                 panel=panel,
                 label=matched_label
             )

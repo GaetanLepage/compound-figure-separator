@@ -160,9 +160,9 @@ def get_most_recent_json(folder_path: str = None) -> str:
 
 
 def add_json_arg(
-        parser: ArgumentParser,
-        json_default_path: str = None,
-        folder_default_path: str = None
+    parser: ArgumentParser,
+    json_default_path: str = None,
+    folder_default_path: str = None
 ) -> None:
     """
     Parse the argument for loading a json file.
@@ -197,9 +197,11 @@ class JsonFigureGenerator(FigureGenerator):
         default_random_order (bool):        Wether to yield figures in a random order.
     """
 
-    def __init__(self,
-                 json_path: str,
-                 default_random_order: bool = True) -> None:
+    def __init__(
+        self,
+        json_path: str,
+        default_random_order: bool = True
+    ) -> None:
         """
         Args:
             json (str):                     The path to a json annotation file OR to a folder where
@@ -255,5 +257,7 @@ class JsonFigureGenerator(FigureGenerator):
 
         for index, figure_dict in enumerate(progressbar(dict_values)):
 
-            yield Figure.from_dict(figure_dict=figure_dict,
-                                   index=index)
+            yield Figure.from_dict(
+                figure_dict=figure_dict,
+                index=index
+            )

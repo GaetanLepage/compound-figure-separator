@@ -48,10 +48,10 @@ class SubFigure:
     """
 
     def __init__(
-            self,
-            panel: Panel = None,
-            label: Label = None,
-            caption: str = None
+        self,
+        panel: Panel = None,
+        label: Label = None,
+        caption: str = None
     ) -> None:
         """
         Init for a `SubFigure` object.
@@ -158,10 +158,10 @@ class DetectedSubFigure(SubFigure):
     """
 
     def __init__(
-            self,
-            panel: DetectedPanel = None,
-            label: DetectedLabel = None,
-            caption: str = None
+        self,
+        panel: DetectedPanel = None,
+        label: DetectedLabel = None,
+        caption: str = None
     ) -> None:
         """
         Init for a `DetectedPanel` object.
@@ -181,8 +181,8 @@ class DetectedSubFigure(SubFigure):
 
     @classmethod
     def from_normal_sub_figure(
-            cls,
-            subfigure: SubFigure
+        cls,
+        subfigure: SubFigure
     ) -> DetectedSubFigure:
         """
         Build a DetectedSubFigure object from a normal Figure object.
