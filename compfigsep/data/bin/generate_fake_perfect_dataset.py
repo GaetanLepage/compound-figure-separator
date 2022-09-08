@@ -28,6 +28,7 @@ The ground truth information are injected in the `detected*` fields of the figur
 
 import sys
 from argparse import ArgumentParser, Namespace
+from collections import OrderedDict
 
 from compfigsep.data.figure_generators.json_figure_generator import (
     add_json_arg,
@@ -74,6 +75,7 @@ def parse_args(args: list[str]) -> Namespace:
 def _edit_figure(figure) -> None:
     figure.detected_panels = []
     figure.detected_labels = []
+    figure.detected_subcaptions = OrderedDict()
     figure.detected_subfigures = []
 
     for gt_subfigure in figure.gt_subfigures:
@@ -88,6 +90,12 @@ def _edit_figure(figure) -> None:
 
         if detected_subfigure.label is not None:
             figure.detected_labels.append(detected_subfigure.label)
+
+        if detected_subfigure.caption is not None:
+            label_text: str = '_'
+            if detected_subfigure.label is not None and detected_subfigure.label.text != '':
+                label_text = detected_subfigure.label.text
+            figure.detected_subcaptions[label_text] = detected_subfigure.caption
 
         # Subcaptions
         if hasattr(figure, 'gt_subcaptions'):

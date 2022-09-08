@@ -72,11 +72,12 @@ def caption_splitting_figure_eval(figure: Figure) -> Optional[CaptionSplittingFi
         return None
 
     # Case where this is not a compound figure.
-    if len(figure.gt_subfigures) == 1 and '_' in figure.detected_subcaptions:
+    if len(figure.gt_subfigures) == 1 and '_' in detected_subcaptions:
         num_gt_labels = 1
         normalized_levenshtein_similarity = textdistance.levenshtein.normalized_similarity(
             figure.gt_subfigures[0],
-            figure.detected_subcaptions['_'])
+            detected_subcaptions['_']
+        )
 
     # Case where multiple labels where detected.
     else:

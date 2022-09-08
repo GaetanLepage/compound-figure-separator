@@ -28,11 +28,13 @@ The original version of this code was written by Stefano Marchesin.
 from typing import Any, cast
 import re
 
-from ..utils.figure.label import (is_char,
-                                  is_roman,
-                                  roman_to_int,
-                                  LC_ROMAN_FROM_INT,
-                                  UC_ROMAN_FROM_INT)
+from ..utils.figure.label import (
+    is_char,
+    is_roman,
+    roman_to_int,
+    LC_ROMAN_FROM_INT,
+    UC_ROMAN_FROM_INT
+)
 
 from . import regex_definitions
 
@@ -62,9 +64,11 @@ def label_identification(caption: str) -> dict:
 
     # Detect alphabetical labels.
     characters: list[str] = [
-        re.sub(pattern=r'[().:]',
-               repl='',
-               string=raw[0])
+        re.sub(
+            pattern=r'[().:]',
+            repl='',
+            string=raw[0]
+        )
         for raw
         in regex_definitions.RE_CHARACTERS.findall(caption)
     ]
@@ -80,9 +84,11 @@ def label_identification(caption: str) -> dict:
 
     # Detect roman numbers.
     romans: list[str] = [
-        re.sub(pattern=r'[().:]',
-               repl='',
-               string=raw[0])
+        re.sub(
+            pattern=r'[().:]',
+            repl='',
+            string=raw[0]
+        )
         for raw in
         regex_definitions.RE_ROMAN.findall(caption)
     ]
@@ -98,9 +104,11 @@ def label_identification(caption: str) -> dict:
 
     # Detect numerical labels.
     digits: list[str] = [
-        re.sub(pattern=r'[().:]',
-               repl='',
-               string=raw[0])
+        re.sub(
+            pattern=r'[().:]',
+            repl='',
+            string=raw[0]
+        )
         for raw
         in regex_definitions.RE_DIGITS.findall(caption)
     ]
@@ -165,8 +173,12 @@ def _expand_hyphen_range(hyphen_expressions: list[str]) -> list[str]:
             inf: int = int(range_pair[0])
             sup: int = int(range_pair[-1])
 
-            hyphen_range += list(map(str,
-                                     range(inf, sup + 1)))
+            hyphen_range += list(
+                map(
+                    str,
+                    range(inf, sup + 1)
+                )
+            )
 
         # Case 2/3: roman numbers.
         elif all(is_roman(r) for r in range_pair):
@@ -198,8 +210,12 @@ def _expand_hyphen_range(hyphen_expressions: list[str]) -> list[str]:
             # Get 'numerical' lower and upper bounds.
             inf = ord(range_pair[0])
             sup = ord(range_pair[-1])
-            hyphen_range += list(map(chr,
-                                     range(inf, sup + 1)))
+            hyphen_range += list(
+                map(
+                    chr,
+                    range(inf, sup + 1)
+                )
+            )
 
     return hyphen_range
 
@@ -220,9 +236,11 @@ def label_expansion(label_dict: dict) -> list[str]:
     # ==> Hyphen ranges.
     # Clean the elements and expand the sequences hyphen range.
     hyphen_cleaned: list[str] = [
-        re.sub(pattern=r'[().:]',
-               repl='',
-               string=element)
+        re.sub(
+            pattern=r'[().:]',
+            repl='',
+            string=element
+        )
         for element in label_dict['ranges']['hyphen']
     ]
 
@@ -231,9 +249,11 @@ def label_expansion(label_dict: dict) -> list[str]:
     # ==> Conjunction ranges.
     # Clean the identified patterns from useless characters.
     conj_range: list[str] = [
-        re.sub(pattern=r'[().:,]',
-               repl=' ',
-               string=element.replace('and', ' '))
+        re.sub(
+            pattern=r'[().:,]',
+            repl=' ',
+            string=element.replace('and', ' ')
+        )
         for element in label_dict['ranges']['conj']
     ]
 

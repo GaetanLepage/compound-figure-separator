@@ -50,8 +50,10 @@ def _parse_args(args: list[str]) -> Namespace:
     """
     parser: ArgumentParser = ArgumentParser(description="Evaluate caption splitting.")
 
-    add_json_arg(parser=parser,
-                 folder_default_relative_path='caption_splitting/output/')
+    add_json_arg(
+        parser=parser,
+        folder_default_path='caption_splitting/output/'
+    )
 
     return parser.parse_args(args)
 

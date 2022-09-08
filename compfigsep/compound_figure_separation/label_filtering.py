@@ -28,8 +28,10 @@ from typing import Optional
 from ..utils.figure.label import LabelStructure
 
 
-def label_filtering(text_labels: list[str],
-                    image_labels: Optional[list[str]] = None) -> LabelStructure:
+def label_filtering(
+    text_labels: list[str],
+    image_labels: Optional[list[str]] = None
+) -> LabelStructure:
     """
     Cross the image-based and text-based label detections.
 

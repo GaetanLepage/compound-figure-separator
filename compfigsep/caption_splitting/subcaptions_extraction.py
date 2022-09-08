@@ -75,8 +75,7 @@ class Position(NamedTuple):
     string_list: list[str]
 
     @classmethod
-    def from_match(cls,
-                   match: re.Match) -> Position:
+    def from_match(cls, match: re.Match) -> Position:
         """
         Create a Position object from a regex Match object.
 
@@ -93,8 +92,10 @@ class Position(NamedTuple):
         )
 
 
-def _sentence_preface(sentences_list: list[str],
-                      target_regex: re.Pattern) -> tuple[str, int]:
+def _sentence_preface(
+    sentences_list: list[str],
+    target_regex: re.Pattern
+) -> tuple[str, int]:
     """
     Search for the preface sentence in the caption.
 
@@ -117,9 +118,11 @@ def _sentence_preface(sentences_list: list[str],
     # Check beginning sentences that do not contain any image pointer
     for index, sentence in enumerate(sentences_list):
 
-        for regex in (target_regex,
-                      RE_CONJUNCTIONS,
-                      RE_HYPHEN):
+        for regex in (
+            target_regex,
+            RE_CONJUNCTIONS,
+            RE_HYPHEN
+        ):
 
             for match in regex.finditer(sentence):
 
@@ -141,8 +144,10 @@ def _sentence_preface(sentences_list: list[str],
     return preface, index
 
 
-def _label_positions(subcaption: str,
-                     target_regex: re.Pattern) -> list[Position]:
+def _label_positions(
+    subcaption: str,
+    target_regex: re.Pattern
+) -> list[Position]:
     """
     Set the positions of labels within the sentence
     TODO
@@ -288,8 +293,10 @@ def _remove_overlaps(positions: list[Position]) -> list[Position]:
     return list(itertools.compress(data=positions, selectors=mask))
 
 
-def _remove_pos(positions: list[Position],
-                positions_pos: list[Position]) -> None:
+def _remove_pos(
+    positions: list[Position],
+    positions_pos: list[Position]
+) -> None:
     """
     Remove from 'positions' elements that have been classified as POS labels.
 
@@ -311,9 +318,9 @@ def _remove_pos(positions: list[Position],
 
 
 def _post_labels(
-        subcaptions: dict[str, str],
-        subcapt: str,
-        positions: list[Position]
+    subcaptions: dict[str, str],
+    subcapt: str,
+    positions: list[Position]
 ) -> None:
     """
     Associate post description labels to sentences.
@@ -356,9 +363,9 @@ def _post_labels(
 
 
 def _pre_labels(
-        subcaptions: dict[str, str],
-        subcapt: str,
-        positions: list[Position]
+    subcaptions: dict[str, str],
+    subcapt: str,
+    positions: list[Position]
 ):
     """
     Associate pre description labels to sentences
@@ -405,8 +412,8 @@ def _pre_labels(
 
 
 def _clean_positions(
-        positions: list[Position],
-        selected_labels
+    positions: list[Position],
+    selected_labels
 ) -> list[Position]:
     """
     TODO
@@ -431,12 +438,12 @@ def _clean_positions(
 
 
 def _process_caption_subsentence(
-        caption_subsentence: str,
-        sub_labels: list[str],
-        sub_image_pointers: list[str],
-        subcaptions: dict[str, str],
-        fuzzy_captions: dict[str, str],
-        target_regex: re.Pattern
+    caption_subsentence: str,
+    sub_labels: list[str],
+    sub_image_pointers: list[str],
+    subcaptions: dict[str, str],
+    fuzzy_captions: dict[str, str],
+    target_regex: re.Pattern
 ) -> None:
     """
     TODO
@@ -518,13 +525,13 @@ def _process_caption_subsentence(
 
 
 def _process_caption_subsentence_pos(
-        caption_subsentence,
-        sub_labels: list[str],
-        sub_image_pointers: list[str],
-        subcaptions: dict[str, str],
-        fuzzy_captions: dict[str, str],
-        target_regex: re.Pattern,
-        target_regex_pos: re.Pattern
+    caption_subsentence,
+    sub_labels: list[str],
+    sub_image_pointers: list[str],
+    subcaptions: dict[str, str],
+    fuzzy_captions: dict[str, str],
+    target_regex: re.Pattern,
+    target_regex_pos: re.Pattern
 ) -> None:
     """
     TODO
@@ -668,13 +675,13 @@ def _process_caption_subsentence_pos(
 
 
 def _process_caption_sentence(
-        caption_sentence: str,
-        subcaptions: dict[str, str],
-        fuzzy_captions: dict[str, str],
-        image_pointers: list[str],
-        filtered_labels: list[str],
-        target_regex: re.Pattern,
-        target_regex_pos: re.Pattern
+    caption_sentence: str,
+    subcaptions: dict[str, str],
+    fuzzy_captions: dict[str, str],
+    image_pointers: list[str],
+    filtered_labels: list[str],
+    target_regex: re.Pattern,
+    target_regex_pos: re.Pattern
 ) -> list[str]:
     """
     TODO
@@ -914,8 +921,8 @@ def _process_caption_sentence(
 
 
 def extract_subcaptions(
-        caption: str,
-        label_structure: LabelStructure
+    caption: str,
+    label_structure: LabelStructure
 ) -> dict[str, str]:
     """
     Split the caption in sentences.
@@ -936,8 +943,14 @@ def extract_subcaptions(
     filtered_labels: list[str] = label_structure.get_core_label_list()
 
     # Initialize the dictionaries containing the subcaptions.
-    subcaptions: dict[str, str] = {label: '' for label in filtered_labels}
-    fuzzy_captions: dict[str, str] = {label: '' for label in filtered_labels}
+    subcaptions: dict[str, str] = {
+        label: ''
+        for label in filtered_labels
+    }
+    fuzzy_captions: dict[str, str] = {
+        label: ''
+        for label in filtered_labels
+    }
 
     # Get the regex from the label_structure.
     target_regex, target_regex_pos = LABEL_STRUCTURE_TO_REGEX[label_structure.labels_type]
